@@ -1,0 +1,23 @@
+
+Running 1 test using 1 worker
+
+  ✘  1 [chromium] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration (4.2s)
+
+
+  1) [chromium] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 
+
+    Error: locator.fill: value: expected string, got function
+
+      11 |     await page.getByPlaceholder('Display Name').fill(name);
+      12 |     await page.getByPlaceholder('Email Address').fill(email);
+    > 13 |     await page.getByPlaceholder('Password').fill(password123 => 'password123'); // Fixed string
+         |                                             ^
+      14 |     await page.getByPlaceholder('Password').fill('password123');
+      15 |     await page.getByRole('button', { name: 'Create Account' }).click();
+      16 |
+        at E:\APPS\AWAKE\tests\verify-vehicle-logic.spec.ts:13:45
+
+    Error Context: test-results\verify-vehicle-logic-Vehic-745c9--up-and-Finance-Integration-chromium\error-context.md
+
+  1 failed
+    [chromium] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 

@@ -1,0 +1,62 @@
+
+Running 3 tests using 3 workers
+
+  ✘  1 [webkit] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration (3.0s)
+  ✘  2 [chromium] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration (3.8s)
+  ✘  3 [firefox] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration (4.9s)
+
+
+  1) [chromium] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/login
+    Call log:
+    [2m  - navigating to "http://localhost:3000/login", waiting until "load"[22m
+
+
+       7 |     const name = `Vehicle Verifier`;
+       8 |
+    >  9 |     await page.goto('http://localhost:3000/login');
+         |                ^
+      10 |     await page.getByText('Create Account').click();
+      11 |     await page.getByPlaceholder('Display Name').fill(name);
+      12 |     await page.getByPlaceholder('Email Address').fill(email);
+        at E:\APPS\AWAKE\tests\verify-vehicle-logic.spec.ts:9:16
+
+  2) [firefox] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 
+
+    Error: page.goto: NS_ERROR_CONNECTION_REFUSED
+    Call log:
+    [2m  - navigating to "http://localhost:3000/login", waiting until "load"[22m
+
+
+       7 |     const name = `Vehicle Verifier`;
+       8 |
+    >  9 |     await page.goto('http://localhost:3000/login');
+         |                ^
+      10 |     await page.getByText('Create Account').click();
+      11 |     await page.getByPlaceholder('Display Name').fill(name);
+      12 |     await page.getByPlaceholder('Email Address').fill(email);
+        at E:\APPS\AWAKE\tests\verify-vehicle-logic.spec.ts:9:16
+
+    Error Context: test-results\verify-vehicle-logic-Vehic-745c9--up-and-Finance-Integration-firefox\error-context.md
+
+  3) [webkit] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 
+
+    Error: page.goto: Could not connect to server
+    Call log:
+    [2m  - navigating to "http://localhost:3000/login", waiting until "load"[22m
+
+
+       7 |     const name = `Vehicle Verifier`;
+       8 |
+    >  9 |     await page.goto('http://localhost:3000/login');
+         |                ^
+      10 |     await page.getByText('Create Account').click();
+      11 |     await page.getByPlaceholder('Display Name').fill(name);
+      12 |     await page.getByPlaceholder('Email Address').fill(email);
+        at E:\APPS\AWAKE\tests\verify-vehicle-logic.spec.ts:9:16
+
+  3 failed
+    [chromium] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 
+    [firefox] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 
+    [webkit] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 

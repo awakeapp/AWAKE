@@ -1,0 +1,55 @@
+
+Running 1 test using 1 worker
+
+Vehicle Management
+
+Track expenses, maintenance, and reminders for your fleet.
+
+Add First Vehicle
+Add New Vehicle
+Car
+Bike
+Scooter
+Commercial
+VEHICLE NAME (NICKNAME)
+BRAND & MODEL
+REG. NUMBER (OPTIONAL)
+FUEL TYPE
+Petrol
+Diesel
+Electric
+Hybrid
+CNG
+PURCHASE DATE
+ODOMETER (KM)
+Add Vehicle
+  ✘  1 [chromium] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration (13.2s)
+
+
+  1) [chromium] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText('Test Bike')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText('Test Bike')[22m
+
+
+      45 |     // Debug: Print body text
+      46 |     console.log(await page.locator('body').innerText());
+    > 47 |     await expect(page.getByText('Test Bike')).toBeVisible();
+         |                                               ^
+      48 |     await expect(page.getByText('1,000 km')).toBeVisible();
+      49 |
+      50 |     // 4. Add Follow-up
+        at E:\APPS\AWAKE\tests\verify-vehicle-logic.spec.ts:47:47
+
+    Error Context: test-results\verify-vehicle-logic-Vehic-745c9--up-and-Finance-Integration-chromium\error-context.md
+
+  1 failed
+    [chromium] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 

@@ -1,0 +1,28 @@
+
+Running 1 test using 1 worker
+
+  ✘  1 [chromium] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration (30.0s)
+
+
+  1) [chromium] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByText('Add Vehicle')[22m
+
+
+      28 |     } else {
+      29 |         // Fallback or explicit FAB if implemented
+    > 30 |         await page.getByText('Add Vehicle').click();
+         |                                             ^
+      31 |     }
+      32 |
+      33 |     await page.getByLabel('Vehicle Name').fill('Test Bike');
+        at E:\APPS\AWAKE\tests\verify-vehicle-logic.spec.ts:30:45
+
+    Error Context: test-results\verify-vehicle-logic-Vehic-745c9--up-and-Finance-Integration-chromium\error-context.md
+
+  1 failed
+    [chromium] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 

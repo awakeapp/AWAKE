@@ -1,0 +1,378 @@
+
+Running 12 tests using 4 workers
+
+  ✘   3 [chromium] › tests\verify-home-redesign.spec.ts:37:9 › Home Screen Redesign Verification › Zone 3: Wellness Insight (30.1s)
+  ✘   4 [chromium] › tests\verify-home-redesign.spec.ts:26:9 › Home Screen Redesign Verification › Zone 2: Support Modules (30.1s)
+  ✘   2 [chromium] › tests\verify-home-redesign.spec.ts:51:9 › Home Screen Redesign Verification › Bottom Navigation Structure (30.1s)
+  ✘   1 [chromium] › tests\verify-home-redesign.spec.ts:19:9 › Home Screen Redesign Verification › Zone 1: Routine Command Center (30.1s)
+  ✘   8 [firefox] › tests\verify-home-redesign.spec.ts:19:9 › Home Screen Redesign Verification › Zone 1: Routine Command Center (30.2s)
+  ✘   5 [firefox] › tests\verify-home-redesign.spec.ts:37:9 › Home Screen Redesign Verification › Zone 3: Wellness Insight (30.1s)
+  ✘   7 [firefox] › tests\verify-home-redesign.spec.ts:26:9 › Home Screen Redesign Verification › Zone 2: Support Modules (30.1s)
+  ✘   6 [firefox] › tests\verify-home-redesign.spec.ts:51:9 › Home Screen Redesign Verification › Bottom Navigation Structure (30.1s)
+  ✘   9 [webkit] › tests\verify-home-redesign.spec.ts:19:9 › Home Screen Redesign Verification › Zone 1: Routine Command Center (30.1s)
+  ✘  10 [webkit] › tests\verify-home-redesign.spec.ts:26:9 › Home Screen Redesign Verification › Zone 2: Support Modules (30.1s)
+  ✘  11 [webkit] › tests\verify-home-redesign.spec.ts:37:9 › Home Screen Redesign Verification › Zone 3: Wellness Insight (30.1s)
+  ✘  12 [webkit] › tests\verify-home-redesign.spec.ts:51:9 › Home Screen Redesign Verification › Bottom Navigation Structure (30.1s)
+
+
+  1) [chromium] › tests\verify-home-redesign.spec.ts:19:9 › Home Screen Redesign Verification › Zone 1: Routine Command Center 
+
+    [31mTest timeout of 30000ms exceeded while running "beforeEach" hook.[39m
+
+      2 |
+      3 | test.describe('Home Screen Redesign Verification', () => {
+    > 4 |     test.beforeEach(async ({ page }) => {
+        |          ^
+      5 |         // Log in first (simplified if possible, reusing auth logic from other tests)
+      6 |         const email = `testuser_${Date.now()}@example.com`;
+      7 |         const name = 'Test User';
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:4:10
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Sign Up' })[22m
+
+
+      12 |         await page.getByPlaceholder('Email Address').fill(email);
+      13 |         await page.getByPlaceholder('Password').fill('password123');
+    > 14 |         await page.getByRole('button', { name: 'Sign Up' }).click();
+         |                                                             ^
+      15 |
+      16 |         await page.waitForURL('http://localhost:3000/');
+      17 |     });
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:14:61
+
+    Error Context: test-results\verify-home-redesign-Home--1caa6-ne-1-Routine-Command-Center-chromium\error-context.md
+
+  2) [chromium] › tests\verify-home-redesign.spec.ts:26:9 › Home Screen Redesign Verification › Zone 2: Support Modules 
+
+    [31mTest timeout of 30000ms exceeded while running "beforeEach" hook.[39m
+
+      2 |
+      3 | test.describe('Home Screen Redesign Verification', () => {
+    > 4 |     test.beforeEach(async ({ page }) => {
+        |          ^
+      5 |         // Log in first (simplified if possible, reusing auth logic from other tests)
+      6 |         const email = `testuser_${Date.now()}@example.com`;
+      7 |         const name = 'Test User';
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:4:10
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Sign Up' })[22m
+
+
+      12 |         await page.getByPlaceholder('Email Address').fill(email);
+      13 |         await page.getByPlaceholder('Password').fill('password123');
+    > 14 |         await page.getByRole('button', { name: 'Sign Up' }).click();
+         |                                                             ^
+      15 |
+      16 |         await page.waitForURL('http://localhost:3000/');
+      17 |     });
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:14:61
+
+    Error Context: test-results\verify-home-redesign-Home--93aaa-tion-Zone-2-Support-Modules-chromium\error-context.md
+
+  3) [chromium] › tests\verify-home-redesign.spec.ts:37:9 › Home Screen Redesign Verification › Zone 3: Wellness Insight 
+
+    [31mTest timeout of 30000ms exceeded while running "beforeEach" hook.[39m
+
+      2 |
+      3 | test.describe('Home Screen Redesign Verification', () => {
+    > 4 |     test.beforeEach(async ({ page }) => {
+        |          ^
+      5 |         // Log in first (simplified if possible, reusing auth logic from other tests)
+      6 |         const email = `testuser_${Date.now()}@example.com`;
+      7 |         const name = 'Test User';
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:4:10
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Sign Up' })[22m
+
+
+      12 |         await page.getByPlaceholder('Email Address').fill(email);
+      13 |         await page.getByPlaceholder('Password').fill('password123');
+    > 14 |         await page.getByRole('button', { name: 'Sign Up' }).click();
+         |                                                             ^
+      15 |
+      16 |         await page.waitForURL('http://localhost:3000/');
+      17 |     });
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:14:61
+
+    Error Context: test-results\verify-home-redesign-Home--e8be4-ion-Zone-3-Wellness-Insight-chromium\error-context.md
+
+  4) [chromium] › tests\verify-home-redesign.spec.ts:51:9 › Home Screen Redesign Verification › Bottom Navigation Structure 
+
+    [31mTest timeout of 30000ms exceeded while running "beforeEach" hook.[39m
+
+      2 |
+      3 | test.describe('Home Screen Redesign Verification', () => {
+    > 4 |     test.beforeEach(async ({ page }) => {
+        |          ^
+      5 |         // Log in first (simplified if possible, reusing auth logic from other tests)
+      6 |         const email = `testuser_${Date.now()}@example.com`;
+      7 |         const name = 'Test User';
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:4:10
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Sign Up' })[22m
+
+
+      12 |         await page.getByPlaceholder('Email Address').fill(email);
+      13 |         await page.getByPlaceholder('Password').fill('password123');
+    > 14 |         await page.getByRole('button', { name: 'Sign Up' }).click();
+         |                                                             ^
+      15 |
+      16 |         await page.waitForURL('http://localhost:3000/');
+      17 |     });
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:14:61
+
+    Error Context: test-results\verify-home-redesign-Home--aca00-Bottom-Navigation-Structure-chromium\error-context.md
+
+  5) [firefox] › tests\verify-home-redesign.spec.ts:19:9 › Home Screen Redesign Verification › Zone 1: Routine Command Center 
+
+    [31mTest timeout of 30000ms exceeded while running "beforeEach" hook.[39m
+
+      2 |
+      3 | test.describe('Home Screen Redesign Verification', () => {
+    > 4 |     test.beforeEach(async ({ page }) => {
+        |          ^
+      5 |         // Log in first (simplified if possible, reusing auth logic from other tests)
+      6 |         const email = `testuser_${Date.now()}@example.com`;
+      7 |         const name = 'Test User';
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:4:10
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Sign Up' })[22m
+
+
+      12 |         await page.getByPlaceholder('Email Address').fill(email);
+      13 |         await page.getByPlaceholder('Password').fill('password123');
+    > 14 |         await page.getByRole('button', { name: 'Sign Up' }).click();
+         |                                                             ^
+      15 |
+      16 |         await page.waitForURL('http://localhost:3000/');
+      17 |     });
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:14:61
+
+    Error Context: test-results\verify-home-redesign-Home--1caa6-ne-1-Routine-Command-Center-firefox\error-context.md
+
+  6) [firefox] › tests\verify-home-redesign.spec.ts:26:9 › Home Screen Redesign Verification › Zone 2: Support Modules 
+
+    [31mTest timeout of 30000ms exceeded while running "beforeEach" hook.[39m
+
+      2 |
+      3 | test.describe('Home Screen Redesign Verification', () => {
+    > 4 |     test.beforeEach(async ({ page }) => {
+        |          ^
+      5 |         // Log in first (simplified if possible, reusing auth logic from other tests)
+      6 |         const email = `testuser_${Date.now()}@example.com`;
+      7 |         const name = 'Test User';
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:4:10
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Sign Up' })[22m
+
+
+      12 |         await page.getByPlaceholder('Email Address').fill(email);
+      13 |         await page.getByPlaceholder('Password').fill('password123');
+    > 14 |         await page.getByRole('button', { name: 'Sign Up' }).click();
+         |                                                             ^
+      15 |
+      16 |         await page.waitForURL('http://localhost:3000/');
+      17 |     });
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:14:61
+
+    Error Context: test-results\verify-home-redesign-Home--93aaa-tion-Zone-2-Support-Modules-firefox\error-context.md
+
+  7) [firefox] › tests\verify-home-redesign.spec.ts:37:9 › Home Screen Redesign Verification › Zone 3: Wellness Insight 
+
+    [31mTest timeout of 30000ms exceeded while running "beforeEach" hook.[39m
+
+      2 |
+      3 | test.describe('Home Screen Redesign Verification', () => {
+    > 4 |     test.beforeEach(async ({ page }) => {
+        |          ^
+      5 |         // Log in first (simplified if possible, reusing auth logic from other tests)
+      6 |         const email = `testuser_${Date.now()}@example.com`;
+      7 |         const name = 'Test User';
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:4:10
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Sign Up' })[22m
+
+
+      12 |         await page.getByPlaceholder('Email Address').fill(email);
+      13 |         await page.getByPlaceholder('Password').fill('password123');
+    > 14 |         await page.getByRole('button', { name: 'Sign Up' }).click();
+         |                                                             ^
+      15 |
+      16 |         await page.waitForURL('http://localhost:3000/');
+      17 |     });
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:14:61
+
+    Error Context: test-results\verify-home-redesign-Home--e8be4-ion-Zone-3-Wellness-Insight-firefox\error-context.md
+
+  8) [firefox] › tests\verify-home-redesign.spec.ts:51:9 › Home Screen Redesign Verification › Bottom Navigation Structure 
+
+    [31mTest timeout of 30000ms exceeded while running "beforeEach" hook.[39m
+
+      2 |
+      3 | test.describe('Home Screen Redesign Verification', () => {
+    > 4 |     test.beforeEach(async ({ page }) => {
+        |          ^
+      5 |         // Log in first (simplified if possible, reusing auth logic from other tests)
+      6 |         const email = `testuser_${Date.now()}@example.com`;
+      7 |         const name = 'Test User';
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:4:10
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Sign Up' })[22m
+
+
+      12 |         await page.getByPlaceholder('Email Address').fill(email);
+      13 |         await page.getByPlaceholder('Password').fill('password123');
+    > 14 |         await page.getByRole('button', { name: 'Sign Up' }).click();
+         |                                                             ^
+      15 |
+      16 |         await page.waitForURL('http://localhost:3000/');
+      17 |     });
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:14:61
+
+    Error Context: test-results\verify-home-redesign-Home--aca00-Bottom-Navigation-Structure-firefox\error-context.md
+
+  9) [webkit] › tests\verify-home-redesign.spec.ts:19:9 › Home Screen Redesign Verification › Zone 1: Routine Command Center 
+
+    [31mTest timeout of 30000ms exceeded while running "beforeEach" hook.[39m
+
+      2 |
+      3 | test.describe('Home Screen Redesign Verification', () => {
+    > 4 |     test.beforeEach(async ({ page }) => {
+        |          ^
+      5 |         // Log in first (simplified if possible, reusing auth logic from other tests)
+      6 |         const email = `testuser_${Date.now()}@example.com`;
+      7 |         const name = 'Test User';
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:4:10
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Sign Up' })[22m
+
+
+      12 |         await page.getByPlaceholder('Email Address').fill(email);
+      13 |         await page.getByPlaceholder('Password').fill('password123');
+    > 14 |         await page.getByRole('button', { name: 'Sign Up' }).click();
+         |                                                             ^
+      15 |
+      16 |         await page.waitForURL('http://localhost:3000/');
+      17 |     });
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:14:61
+
+    Error Context: test-results\verify-home-redesign-Home--1caa6-ne-1-Routine-Command-Center-webkit\error-context.md
+
+  10) [webkit] › tests\verify-home-redesign.spec.ts:26:9 › Home Screen Redesign Verification › Zone 2: Support Modules 
+
+    [31mTest timeout of 30000ms exceeded while running "beforeEach" hook.[39m
+
+      2 |
+      3 | test.describe('Home Screen Redesign Verification', () => {
+    > 4 |     test.beforeEach(async ({ page }) => {
+        |          ^
+      5 |         // Log in first (simplified if possible, reusing auth logic from other tests)
+      6 |         const email = `testuser_${Date.now()}@example.com`;
+      7 |         const name = 'Test User';
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:4:10
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Sign Up' })[22m
+
+
+      12 |         await page.getByPlaceholder('Email Address').fill(email);
+      13 |         await page.getByPlaceholder('Password').fill('password123');
+    > 14 |         await page.getByRole('button', { name: 'Sign Up' }).click();
+         |                                                             ^
+      15 |
+      16 |         await page.waitForURL('http://localhost:3000/');
+      17 |     });
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:14:61
+
+    Error Context: test-results\verify-home-redesign-Home--93aaa-tion-Zone-2-Support-Modules-webkit\error-context.md
+
+  11) [webkit] › tests\verify-home-redesign.spec.ts:37:9 › Home Screen Redesign Verification › Zone 3: Wellness Insight 
+
+    [31mTest timeout of 30000ms exceeded while running "beforeEach" hook.[39m
+
+      2 |
+      3 | test.describe('Home Screen Redesign Verification', () => {
+    > 4 |     test.beforeEach(async ({ page }) => {
+        |          ^
+      5 |         // Log in first (simplified if possible, reusing auth logic from other tests)
+      6 |         const email = `testuser_${Date.now()}@example.com`;
+      7 |         const name = 'Test User';
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:4:10
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Sign Up' })[22m
+
+
+      12 |         await page.getByPlaceholder('Email Address').fill(email);
+      13 |         await page.getByPlaceholder('Password').fill('password123');
+    > 14 |         await page.getByRole('button', { name: 'Sign Up' }).click();
+         |                                                             ^
+      15 |
+      16 |         await page.waitForURL('http://localhost:3000/');
+      17 |     });
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:14:61
+
+    Error Context: test-results\verify-home-redesign-Home--e8be4-ion-Zone-3-Wellness-Insight-webkit\error-context.md
+
+  12) [webkit] › tests\verify-home-redesign.spec.ts:51:9 › Home Screen Redesign Verification › Bottom Navigation Structure 
+
+    [31mTest timeout of 30000ms exceeded while running "beforeEach" hook.[39m
+
+      2 |
+      3 | test.describe('Home Screen Redesign Verification', () => {
+    > 4 |     test.beforeEach(async ({ page }) => {
+        |          ^
+      5 |         // Log in first (simplified if possible, reusing auth logic from other tests)
+      6 |         const email = `testuser_${Date.now()}@example.com`;
+      7 |         const name = 'Test User';
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:4:10
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Sign Up' })[22m
+
+
+      12 |         await page.getByPlaceholder('Email Address').fill(email);
+      13 |         await page.getByPlaceholder('Password').fill('password123');
+    > 14 |         await page.getByRole('button', { name: 'Sign Up' }).click();
+         |                                                             ^
+      15 |
+      16 |         await page.waitForURL('http://localhost:3000/');
+      17 |     });
+        at E:\APPS\AWAKE\tests\verify-home-redesign.spec.ts:14:61
+
+    Error Context: test-results\verify-home-redesign-Home--aca00-Bottom-Navigation-Structure-webkit\error-context.md
+
+  12 failed
+    [chromium] › tests\verify-home-redesign.spec.ts:19:9 › Home Screen Redesign Verification › Zone 1: Routine Command Center 
+    [chromium] › tests\verify-home-redesign.spec.ts:26:9 › Home Screen Redesign Verification › Zone 2: Support Modules 
+    [chromium] › tests\verify-home-redesign.spec.ts:37:9 › Home Screen Redesign Verification › Zone 3: Wellness Insight 
+    [chromium] › tests\verify-home-redesign.spec.ts:51:9 › Home Screen Redesign Verification › Bottom Navigation Structure 
+    [firefox] › tests\verify-home-redesign.spec.ts:19:9 › Home Screen Redesign Verification › Zone 1: Routine Command Center 
+    [firefox] › tests\verify-home-redesign.spec.ts:26:9 › Home Screen Redesign Verification › Zone 2: Support Modules 
+    [firefox] › tests\verify-home-redesign.spec.ts:37:9 › Home Screen Redesign Verification › Zone 3: Wellness Insight 
+    [firefox] › tests\verify-home-redesign.spec.ts:51:9 › Home Screen Redesign Verification › Bottom Navigation Structure 
+    [webkit] › tests\verify-home-redesign.spec.ts:19:9 › Home Screen Redesign Verification › Zone 1: Routine Command Center 
+    [webkit] › tests\verify-home-redesign.spec.ts:26:9 › Home Screen Redesign Verification › Zone 2: Support Modules 
+    [webkit] › tests\verify-home-redesign.spec.ts:37:9 › Home Screen Redesign Verification › Zone 3: Wellness Insight 
+    [webkit] › tests\verify-home-redesign.spec.ts:51:9 › Home Screen Redesign Verification › Bottom Navigation Structure 

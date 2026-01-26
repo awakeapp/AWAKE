@@ -1,0 +1,264 @@
+
+Running 3 tests using 3 workers
+
+Name: Test Bike
+Brand: Hero Splendor
+Odometer: 1000
+--- Page Content Post-Add ---
+Vehicle Dashboard
+Test Bike
+
+Hero Splendor
+
+TOTAL COST
+
+₹0
+
+MONTHLY
+
+₹0
+
+ODOMETER
+
+1,000 km
+
+Overview
+History
+Loans
+Check Routine
+Edit Details
+Reminders & Service
+Manage
+Add
+DUE SOON
+Chain Lubrication
+Due Feb 25, 2026
+Due at 1,500 km
+Recurring
+Dismiss
+Done
+UPCOMING
+Tyre Pressure
+Due Feb 25, 2026
+Recurring
+Dismiss
+Done
+Oil Change
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Engine Oil Filter
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Brake Check
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Coolant Check
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Pollution Certificate
+Due Jul 25, 2026
+Recurring
+Dismiss
+Done
+Air Filter
+Due Jan 25, 2027
+Due at 21,000 km
+Recurring
+Dismiss
+Done
+Battery Health
+Due Jan 25, 2027
+Recurring
+Dismiss
+Done
+Tyre Rotation
+Due Jan 25, 2027
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Wheel Alignment
+Due Jan 25, 2027
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+General Service
+Due Jan 25, 2027
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Accessories Maintenance
+Due Jan 25, 2027
+Recurring
+Dismiss
+Done
+Insurance Renewal
+Due Jan 25, 2027
+Recurring
+Dismiss
+Done
+Registration Renewal
+Due Jan 25, 2041
+Recurring
+Dismiss
+Done
+Insights & Alerts
+Monthly Cost: ₹0
+
+Average cost of ownership per month.
+  ✓  2 [chromium] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration (12.0s)
+Name: Test Bike
+Brand: Hero Splendor
+Odometer: 1000
+--- Page Content Post-Add ---
+
+Vehicle Dashboard
+
+Test Bike
+Hero Splendor
+TOTAL COST
+₹0
+MONTHLY
+₹0
+ODOMETER
+1,000 km
+Overview
+History
+Loans
+
+Check Routine
+
+Edit Details
+Reminders & Service
+Manage
+Add
+DUE SOON
+
+Chain Lubrication
+Due Feb 25, 2026
+Due at 1,500 km
+Recurring
+Dismiss
+Done
+UPCOMING
+
+Tyre Pressure
+Due Feb 25, 2026
+Recurring
+Dismiss
+Done
+Oil Change
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Engine Oil Filter
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Brake Check
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Coolant Check
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Pollution Certificate
+Due Jul 25, 2026
+Recurring
+Dismiss
+Done
+Air Filter
+Due Jan 25, 2027
+Due at 21,000 km
+Recurring
+Dismiss
+Done
+Battery Health
+Due Jan 25, 2027
+Recurring
+Dismiss
+Done
+Tyre Rotation
+Due Jan 25, 2027
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Wheel Alignment
+Due Jan 25, 2027
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+General Service
+Due Jan 25, 2027
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Accessories Maintenance
+Due Jan 25, 2027
+Recurring
+Dismiss
+Done
+Insurance Renewal
+Due Jan 25, 2027
+Recurring
+Dismiss
+Done
+Registration Renewal
+Due Jan 25, 2041
+Recurring
+Dismiss
+Done
+Insights & Alerts
+Monthly Cost: ₹0
+Average cost of ownership per month.
+
+  ✓  3 [webkit] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration (22.2s)
+  ✘  1 [firefox] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration (30.1s)
+
+
+  1) [firefox] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.waitForLoadState: Test timeout of 30000ms exceeded.
+
+      18 |     // 2. Navigate to Vehicle Dashboard
+      19 |     await page.goto('http://localhost:3000/vehicle');
+    > 20 |     await page.waitForLoadState('networkidle');
+         |                ^
+      21 |
+      22 |     // 3. Add Vehicle
+      23 |     const addVehBtn = page.getByRole('button', { name: 'Add First Vehicle' });
+        at E:\APPS\AWAKE\tests\verify-vehicle-logic.spec.ts:20:16
+
+    Error Context: test-results\verify-vehicle-logic-Vehic-745c9--up-and-Finance-Integration-firefox\error-context.md
+
+  1 failed
+    [firefox] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 
+  2 passed (38.1s)

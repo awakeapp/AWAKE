@@ -1,0 +1,460 @@
+
+Running 3 tests using 3 workers
+
+Name: Test Bike
+Brand: Hero Splendor
+Odometer: 1000
+--- Page Content Post-Add ---
+Vehicle Dashboard
+Test Bike
+
+Hero Splendor
+
+TOTAL COST
+
+₹0
+
+MONTHLY
+
+₹0
+
+ODOMETER
+
+1,000 km
+
+Overview
+History
+Loans
+Check Routine
+Edit Details
+Reminders & Service
+Manage
+Add
+DUE SOON
+Chain Lubrication
+Due Feb 25, 2026
+Due at 1,500 km
+Recurring
+Dismiss
+Done
+UPCOMING
+Tyre Pressure
+Due Feb 25, 2026
+Recurring
+Dismiss
+Done
+Oil Change
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Engine Oil Filter
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Brake Check
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Coolant Check
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Pollution Certificate
+Due Jul 25, 2026
+Recurring
+Dismiss
+Done
+Air Filter
+Due Jan 25, 2027
+Due at 21,000 km
+Recurring
+Dismiss
+Done
+Battery Health
+Due Jan 25, 2027
+Recurring
+Dismiss
+Done
+Tyre Rotation
+Due Jan 25, 2027
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Wheel Alignment
+Due Jan 25, 2027
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+General Service
+Due Jan 25, 2027
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Accessories Maintenance
+Due Jan 25, 2027
+Recurring
+Dismiss
+Done
+Insurance Renewal
+Due Jan 25, 2027
+Recurring
+Dismiss
+Done
+Registration Renewal
+Due Jan 25, 2041
+Recurring
+Dismiss
+Done
+Insights & Alerts
+Monthly Cost: ₹0
+
+Average cost of ownership per month.
+  ✘  2 [chromium] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration (13.2s)
+Name: Test Bike
+Brand: Hero Splendor
+Odometer: 1000
+--- Page Content Post-Add ---
+
+Vehicle Dashboard
+
+Test Bike
+Hero Splendor
+TOTAL COST
+₹0
+MONTHLY
+₹0
+ODOMETER
+1,000 km
+Overview
+History
+Loans
+
+Check Routine
+
+Edit Details
+Reminders & Service
+Manage
+Add
+DUE SOON
+
+Chain Lubrication
+Due Feb 25, 2026
+Due at 1,500 km
+Recurring
+Dismiss
+Done
+UPCOMING
+
+Tyre Pressure
+Due Feb 25, 2026
+Recurring
+Dismiss
+Done
+Oil Change
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Engine Oil Filter
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Brake Check
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Coolant Check
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Pollution Certificate
+Due Jul 25, 2026
+Recurring
+Dismiss
+Done
+Air Filter
+Due Jan 25, 2027
+Due at 21,000 km
+Recurring
+Dismiss
+Done
+Battery Health
+Due Jan 25, 2027
+Recurring
+Dismiss
+Done
+Tyre Rotation
+Due Jan 25, 2027
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Wheel Alignment
+Due Jan 25, 2027
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+General Service
+Due Jan 25, 2027
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Accessories Maintenance
+Due Jan 25, 2027
+Recurring
+Dismiss
+Done
+Insurance Renewal
+Due Jan 25, 2027
+Recurring
+Dismiss
+Done
+Registration Renewal
+Due Jan 25, 2041
+Recurring
+Dismiss
+Done
+Insights & Alerts
+Monthly Cost: ₹0
+Average cost of ownership per month.
+
+Name: Test Bike
+Brand: Hero Splendor
+Odometer: 1000
+  ✘  1 [webkit] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration (19.9s)
+--- Page Content Post-Add ---
+Vehicle Dashboard
+Test Bike
+
+Hero Splendor
+
+TOTAL COST
+
+₹0
+
+MONTHLY
+
+₹0
+
+ODOMETER
+
+1,000 km
+
+Overview
+History
+Loans
+Check Routine
+Edit Details
+Reminders & Service
+Manage
+Add
+DUE SOON
+Chain Lubrication
+Due Feb 25, 2026
+Due at 1,500 km
+Recurring
+Dismiss
+Done
+UPCOMING
+Tyre Pressure
+Due Feb 25, 2026
+Recurring
+Dismiss
+Done
+Oil Change
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Engine Oil Filter
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Brake Check
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Coolant Check
+Due Jul 25, 2026
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Pollution Certificate
+Due Jul 25, 2026
+Recurring
+Dismiss
+Done
+Air Filter
+Due Jan 25, 2027
+Due at 21,000 km
+Recurring
+Dismiss
+Done
+Battery Health
+Due Jan 25, 2027
+Recurring
+Dismiss
+Done
+Tyre Rotation
+Due Jan 25, 2027
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Wheel Alignment
+Due Jan 25, 2027
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+General Service
+Due Jan 25, 2027
+Due at 11,000 km
+Recurring
+Dismiss
+Done
+Accessories Maintenance
+Due Jan 25, 2027
+Recurring
+Dismiss
+Done
+Insurance Renewal
+Due Jan 25, 2027
+Recurring
+Dismiss
+Done
+Registration Renewal
+Due Jan 25, 2041
+Recurring
+Dismiss
+Done
+Insights & Alerts
+Monthly Cost: ₹0
+
+Average cost of ownership per month.
+  ✘  3 [firefox] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration (19.0s)
+
+
+  1) [chromium] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText('1,000 km')
+    Expected: visible
+    Error: strict mode violation: getByText('1,000 km') resolved to 9 elements:
+        1) <p class="font-bold text-sm">1,000 km</p> aka getByText('1,000 km', { exact: true })
+        2) <span class="flex items-center gap-1">…</span> aka getByText('Due at 11,000 km').first()
+        3) <span class="flex items-center gap-1">…</span> aka getByText('Due at 11,000 km').nth(1)
+        4) <span class="flex items-center gap-1">…</span> aka getByText('Due at 11,000 km').nth(2)
+        5) <span class="flex items-center gap-1">…</span> aka getByText('Due at 11,000 km').nth(3)
+        6) <span class="flex items-center gap-1">…</span> aka getByText('Due at 21,000 km')
+        7) <span class="flex items-center gap-1">…</span> aka getByText('Due at 11,000 km').nth(4)
+        8) <span class="flex items-center gap-1">…</span> aka getByText('Due at 11,000 km').nth(5)
+        9) <span class="flex items-center gap-1">…</span> aka locator('div:nth-child(12) > .flex.justify-between.items-start > .flex.items-center.gap-2 > div > .text-\\[10px\\] > span:nth-child(2)')
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText('1,000 km')[22m
+
+
+      54 |     // Verify Vehicle Card
+      55 |     await expect(page.getByText('Test Bike', { exact: true })).toBeVisible();
+    > 56 |     await expect(page.getByText('1,000 km')).toBeVisible();
+         |                                              ^
+      57 |
+      58 |     // 4. Add Follow-up
+      59 |     await page.getByRole('button', { name: 'Add', exact: true }).click();
+        at E:\APPS\AWAKE\tests\verify-vehicle-logic.spec.ts:56:46
+
+    Error Context: test-results\verify-vehicle-logic-Vehic-745c9--up-and-Finance-Integration-chromium\error-context.md
+
+  2) [firefox] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText('1,000 km')
+    Expected: visible
+    Error: strict mode violation: getByText('1,000 km') resolved to 9 elements:
+        1) <p class="font-bold text-sm">1,000 km</p> aka getByText('1,000 km', { exact: true })
+        2) <span class="flex items-center gap-1">…</span> aka getByText('Due at 11,000 km').first()
+        ...
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText('1,000 km')[22m
+
+
+      54 |     // Verify Vehicle Card
+      55 |     await expect(page.getByText('Test Bike', { exact: true })).toBeVisible();
+    > 56 |     await expect(page.getByText('1,000 km')).toBeVisible();
+         |                                              ^
+      57 |
+      58 |     // 4. Add Follow-up
+      59 |     await page.getByRole('button', { name: 'Add', exact: true }).click();
+        at E:\APPS\AWAKE\tests\verify-vehicle-logic.spec.ts:56:46
+
+    Error Context: test-results\verify-vehicle-logic-Vehic-745c9--up-and-Finance-Integration-firefox\error-context.md
+
+  3) [webkit] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText('1,000 km')
+    Expected: visible
+    Error: strict mode violation: getByText('1,000 km') resolved to 9 elements:
+        1) <p class="font-bold text-sm">1,000 km</p> aka getByText('1,000 km', { exact: true })
+        2) <span class="flex items-center gap-1">…</span> aka getByText('Due at 11,000 km').first()
+        3) <span class="flex items-center gap-1">…</span> aka getByText('Due at 11,000 km').nth(1)
+        4) <span class="flex items-center gap-1">…</span> aka getByText('Due at 11,000 km').nth(2)
+        5) <span class="flex items-center gap-1">…</span> aka getByText('Due at 11,000 km').nth(3)
+        6) <span class="flex items-center gap-1">…</span> aka getByText('Due at 21,000 km')
+        7) <span class="flex items-center gap-1">…</span> aka getByText('Due at 11,000 km').nth(4)
+        8) <span class="flex items-center gap-1">…</span> aka getByText('Due at 11,000 km').nth(5)
+        9) <span class="flex items-center gap-1">…</span> aka locator('div:nth-child(12) > .flex.justify-between.items-start > .flex.items-center.gap-2 > div > .text-\\[10px\\] > span:nth-child(2)')
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText('1,000 km')[22m
+
+
+      54 |     // Verify Vehicle Card
+      55 |     await expect(page.getByText('Test Bike', { exact: true })).toBeVisible();
+    > 56 |     await expect(page.getByText('1,000 km')).toBeVisible();
+         |                                              ^
+      57 |
+      58 |     // 4. Add Follow-up
+      59 |     await page.getByRole('button', { name: 'Add', exact: true }).click();
+        at E:\APPS\AWAKE\tests\verify-vehicle-logic.spec.ts:56:46
+
+    Error Context: test-results\verify-vehicle-logic-Vehic-745c9--up-and-Finance-Integration-webkit\error-context.md
+
+  3 failed
+    [chromium] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 
+    [firefox] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 
+    [webkit] › tests\verify-vehicle-logic.spec.ts:3:5 › Vehicle Logic: Add Vehicle, Follow-up, and Finance Integration 

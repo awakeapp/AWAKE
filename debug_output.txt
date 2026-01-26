@@ -1,0 +1,30 @@
+﻿
+Running 1 test using 1 worker
+
+[1A[2K[1/1] [chromium] ÔÇ║ tests\verify-settings-logout.spec.ts:4:5 ÔÇ║ verify settings update and logout flow
+[1A[2K[chromium] ÔÇ║ tests\verify-settings-logout.spec.ts:4:5 ÔÇ║ verify settings update and logout flow
+Creating user for verification: verify1769243862681@example.com
+
+[1A[2K  1) [chromium] ÔÇ║ tests\verify-settings-logout.spec.ts:4:5 ÔÇ║ verify settings update and logout flow 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button:has(.lucide-edit-2)').first()[22m
+
+
+      36 |
+      37 |     // Let's try to find the button near the name.
+    > 38 |     await page.locator('button:has(.lucide-edit-2)').first().click({ force: true });
+         |                                                              ^
+      39 |
+      40 |     // 4. Fill new name
+      41 |     await page.locator('input[value="' + name + '"]').fill(newName);
+        at E:\APPS\AWAKE\tests\verify-settings-logout.spec.ts:38:62
+
+    Error Context: test-results\verify-settings-logout-ver-c2f62-ings-update-and-logout-flow-chromium\error-context.md
+
+
+[1A[2K  1 failed
+    [chromium] ÔÇ║ tests\verify-settings-logout.spec.ts:4:5 ÔÇ║ verify settings update and logout flow ÔöÇ
