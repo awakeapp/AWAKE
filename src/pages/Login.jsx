@@ -6,121 +6,73 @@ import { useAuthContext } from '../hooks/useAuthContext';
 import Button from '../components/atoms/Button';
 import Input from '../components/atoms/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/atoms/Card';
-import { UserCircle2, ArrowRight, Sparkles, Smartphone, Mail, Hash } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import awakeLogo from '../assets/awake_logo_new.png';
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { auth } from '../lib/firebase';
 
 const Login = () => {
     const [isSignup, setIsSignup] = useState(false);
-    const [identifier, setIdentifier] = useState('');
+    const [identifier, setIdentifier] = useState(''); // Email
     const [password, setPassword] = useState('');
     const [displayName, setDisplayName] = useState('');
-    const [phone, setPhone] = useState('');
-    const [signupMethod, setSignupMethod] = useState('email'); // 'email' or 'phone'
-    const [isOtpPhase, setIsOtpPhase] = useState(false);
-    const [otp, setOtp] = useState('');
-    const [generatedOtp, setGeneratedOtp] = useState('');
+    const [googleError, setGoogleError] = useState(null);
+    const [isGooglePending, setIsGooglePending] = useState(false);
 
     const { login, error: loginError, isPending: loginPending } = useLogin();
-    const { signup, verifyOtp, error: signupError, isPending: signupPending } = useSignup();
-    const { user } = useAuthContext();
-    const [migrating, setMigrating] = useState(false);
-    const [localUsersFound, setLocalUsersFound] = useState(false);
-
-    // Check for local users on mount
-    useState(() => {
-        const localUsers = JSON.parse(localStorage.getItem('awake_users') || '[]');
-        if (localUsers.length > 0) {
-            setLocalUsersFound(true);
-        }
-    }, []);
-
-    const handleMigration = async () => {
-        if (!confirm("This will upload your local accounts to the cloud. You will need to Reset Your Password to log in afterwards. Continue?")) return;
-
-        setMigrating(true);
-        try {
-            const localUsers = JSON.parse(localStorage.getItem('awake_users') || '[]');
-            const { api } = await import('../services/api'); // Dynamic import to avoid circular dep if any, or just import at top
-
-            // We need to shape the data for backend
-            // Backend expects: [{ email, phone, displayName, uid }]
-            const usersToMigrate = localUsers.map(u => ({
-                email: u.email,
-                phone: u.phone,
-                displayName: u.displayName,
-                uid: u.uid
-            }));
-
-            const res = await api.auth('migrateUsers', { users: usersToMigrate });
-
-            if (res.success) {
-                alert(`Migration Successful! \nSuccess: ${res.data.success}, Failed/Example: ${res.data.failed}\n\nPlease 'Forgot Password' to set your new secure password.`);
-                // Clear local users to prevent re-migration
-                localStorage.removeItem('awake_users');
-                setLocalUsersFound(false);
-            } else {
-                alert("Migration encountered an error: " + (res.data?.message || res.error?.message));
-            }
-        } catch (e) {
-            console.error(e);
-            alert("Migration Failed");
-        } finally {
-            setMigrating(false);
-        }
-    };
-
-    const handleSignupInitiate = async (e) => {
-        e.preventDefault();
-        try {
-            const data = await signup(
-                signupMethod === 'email' ? identifier : '',
-                password,
-                displayName,
-                signupMethod === 'phone' ? identifier : ''
-            );
-
-            if (data) {
-                setIsOtpPhase(true);
-                if (data.dev_otp) {
-                    alert(`Verification Code (Dev Mode): ${data.dev_otp}`);
-                } else {
-                    alert('Verification code sent to your device.');
-                }
-            }
-        } catch (e) {
-            console.error("Signup Init Failed", e);
-        }
-    };
-
-    const handleOtpVerify = async (e) => {
-        e.preventDefault();
-        try {
-            await verifyOtp(identifier, otp);
-            // Verification successful, now auto-login
-            await login(identifier, password);
-        } catch (e) {
-            console.error("Verification Failed", e);
-        }
-    };
+    const { signup, error: signupError, isPending: signupPending } = useSignup();
+    const { user, authIsReady } = useAuthContext();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setGoogleError(null);
         if (isSignup) {
-            handleSignupInitiate(e);
+            await signup(identifier, password, displayName);
         } else {
             await login(identifier, password);
         }
     };
 
+    const handleGoogleLogin = async () => {
+        setGoogleError(null);
+        setIsGooglePending(true);
+        const provider = new GoogleAuthProvider();
+
+        try {
+            await signInWithPopup(auth, provider);
+        } catch (err) {
+            console.error("Error signing in with Google:", err);
+            let errorMessage = "Failed to sign in with Google.";
+            if (err.code === 'auth/popup-closed-by-user') {
+                errorMessage = "Sign-in popup was closed.";
+            } else if (err.code === 'auth/cancelled-popup-request') {
+                errorMessage = "Only one popup request is allowed at a time.";
+            } else if (err.code === 'auth/popup-blocked') {
+                errorMessage = "Sign-in popup was blocked by the browser.";
+            } else if (err.code === 'auth/operation-not-allowed') {
+                errorMessage = "Google Sign-In is not enabled in Firebase Console.";
+            } else if (err.code === 'auth/unauthorized-domain') {
+                errorMessage = "This domain is not authorized in Firebase Console.";
+            } else {
+                errorMessage = err.message || "An unknown error occurred.";
+            }
+            setGoogleError(errorMessage);
+            setIsGooglePending(false);
+        }
+    };
+
     const toggleMode = () => {
         setIsSignup(!isSignup);
-        setIsOtpPhase(false);
         setIdentifier('');
         setPassword('');
         setDisplayName('');
-        setOtp('');
+        setGoogleError(null);
     };
+
+    if (!authIsReady) {
+        return <div className="min-h-screen bg-slate-50 dark:bg-slate-950" />;
+    }
 
     if (user) {
         return <Navigate to="/" replace />;
@@ -151,174 +103,146 @@ const Login = () => {
                             </div>
                         </div>
                         <CardTitle className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-                            {isSignup ? (isOtpPhase ? 'Verify Identity' : 'Begin Journey') : 'Welcome Back'}
+                            {isSignup ? 'Create Account' : 'Welcome Back'}
                         </CardTitle>
                         <p className="text-slate-500 font-medium dark:text-slate-400">
-                            {isOtpPhase
-                                ? `Enter the 6-digit code sent to your ${signupMethod}`
-                                : isSignup ? 'Create your universal identity' : 'Enter credentials to access your space'}
+                            {isSignup ? 'Create your universal identity' : 'Sign in to access your space'}
                         </p>
                     </CardHeader>
 
                     <CardContent className="px-8 pb-10">
-                        {!isOtpPhase ? (
-                            <form onSubmit={handleSubmit} className="space-y-5">
-                                <AnimatePresence mode="popLayout">
-                                    {isSignup && (
-                                        <motion.div
-                                            initial={{ opacity: 0, height: 0 }}
-                                            animate={{ opacity: 1, height: 'auto' }}
-                                            exit={{ opacity: 0, height: 0 }}
-                                            className="space-y-4 overflow-hidden"
-                                        >
-                                            <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setSignupMethod('email')}
-                                                    className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold rounded-lg transition-all ${signupMethod === 'email' ? 'bg-white shadow-sm text-indigo-600 dark:bg-slate-700 dark:text-white' : 'text-slate-500 hover:text-slate-700'}`}
-                                                >
-                                                    <Mail className="w-3 h-3" /> Email
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setSignupMethod('phone')}
-                                                    className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold rounded-lg transition-all ${signupMethod === 'phone' ? 'bg-white shadow-sm text-indigo-600 dark:bg-slate-700 dark:text-white' : 'text-slate-500 hover:text-slate-700'}`}
-                                                >
-                                                    <Smartphone className="w-3 h-3" /> Phone
-                                                </button>
-                                            </div>
-
-                                            <Input
-                                                type="text"
-                                                placeholder="Unique Username"
-                                                value={displayName}
-                                                onChange={(e) => setDisplayName(e.target.value)}
-                                                required
-                                                className="h-12 bg-slate-50 border-transparent focus:bg-white transition-all text-lg"
-                                            />
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-
-                                <div className="space-y-4">
-                                    <Input
-                                        type={isSignup ? (signupMethod === 'email' ? "email" : "tel") : "text"}
-                                        placeholder={isSignup ? (signupMethod === 'email' ? "Email Address" : "Phone Number") : "Email, Phone or Username"}
-                                        value={identifier}
-                                        onChange={(e) => setIdentifier(e.target.value)}
-                                        autoComplete={isSignup ? (signupMethod === 'email' ? "email" : "tel") : "username"}
-                                        required
-                                        className="h-12 bg-slate-50 border-transparent focus:bg-white transition-all text-lg"
-                                    />
-
-                                    <div className="space-y-1">
+                        <form onSubmit={handleSubmit} className="space-y-5">
+                            <AnimatePresence mode="popLayout">
+                                {isSignup && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="space-y-4 overflow-hidden"
+                                    >
                                         <Input
-                                            type="password"
-                                            placeholder="Password"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            autoComplete={isSignup ? "new-password" : "current-password"}
+                                            type="text"
+                                            placeholder="Display Name"
+                                            value={displayName}
+                                            onChange={(e) => setDisplayName(e.target.value)}
                                             required
                                             className="h-12 bg-slate-50 border-transparent focus:bg-white transition-all text-lg"
                                         />
-                                        {!isSignup && (
-                                            <div className="flex justify-end">
-                                                <Link
-                                                    to="/forgot-password"
-                                                    className="text-xs font-medium text-indigo-600 hover:text-indigo-700 hover:underline dark:text-indigo-400"
-                                                >
-                                                    Forgot password?
-                                                </Link>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {error && (
-                                    <motion.div
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        className="text-sm font-medium text-red-600 bg-red-50 p-3 rounded-xl border border-red-100 flex items-center gap-2"
-                                    >
-                                        <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                                        {error.replace('Firebase:', '').replace('Error', '').trim()}
                                     </motion.div>
                                 )}
+                            </AnimatePresence>
 
-                                <Button
-                                    type="submit"
-                                    className="w-full h-12 text-lg font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 dark:shadow-none rounded-xl"
-                                    isLoading={isPending}
-                                >
-                                    {isSignup ? 'Send Code' : 'Sign In'}
-                                    {!isPending && <ArrowRight className="ml-2 w-5 h-5" />}
-                                </Button>
+                            <div className="space-y-4">
+                                <Input
+                                    type="email"
+                                    placeholder="Email address"
+                                    value={identifier}
+                                    onChange={(e) => setIdentifier(e.target.value)}
+                                    autoComplete="email"
+                                    required
+                                    className="h-12 bg-slate-50 border-transparent focus:bg-white transition-all text-lg"
+                                />
 
-                                <div className="text-center">
-                                    <button
-                                        type="button"
-                                        onClick={toggleMode}
-                                        className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors py-2 px-4 rounded-lg hover:bg-indigo-50 dark:text-slate-400 dark:hover:text-indigo-400 dark:hover:bg-slate-800"
-                                    >
-                                        {isSignup ? (
-                                            <>Already have credentials? <span className="text-indigo-600 dark:text-indigo-400">Sign In</span></>
-                                        ) : (
-                                            <>New here? <span className="text-indigo-600 dark:text-indigo-400">Create Account</span></>
-                                        )}
-                                    </button>
+                                <div className="space-y-1">
+                                    <Input
+                                        type="password"
+                                        placeholder="Password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        autoComplete={isSignup ? "new-password" : "current-password"}
+                                        required
+                                        className="h-12 bg-slate-50 border-transparent focus:bg-white transition-all text-lg"
+                                    />
+                                    {!isSignup && (
+                                        <div className="flex justify-end">
+                                            <Link
+                                                to="/forgot-password"
+                                                className="text-xs font-medium text-indigo-600 hover:text-indigo-700 hover:underline dark:text-indigo-400"
+                                            >
+                                                Forgot password?
+                                            </Link>
+                                        </div>
+                                    )}
                                 </div>
-                            </form>
-                        ) : (
-                            <form onSubmit={handleOtpVerify} className="space-y-6">
-                                <div className="space-y-4">
-                                    <div className="flex justify-center gap-2">
-                                        <Input
-                                            type="text"
-                                            maxLength="6"
-                                            placeholder="Enter 6-digit code"
-                                            value={otp}
-                                            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                                            required
-                                            className="h-16 text-center text-2xl tracking-[0.5em] font-black bg-slate-50 border-transparent focus:bg-white transition-all"
+                            </div>
+
+                            {(error || googleError) && (
+                                <motion.div
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    className="text-sm font-medium text-red-600 bg-red-50 p-3 rounded-xl border border-red-100 flex items-center gap-2"
+                                >
+                                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                                    {googleError || error?.replace('Firebase:', '').replace('Error', '').trim()}
+                                </motion.div>
+                            )}
+
+                            <Button
+                                type="submit"
+                                className="w-full h-12 text-lg font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 dark:shadow-none rounded-xl"
+                                isLoading={isPending}
+                            >
+                                {isSignup ? 'Create Account' : 'Sign In'}
+                                {!isPending && <ArrowRight className="ml-2 w-5 h-5" />}
+                            </Button>
+
+                            <div className="relative">
+                                <div className="absolute inset-0 flex items-center">
+                                    <span className="w-full border-t border-slate-200 dark:border-slate-700" />
+                                </div>
+                                <div className="relative flex justify-center text-xs uppercase">
+                                    <span className="bg-white px-2 text-slate-500 dark:bg-slate-900 dark:text-slate-400">
+                                        Or continue with
+                                    </span>
+                                </div>
+                            </div>
+
+                            <Button
+                                type="button"
+                                onClick={handleGoogleLogin}
+                                className="w-full h-12 text-base font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-sm hover:shadow-md transition-all rounded-xl flex items-center justify-center gap-3 dark:bg-slate-800 dark:border-slate-700 dark:text-white dark:hover:bg-slate-700"
+                                isLoading={isGooglePending}
+                            >
+                                {!isGooglePending && (
+                                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                                        <path
+                                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                                            fill="#4285F4"
                                         />
-                                    </div>
-                                    <p className="text-center text-xs text-slate-400">
-                                        Didn't receive code? <button type="button" onClick={handleSignupInitiate} className="text-indigo-600 font-bold hover:underline">Resend</button>
-                                    </p>
-                                </div>
+                                        <path
+                                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                                            fill="#34A853"
+                                        />
+                                        <path
+                                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.84z"
+                                            fill="#FBBC05"
+                                        />
+                                        <path
+                                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                                            fill="#EA4335"
+                                        />
+                                    </svg>
+                                )}
+                                Google
+                            </Button>
 
-                                <Button
-                                    type="submit"
-                                    className="w-full h-12 text-lg font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 dark:shadow-none rounded-xl"
-                                    isLoading={isPending}
-                                >
-                                    Verify & Create Account
-                                </Button>
-
+                            <div className="text-center pt-2">
                                 <button
                                     type="button"
-                                    onClick={() => setIsOtpPhase(false)}
-                                    className="w-full text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors"
+                                    onClick={toggleMode}
+                                    className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors py-2 px-4 rounded-lg hover:bg-indigo-50 dark:text-slate-400 dark:hover:text-indigo-400 dark:hover:bg-slate-800"
                                 >
-                                    Change email/phone
+                                    {isSignup ? (
+                                        <>Already have account? <span className="text-indigo-600 dark:text-indigo-400">Sign In</span></>
+                                    ) : (
+                                        <>New here? <span className="text-indigo-600 dark:text-indigo-400">Create Account</span></>
+                                    )}
                                 </button>
-                            </form>
-                        )}
+                            </div>
+                        </form>
                     </CardContent>
                 </Card>
             </motion.div>
-
-            {localUsersFound && (
-                <div className="absolute bottom-16 left-0 w-full flex justify-center z-20">
-                    <button
-                        onClick={handleMigration}
-                        disabled={migrating}
-                        className="bg-amber-100 text-amber-800 px-4 py-2 rounded-full text-xs font-bold shadow-lg hover:bg-amber-200 transition-colors flex items-center gap-2"
-                    >
-                        {migrating ? 'Syncing...' : '⚠️ Sync Local Accounts to Cloud'}
-                    </button>
-                </div>
-            )}
 
             <div className="absolute bottom-4 left-0 w-full text-center z-10">
                 <p className="text-[10px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-[0.2em] opacity-60">

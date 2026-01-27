@@ -1,50 +1,40 @@
 import { useState } from 'react';
-import { api } from '../services/api';
+import { auth, sendPasswordResetEmail } from '../lib/firebase';
 
 export const useResetPassword = () => {
     const [error, setError] = useState(null);
     const [isPending, setIsPending] = useState(false);
     const [success, setSuccess] = useState(false);
 
-    // Step 1: Request OTP
-    const initiateReset = async (identifier) => {
-        setError(null);
-        setIsPending(true);
-        try {
-            const res = await api.auth('initiatePasswordReset', { identifier });
-            if (!res.success) throw new Error(res.error.message || 'Failed to initiate reset');
-            setIsPending(false);
-            return res.data; // might contain dev_otp
-        } catch (err) {
-            setError(err.message);
-            setIsPending(false);
-            throw err;
-        }
-    };
-
-    // Step 2 & 3: Verify OTP and Set New Password
-    const confirmReset = async (identifier, otp, newPassword) => {
+    const resetPassword = async (email) => {
         setError(null);
         setIsPending(true);
         setSuccess(false);
 
         try {
-            const res = await api.auth('completePasswordReset', {
-                identifier,
-                otp,
-                newPassword
-            });
-
-            if (!res.success) throw new Error(res.error.message || 'Reset failed');
-
+            await sendPasswordResetEmail(auth, email);
             setSuccess(true);
             setIsPending(false);
         } catch (err) {
-            console.log(err.message);
-            setError(err.message);
+            console.error(err);
+            let errorMessage = "Failed to send reset email";
+            if (err.code === 'auth/user-not-found') {
+                // Security: usually we shouldn't reveal this, but for UX requests we often do. 
+                // Standard security practice: "If that email exists, we sent a link."
+                // But for this project's scope, let's keep it helpful or generic as per instructions?
+                // Instructions: "Generic error messages".
+                errorMessage = "If an account exists, a reset link has been sent.";
+                // Actually returning success even if not found is the most secure way (User Enumeration prevention).
+                setSuccess(true);
+                setIsPending(false);
+                return;
+            } else if (err.code === 'auth/invalid-email') {
+                errorMessage = "Invalid email address";
+            }
+            setError(errorMessage);
             setIsPending(false);
         }
     };
 
-    return { initiateReset, confirmReset, error, isPending, success };
+    return { resetPassword, error, isPending, success };
 };
