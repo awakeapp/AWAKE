@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { format, startOfMonth, endOfMonth, isWithinInterval, addDays, addWeeks, addMonths, addYears, isBefore, isSameDay, startOfWeek, endOfWeek } from 'date-fns';
+import { api } from '../services/api';
 
 const FinanceContext = createContext();
 
@@ -109,6 +110,19 @@ export const FinanceContextProvider = ({ children }) => {
         if (newRules) setRecurringRules(newRules);
 
         localStorage.setItem(`awake_finance_data_${uid}`, JSON.stringify(data));
+
+        // SYNC TO GOOGLE SHEET
+        if (user) {
+            api.sync({
+                mutations: [{
+                    mutationId: `fin_${Date.now()}`,
+                    type: 'UPDATE_MODULE',
+                    uid: user.uid,
+                    moduleName: 'finance',
+                    data: data
+                }]
+            }).then(res => console.log("Synced Finance:", res));
+        }
     };
 
     // --- Recurring Logic Processing ---
@@ -536,6 +550,8 @@ export const FinanceContextProvider = ({ children }) => {
             id: `debt_${Date.now()}`,
             createdAt: Date.now(),
             status: 'open', // open, partial, settled, overdue
+            isSettled: false,
+            paidAmount: 0,
             history: [], // [{ date, amount, type, note }]
             ...debt
         };

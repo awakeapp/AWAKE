@@ -1,18 +1,42 @@
 import { useState } from 'react';
-import { auth, sendPasswordResetEmail } from '../lib/firebase';
+import { api } from '../services/api';
 
 export const useResetPassword = () => {
     const [error, setError] = useState(null);
     const [isPending, setIsPending] = useState(false);
     const [success, setSuccess] = useState(false);
 
-    const resetPassword = async (email) => {
+    // Step 1: Request OTP
+    const initiateReset = async (identifier) => {
+        setError(null);
+        setIsPending(true);
+        try {
+            const res = await api.auth('initiatePasswordReset', { identifier });
+            if (!res.success) throw new Error(res.error.message || 'Failed to initiate reset');
+            setIsPending(false);
+            return res.data; // might contain dev_otp
+        } catch (err) {
+            setError(err.message);
+            setIsPending(false);
+            throw err;
+        }
+    };
+
+    // Step 2 & 3: Verify OTP and Set New Password
+    const confirmReset = async (identifier, otp, newPassword) => {
         setError(null);
         setIsPending(true);
         setSuccess(false);
 
         try {
-            await sendPasswordResetEmail(auth, email);
+            const res = await api.auth('completePasswordReset', {
+                identifier,
+                otp,
+                newPassword
+            });
+
+            if (!res.success) throw new Error(res.error.message || 'Reset failed');
+
             setSuccess(true);
             setIsPending(false);
         } catch (err) {
@@ -22,5 +46,5 @@ export const useResetPassword = () => {
         }
     };
 
-    return { resetPassword, error, isPending, success };
+    return { initiateReset, confirmReset, error, isPending, success };
 };

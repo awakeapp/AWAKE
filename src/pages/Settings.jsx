@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
+import clsx from 'clsx';
 import { Card, CardContent } from '../components/atoms/Card';
 import { useAuthContext } from '../hooks/useAuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { useLogout } from '../hooks/useLogout';
-import { User, Lock, Edit2, Check, X, Download, ShieldCheck, LogOut } from 'lucide-react';
+import { User, Lock, Edit2, Check, X, Download, ShieldCheck, LogOut, Moon, Sun } from 'lucide-react';
 import Button from '../components/atoms/Button';
-import { getReportData, generateCredentialPDF } from '../utils/reportUtils';
+import { getReportData, generateUserReportPDF } from '../utils/reportUtils';
 
 const Settings = () => {
     const { user, dispatch } = useAuthContext();
     const { logout } = useLogout();
+    const { theme, toggleTheme } = useTheme();
     const [isEditingName, setIsEditingName] = useState(false);
     const [newName, setNewName] = useState('');
 
@@ -101,7 +104,7 @@ const Settings = () => {
 
     const handleDownloadReport = () => {
         if (!user || !stats) return;
-        generateCredentialPDF(user, stats);
+        generateUserReportPDF(user, stats);
     };
 
     // --- App Settings States ---
@@ -246,6 +249,38 @@ const Settings = () => {
                 </Card>
             </section>
 
+            {/* Appearance */}
+            <section className="space-y-4">
+                <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] px-1">Appearance</h3>
+                <Card className="border-none shadow-premium overflow-hidden">
+                    <CardContent className="p-4 flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="p-2.5 bg-sky-50 dark:bg-sky-900/20 text-sky-600 rounded-xl">
+                                {theme === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+                            </div>
+                            <div>
+                                <p className="font-bold text-slate-700 dark:text-slate-200 text-sm">Dark Mode</p>
+                                <p className="text-xs text-slate-500">Adjust app appearance</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={toggleTheme}
+                            className={clsx(
+                                "relative w-12 h-6 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900",
+                                theme === 'dark' ? "bg-indigo-600" : "bg-slate-200"
+                            )}
+                        >
+                            <span
+                                className={clsx(
+                                    "absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300",
+                                    theme === 'dark' ? "translate-x-6" : "translate-x-0"
+                                )}
+                            />
+                        </button>
+                    </CardContent>
+                </Card>
+            </section>
+
             {/* Security */}
             <section className="space-y-4">
                 <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] px-1">Security & Access</h3>
@@ -316,26 +351,49 @@ const Settings = () => {
                 </Card>
             </section>
 
-            {/* Data Management */}
+            {/* Data Management & Reports */}
             <section className="space-y-4">
-                <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] px-1">Storage & Privacy</h3>
-                <Card className="border-none shadow-premium bg-rose-50/30 dark:bg-rose-950/10">
-                    <CardContent className="p-4 flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className="p-2.5 bg-rose-100 dark:bg-rose-900/30 text-rose-600 rounded-xl">
-                                <Download className="w-5 h-5" />
+                <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] px-1">Storage & Reports</h3>
+
+                <div className="grid gap-4">
+                    {/* Download Report */}
+                    <Card className="border-none shadow-premium bg-indigo-50/30 dark:bg-indigo-950/10">
+                        <CardContent className="p-4 flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="p-2.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 rounded-xl">
+                                    <Download className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">Download Report</p>
+                                    <p className="text-xs text-slate-500">Get your performance as PDF</p>
+                                </div>
                             </div>
-                            <div>
-                                <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">Clear All Data</p>
-                                <p className="text-xs text-slate-500">Permanently wipe local storage</p>
+                            <button
+                                onClick={handleDownloadReport}
+                                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-black rounded-lg transition-transform active:scale-95 shadow-lg shadow-indigo-200 dark:shadow-none"
+                            >DOWNLOAD</button>
+                        </CardContent>
+                    </Card>
+
+                    {/* Clear Data */}
+                    <Card className="border-none shadow-premium bg-rose-50/30 dark:bg-rose-950/10">
+                        <CardContent className="p-4 flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="p-2.5 bg-rose-100 dark:bg-rose-900/30 text-rose-600 rounded-xl">
+                                    <ShieldCheck className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">Clear All Data</p>
+                                    <p className="text-xs text-slate-500">Permanently wipe local storage</p>
+                                </div>
                             </div>
-                        </div>
-                        <button
-                            onClick={handleClearData}
-                            className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-black rounded-lg transition-transform active:scale-95 shadow-lg shadow-rose-200 dark:shadow-none"
-                        >WIPE DATA</button>
-                    </CardContent>
-                </Card>
+                            <button
+                                onClick={handleClearData}
+                                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-black rounded-lg transition-transform active:scale-95 shadow-lg shadow-rose-200 dark:shadow-none"
+                            >WIPE DATA</button>
+                        </CardContent>
+                    </Card>
+                </div>
             </section>
 
             {/* Logout Section */}

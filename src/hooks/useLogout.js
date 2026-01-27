@@ -14,6 +14,7 @@ export const useLogout = () => {
         try {
             // Remove session
             localStorage.removeItem('awake_session');
+            localStorage.removeItem('awake_session_token'); // Clear legacy/alt keys if any
 
             // Dispatch logout action
             dispatch({ type: 'LOGOUT' });

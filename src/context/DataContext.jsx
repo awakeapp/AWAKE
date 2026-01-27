@@ -114,8 +114,8 @@ export const DataContextProvider = ({ children }) => {
         const loadRemote = async () => {
             try {
                 const data = await api.fetchAll();
-                if (data && data.days) {
-                    console.log("Remote Data Loaded:", Object.keys(data.days));
+                if (data && data.days && user) {
+                    console.log("Remote Data Loaded:", Object.keys(data.days).length, "items");
                     setRemoteData(data.days);
                 }
             } catch (err) {
@@ -128,29 +128,25 @@ export const DataContextProvider = ({ children }) => {
     // 2. Re-Hydrate if Remote Data arrives and we are on a date that has remote data
     // Strategy: If Local is default/empty OR Remote is newer (we don't have timestamps easy check yet, assume Remote Wins for now if local matches default)
     useEffect(() => {
-        if (remoteData && remoteData[formattedDate]) {
-            // Check if we should overwrite local?
-            // For MVP: If remote exists, use it.
-            // But we don't want to overwrite un-saved local work?
-            // Let's assume: If I open the app, I want what's on the sheet.
-            // We should only overwrite if our local 'lastModified' is older than remote? 
-            // We don't have remote timestamps in this simple kv store yet.
-            // SIMPLEST: Just use remote if available.
-            const incoming = remoteData[formattedDate];
+        if (remoteData && user) {
+            const cloudKey = `${user.uid}_${formattedDate}`;
+            if (remoteData[cloudKey]) {
+                const incoming = remoteData[cloudKey];
 
-            // Basic safety: Don't overwrite if we already have the SAME data
-            if (JSON.stringify(incoming) !== JSON.stringify(dailyData)) {
-                // Check if it looks valid
-                if (incoming.tasks) {
-                    console.log("Hydrating from Remote for", formattedDate);
-                    setDailyData(incoming);
-                    // Update LocalStorage too so it persists offline
-                    const uid = user ? user.uid : 'guest';
-                    localStorage.setItem(`awake_data_${uid}_${formattedDate}`, JSON.stringify(incoming));
+                // Basic safety: Don't overwrite if we already have the SAME data
+                if (JSON.stringify(incoming) !== JSON.stringify(dailyData)) {
+                    // Check if it looks valid
+                    if (incoming.tasks) {
+                        console.log("Hydrating from Remote for", formattedDate);
+                        setDailyData(incoming);
+                        // Update LocalStorage too so it persists offline
+                        const uid = user ? user.uid : 'guest';
+                        localStorage.setItem(`awake_data_${user.uid}_${formattedDate}`, JSON.stringify(incoming));
+                    }
                 }
             }
         }
-    }, [remoteData, formattedDate]); // Dependencies: when remote loads OR date changes
+    }, [remoteData, formattedDate, user]); // Dependencies: when remote loads OR date changes OR user change
 
     // Persistence Layer
     const saveData = (newData) => {
@@ -165,15 +161,17 @@ export const DataContextProvider = ({ children }) => {
         localStorage.setItem(storageKey, JSON.stringify(payload));
 
         // SYNC TO GOOGLE SHEET
-        // Debounce this? For now, fire and forget.
-        api.sync({
-            mutations: [{
-                mutationId: crypto.randomUUID(),
-                type: 'UPDATE_DAY',
-                date: formattedDate,
-                data: payload
-            }]
-        }).then(res => console.log("Synced:", res));
+        if (user) {
+            api.sync({
+                mutations: [{
+                    mutationId: crypto.randomUUID(),
+                    type: 'UPDATE_DAY',
+                    uid: user.uid,
+                    date: formattedDate,
+                    data: payload
+                }]
+            }).then(res => console.log("Synced Day:", res));
+        }
     };
 
     // Derived Locked State (Explicit Lock OR Past Date)

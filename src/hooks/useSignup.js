@@ -1,57 +1,61 @@
 import { useState } from 'react';
 import { useAuthContext } from './useAuthContext';
+import { api } from '../services/api';
 
 export const useSignup = () => {
     const [error, setError] = useState(null);
     const [isPending, setIsPending] = useState(false);
-    const { dispatch } = useAuthContext();
+    // dispatch is unused here because signup doesn't auto-login anymore in this secure flow
+    // but verifyOtp might want to auto-login or we do it in component.
 
-    const signup = async (email, password, displayName) => {
+    const signup = async (email, password, displayName, phone = '') => {
         setError(null);
         setIsPending(true);
 
         try {
-            // Mimic Network Delay
-            await new Promise(resolve => setTimeout(resolve, 800));
+            const res = await api.auth('signUp', {
+                email,
+                password,
+                username: displayName,
+                phone
+            });
 
-            const users = JSON.parse(localStorage.getItem('awake_users') || '[]');
-
-            // Check if email exists
-            if (users.some(u => u.email === email)) {
-                throw new Error('Email already in use');
+            if (!res.success) {
+                throw new Error(res.error.message || 'Signup failed');
             }
 
-            const newUser = {
-                uid: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                email,
-                password, // In a real app we'd hash this, but per requirements "simple login system... local storage"
-                displayName,
-                createdAt: Date.now()
-            };
-
-            users.push(newUser);
-            localStorage.setItem('awake_users', JSON.stringify(users));
-
-            // Create session (don't store password in session)
-            const sessionUser = {
-                uid: newUser.uid,
-                email: newUser.email,
-                displayName: newUser.displayName
-            };
-            localStorage.setItem('awake_session', JSON.stringify(sessionUser));
-
-            // Dispatch login action
-            dispatch({ type: 'LOGIN', payload: sessionUser });
-
-            setIsPending(false);
-            return sessionUser;
+            // Return data including the dev_otp for now
+            return res.data;
 
         } catch (err) {
-            console.log(err.message);
+            console.error("Signup Failed:", err);
             setError(err.message);
+            throw err;
+        } finally {
             setIsPending(false);
         }
     };
 
-    return { signup, error, isPending };
+    const verifyOtp = async (identifier, otp) => {
+        setError(null);
+        setIsPending(true);
+        try {
+            const res = await api.auth('verifySignUpOTP', {
+                identifier,
+                otp
+            });
+
+            if (!res.success) {
+                throw new Error(res.error.message || 'Verification failed');
+            }
+            return res.data;
+        } catch (err) {
+            setError(err.message);
+            throw err;
+        } finally {
+            setIsPending(false);
+        }
+    };
+
+    return { signup, verifyOtp, error, isPending };
 };

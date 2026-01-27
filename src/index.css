@@ -5,7 +5,7 @@
 
 @layer base {
     body {
-        @apply bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-50 transition-colors duration-300;
+        @apply bg-slate-50 text-slate-900 antialiased dark:bg-primary-950 dark:text-slate-50 transition-colors duration-300;
     }
 }
 
@@ -38,7 +38,7 @@
     }
 
     .premium-gradient-text {
-        @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 font-bold;
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-500 via-purple-500 to-pink-500 font-bold;
     }
 
     /* Hyper-Modern Design System */

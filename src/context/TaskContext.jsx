@@ -113,6 +113,7 @@ export const TaskContextProvider = ({ children }) => {
             // New Properties
             priority: options.priority || 'Medium',
             category: options.category || 'Work',
+            time: options.time || null,
             estimatedTime: options.estimatedTime || 15,
             description: options.description || '',
         };

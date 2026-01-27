@@ -77,6 +77,19 @@ export const VehicleContextProvider = ({ children }) => {
         if (newLoans) setLoans(newLoans);
 
         localStorage.setItem(`awake_vehicle_data_${uid}`, JSON.stringify(data));
+
+        // SYNC TO GOOGLE SHEET
+        if (user) {
+            api.sync({
+                mutations: [{
+                    mutationId: `veh_${Date.now()}`,
+                    type: 'UPDATE_MODULE',
+                    uid: user.uid,
+                    moduleName: 'vehicle',
+                    data: data
+                }]
+            }).then(res => console.log("Synced Vehicle:", res));
+        }
     };
 
     // --- Vehicle Actions ---

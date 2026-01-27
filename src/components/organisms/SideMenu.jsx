@@ -2,21 +2,32 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Home, CheckSquare, Calendar, Settings, LogOut, Utensils, PieChart, ChevronRight, Heart, Wallet, Activity } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../hooks/useAuthContext';
+import { useLogout } from '../../hooks/useLogout';
 
 import { useRef, useState } from 'react';
 import { useDate } from '../../context/DateContext';
 import JumpDateModal from './JumpDateModal';
 
 const SideMenu = ({ isOpen, onClose }) => {
-    const { logout, user } = useAuthContext();
+    const { user } = useAuthContext();
+    const { logout } = useLogout();
     const { setDate, formattedDate, maxDate } = useDate();
     const navigate = useNavigate();
     const [isJumpModalOpen, setIsJumpModalOpen] = useState(false);
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-        onClose();
+    const handleLogout = async () => {
+        console.log("Logout initiated...");
+        try {
+            await logout();
+            // App.jsx ProtectedRoute should handle redirect, 
+            // but we'll try to navigate too for good measure.
+            navigate('/login', { replace: true });
+        } catch (err) {
+            console.error("Logout error:", err);
+            // Hard reset fallback
+            localStorage.clear();
+            window.location.hash = '/login';
+        }
     };
 
     const menuItems = [
@@ -154,8 +165,9 @@ const SideMenu = ({ isOpen, onClose }) => {
                         {/* Footer */}
                         <div className="p-4 border-t">
                             <button
+                                type="button"
                                 onClick={handleLogout}
-                                className="flex items-center gap-3 w-full px-3 py-3 rounded-xl text-red-600 hover:bg-red-50 font-medium transition-colors"
+                                className="flex items-center gap-3 w-full px-3 py-3 rounded-xl text-red-600 hover:bg-red-50 font-medium transition-colors active:scale-95 z-[60]"
                             >
                                 <LogOut className="w-5 h-5" />
                                 Sign Out

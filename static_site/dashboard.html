@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Awake</title>
+    <link rel="stylesheet" href="css/auth.css">
+    <style>
+        .dashboard-container {
+            max-width: 800px;
+            width: 100%;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>Dashboard</h1>
+            <button id="logout-btn" class="btn" style="width: auto; background-color: var(--text-muted);">Sign
+                Out</button>
+        </div>
+
+        <div class="card">
+            <h2>Welcome!</h2>
+            <p>You have successfully authenticated via Google Apps Script.</p>
+            <p class="subtitle" style="text-align: left; margin-top: 1rem;">
+                Your session is secure. LocalStorage only contains your session ID.
+            </p>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Protect this route
+        Session.requireAuth();
+    </script>
+</body>
+
+</html>

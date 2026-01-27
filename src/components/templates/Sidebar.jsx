@@ -3,6 +3,7 @@ import { LayoutDashboard, Calendar, Settings, LogOut, Sun, Cloud, ChefHat, Heart
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useLogout } from '../../hooks/useLogout';
 import { cn } from '../../lib/utils';
+import awakeLogo from '../../assets/awake_logo_new.png';
 
 const Sidebar = ({ onClose }) => {
     const { logout } = useLogout();
@@ -22,11 +23,8 @@ const Sidebar = ({ onClose }) => {
 
     return (
         <div className="h-full flex flex-col">
-            <div className="p-6 border-b border-slate-100 flex items-center gap-2">
-                <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white">
-                    <Sun className="w-5 h-5" />
-                </div>
-                <span className="text-xl font-bold text-slate-800 tracking-tight">AWAKE</span>
+            <div className="p-6 border-b border-slate-100 flex items-center justify-center gap-2">
+                <img src={awakeLogo} alt="Logo" className="h-8 w-auto object-contain dark:brightness-0 dark:invert" />
             </div>
 
             <nav className="flex-1 p-4 space-y-1">
@@ -70,7 +68,7 @@ const Sidebar = ({ onClose }) => {
                     </button>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

@@ -52,5 +52,26 @@ export const api = {
             console.error("API Sync Error:", error);
             return { success: false, error: error.message };
         }
+    },
+
+    /**
+     * Authenticate with the Google Apps Script Backend
+     * @param {string} action - 'signIn', 'signUp', 'verifySignUpOTP', 'validateSession'
+     * @param {object} payload - Action specific data
+     */
+    async auth(action, payload) {
+        if (!API_URL) return { success: false, error: "No API URL" };
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action, payload }),
+                redirect: 'follow'
+            });
+            return await res.json();
+        } catch (error) {
+            console.error("Auth API Error:", error);
+            return { success: false, error: error.message };
+        }
     }
 };

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuthContext } from './useAuthContext';
+import { api } from '../services/api';
 
 export const useLogin = () => {
     const [isCancelled, setIsCancelled] = useState(false);
@@ -12,27 +13,27 @@ export const useLogin = () => {
         setIsPending(true);
 
         try {
-            // Mimic Network Delay
-            await new Promise(resolve => setTimeout(resolve, 800));
+            const res = await api.auth('signIn', { identifier, password });
 
-            const users = JSON.parse(localStorage.getItem('awake_users') || '[]');
-            const user = users.find(u => (u.email === identifier || u.displayName === identifier) && u.password === password);
-
-            if (!user) {
-                throw new Error('Invalid credentials');
+            if (!res.success) {
+                throw new Error(res.error.message || 'Login failed');
             }
 
-            // Create session
+            const data = res.data;
+
+            // Create session object compatible with app
             const sessionUser = {
-                uid: user.uid,
-                email: user.email,
-                displayName: user.displayName
+                uid: data.userId,
+                sessionId: data.sessionId,
+                email: data.user.email,
+                phone: data.user.phone,
+                displayName: data.user.username
             };
 
             localStorage.setItem('awake_session', JSON.stringify(sessionUser));
-
-            // Dispatch login action
             dispatch({ type: 'LOGIN', payload: sessionUser });
+
+            // Hydration/Sync logic would go here, but backend currently supports Auth only.
 
             if (!isCancelled) {
                 setIsPending(false);

@@ -9,7 +9,7 @@ const AddTaskModal = ({ isOpen, onClose, onAdd, initialDate }) => {
     const [title, setTitle] = useState('');
     const [category, setCategory] = useState('Work');
     const [priority, setPriority] = useState('Medium');
-    const [time, setTime] = useState(15);
+    const [startTime, setStartTime] = useState('09:00');
     const [date, setDate] = useState(initialDate);
     const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -19,7 +19,7 @@ const AddTaskModal = ({ isOpen, onClose, onAdd, initialDate }) => {
             setTitle('');
             setCategory('Work');
             setPriority('Medium');
-            setTime(15);
+            setStartTime('09:00');
             setDate(initialDate || new Date().toISOString().split('T')[0]);
         }
     }, [isOpen, initialDate]);
@@ -31,7 +31,7 @@ const AddTaskModal = ({ isOpen, onClose, onAdd, initialDate }) => {
         onAdd(title, {
             category,
             priority,
-            estimatedTime: parseInt(time) || 15,
+            time: startTime,
             date
         });
         onClose();
@@ -117,21 +117,19 @@ const AddTaskModal = ({ isOpen, onClose, onAdd, initialDate }) => {
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
-                                    {/* Duration */}
+                                    {/* Start Time */}
                                     <div className="space-y-2">
                                         <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                            Duration
+                                            Start Time
                                         </label>
                                         <div className="relative">
                                             <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                             <input
-                                                type="number"
-                                                value={time}
-                                                onChange={(e) => setTime(e.target.value)}
+                                                type="time"
+                                                value={startTime}
+                                                onChange={(e) => setStartTime(e.target.value)}
                                                 className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl pl-9 pr-3 py-2.5 text-sm text-slate-700 dark:text-slate-300 focus:ring-2 focus:ring-indigo-500/20"
-                                                min="5"
                                             />
-                                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-medium">min</span>
                                         </div>
                                     </div>
 

@@ -6,6 +6,7 @@ import { LayoutGrid, ArrowLeft, Droplet, Moon, Sun } from 'lucide-react';
 import { useDate } from '../../context/DateContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useState } from 'react';
+import awakeLogo from '../../assets/awake_logo_new.png';
 
 const MainLayout = ({ children }) => {
     const { formattedDate } = useDate();
@@ -25,14 +26,15 @@ const MainLayout = ({ children }) => {
             <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between dark:bg-slate-900/80 dark:border-slate-800 transition-colors">
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
+
                         <button
                             onClick={() => navigate('/')}
                             className="focus:outline-none hover:opacity-80 transition-opacity"
                         >
                             <img
-                                src={isDark ? "/logo-dark.png" : "/logo-light.png"}
+                                src={awakeLogo}
                                 alt="HUMI AWAKE"
-                                className="h-8 w-auto object-contain"
+                                className="h-8 w-auto object-cover dark:brightness-0 dark:invert"
                             />
                         </button>
                     </div>
@@ -68,6 +70,9 @@ const MainLayout = ({ children }) => {
             </header>
             <main className="px-4 py-6 max-w-md mx-auto w-full">
                 {children || <Outlet />}
+                <div className="text-[10px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-[0.2em] text-center mt-8 mb-2 opacity-60">
+                    Developed by CoolCraft
+                </div>
             </main>
 
             {/* Bottom Navigation (Mobile Only) */}
