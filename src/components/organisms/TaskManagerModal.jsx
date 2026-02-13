@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Trash2, Edit2, Check } from 'lucide-react';
 import Button from '../atoms/Button';
 import { useData } from '../../context/DataContext';
+import { inferIcon, getIconComponent } from '../../utils/iconInference';
 
 
 const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
@@ -25,9 +26,25 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
     }, [isOpen, tasks]);
 
     const handleTaskChange = (id, field, value) => {
-        setLocalTasks(prev => prev.map(t =>
-            t.id === id ? { ...t, [field]: value } : t
-        ));
+        setLocalTasks(prev => prev.map(t => {
+            if (t.id !== id) return t;
+            const updates = { [field]: value };
+            // Auto-update icon if name changes
+            if (field === 'name') {
+                const inference = inferIcon(value);
+                updates.icon = inference.icon; // Store string name
+            }
+            // Auto-update category if time changes
+            if (field === 'time') {
+                const [h] = value.split(':').map(Number);
+                let computedCategory = 'EVE/NIGHT';
+                if (h >= 4 && h < 9) computedCategory = 'EARLY MORNING';
+                else if (h >= 9 && h < 13) computedCategory = 'BEFORE NOON';
+                else if (h >= 13 && h < 17) computedCategory = 'AFTER NOON';
+                updates.category = computedCategory;
+            }
+            return { ...t, ...updates };
+        }));
     };
 
     const handleDelete = (id) => {
@@ -37,11 +54,19 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
     const handleConfirmAdd = () => {
         if (!newTaskName.trim() || !newTaskTime) return;
 
+        // Auto-assign category based on time
+        const [h] = newTaskTime.split(':').map(Number);
+        let computedCategory = 'EVE/NIGHT'; // Default/Fallback
+        if (h >= 4 && h < 9) computedCategory = 'EARLY MORNING';
+        else if (h >= 9 && h < 13) computedCategory = 'BEFORE NOON';
+        else if (h >= 13 && h < 17) computedCategory = 'AFTER NOON';
+
         const newTask = {
             id: `task_${Date.now()}`,
             name: newTaskName.trim(),
             time: newTaskTime,
-            icon: '✨',
+            category: computedCategory,
+            icon: inferIcon(newTaskName.trim()).icon,
             status: 'unchecked'
         };
 
@@ -62,10 +87,43 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
     };
 
     const handleSave = () => {
-        // Validation: remove empty tasks
-        const validTasks = localTasks.filter(t => t.name.trim() !== '' && t.time !== '');
+        // 1. Capture existing tasks
+        let finalTasks = [...localTasks];
 
-        // Final Sort just in case edited times changed order
+        // 2. CHECK FOR PENDING INPUT (The "Forgot to click +" fix)
+        if (newTaskName.trim() && newTaskTime) {
+            const [h] = newTaskTime.split(':').map(Number);
+            let computedCategory = 'EVE/NIGHT';
+            if (h >= 4 && h < 9) computedCategory = 'EARLY MORNING';
+            else if (h >= 9 && h < 13) computedCategory = 'BEFORE NOON';
+            else if (h >= 13 && h < 17) computedCategory = 'AFTER NOON';
+
+            const pendingTask = {
+                id: `task_${Date.now()}_pending`, // distinct ID
+                name: newTaskName.trim(),
+                time: newTaskTime,
+                category: computedCategory,
+                icon: inferIcon(newTaskName.trim()).icon,
+                status: 'unchecked'
+            };
+            finalTasks.push(pendingTask);
+        }
+
+        // 3. Validation: remove empty tasks
+        let validTasks = finalTasks.filter(t => t.name.trim() !== '' && t.time !== '');
+
+        // 4. Force Re-Categorization (Safety Check for ALL tasks)
+        validTasks = validTasks.map(t => {
+            if (!t.time) return t;
+            const [h] = t.time.split(':').map(Number);
+            let computedCategory = 'EVE/NIGHT';
+            if (h >= 4 && h < 9) computedCategory = 'EARLY MORNING';
+            else if (h >= 9 && h < 13) computedCategory = 'BEFORE NOON';
+            else if (h >= 13 && h < 17) computedCategory = 'AFTER NOON';
+            return { ...t, category: computedCategory };
+        });
+
+        // 5. Final Sort
         validTasks.sort((a, b) => {
             if (!a.time || !b.time) return 0;
             const timeA = a.time.split(':').map(Number);
@@ -139,6 +197,16 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
                                         />
                                     </div>
 
+                                    {/* Icon Preview */}
+                                    <div className="shrink-0 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+                                        {(() => {
+                                            let IconCmp = getIconComponent(task.icon);
+                                            // Safety Fallback
+                                            if (!IconCmp) return <Check className="w-4 h-4" />;
+                                            return <IconCmp className="w-4 h-4" />;
+                                        })()}
+                                    </div>
+
                                     {/* Task Content */}
                                     <div className="flex-1 min-w-0">
                                         <input
@@ -175,6 +243,13 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
                                         value={newTaskTime}
                                         onChange={setNewTaskTime}
                                     />
+                                </div>
+                                <div className="shrink-0 w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600">
+                                    {(() => {
+                                        let IconCmp = inferIcon(newTaskName).component;
+                                        if (!IconCmp) return <Check className="w-4 h-4" />;
+                                        return <IconCmp className="w-4 h-4" />;
+                                    })()}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <input

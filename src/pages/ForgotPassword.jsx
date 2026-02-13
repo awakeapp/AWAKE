@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/atoms/Ca
 import { ArrowLeft, KeyRound, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import awakeLogo from '../assets/awake_logo_new.png';
+import ErrorDisplay from '../components/molecules/ErrorDisplay';
 
 const ForgotPassword = () => {
     const [identifier, setIdentifier] = useState('');
@@ -71,9 +72,11 @@ const ForgotPassword = () => {
                                 />
 
                                 {error && (
-                                    <div className="text-sm font-medium text-red-600 bg-red-50 p-3 rounded-xl border border-red-100">
-                                        {error}
-                                    </div>
+                                    <ErrorDisplay
+                                        type="auth"
+                                        title="Reset Failed"
+                                        message={error}
+                                    />
                                 )}
 
                                 <Button

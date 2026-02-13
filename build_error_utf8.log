@@ -1,0 +1,51 @@
+﻿
+> awake@1.0.0 build
+> vite build
+
+[36mvite v7.3.1 [32mbuilding client environment for production...[36m[39m
+transforming...
+node.exe : [33m[plugin vite:esbuild] src/context/VehicleContext.jsx: [33mDuplicate key "getLoanDetailedStatus" in object literal[33m
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([33m[plugin vi...ct literal[33m:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+714 |          getLoanForVehicle,
+715 |          getLoanDetailedStatus,
+716 |          getLoanDetailedStatus,
+    |          ^
+717 |          getVehicleRisks,
+718 |          getVehicleRisks,
+[39m
+[33m[plugin vite:esbuild] src/context/VehicleContext.jsx: [33mDuplicate key "getVehicleRisks" in object literal[33m
+716 |          getLoanDetailedStatus,
+717 |          getVehicleRisks,
+718 |          getVehicleRisks,
+    |          ^
+719 |          deleteVehicle,
+720 |          error,
+[39m
+[32mÔ£ô[39m 3401 modules transformed.
+[31mÔ£ù[39m Build failed in 5.73s
+[31merror during build:
+[31msrc/pages/Login.jsx (12:32): "GoogleAuthProvider" is not exported by "src/lib/firebase.js", imported by "src/pages/Login.jsx".[31m
+file: [36mE:/APPS/AWAKE/src/pages/Login.jsx:12:32[31m
+[33m
+10: import { motion, AnimatePresence } from 'framer-motion';
+11: import awakeLogo from '../assets/awake_logo_new.png';
+12: import { auth, signInWithPopup, GoogleAuthProvider } from '../lib/firebase';
+                                    ^
+13: import { cn } from '../lib/utils';
+14: import FullPageLoader from '../components/molecules/FullPageLoader';
+[31m
+    at getRollupError (file:///E:/APPS/AWAKE/node_modules/rollup/dist/es/shared/parseAst.js:400:41)
+    at error (file:///E:/APPS/AWAKE/node_modules/rollup/dist/es/shared/parseAst.js:396:42)
+    at Module.error (file:///E:/APPS/AWAKE/node_modules/rollup/dist/es/shared/node-entry.js:17036:16)
+    at Module.traceVariable (file:///E:/APPS/AWAKE/node_modules/rollup/dist/es/shared/node-entry.js:17448:29)
+    at ModuleScope.findVariable (file:///E:/APPS/AWAKE/node_modules/rollup/dist/es/shared/node-entry.js:15066:39)
+    at ReturnValueScope.findVariable (file:///E:/APPS/AWAKE/node_modules/rollup/dist/es/shared/node-entry.js:5673:38)
+    at FunctionBodyScope.findVariable (file:///E:/APPS/AWAKE/node_modules/rollup/dist/es/shared/node-entry.js:5673:38)
+    at ReturnValueScope.findVariable (file:///E:/APPS/AWAKE/node_modules/rollup/dist/es/shared/node-entry.js:5673:38)
+    at FunctionBodyScope.findVariable (file:///E:/APPS/AWAKE/node_modules/rollup/dist/es/shared/node-entry.js:5673:38)
+    at Identifier.bind (file:///E:/APPS/AWAKE/node_modules/rollup/dist/es/shared/node-entry.js:5447:40)[39m

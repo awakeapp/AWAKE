@@ -2,55 +2,34 @@ import { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../hooks/useAuthContext';
+import { useData } from '../context/DataContext';
 import ProgressCharts from '../components/organisms/ProgressCharts';
 
 const Analytics = () => {
     const navigate = useNavigate();
     const [chartData, setChartData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const { user } = useAuthContext();
+    const { getAllHistory } = useData();
 
     useEffect(() => {
-        if (!user) return; // Wait for auth
-
-        const loadedData = [];
-        // Filter keys by current user ID
-        const uid = user.uid;
-        const prefix = `awake_data_${uid}_`;
-
-        const keys = Object.keys(localStorage).filter(k => k.startsWith(prefix));
-
-        // Sort keys by date
-        keys.sort();
-
-        keys.forEach(key => {
-            try {
-                const dateStr = key.replace(prefix, '');
-                const raw = JSON.parse(localStorage.getItem(key));
-
-                if (raw && raw.tasks) {
-                    const total = raw.tasks.length;
-                    const completed = raw.tasks.filter(t => t.status === 'checked').length;
-                    const score = total > 0 ? Math.round((completed / total) * 100) : 0;
-
-                    // Format date to short string (e.g. "Jan 22")
-                    const dateObj = new Date(dateStr);
-                    const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-
-                    loadedData.push({
-                        date: formattedDate,
-                        fullDate: dateStr,
-                        score: score,
-                        habits: raw.habits || {}
-                    });
-                }
-            } catch (e) {
-                console.error("Failed to parse data for analytics", e);
+        const load = async () => {
+            if (!user) {
+                setLoading(false);
+                return;
             }
-        });
-
-        setChartData(loadedData);
-    }, [user]);
+            try {
+                const loadedData = await getAllHistory(30);
+                setChartData(loadedData);
+            } catch (err) {
+                console.error("Failed to load analytics", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        load();
+    }, [user, getAllHistory]);
 
     return (
         <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
@@ -62,7 +41,11 @@ const Analytics = () => {
                 <h2 className="text-xl font-bold text-slate-900">Analytics</h2>
             </div>
 
-            <ProgressCharts data={chartData} />
+            {loading ? (
+                <div className="flex items-center justify-center h-64 text-slate-400">Loading analytics...</div>
+            ) : (
+                <ProgressCharts data={chartData} />
+            )}
         </div>
     );
 };

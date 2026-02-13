@@ -1,19 +1,15 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, X, Trash2, Edit2, Smartphone, Pizza, Candy, GlassWater, Wallet, CheckCircle, Activity, Check } from 'lucide-react';
+import { Plus, X, Trash2, Edit2, Check, CheckCircle } from 'lucide-react';
 import { Card, CardContent } from '../atoms/Card';
 import clsx from 'clsx';
 import { useData } from '../../context/DataContext';
-import { getIconForTask } from '../../utils/TaskIcons';
-
-const HABIT_COMPONENTS = {
-    Pizza, Candy, GlassWater, Smartphone, Wallet, CheckCircle, Activity
-};
+import { getIconComponent } from '../../utils/iconInference';
+import HabitManagerDialog from './HabitManagerDialog'; // Forced update v3
 
 const HabitToggle = ({ id, icon, label, value, onChange, onDelete, disabled, isEditing }) => {
-    let Icon = HABIT_COMPONENTS[icon] || CheckCircle;
-    // Fallback if icon is a string not in components
-    if (typeof Icon === 'string') Icon = CheckCircle;
+    // Dynamic Icon Resolution
+    const Icon = getIconComponent(icon);
 
     return (
         <div className="flex items-center justify-between py-3.5 border-b border-slate-50 dark:border-slate-800/50 last:border-0 group">
@@ -79,8 +75,8 @@ const HabitToggle = ({ id, icon, label, value, onChange, onDelete, disabled, isE
 };
 
 const NumericHabitInput = ({ id, icon, label, value, unit, onChange, onDelete, disabled, isEditing }) => {
-    let Icon = HABIT_COMPONENTS[icon] || Smartphone;
-    if (typeof Icon === 'string') Icon = Smartphone;
+    // Dynamic Icon Resolution
+    const Icon = getIconComponent(icon);
 
     const getColorClass = (h) => {
         if (unit === 'hrs') {
@@ -149,28 +145,12 @@ const NumericHabitInput = ({ id, icon, label, value, unit, onChange, onDelete, d
 
 const DailyHabits = ({ habits, onUpdateHabit, isLocked }) => {
     const { addHabit, deleteHabit } = useData();
-    const [isAdding, setIsAdding] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
-    const [newName, setNewName] = useState('');
-    const [newType, setNewType] = useState('toggle');
-    const [newUnit, setNewUnit] = useState('hrs');
+    const [showModal, setShowModal] = useState(false);
 
-    const derivedIcon = useMemo(() => {
-        if (!newName.trim()) return null;
-        const iconComponent = getIconForTask(newName);
-        // Find the name of the icon from components map or default
-        const iconName = Object.keys(HABIT_COMPONENTS).find(key => HABIT_COMPONENTS[key] === iconComponent);
-        return iconName || 'CheckCircle';
-    }, [newName]);
-
-    const handleAddHabit = () => {
-        if (!newName.trim()) return;
-        addHabit(newName.trim(), newType, newUnit, derivedIcon);
-        setNewName('');
-        setIsAdding(false);
+    const handleAdd = (name, type, unit, icon) => {
+        addHabit(name, type, unit, icon);
     };
-
-    const DerivedIconComponent = derivedIcon ? (HABIT_COMPONENTS[derivedIcon] || CheckCircle) : CheckCircle;
 
     return (
         <section className="mb-6">
@@ -195,102 +175,19 @@ const DailyHabits = ({ habits, onUpdateHabit, isLocked }) => {
                 {!isLocked && (
                     <button
                         onClick={() => {
-                            setIsAdding(!isAdding);
-                            setIsEditing(false); // Can't edit and add at once for clarity
+                            setShowModal(true);
+                            setIsEditing(false);
                         }}
                         className="p-1 text-slate-400 hover:text-indigo-600 transition-colors"
                         title="Add Habit"
                     >
-                        <Plus className={clsx("w-5 h-5 transition-transform", isAdding && "rotate-45")} />
+                        <Plus className="w-5 h-5" />
                     </button>
                 )}
             </div>
 
             <Card className="border-none shadow-premium dark:bg-slate-950 overflow-visible">
                 <CardContent className="p-4 sm:p-5">
-                    <AnimatePresence initial={false}>
-                        {isAdding && (
-                            <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: 'auto', opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                className="overflow-hidden"
-                            >
-                                <div className="mb-4 p-4 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-2xl border border-indigo-100/50 dark:border-indigo-900/20">
-                                    <div className="flex flex-col gap-3">
-                                        <div className="flex items-center gap-3 bg-white dark:bg-slate-900 px-4 py-2.5 rounded-xl shadow-sm ring-1 ring-slate-100 dark:ring-slate-800">
-                                            <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-500">
-                                                <DerivedIconComponent className="w-4 h-4" />
-                                            </div>
-                                            <input
-                                                autoFocus
-                                                type="text"
-                                                value={newName}
-                                                onChange={(e) => setNewName(e.target.value)}
-                                                placeholder="Habit name (e.g. Smoothie)"
-                                                onKeyDown={(e) => e.key === 'Enter' && handleAddHabit()}
-                                                className="flex-1 bg-transparent border-none p-0 text-sm focus:ring-0 outline-none dark:text-white"
-                                            />
-                                        </div>
-
-                                        <div className="flex items-center justify-between gap-3">
-                                            <div className="flex bg-white dark:bg-slate-900 p-1 rounded-full ring-1 ring-slate-100 dark:ring-slate-800">
-                                                <button
-                                                    onClick={() => setNewType('toggle')}
-                                                    className={clsx(
-                                                        "px-4 py-1.5 text-[10px] font-bold rounded-full transition-all",
-                                                        newType === 'toggle' ? "bg-indigo-600 text-white shadow-md" : "text-slate-500"
-                                                    )}
-                                                >
-                                                    YES/NO
-                                                </button>
-                                                <button
-                                                    onClick={() => setNewType('number')}
-                                                    className={clsx(
-                                                        "px-4 py-1.5 text-[10px] font-bold rounded-full transition-all",
-                                                        newType === 'number' ? "bg-indigo-600 text-white shadow-md" : "text-slate-500"
-                                                    )}
-                                                >
-                                                    NUMBER
-                                                </button>
-                                            </div>
-
-                                            {newType === 'number' && (
-                                                <div className="flex bg-white dark:bg-slate-900 p-1 rounded-full ring-1 ring-slate-100 dark:ring-slate-800">
-                                                    <button
-                                                        onClick={() => setNewUnit('hrs')}
-                                                        className={clsx(
-                                                            "px-3 py-1.5 text-[9px] font-bold rounded-full transition-all",
-                                                            newUnit === 'hrs' ? "bg-amber-500 text-white shadow-sm" : "text-slate-400"
-                                                        )}
-                                                    >
-                                                        HRS
-                                                    </button>
-                                                    <button
-                                                        onClick={() => setNewUnit('mins')}
-                                                        className={clsx(
-                                                            "px-3 py-1.5 text-[9px] font-bold rounded-full transition-all",
-                                                            newUnit === 'mins' ? "bg-amber-500 text-white shadow-sm" : "text-slate-400"
-                                                        )}
-                                                    >
-                                                        MINS
-                                                    </button>
-                                                </div>
-                                            )}
-
-                                            <button
-                                                onClick={handleAddHabit}
-                                                disabled={!newName.trim()}
-                                                className="bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg shadow-indigo-200 dark:shadow-none hover:bg-indigo-700 disabled:opacity-50 transition-all ml-auto"
-                                            >
-                                                Add Item
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
 
                     <div className="space-y-1">
                         {habits.map((habit) => (
@@ -321,9 +218,30 @@ const DailyHabits = ({ habits, onUpdateHabit, isLocked }) => {
                                 />
                             )
                         ))}
+
+                        {habits.length === 0 && (
+                            <div className="py-8 text-center bg-slate-50/50 dark:bg-slate-900/30 rounded-2xl border-2 border-dashed border-slate-100 dark:border-slate-800">
+                                <span className="block text-slate-400 text-xs mb-2">No habits tracked yet</span>
+                                <button
+                                    onClick={() => {
+                                        setShowModal(true);
+                                        setIsEditing(false);
+                                    }}
+                                    className="text-indigo-500 font-semibold text-xs hover:underline"
+                                >
+                                    + Add New Habit
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </CardContent>
             </Card>
+
+            <HabitManagerDialog
+                isOpen={showModal}
+                onClose={() => setShowModal(false)}
+                onAdd={handleAdd}
+            />
         </section>
     );
 };

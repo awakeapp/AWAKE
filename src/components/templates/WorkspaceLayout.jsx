@@ -1,5 +1,5 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Home, Calendar, Layout, List, Settings, Plus, Bell, Search, Star, Clock, Menu, X, ChevronRight } from 'lucide-react';
+import { Home, Calendar, Layout, List, Settings, Plus, Bell, Search, Star, Clock, Menu, X, ChevronRight, ListTodo } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -26,7 +26,7 @@ const WorkspaceLayout = ({ children }) => {
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-sans transition-colors duration-300">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-sans transition-colors duration-300 pb-24">
             {/* Background Decoration */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
                 <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl opacity-50 mix-blend-multiply animate-float" />
@@ -37,10 +37,10 @@ const WorkspaceLayout = ({ children }) => {
             <header className="sticky top-0 left-0 right-0 h-16 glass-panel z-30 px-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
                 <div className="flex items-center gap-3" onClick={() => navigate('/')}>
                     <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-indigo-500/20">
-                        W
+                        <ListTodo className="w-5 h-5" />
                     </div>
                     <div>
-                        <span className="block font-bold text-slate-900 dark:text-white leading-none">Workspace</span>
+                        <span className="block font-bold text-slate-900 dark:text-white leading-none">Todo</span>
                     </div>
                 </div>
                 <button

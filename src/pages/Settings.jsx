@@ -7,13 +7,17 @@ import { useLogout } from '../hooks/useLogout';
 import { User, Lock, Edit2, Check, X, Download, ShieldCheck, LogOut, Moon, Sun } from 'lucide-react';
 import Button from '../components/atoms/Button';
 import { getReportData, generateUserReportPDF } from '../utils/reportUtils';
+import EditProfileModal from '../components/organisms/EditProfileModal';
+import { FirestoreService } from '../services/firestore-service';
+import LegacyMigrator from '../components/molecules/LegacyMigrator'; // Added
+import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
+import { auth } from '../lib/firebase';
 
 const Settings = () => {
-    const { user, dispatch } = useAuthContext();
+    const { user } = useAuthContext();
     const { logout } = useLogout();
     const { theme, toggleTheme } = useTheme();
-    const [isEditingName, setIsEditingName] = useState(false);
-    const [newName, setNewName] = useState('');
+    const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
     // Password state
     const [isEditingPassword, setIsEditingPassword] = useState(false);
@@ -21,73 +25,45 @@ const Settings = () => {
     const [newPassword, setNewPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [passwordSuccess, setPasswordSuccess] = useState('');
+    const [isPasswordLoading, setIsPasswordLoading] = useState(false);
 
     // Report state
     const [stats, setStats] = useState(null);
 
     useEffect(() => {
         if (user) {
-            setNewName(user.displayName || '');
-            const reportStats = getReportData(user.uid);
-            setStats(reportStats);
+            getReportData(user.uid).then(reportStats => {
+                setStats(reportStats);
+            });
         }
     }, [user]);
 
-    const handleSaveName = () => {
-        if (!newName.trim()) return;
-
-        // Update local state (context)
-        const updatedUser = { ...user, displayName: newName };
-        dispatch({ type: 'LOGIN', payload: updatedUser });
-
-        // Update in localStorage 'awake_session'
-        localStorage.setItem('awake_session', JSON.stringify(updatedUser)); // Fix: Update session too or it reverts on reload if checking raw session
-
-        // Update in "database" (awake_users)
-        try {
-            const users = JSON.parse(localStorage.getItem('awake_users') || '[]');
-            const updatedUsers = users.map(u => u.uid === user.uid ? { ...u, displayName: newName } : u);
-            localStorage.setItem('awake_users', JSON.stringify(updatedUsers));
-        } catch (e) {
-            console.error("Failed to update user database", e);
-        }
-
-        setIsEditingName(false);
-    };
-
-    const handleSavePassword = () => {
+    const handleSavePassword = async () => {
         setPasswordError('');
         setPasswordSuccess('');
+        setIsPasswordLoading(true);
 
         if (!currentPassword || !newPassword) {
             setPasswordError("All fields are required");
+            setIsPasswordLoading(false);
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            setPasswordError("New password must be at least 6 characters");
+            setIsPasswordLoading(false);
             return;
         }
 
         try {
-            const users = JSON.parse(localStorage.getItem('awake_users') || '[]');
-            const foundIndex = users.findIndex(u => u.uid === user.uid);
+            if (!auth.currentUser) throw new Error("No user logged in");
 
-            if (foundIndex === -1) {
-                setPasswordError("User record not found");
-                return;
-            }
+            // Re-authenticate
+            const credential = EmailAuthProvider.credential(auth.currentUser.email, currentPassword);
+            await reauthenticateWithCredential(auth.currentUser, credential);
 
-            const foundUser = users[foundIndex];
-
-            if (foundUser.password !== currentPassword) {
-                setPasswordError("Incorrect current password");
-                return;
-            }
-
-            // Update password
-            users[foundIndex] = { ...foundUser, password: newPassword };
-            localStorage.setItem('awake_users', JSON.stringify(users));
-
-            // Update current user object if it contains password (usually shouldn't, but our mock might)
-            const updatedUser = { ...user, password: newPassword };
-            dispatch({ type: 'LOGIN', payload: updatedUser });
-            localStorage.setItem('awake_session', JSON.stringify(updatedUser));
+            // Update Password
+            await updatePassword(auth.currentUser, newPassword);
 
             setPasswordSuccess("Password updated successfully");
             setCurrentPassword('');
@@ -98,7 +74,16 @@ const Settings = () => {
             }, 1500);
 
         } catch (e) {
-            setPasswordError("Failed to update password");
+            console.error("Password Update Error", e);
+            if (e.code === 'auth/wrong-password') {
+                setPasswordError("Incorrect current password");
+            } else if (e.code === 'auth/requires-recent-login') {
+                setPasswordError("Please log in again before changing password");
+            } else {
+                setPasswordError("Failed to update password: " + e.message);
+            }
+        } finally {
+            setIsPasswordLoading(false);
         }
     };
 
@@ -108,75 +93,106 @@ const Settings = () => {
     };
 
     // --- App Settings States ---
-    const [appSettings, setAppSettings] = useState(() => {
-        const stored = localStorage.getItem('awake_settings');
-        return stored ? JSON.parse(stored) : {
-            language: 'English',
-            timeFormat: '12h',
-            appLock: false,
-            biometrics: false,
-            notifications: true
-        };
+    const [appSettings, setAppSettings] = useState({
+        language: 'English',
+        timeFormat: '12h',
+        appLock: false,
+        biometrics: false,
+        notifications: true
     });
 
-    const updateSetting = (key, value) => {
+    // Load Settings from Firestore
+    useEffect(() => {
+        if (!user) return;
+        const unsub = FirestoreService.subscribeToDocument(
+            `users/${user.uid}/config/settings`,
+            (data) => {
+                if (data) {
+                    setAppSettings(prev => ({ ...prev, ...data }));
+                }
+            }
+        );
+        return () => unsub();
+    }, [user]);
+
+    const updateSetting = async (key, value) => {
+        // Optimistic update
         const newSettings = { ...appSettings, [key]: value };
         setAppSettings(newSettings);
-        localStorage.setItem('awake_settings', JSON.stringify(newSettings));
+
+        if (user) {
+            try {
+                // Merge update
+                await FirestoreService.setItem(`users/${user.uid}/config/settings`, { [key]: value }, true);
+            } catch (e) {
+                console.error("Failed to save setting", e);
+                // Revert? (Complex without previous state history, but typically safe to ignore strict revert for settings)
+            }
+        }
     };
 
-    const handleClearData = () => {
-        if (window.confirm("Are you sure? This will wipe ALL your local routine and finance data. This cannot be undone.")) {
-            const keysToRemove = Object.keys(localStorage).filter(key =>
-                key.startsWith('awake_data_') ||
-                key.startsWith('awake_finance_data_') ||
-                key.startsWith('awake_settings')
-            );
-            keysToRemove.forEach(k => localStorage.removeItem(k));
-            window.location.reload();
+    const handleClearData = async () => {
+        if (window.confirm("Are you sure you want to sign out and clear local cache? This will NOT delete your cloud data.")) {
+            // We just logout and clear localStorage. 
+            // Firestore data persists.
+            try {
+                await logout();
+                localStorage.clear();
+                window.location.reload();
+            } catch (e) {
+                console.error("Clear data error", e);
+            }
         }
     };
 
     return (
         <div className="space-y-6 animate-in slide-in-from-right-4 duration-500 pb-24">
+
+            <EditProfileModal isOpen={isEditProfileOpen} onClose={() => setIsEditProfileOpen(false)} />
+
             {/* Header / Letterhead Style */}
-            <div className="relative overflow-hidden rounded-[2rem] bg-indigo-600 text-white shadow-2xl">
-                <div className="absolute top-0 right-0 p-12 opacity-10">
+            <div className="relative overflow-hidden rounded-[2rem] bg-cyan-500 text-white shadow-2xl">
+                {/* Background Pattern */}
+                <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
                     <ShieldCheck size={180} />
                 </div>
 
-                <div className="relative z-10 p-10 text-center space-y-4">
-                    <div className="w-24 h-24 mx-auto bg-white text-indigo-600 rounded-full flex items-center justify-center text-4xl font-bold border-4 border-indigo-200/50 shadow-lg">
-                        {user?.displayName?.charAt(0).toUpperCase() || 'U'}
-                    </div>
+                {/* Edit Button (Top Right) */}
+                <div className="absolute top-6 right-6 z-20">
+                    <button
+                        onClick={() => setIsEditProfileOpen(true)}
+                        className="p-3 bg-white/20 hover:bg-white/30 rounded-full transition-all backdrop-blur-md text-white shadow-lg"
+                        title="Edit Profile"
+                    >
+                        <Edit2 size={20} />
+                    </button>
+                </div>
 
-                    <div className="space-y-1">
-                        {isEditingName ? (
-                            <div className="flex items-center justify-center gap-2">
-                                <input
-                                    data-testid="name-input"
-                                    value={newName}
-                                    onChange={(e) => setNewName(e.target.value)}
-                                    className="bg-indigo-700/50 border border-indigo-400 rounded-xl px-4 py-1 text-center text-lg font-bold outline-none focus:ring-2 focus:ring-white/50"
-                                    autoFocus
+                <div className="relative z-10 p-10 text-center space-y-6">
+                    {/* Avatar */}
+                    <div className="relative w-32 h-32 mx-auto">
+                        <div className={`w-full h-full backdrop-blur-sm rounded-full p-2 border-4 border-white/30 shadow-2xl overflow-hidden flex items-center justify-center ${user?.profileColor || 'bg-cyan-400'}`}>
+                            {user?.photoURL ? (
+                                <img
+                                    src={user.photoURL}
+                                    alt={user?.name}
+                                    className="w-full h-full object-cover rounded-full bg-slate-100"
                                 />
-                                <button onClick={handleSaveName} className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors"><Check size={18} /></button>
-                                <button onClick={() => { setIsEditingName(false); setNewName(user?.displayName || ''); }} className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors"><X size={18} /></button>
-                            </div>
-                        ) : (
-                            <div className="flex items-center justify-center gap-2 group">
-                                <h2 className="text-2xl font-black tracking-tight">{user?.displayName || 'User'}</h2>
-                                <button
-                                    onClick={() => setIsEditingName(true)}
-                                    className="opacity-0 group-hover:opacity-100 transition-all p-1.5 hover:bg-white/20 rounded-full"
-                                >
-                                    <Edit2 size={14} />
-                                </button>
-                            </div>
-                        )}
-                        <p className="text-indigo-200 text-sm font-medium">{user?.email}</p>
+                            ) : (
+                                <div className="w-full h-full rounded-full flex items-center justify-center text-4xl font-black !text-white uppercase tracking-wider">
+                                    {user?.initials || user?.name?.charAt(0) || 'U'}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
+                    {/* Name & Info */}
+                    <div className="space-y-1">
+                        <h2 className="text-4xl font-black tracking-tight">{user?.name}</h2>
+                        <p className="text-white/80 text-lg font-medium">{user?.email}</p>
+                    </div>
+
+                    {/* Status Badges */}
                     <div className="pt-2 flex justify-center gap-2">
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[10px] font-bold tracking-widest uppercase">
                             <ShieldCheck size={10} /> Verified ID
@@ -298,7 +314,7 @@ const Settings = () => {
                                     </div>
                                     <div className="text-left">
                                         <p className="font-bold text-slate-700 dark:text-slate-200 text-sm">Update Password</p>
-                                        <p className="text-xs text-slate-500">Last changed: 30 days ago</p>
+                                        <p className="text-xs text-slate-500">Last changed: --</p>
                                     </div>
                                 </div>
                                 <Edit2 className="w-4 h-4 text-slate-400 group-hover:text-indigo-500 transition-colors" />
@@ -324,7 +340,7 @@ const Settings = () => {
                                                 value={newPassword}
                                                 onChange={(e) => setNewPassword(e.target.value)}
                                                 className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
-                                                placeholder="Min. 8 characters"
+                                                placeholder="Min. 6 characters"
                                             />
                                         </div>
                                     </div>
@@ -342,7 +358,13 @@ const Settings = () => {
 
                                     <div className="flex gap-3 pt-2">
                                         <Button variant="outline" className="flex-1 rounded-xl h-11" onClick={() => setIsEditingPassword(false)}>Cancel</Button>
-                                        <Button className="flex-1 rounded-xl h-11 shadow-lg shadow-indigo-100 dark:shadow-none" onClick={handleSavePassword}>Save Changes</Button>
+                                        <Button
+                                            className="flex-1 rounded-xl h-11 shadow-lg shadow-indigo-100 dark:shadow-none"
+                                            onClick={handleSavePassword}
+                                            isLoading={isPasswordLoading}
+                                        >
+                                            Save Changes
+                                        </Button>
                                     </div>
                                 </div>
                             )}
@@ -375,24 +397,27 @@ const Settings = () => {
                         </CardContent>
                     </Card>
 
-                    {/* Clear Data */}
-                    <Card className="border-none shadow-premium bg-rose-50/30 dark:bg-rose-950/10">
+                    {/* Clear Configuration */}
+                    <Card className="border-none shadow-premium bg-amber-50/30 dark:bg-amber-950/10">
                         <CardContent className="p-4 flex items-center justify-between">
                             <div className="flex items-center gap-4">
-                                <div className="p-2.5 bg-rose-100 dark:bg-rose-900/30 text-rose-600 rounded-xl">
+                                <div className="p-2.5 bg-amber-100 dark:bg-amber-900/30 text-amber-600 rounded-xl">
                                     <ShieldCheck className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">Clear All Data</p>
-                                    <p className="text-xs text-slate-500">Permanently wipe local storage</p>
+                                    <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">Reset Cache</p>
+                                    <p className="text-xs text-slate-500">Fix sync issues by clearing local cache</p>
                                 </div>
                             </div>
                             <button
                                 onClick={handleClearData}
-                                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-black rounded-lg transition-transform active:scale-95 shadow-lg shadow-rose-200 dark:shadow-none"
-                            >WIPE DATA</button>
+                                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-black rounded-lg transition-transform active:scale-95 shadow-lg shadow-amber-200 dark:shadow-none"
+                            >RESET</button>
                         </CardContent>
                     </Card>
+
+                    {/* Migration Tool */}
+                    <LegacyMigrator />
                 </div>
             </section>
 
@@ -409,7 +434,7 @@ const Settings = () => {
                     Humi Awake v1.2.0 • Build ID: 88AF2
                 </p>
             </div>
-        </div>
+        </div >
     );
 };
 

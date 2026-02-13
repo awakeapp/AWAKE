@@ -19,6 +19,7 @@
   "type": "commonjs",
   "dependencies": {
     "@mlc-ai/web-llm": "^0.2.80",
+    "blueimp-md5": "^2.19.0",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",

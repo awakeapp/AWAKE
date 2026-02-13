@@ -1,11 +1,12 @@
 import { Navigate } from 'react-router-dom';
 import { useAuthContext } from '../hooks/useAuthContext';
+import FullPageLoader from './molecules/FullPageLoader';
 
 const ProtectedRoute = ({ children }) => {
     const { user, authIsReady } = useAuthContext();
 
     if (!authIsReady) {
-        return <div>Loading...</div>; // Or a proper loading spinner
+        return <FullPageLoader />;
     }
 
     if (!user) {

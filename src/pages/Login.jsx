@@ -6,29 +6,79 @@ import { useAuthContext } from '../hooks/useAuthContext';
 import Button from '../components/atoms/Button';
 import Input from '../components/atoms/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/atoms/Card';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, CheckCircle, XCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import awakeLogo from '../assets/awake_logo_new.png';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from '../lib/firebase';
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { cn } from '../lib/utils';
+import FullPageLoader from '../components/molecules/FullPageLoader';
+import ErrorDisplay from '../components/molecules/ErrorDisplay';
 
 const Login = () => {
+
     const [isSignup, setIsSignup] = useState(false);
     const [identifier, setIdentifier] = useState(''); // Email
     const [password, setPassword] = useState('');
     const [displayName, setDisplayName] = useState('');
     const [googleError, setGoogleError] = useState(null);
     const [isGooglePending, setIsGooglePending] = useState(false);
+    const [isEmailValid, setIsEmailValid] = useState(null);
 
     const { login, error: loginError, isPending: loginPending } = useLogin();
     const { signup, error: signupError, isPending: signupPending } = useSignup();
     const { user, authIsReady } = useAuthContext();
 
+    const [successMessage, setSuccessMessage] = useState(null);
+
+    // List of common disposable email domains to block
+    const DISPOSABLE_DOMAINS = [
+        'tempmail.com', '10minutemail.com', 'mailinator.com', 'yopmail.com',
+        'guerrillamail.com', 'sharklasers.com', 'throwawaymail.com', 'getnada.com',
+        'dispostable.com', 'fake-email.com'
+    ];
+
+    const validateEmail = (email) => {
+        // Strict syntax check
+        const strictRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!strictRegex.test(email)) return false;
+
+        const domain = email.split('@')[1];
+        if (!domain) return false;
+        return !DISPOSABLE_DOMAINS.includes(domain.toLowerCase());
+    };
+
+    const validatePassword = (pwd) => {
+        // At least 8 chars, 1 uppercase, 1 number/special char
+        const strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9!@#\$%\^&\*])(?=.{8,})");
+        return strongRegex.test(pwd);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setGoogleError(null);
+        setSuccessMessage(null);
+
+        // Signup Validations
         if (isSignup) {
-            await signup(identifier, password, displayName);
+            if (!validateEmail(identifier)) {
+                setGoogleError("Please use a valid, permanent email address.");
+                return;
+            }
+            if (!validatePassword(password)) {
+                setGoogleError("Password must be at least 8 characters with 1 uppercase letter and 1 number/symbol.");
+                return;
+            }
+
+            const res = await signup(identifier, password, displayName);
+            if (res && res.verificationRequired) {
+                setSuccessMessage("Account created! We sent you a verification email. Please verify to log in.");
+                setIsSignup(false);
+                setIdentifier('');
+                setPassword('');
+                setDisplayName('');
+            }
+
         } else {
             await login(identifier, password);
         }
@@ -71,7 +121,7 @@ const Login = () => {
     };
 
     if (!authIsReady) {
-        return <div className="min-h-screen bg-slate-50 dark:bg-slate-950" />;
+        return <FullPageLoader />;
     }
 
     if (user) {
@@ -133,15 +183,38 @@ const Login = () => {
                             </AnimatePresence>
 
                             <div className="space-y-4">
-                                <Input
-                                    type="email"
-                                    placeholder="Email address"
-                                    value={identifier}
-                                    onChange={(e) => setIdentifier(e.target.value)}
-                                    autoComplete="email"
-                                    required
-                                    className="h-12 bg-slate-50 border-transparent focus:bg-white transition-all text-lg"
-                                />
+                                <div className="relative">
+                                    <Input
+                                        type="email"
+                                        placeholder="Email address"
+                                        value={identifier}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            setIdentifier(val);
+                                            if (val.length > 0) {
+                                                // Only validate if it looks like an email mostly
+                                                if (val.includes('@') && val.includes('.')) {
+                                                    setIsEmailValid(validateEmail(val));
+                                                } else {
+                                                    setIsEmailValid(false);
+                                                }
+                                            } else {
+                                                setIsEmailValid(null);
+                                            }
+                                        }}
+                                        autoComplete="email"
+                                        required
+                                        className={cn(
+                                            "h-12 bg-slate-50 border-transparent focus:bg-white transition-all text-lg pr-12",
+                                            isEmailValid === true && "border-green-500 focus:ring-green-500",
+                                            isEmailValid === false && identifier.length > 0 && "border-red-500 focus:ring-red-500"
+                                        )}
+                                    />
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                        {isEmailValid === true && <CheckCircle className="w-5 h-5 text-green-500" />}
+                                        {isEmailValid === false && identifier.length > 0 && <XCircle className="w-5 h-5 text-red-500" />}
+                                    </div>
+                                </div>
 
                                 <div className="space-y-1">
                                     <Input
@@ -167,13 +240,37 @@ const Login = () => {
                             </div>
 
                             {(error || googleError) && (
+                                <ErrorDisplay
+                                    type="auth"
+                                    title="Authentication Error"
+                                    message={(() => {
+                                        const rawMsg = googleError || error || "";
+                                        if (rawMsg.includes("auth/invalid-credential") || rawMsg.includes("auth/wrong-password") || rawMsg.includes("auth/user-not-found")) {
+                                            return "Incorrect email or password.";
+                                        }
+                                        if (rawMsg.includes("auth/too-many-requests")) {
+                                            return "Too many failed attempts. Please try again later.";
+                                        }
+                                        if (rawMsg.includes("auth/email-already-in-use")) {
+                                            return "Email already in use. Please sign in.";
+                                        }
+                                        if (rawMsg.includes("auth/weak-password")) {
+                                            return "Password is too weak. Try a stronger one.";
+                                        }
+                                        // Fallback cleaning
+                                        return rawMsg.replace('Firebase:', '').replace('Error:', '').trim();
+                                    })()}
+                                />
+                            )}
+
+                            {successMessage && (
                                 <motion.div
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
-                                    className="text-sm font-medium text-red-600 bg-red-50 p-3 rounded-xl border border-red-100 flex items-center gap-2"
+                                    className="text-sm font-medium text-green-600 bg-green-50 p-3 rounded-xl border border-green-100 flex items-center gap-2"
                                 >
-                                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                                    {googleError || error?.replace('Firebase:', '').replace('Error', '').trim()}
+                                    <CheckCircle className="w-5 h-5" />
+                                    {successMessage}
                                 </motion.div>
                             )}
 
@@ -182,7 +279,7 @@ const Login = () => {
                                 className="w-full h-12 text-lg font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 dark:shadow-none rounded-xl"
                                 isLoading={isPending}
                             >
-                                {isSignup ? 'Create Account' : 'Sign In'}
+                                {isSignup ? 'Create Account' : 'Sign In (Updated)'}
                                 {!isPending && <ArrowRight className="ml-2 w-5 h-5" />}
                             </Button>
 

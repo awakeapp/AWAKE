@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { format, subDays, startOfDay } from 'date-fns';
 import { useAuthContext } from '../../hooks/useAuthContext';
+import { useData } from '../../context/DataContext';
 import { Card, CardContent } from '../atoms/Card';
 import { MoreHorizontal } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,69 +16,88 @@ const METRICS = [
 
 const WeeklyProgress = () => {
     const { user } = useAuthContext();
-    const uid = user ? user.uid : 'guest';
+    const { getHistory } = useData();
     const [selectedMetric, setSelectedMetric] = useState(METRICS[0]);
     const [showMenu, setShowMenu] = useState(false);
+    const [historyData, setHistoryData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const data = useMemo(() => {
-        const history = [];
-        const today = startOfDay(new Date());
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!user) {
+                setLoading(false);
+                return;
+            }
+            try {
+                // Fetch last 7 days including today
+                const data = await getHistory(7);
+                setHistoryData(data);
+            } catch (err) {
+                console.error("Failed to load history", err);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-        for (let i = 6; i >= 0; i--) {
-            const date = subDays(today, i);
-            const dateKey = format(date, 'yyyy-MM-dd');
-            const storageKey = `awake_data_${uid}_${dateKey}`;
+        fetchData();
+    }, [user, getHistory]);
 
-            const dayLabel = i === 0 ? 'Today' : format(date, 'EEE');
+    const chartData = useMemo(() => {
+        if (!historyData || historyData.length === 0) return Array(7).fill({ day: '-', score: 0 });
+
+        return historyData.map((dayData, index) => {
+            const isToday = index === 6; // Assuming getHistory returns oldest to newest
+            const dayLabel = isToday ? 'Today' : (new Date(dayData.date).toLocaleDateString('en-US', { weekday: 'short' }));
 
             let score = 0;
-            try {
-                const stored = localStorage.getItem(storageKey);
-                if (stored) {
-                    const parsed = JSON.parse(stored);
+            if (dayData.data) {
+                if (selectedMetric.id === 'routine') {
+                    // Score is already calculated in getHistory for routine but let's re-verify or use it
+                    score = dayData.score;
+                } else {
+                    // Habits
+                    const val = dayData.data.habits?.find(h => h.id === selectedMetric.id)?.value
+                        || dayData.data.habits?.[selectedMetric.id]; // Backwards compat for object structure if any
 
-                    if (selectedMetric.id === 'routine') {
-                        if (parsed.tasks && parsed.tasks.length > 0) {
-                            const completed = parsed.tasks.filter(t => t.status === 'checked').length;
-                            score = Math.round((completed / parsed.tasks.length) * 100);
-                        }
-                    } else {
-                        // Habits logic
-                        const val = parsed.habits?.[selectedMetric.id];
-                        if (typeof val === 'boolean') {
-                            score = val ? 100 : 0;
-                        } else if (typeof val === 'number') {
-                            score = val;
-                        }
+                    if (typeof val === 'boolean') {
+                        score = val ? 100 : 0;
+                    } else if (typeof val === 'number') {
+                        score = val;
                     }
                 }
-            } catch (e) {
-                console.warn('Failed to parse data for graph', e);
             }
 
-            history.push({
+            return {
                 day: dayLabel,
                 score: score,
-                date: dateKey
-            });
-        }
-        return history;
-    }, [uid, selectedMetric]);
+                date: dayData.date
+            };
+        });
+    }, [historyData, selectedMetric]);
+
 
     // Interpretive Insight Logic
     const trendInsight = useMemo(() => {
-        if (!data || data.length < 2) return null;
-        const scores = data.map(d => d.score);
+        if (!chartData || chartData.length < 2) return null;
+        const scores = chartData.map(d => d.score);
         const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
-        const todayScore = scores[6];
-        const yesterdayScore = scores[5];
+        const todayScore = scores[scores.length - 1];
+        const yesterdayScore = scores[scores.length - 2];
 
         if (todayScore === 100 && yesterdayScore === 100) return "Top-tier consistency! You're on a roll.";
         if (todayScore > yesterdayScore) return "Momentum is building. Keep pushing!";
         if (avg > 80) return "Highly disciplined week. You're crushing it.";
         if (avg > 50) return "Steady progress. Stay the course.";
         return "New day, new opportunity. Build your streak.";
-    }, [data]);
+    }, [chartData]);
+
+    if (loading) {
+        return (
+            <Card className="border-none shadow-sm bg-white h-[240px] flex items-center justify-center">
+                <div className="text-slate-400 text-sm">Loading progress...</div>
+            </Card>
+        );
+    }
 
     return (
         <Card className="border-none shadow-sm bg-white overflow-visible relative z-10">
@@ -129,7 +148,7 @@ const WeeklyProgress = () => {
 
                 <div className="h-32 w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={data} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
+                        <BarChart data={chartData} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
                             <XAxis
                                 dataKey="day"
                                 axisLine={false}
@@ -149,7 +168,7 @@ const WeeklyProgress = () => {
                                 formatter={(value) => [`${value}${typeof value === 'boolean' ? '' : '%'}`, 'Value']}
                             />
                             <Bar dataKey="score" radius={[4, 4, 0, 0]} maxBarSize={40}>
-                                {data.map((entry, index) => (
+                                {chartData.map((entry, index) => (
                                     <Cell
                                         key={`cell-${index}`}
                                         fill={entry.day === 'Today' ? '#4f46e5' : '#cbd5e1'}

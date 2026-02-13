@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { auth, sendPasswordResetEmail } from '../lib/firebase';
+import { auth } from '../lib/firebase';
+import { sendPasswordResetEmail } from 'firebase/auth';
 
 export const useResetPassword = () => {
     const [error, setError] = useState(null);

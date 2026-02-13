@@ -22,6 +22,14 @@ const Routine = () => {
     const [showManagerModal, setShowManagerModal] = useState(false);
     const [showUnlockModal, setShowUnlockModal] = useState(false);
 
+    // Track expanded categories (default all open)
+    const [expandedCategories, setExpandedCategories] = useState({
+        'EARLY MORNING': true,
+        'BEFORE NOON': true,
+        'AFTER NOON': true,
+        'EVE/NIGHT': true,
+    });
+
     // Unified Feedback Logic
     const [feedbackModal, setFeedbackModal] = useState({ isOpen: false, type: 'success', category: '' });
 

@@ -1,61 +1,52 @@
 import { useState } from 'react';
 import { useAuthContext } from './useAuthContext';
-import { api } from '../services/api';
+import { auth } from '../lib/firebase';
+import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification, signOut } from 'firebase/auth';
 
 export const useSignup = () => {
     const [error, setError] = useState(null);
     const [isPending, setIsPending] = useState(false);
-    // dispatch is unused here because signup doesn't auto-login anymore in this secure flow
-    // but verifyOtp might want to auto-login or we do it in component.
 
-    const signup = async (email, password, displayName, phone = '') => {
+
+    const signup = async (email, password, displayName) => {
         setError(null);
         setIsPending(true);
 
         try {
-            const res = await api.auth('signUp', {
-                email,
-                password,
-                username: displayName,
-                phone
-            });
+            const res = await createUserWithEmailAndPassword(auth, email, password);
 
-            if (!res.success) {
-                throw new Error(res.error.message || 'Signup failed');
+            if (!res) {
+                throw new Error('Could not complete signup');
             }
 
-            // Return data including the dev_otp for now
-            return res.data;
+            // Generate default avatar
+            const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random&color=fff&bold=true`;
+
+            // Update display name and photoURL
+            await updateProfile(res.user, {
+                displayName,
+                photoURL: avatarUrl
+            });
+
+            // Send verification email
+            await sendEmailVerification(res.user);
+
+            // Sign out immediately so they can't access app
+            await signOut(auth);
+
+            // Do NOT dispatch login. Instead, return specific flag
+ 
+
+            setIsPending(false);
+            return { verificationRequired: true };
 
         } catch (err) {
             console.error("Signup Failed:", err);
             setError(err.message);
-            throw err;
-        } finally {
             setIsPending(false);
+            throw err; // Re-throw so component knows it failed
         }
     };
 
-    const verifyOtp = async (identifier, otp) => {
-        setError(null);
-        setIsPending(true);
-        try {
-            const res = await api.auth('verifySignUpOTP', {
-                identifier,
-                otp
-            });
-
-            if (!res.success) {
-                throw new Error(res.error.message || 'Verification failed');
-            }
-            return res.data;
-        } catch (err) {
-            setError(err.message);
-            throw err;
-        } finally {
-            setIsPending(false);
-        }
-    };
-
-    return { signup, verifyOtp, error, isPending };
+    return { signup, error, isPending };
 };

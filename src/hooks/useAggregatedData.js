@@ -11,7 +11,7 @@ import { isBefore, addDays, parseISO, differenceInDays } from 'date-fns';
  */
 export const useAggregatedData = () => {
     const { getVehicleRisks, followUps } = useVehicle();
-    const { recurringRules, subscriptions, getBudgetStats, transactions } = useFinance();
+    const { recurringRules, subscriptions, getBudgetStats, transactions, categories } = useFinance();
     const { tasks } = useTasks();
     const { dailyData } = useData(); // Routine tasks
 
@@ -69,12 +69,34 @@ export const useAggregatedData = () => {
             }
         });
 
-        // 2. Budget Overruns (e.g., Food > 100%)
-        // We'd need categories from context to invoke getBudgetStats, but simpler:
-        // Assume context provides a way or we skip for now to avoid complexity in this step.
+        // 2. Budget Overruns
+        if (categories) {
+            categories.forEach(cat => {
+                if (cat.type === 'expense' && cat.budget > 0) {
+                    const stats = getBudgetStats(cat.id);
+                    if (stats && stats.percent >= 100) {
+                        allAlerts.push({
+                            id: `fin_budget_${cat.id}`,
+                            module: 'finance',
+                            level: 'critical',
+                            title: `Budget Exceeded`,
+                            sub: `${cat.name} used ${stats.percent}%`,
+                            actionLink: '/finance',
+                            date: new Date().toISOString()
+                        });
+                    }
+                }
+            });
+        }
+
+        // Refetch categories from hook
+        // ... wait, I need to allow useFinance destructuring to include categories
 
         return allAlerts.sort((a, b) => (a.level === 'critical' ? -1 : 1));
-    }, [followUps, subscriptions]);
+    }, [followUps, subscriptions, recurringRules, transactions, categories]);
+
+
+
 
     const pendingCounts = useMemo(() => {
         return {

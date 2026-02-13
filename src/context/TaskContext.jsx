@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { useAuthContext } from '../hooks/useAuthContext';
-import { format, isBefore, startOfDay, isSameDay } from 'date-fns';
+import { format } from 'date-fns';
+import { FirestoreService } from '../services/firestore-service';
+import { where, orderBy, limit } from 'firebase/firestore';
 
 const TaskContext = createContext();
 
@@ -13,9 +15,12 @@ export const useTasks = () => {
 };
 
 export const TaskContextProvider = ({ children }) => {
-    const { user } = useAuthContext();
-    const [tasks, setTasks] = useState([]);
-    const [lockedDays, setLockedDays] = useState({}); // { "YYYY-MM-DD": { score: 85, completedAt: timestamp } }
+    const { user, authIsReady } = useAuthContext();
+    const [activeTasks, setActiveTasks] = useState([]);
+    const [completedTasks, setCompletedTasks] = useState([]);
+    const [completedLimit, setCompletedLimit] = useState(50);
+    const [lockedDays, setLockedDays] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
 
     // Default Settings
     const [settings, setSettings] = useState({
@@ -30,98 +35,136 @@ export const TaskContextProvider = ({ children }) => {
 
     const currentDateStr = format(new Date(), 'yyyy-MM-dd');
 
-    // Load from local storage
+    // --- Firestore Subscriptions ---
     useEffect(() => {
-        const uid = user ? user.uid : 'guest';
-        const tasksKey = `awake_workspace_tasks_${uid}`;
-        const lockedKey = `awake_workspace_locked_days_${uid}`;
-        const settingsKey = `awake_workspace_settings_${uid}`;
+        if (!authIsReady) return;
 
-        try {
-            const storedTasks = localStorage.getItem(tasksKey);
-            const storedLocked = localStorage.getItem(lockedKey);
-            const storedSettings = localStorage.getItem(settingsKey);
-
-            if (storedTasks) setTasks(JSON.parse(storedTasks));
-            else setTasks([]);
-
-            if (storedLocked) setLockedDays(JSON.parse(storedLocked));
-            else setLockedDays({});
-
-            if (storedSettings) setSettings(prev => ({ ...prev, ...JSON.parse(storedSettings) }));
-        } catch (e) {
-            console.error("Failed to load task data", e);
+        if (!user) {
+            setActiveTasks([]);
+            setCompletedTasks([]);
+            setLockedDays({});
+            setIsLoading(false);
+            return;
         }
-    }, [user]);
 
-    // Persistence Helper
-    const saveData = (newTasks, newLockedDays, newSettings) => {
-        const uid = user ? user.uid : 'guest';
-        if (newTasks !== undefined) {
-            setTasks(newTasks);
-            localStorage.setItem(`awake_workspace_tasks_${uid}`, JSON.stringify(newTasks));
-        }
-        if (newLockedDays !== undefined) {
-            setLockedDays(newLockedDays);
-            localStorage.setItem(`awake_workspace_locked_days_${uid}`, JSON.stringify(newLockedDays));
-        }
-        if (newSettings !== undefined) {
-            setSettings(newSettings);
-            localStorage.setItem(`awake_workspace_settings_${uid}`, JSON.stringify(newSettings));
-        }
-    };
+        setIsLoading(true);
+
+        // 1. Subscribe to Active Tasks (Pending)
+        // High limit to ensure we see all relevant work
+        const activeUnsubscribe = FirestoreService.subscribeToCollection(
+            `users/${user.uid}/tasks`,
+            (data) => {
+                setActiveTasks(data);
+                // We consider app "loaded" when active tasks arrive
+                setIsLoading(false);
+            },
+            where('status', '==', 'pending'),
+            orderBy('createdAt', 'desc'),
+            limit(200)
+        );
+
+        // 2. Subscribe to Completed Tasks (Limited)
+        const completedUnsubscribe = FirestoreService.subscribeToCollection(
+            `users/${user.uid}/tasks`,
+            (data) => {
+                setCompletedTasks(data);
+            },
+            where('status', '==', 'completed'),
+            orderBy('createdAt', 'desc'),
+            limit(completedLimit)
+        );
+
+        // 2. Subscribe to Settings
+        const settingsUnsubscribe = FirestoreService.subscribeToDocument(
+            `users/${user.uid}/config`,
+            'taskSettings',
+            (data) => {
+                if (data) {
+                    setSettings(prev => ({ ...prev, ...data }));
+                }
+            }
+        );
+
+        // 3. Subscribe to Locked Days
+        // Storing simply as a single document for now to match easy migration
+        const lockedUnsubscribe = FirestoreService.subscribeToDocument(
+            `users/${user.uid}/data`,
+            'lockedDays',
+            (data) => {
+                if (data && data.days) {
+                    setLockedDays(data.days);
+                }
+            }
+        );
+
+        return () => {
+            activeUnsubscribe();
+            completedUnsubscribe();
+            settingsUnsubscribe();
+            lockedUnsubscribe();
+        };
+    }, [user, authIsReady, completedLimit]);
+
+    // --- Persistence Helpers ---
+    // (We now write directly to Firestore)
 
     const updateSettings = (updates) => {
+        if (!user) return; // Guest mode deferred for now or handle appropriately
         const newSettings = { ...settings, ...updates };
-        saveData(undefined, undefined, newSettings);
+        setSettings(newSettings); // Optimistic
+        FirestoreService.setItem(`users/${user.uid}/config`, 'taskSettings', newSettings);
     };
 
     // --- Helpers ---
     const isDayLocked = (dateStr) => {
-        // Only lock strictly past dates. Today is always editable until midnight.
         return dateStr < currentDateStr;
     };
 
     const getDailyScore = (dateStr) => {
         const dayTasks = tasks.filter(t => t.date === dateStr);
         if (dayTasks.length === 0) return 0;
-
-        // Count completed tasks (status 'completed' OR boolean check if migrating)
         const completed = dayTasks.filter(t => t.status === 'completed' || t.isCompleted).length;
         return Math.round((completed / dayTasks.length) * 100);
     };
 
     // --- Actions ---
 
-    // Enhanced Add Task
-    const addTask = (title, options = {}) => {
-        const taskDate = options.date || currentDateStr;
+    const addTask = async (title, options = {}) => {
+        if (!user) return; // TODO: Prompt login
 
+        const taskDate = options.date || currentDateStr;
         if (isDayLocked(taskDate)) {
             console.warn("Cannot add tasks to a locked day.");
             return;
         }
 
         const newTask = {
-            id: `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             title,
-            status: 'pending', // pending | completed | missed
-            isCompleted: false, // Backward compatibility
+            status: 'pending',
+            isCompleted: false,
             date: taskDate,
             createdAt: Date.now(),
-
-            // New Properties
             priority: options.priority || 'Medium',
             category: options.category || 'Work',
             time: options.time || null,
             estimatedTime: options.estimatedTime || 15,
             description: options.description || '',
+            userId: user.uid // Redundant with path but good for index safety
         };
 
-        saveData([newTask, ...tasks], undefined);
+        try {
+            // Tasks are now individual documents in the collection
+            const docRef = await FirestoreService.addItem(`users/${user.uid}/tasks`, newTask);
+            console.log("Task added successfully with ID:", docRef.id);
+            return { ...newTask, id: docRef.id };
+        } catch (error) {
+            console.error("Error adding task:", error);
+            throw error;
+        }
     };
 
-    const updateTask = (id, updates) => {
+    const updateTask = async (id, updates) => {
+        if (!user) return;
         const task = tasks.find(t => t.id === id);
         if (!task) return;
 
@@ -130,99 +173,64 @@ export const TaskContextProvider = ({ children }) => {
             return;
         }
 
-        const newTasks = tasks.map(t =>
-            t.id === id ? { ...t, ...updates } : t
-        );
-        saveData(newTasks, undefined);
+        // Optimistic update (optional, but UI listens to onSnapshot so it will bounce back quickly)
+        // Here we just fire and forget the update
+        await FirestoreService.updateItem(`users/${user.uid}/tasks`, id, updates);
     };
 
-    const toggleTask = (id) => {
-        const task = tasks.find(t => t.id === id);
-        if (!task) return;
-
-        // Smart Toggle: If completing a PENDING task from a LOCKED (past) day, move it to TODAY first.
-        if (isDayLocked(task.date)) {
-            if (task.status !== 'completed' && !task.isCompleted) {
-                // Move to today and complete
-                updateTask(id, {
-                    date: currentDateStr,
-                    status: 'completed',
-                    isCompleted: true
-                });
-                // Note: updateTask has a lock check, so we need to bypass it or use a raw update here.
-                // updateTask blocks locked days. We should use a raw update or the new reschedule logic combined.
-                return; // We'll handle this purely in the replacement block below to avoid double calls/logic issues.
-            } else {
-                return; // Prevent unchecking/modifying already completed past tasks
-            }
-        }
-
-        // Standard logic for non-locked days
-        const isNowCompleted = !(task.status === 'completed' || task.isCompleted);
-        const newStatus = isNowCompleted ? 'completed' : 'pending';
-
-        updateTask(id, {
-            status: newStatus,
-            isCompleted: isNowCompleted
-        });
-    };
-
-    // Special action to move a task regardless of lock status (e.g., rolling over)
-    const rescheduleTask = (id, newDateStr) => {
-        const newTasks = tasks.map(t =>
-            t.id === id ? { ...t, date: newDateStr } : t
-        );
-        saveData(newTasks, undefined); // Bypasses specific Update warnings
-    };
-
-    // Revision of toggleTask to use raw data update for the "Smart Move" to avoid the updateTask lock
-    const smartToggleTask = (id) => {
-        const task = tasks.find(t => t.id === id);
-        if (!task) return;
-
-        // Case 1: Task is on a locked past day AND is pending
-        if (isDayLocked(task.date) && !task.isCompleted && task.status !== 'completed') {
-            const newTasks = tasks.map(t =>
-                t.id === id ? { ...t, date: currentDateStr, status: 'completed', isCompleted: true } : t
-            );
-            saveData(newTasks, undefined);
-            return;
-        }
-
-        // Case 2: Task is on a locked day (completed/missed) -> Read Only
-        if (isDayLocked(task.date)) return;
-
-        // Case 3: Normal Toggle on Active Day
-        const isNowCompleted = !(task.status === 'completed' || task.isCompleted);
-        const newStatus = isNowCompleted ? 'completed' : 'pending';
-
-        const newTasks = tasks.map(t =>
-            t.id === id ? { ...t, status: newStatus, isCompleted: isNowCompleted } : t
-        );
-        saveData(newTasks, undefined);
-    };
-
-    const deleteTask = (id) => {
+    const deleteTask = async (id) => {
+        if (!user) return;
         const task = tasks.find(t => t.id === id);
         if (task && isDayLocked(task.date)) {
             console.warn("Cannot delete tasks of a locked day.");
             return;
         }
-        const newTasks = tasks.filter(t => t.id !== id);
-        saveData(newTasks, undefined);
+        await FirestoreService.deleteItem(`users/${user.uid}/tasks`, id);
     };
 
-    // Complete Day Action
-    const completeDay = () => {
+    const toggleTask = async (id) => {
+        console.warn("Using smartToggleTask instead.");
+        smartToggleTask(id);
+    };
+
+    const rescheduleTask = async (id, newDateStr) => {
+        if (!user) return;
+        await FirestoreService.updateItem(`users/${user.uid}/tasks`, id, { date: newDateStr });
+    };
+
+    const smartToggleTask = async (id) => {
+        if (!user) return;
+        const task = tasks.find(t => t.id === id);
+        if (!task) return;
+
+        // Case 1: Past & Pending -> Move to Today & Complete
+        if (isDayLocked(task.date) && !task.isCompleted && task.status !== 'completed') {
+            await FirestoreService.updateItem(`users/${user.uid}/tasks`, id, {
+                date: currentDateStr,
+                status: 'completed',
+                isCompleted: true
+            });
+            return;
+        }
+
+        // Case 2: Past & Completed -> Locked (Read Only)
+        if (isDayLocked(task.date)) return;
+
+        // Case 3: Normal Toggle
+        const isNowCompleted = !(task.status === 'completed' || task.isCompleted);
+        const newStatus = isNowCompleted ? 'completed' : 'pending';
+
+        await FirestoreService.updateItem(`users/${user.uid}/tasks`, id, {
+            status: newStatus,
+            isCompleted: isNowCompleted
+        });
+    };
+
+    const completeDay = async () => {
+        if (!user) return 0;
         const score = getDailyScore(currentDateStr);
 
-        // Mark all non-completed tasks as missed -> CHANGED: Keep them pending for rollover
-        // We only lock the day. Pending tasks remain pending and will show up in "Pending from Previous Days"
-        const newTasks = tasks.map(t => {
-            // No status change for pending
-            return t;
-        });
-
+        // We do strictly one thing: Lock the day.
         const newLockedDays = {
             ...lockedDays,
             [currentDateStr]: {
@@ -231,34 +239,48 @@ export const TaskContextProvider = ({ children }) => {
             }
         };
 
-        saveData(newTasks, newLockedDays);
+        setLockedDays(newLockedDays); // Optimistic
+        await FirestoreService.setItem(`users/${user.uid}/data`, 'lockedDays', { days: newLockedDays });
         return score;
     };
 
-    const clearAllTasks = () => {
-        saveData([], {});
+    const clearAllTasks = async () => {
+        // Warning: This could be heavy if there are thousands. For now, we iterate.
+        if (!user) return;
+        // Batching would be better but keeping it simple for now as requested.
+        const promises = tasks.map(t => FirestoreService.deleteItem(`users/${user.uid}/tasks`, t.id));
+        await Promise.all(promises);
     };
 
     const [activePopoverId, setActivePopoverId] = useState(null);
 
+    // Merge active and completed tasks for consumers
+    const tasks = useMemo(() => {
+        const merged = [...activeTasks, ...completedTasks];
+        // Re-sort in case strict time order is needed across both lists
+        return merged.sort((a, b) => b.createdAt - a.createdAt);
+    }, [activeTasks, completedTasks]);
+
     const value = useMemo(() => ({
         tasks,
         lockedDays,
-        settings, // Expose
+        settings,
         currentDateStr,
         addTask,
         updateTask,
         deleteTask,
-        toggleTask: smartToggleTask, // Use our new smart logic
-        rescheduleTask, // New capability
+        toggleTask: smartToggleTask,
+        rescheduleTask,
         completeDay,
         getDailyScore,
         isDayLocked,
         clearAllTasks,
-        updateSettings, // Expose
-        activePopoverId, // New Global State for UI
-        setActivePopoverId // New Global Setter
-    }), [tasks, lockedDays, currentDateStr, settings, activePopoverId]);
+        updateSettings,
+        activePopoverId,
+        setActivePopoverId,
+        isLoading,
+        loadMoreCompleted: () => setCompletedLimit(prev => prev + 50)
+    }), [tasks, lockedDays, currentDateStr, settings, activePopoverId, isLoading]);
 
     return (
         <TaskContext.Provider value={value}>

@@ -81,12 +81,20 @@ const SideMenu = ({ isOpen, onClose }) => {
                             className="p-5 bg-slate-50 border-b dark:bg-slate-900 dark:border-slate-800 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                         >
                             <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-lg font-bold shadow-sm ring-2 ring-white dark:ring-slate-700">
-                                    {(user?.email?.[0] || 'U').toUpperCase()}
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold shadow-sm ring-2 ring-white dark:ring-slate-700 overflow-hidden ${user?.profileColor ? `${user.profileColor} text-white` : 'bg-indigo-100 text-indigo-600'}`}>
+                                    {user?.photoURL ? (
+                                        <img
+                                            src={user.photoURL}
+                                            alt={user?.name}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <span className="text-sm font-black uppercase tracking-wider !text-white">{user?.initials || user?.name?.charAt(0)}</span>
+                                    )}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center justify-between">
-                                        <p className="font-bold text-slate-900 truncate dark:text-white">{user?.displayName || 'User'}</p>
+                                        <p className="font-bold text-slate-900 truncate dark:text-white">{user?.name}</p>
                                         <ChevronRight className="w-4 h-4 text-slate-400" />
                                     </div>
                                     <p className="text-[10px] text-slate-500 font-medium">Member ID: AWK-{user?.uid?.slice(-4).toUpperCase() || 'GUEST'}</p>

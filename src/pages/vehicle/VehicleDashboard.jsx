@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useVehicle } from '../../context/VehicleContext';
+import ErrorDisplay from '../../components/molecules/ErrorDisplay';
 import { useData } from '../../context/DataContext';
 import {
     ArrowLeft, Plus, Car, Archive, CheckCircle, Bike, Truck,
@@ -29,7 +30,8 @@ const VehicleDashboard = () => {
         getLoanDetailedStatus,
         addLoan,
         payEMI,
-        getVehicleRisks
+        getVehicleRisks,
+        deleteVehicle
     } = useVehicle();
 
     const { addTask } = useData();
@@ -113,6 +115,12 @@ const VehicleDashboard = () => {
                     className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold shadow-lg shadow-indigo-500/30 transition-all flex items-center gap-2"
                 >
                     <Plus className="w-5 h-5" /> Add First Vehicle
+                </button>
+                <button
+                    onClick={() => navigate(-1)}
+                    className="mt-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-sm font-bold flex items-center gap-2 transition-colors px-4 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
+                >
+                    <ArrowLeft className="w-4 h-4" /> Go Back
                 </button>
                 <AddVehicleModal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} onSave={handleSaveVehicle} />
             </div>
@@ -516,6 +524,17 @@ const VehicleDashboard = () => {
                                         })()}
 
                                         <div className="mt-3 pt-2 border-t border-slate-50 dark:border-slate-800 flex justify-end gap-2">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    if (window.confirm('Are you sure you want to permanently delete this vehicle?')) {
+                                                        deleteVehicle(vehicle.id);
+                                                    }
+                                                }}
+                                                className="text-red-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-wider px-2 py-1"
+                                            >
+                                                Delete
+                                            </button>
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();

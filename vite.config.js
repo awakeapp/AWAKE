@@ -1,4 +1,5 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite'
+// Force Restart;
 import react from '@vitejs/plugin-react';
 import path from 'path';
 

@@ -56,12 +56,20 @@ const Sidebar = ({ onClose }) => {
                 </div>
 
                 <div className="flex items-center gap-3 px-4 py-2">
-                    <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-medium text-slate-600">
-                        {user?.email?.charAt(0).toUpperCase() || 'U'}
+                    <div className={`w-8 h-8 rounded-full overflow-hidden ring-2 ring-white dark:ring-slate-700 shadow-sm flex items-center justify-center ${user?.profileColor ? `${user.profileColor} text-white` : 'bg-slate-200 text-slate-500'}`}>
+                        {user?.photoURL ? (
+                            <img
+                                src={user.photoURL}
+                                alt={user?.name}
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <span className="text-xs font-black uppercase !text-white">{user?.initials || user?.name?.charAt(0)}</span>
+                        )}
                     </div>
                     <div className="flex-1 overflow-hidden">
-                        <p className="text-sm font-medium text-slate-700 truncate">{user?.displayName || 'User'}</p>
-                        <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                        <p className="text-sm font-bold text-slate-700 dark:text-slate-200 truncate">{user?.name}</p>
+                        <p className="text-[10px] font-medium text-slate-400 truncate tracking-wide">{user?.email}</p>
                     </div>
                     <button onClick={handleLogout} className="text-slate-400 hover:text-red-600 transition-colors">
                         <LogOut className="w-5 h-5" />

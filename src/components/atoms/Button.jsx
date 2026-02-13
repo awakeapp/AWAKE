@@ -1,12 +1,12 @@
 import { cn } from '../../lib/utils';
-import { Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import awakeLogo from '../../assets/awake_logo_new.png';
 
 const Button = ({ children, variant = 'primary', className, isLoading, disabled, ...props }) => {
     const baseStyles = "inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-white";
 
     const variants = {
-        primary: "bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-600",
+        primary: "bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-600 shadow-sm",
         secondary: "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 focus:ring-slate-500",
         ghost: "bg-transparent text-slate-700 hover:bg-slate-100 focus:ring-slate-500",
         danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-600",
@@ -20,14 +20,27 @@ const Button = ({ children, variant = 'primary', className, isLoading, disabled,
 
     return (
         <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: disabled || isLoading ? 1 : 1.02 }}
+            whileTap={{ scale: disabled || isLoading ? 1 : 0.95 }}
             className={cn(baseStyles, variants[variant], sizes.default, className)}
             disabled={disabled || isLoading}
             {...props}
         >
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {children}
+            {isLoading ? (
+                <div className="flex items-center gap-2">
+                    <img
+                        src={awakeLogo}
+                        alt="Loading..."
+                        className={cn(
+                            "h-5 w-auto animate-pulse",
+                            (variant === 'primary' || variant === 'danger') && "brightness-0 invert"
+                        )}
+                    />
+                    <span className="opacity-70">Processing...</span>
+                </div>
+            ) : (
+                children
+            )}
         </motion.button>
     );
 };

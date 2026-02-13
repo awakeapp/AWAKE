@@ -49,11 +49,18 @@ const TaskDashboard = () => {
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleAddTask = (title, options) => {
-        addTask(title, {
-            ...options,
-            date: options.date || selectedDateStr // Use modal date or fallback to selected
-        });
+    const handleAddTask = async (title, options) => {
+        try {
+            await addTask(title, {
+                ...options,
+                date: options.date || selectedDateStr // Use modal date or fallback to selected
+            });
+            setIsModalOpen(false);
+        } catch (error) {
+            console.error("Failed to add task from dashboard:", error);
+            // detailed error handled in context, but we keep modal open so user doesn't lose data
+            alert(`Failed to add task: ${error.message}`);
+        }
     };
 
     const navigateDate = (direction) => {

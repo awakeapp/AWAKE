@@ -1,8 +1,8 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import BottomNav from '../organisms/BottomNav';
+
 import SideMenu from '../organisms/SideMenu';
 import { LayoutGrid, ArrowLeft, Droplet, Moon, Sun } from 'lucide-react';
-// import ChatWidget from '../organisms/chat/ChatWidget';
+
 import { useDate } from '../../context/DateContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useState } from 'react';
@@ -76,7 +76,7 @@ const MainLayout = ({ children }) => {
             </main>
 
             {/* Bottom Navigation (Mobile Only) */}
-            <BottomNav onOpenMenu={() => setIsMenuOpen(true)} />
+
 
             {/* Overlay Menu */}
             <SideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />

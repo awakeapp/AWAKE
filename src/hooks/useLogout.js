@@ -1,23 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useAuthContext } from './useAuthContext';
+import { auth } from '../lib/firebase';
+import { signOut } from 'firebase/auth';
 
 export const useLogout = () => {
     const [isCancelled, setIsCancelled] = useState(false);
     const [error, setError] = useState(null);
     const [isPending, setIsPending] = useState(false);
-    const { dispatch } = useAuthContext();
+
 
     const logout = async () => {
         setError(null);
         setIsPending(true);
 
         try {
-            // Remove session
-            localStorage.removeItem('awake_session');
-            localStorage.removeItem('awake_session_token'); // Clear legacy/alt keys if any
+            await signOut(auth);
 
             // Dispatch logout action
-            dispatch({ type: 'LOGOUT' });
+
 
             if (!isCancelled) {
                 setIsPending(false);

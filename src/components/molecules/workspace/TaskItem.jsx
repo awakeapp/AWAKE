@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTasks } from '../../../context/TaskContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThreeStateCheckbox from '../../atoms/ThreeStateCheckbox';
-import { getIconForTask } from '../../../utils/TaskIcons';
+import { inferIcon, getIconComponent } from '../../../utils/iconInference';
 import clsx from 'clsx';
 import { Clock, ArrowUp, Trash2, Calendar as CalendarIcon, Tag } from 'lucide-react';
 import DatePicker from '../../atoms/DatePicker';
@@ -11,7 +11,15 @@ import { format } from 'date-fns';
 const TaskItem = ({ task, onUpdateStatus, isLocked, variant = 'default', onReschedule, onDelete, isRoutine = false }) => {
     // Safely handle missing name/title
     const displayTitle = task.name || task.title || 'Untitled';
-    const IconComponent = getIconForTask(displayTitle);
+
+    // Determine Icon: Use stored icon if available, otherwise infer from title
+    let IconComponent = task.icon
+        ? getIconComponent(task.icon)
+        : inferIcon(displayTitle).component;
+
+    if (!IconComponent) {
+        IconComponent = Tag;
+    }
 
     // Import TaskContext for global popover management
     const { activePopoverId, setActivePopoverId } = useTasks();

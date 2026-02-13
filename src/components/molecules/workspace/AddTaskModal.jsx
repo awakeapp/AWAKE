@@ -24,17 +24,26 @@ const AddTaskModal = ({ isOpen, onClose, onAdd, initialDate }) => {
         }
     }, [isOpen, initialDate]);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (!title.trim()) return;
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-        onAdd(title, {
-            category,
-            priority,
-            time: startTime,
-            date
-        });
-        onClose();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!title.trim() || isSubmitting) return;
+
+        setIsSubmitting(true);
+        try {
+            await onAdd(title, {
+                category,
+                priority,
+                time: startTime,
+                date
+            });
+            // Parent handles closing on success
+        } catch (error) {
+            console.error("Error in modal submission:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -183,16 +192,17 @@ const AddTaskModal = ({ isOpen, onClose, onAdd, initialDate }) => {
                                     <button
                                         type="button"
                                         onClick={onClose}
-                                        className="px-5 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                                        disabled={isSubmitting}
+                                        className="px-5 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
-                                        disabled={!title.trim()}
-                                        className="px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 disabled:opacity-50 disabled:shadow-none transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                        disabled={!title.trim() || isSubmitting}
+                                        className="px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 disabled:opacity-50 disabled:shadow-none transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2"
                                     >
-                                        Create Task
+                                        {isSubmitting ? 'Creating...' : 'Create Task'}
                                     </button>
                                 </div>
                             </form>

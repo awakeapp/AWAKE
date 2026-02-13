@@ -1,12 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useFinance } from '../../context/FinanceContext';
+import { useAuthContext } from '../../hooks/useAuthContext';
 import { X, ArrowRight, Wallet, ArrowRightLeft, Calendar, FileText, AlertTriangle, Repeat, Split, Trash } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
+import { FirestoreService } from '../../services/firestore-service';
 
 const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDelete }) => {
     const { addTransaction, addTransfer, editTransaction, deleteTransaction, checkDuplicate, categories, accounts, transactions, addRecurringRule, getBudgetStats } = useFinance();
-
+    const { user } = useAuthContext();
     const [amount, setAmount] = useState('');
     const [type, setType] = useState('expense'); // expense | income | transfer
     const [categoryId, setCategoryId] = useState('');
@@ -30,13 +32,17 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
 
     // Load Last Used Account
     useEffect(() => {
-        if (!editTransactionId) {
-            const lastUsed = localStorage.getItem('last_used_account_id');
-            if (lastUsed && accounts.some(a => a.id === lastUsed)) {
-                setAccountId(lastUsed);
-            }
+        if (!editTransactionId && user) {
+            // Check session storage first for speed, or just fetch? 
+            // Better to fetch from user config
+            FirestoreService.getDocument(`users/${user.uid}/config/ui`)
+                .then(doc => {
+                    if (doc && doc.lastUsedAccountId && accounts.some(a => a.id === doc.lastUsedAccountId)) {
+                        setAccountId(doc.lastUsedAccountId);
+                    }
+                });
         }
-    }, [accounts, editTransactionId]);
+    }, [accounts, editTransactionId, user]);
 
     // Pre-fill for Edit Mode
     useEffect(() => {
@@ -171,7 +177,9 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                 }
             }
             // Update Last Used
-            localStorage.setItem('last_used_account_id', accountId);
+            if (user) {
+                FirestoreService.setItem(`users/${user.uid}/config/ui`, { lastUsedAccountId: accountId }, true);
+            }
         }
         onClose();
     };

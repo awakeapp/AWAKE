@@ -1,4 +1,5 @@
 import React from 'react';
+import ErrorDisplay from './molecules/ErrorDisplay';
 
 class ErrorBoundary extends React.Component {
     constructor(props) {
@@ -18,52 +19,14 @@ class ErrorBoundary extends React.Component {
 
     render() {
         if (this.state.hasError) {
-            // You can render any custom fallback UI
             return (
-                <div style={{
-                    height: '100vh',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: '#fff',
-                    color: '#333',
-                    fontFamily: 'sans-serif',
-                    padding: '2rem',
-                    textAlign: 'center'
-                }}>
-                    <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Something went wrong.</h1>
-                    <p style={{ maxWidth: '600px', marginBottom: '2rem', color: '#666' }}>
-                        We're sorry, but an unexpected error has occurred. Please try refreshing the page.
-                    </p>
-                    {this.state.error && (
-                        <pre style={{
-                            backgroundColor: '#f5f5f5',
-                            padding: '1rem',
-                            borderRadius: '4px',
-                            overflowX: 'auto',
-                            maxWidth: '100%',
-                            textAlign: 'left',
-                            fontSize: '0.9rem'
-                        }}>
-                            {this.state.error.toString()}
-                        </pre>
-                    )}
-                    <button
-                        onClick={() => window.location.reload()}
-                        style={{
-                            marginTop: '1.5rem',
-                            padding: '0.75rem 1.5rem',
-                            backgroundColor: '#000',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '6px',
-                            cursor: 'pointer',
-                            fontSize: '1rem'
-                        }}
-                    >
-                        Reload Page
-                    </button>
+                <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4">
+                    <ErrorDisplay
+                        isFullPage={true}
+                        title="Something went wrong"
+                        message="We encountered an unexpected issue. Please try refreshing the page."
+                        onRetry={() => window.location.reload()}
+                    />
                 </div>
             );
         }
