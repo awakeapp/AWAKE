@@ -35,7 +35,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
         if (!editTransactionId && user) {
             // Check session storage first for speed, or just fetch? 
             // Better to fetch from user config
-            FirestoreService.getDocument(`users/${user.uid}/config/ui`)
+            FirestoreService.getDocument(`users/${user.uid}/config`, 'ui')
                 .then(doc => {
                     if (doc && doc.lastUsedAccountId && accounts.some(a => a.id === doc.lastUsedAccountId)) {
                         setAccountId(doc.lastUsedAccountId);
@@ -178,7 +178,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
             }
             // Update Last Used
             if (user) {
-                FirestoreService.setItem(`users/${user.uid}/config/ui`, { lastUsedAccountId: accountId }, true);
+                FirestoreService.setItem(`users/${user.uid}/config`, 'ui', { lastUsedAccountId: accountId }, true);
             }
         }
         onClose();

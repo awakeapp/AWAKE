@@ -1,79 +1,23 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper Functions
-    // Check if user is authenticated
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    // Check if user's UID matches the requested userId
-    function isUser(userId) {
+    function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    // Check if the document's 'userId' field matches the current user's UID
-    // Validates both existing data (for read/update/delete) and incoming data (for create/update)
-    function isOwner() {
-      return isAuthenticated() &&
-        (resource == null || resource.data.userId == request.auth.uid) &&
-        (request.resource == null || request.resource.data.userId == request.auth.uid);
-    }
-
-    // Users Collection
-    // Users can only read and write their own user document
     match /users/{userId} {
-      allow read, write: if isUser(userId);
-    }
 
-    // Vehicles Collection
-    // Users can only read/write vehicles they own (userId matches)
-    match /vehicles/{docId} {
-      allow read, write: if isOwner();
-    }
+      allow read, write: if isOwner(userId);
 
-    // Tasks Collection
-    // Users can only read/write tasks they own (userId matches)
-    match /tasks/{docId} {
-      allow read, write: if isOwner();
-    }
-
-    // Reports Collection
-    // Users can only read/write reports they own (userId matches)
-    match /reports/{docId} {
-      allow read, write: if isOwner();
-    }
-
-    // ChatRooms Collection
-    // Only users listed in the 'participants' array can read/write the room
-    match /chatRooms/{roomId} {
-      allow create: if isAuthenticated() && request.auth.uid in request.resource.data.participants;
-      allow read, update, delete: if isAuthenticated() && request.auth.uid in resource.data.participants;
-    }
-
-    // Messages Collection
-    // Users can only read/write messages if they are a participant in the related chatRoom
-    match /messages/{docId} {
-      // Helper to check room participation
-      function isRoomParticipant(roomId) {
-        let room = get(/databases/$(database)/documents/chatRooms/$(roomId));
-        return request.auth.uid in room.data.participants;
+      match /{subCollection}/{docId} {
+        allow read, write: if isOwner(userId);
       }
-
-      // For creating messages: Ensure user is author AND room participant
-      allow create: if isAuthenticated() && 
-                    request.resource.data.userId == request.auth.uid && 
-                    isRoomParticipant(request.resource.data.roomId);
-      
-      // For reading/updating/deleting: Ensure user is room participant
-      // Note: Typically you'd restrict update/delete to author as well, but requirement was focused on participation.
-      // Defaulting to only author can edit own messages, but all participants can read.
-      allow read: if isAuthenticated() && isRoomParticipant(resource.data.roomId);
-      allow update, delete: if isAuthenticated() && 
-                            resource.data.userId == request.auth.uid && 
-                            isRoomParticipant(resource.data.roomId);
     }
+
   }
 }

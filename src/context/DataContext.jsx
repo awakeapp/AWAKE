@@ -4,6 +4,7 @@ import { useAuthContext } from '../hooks/useAuthContext';
 import { DEFAULT_ROUTINE } from '../data/defaultRoutine';
 import { FirestoreService } from '../services/firestore-service';
 import { Timestamp, orderBy, limit } from 'firebase/firestore'; // For robust timestamps if needed
+import { DB } from '../services/db';
 
 const DataContext = createContext();
 
@@ -512,6 +513,11 @@ export const DataContextProvider = ({ children }) => {
         return [];
     };
 
+    const getAllHistory = async () => {
+        if (!user) return [];
+        return await DB.getAllHistory(user.uid);
+    };
+
     const value = useMemo(() => ({
         dailyData,
         updateTaskStatus,
@@ -529,6 +535,7 @@ export const DataContextProvider = ({ children }) => {
         isLocked: isEffectivelyLocked,
         getDisciplineScore,
         getHistory,
+        getAllHistory,
         isLoading
     }), [dailyData, isEffectivelyLocked, user, isLoading]);
 

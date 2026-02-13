@@ -46,7 +46,7 @@ export const ThemeContextProvider = ({ children }) => {
         if (!user) return;
         const fetchSettings = async () => {
             try {
-                const settings = await FirestoreService.getDocument(`users/${user.uid}/config/settings`);
+                const settings = await FirestoreService.getDocument(`users/${user.uid}/config`, 'settings');
                 if (settings && settings.theme && settings.theme !== theme) {
                     setTheme(settings.theme);
                 }
@@ -70,7 +70,7 @@ export const ThemeContextProvider = ({ children }) => {
             try {
                 // Merge with existing settings? 
                 // We should probably rely on a SettingsContext for this, but simplistic approach here:
-                await FirestoreService.setItem(`users/${user.uid}/config/settings`, { theme: newTheme }, true);
+                await FirestoreService.setItem(`users/${user.uid}/config`, 'settings', { theme: newTheme }, true);
             } catch (e) {
                 console.error("Failed to save theme", e);
             }

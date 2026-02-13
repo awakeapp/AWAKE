@@ -105,7 +105,8 @@ const Settings = () => {
     useEffect(() => {
         if (!user) return;
         const unsub = FirestoreService.subscribeToDocument(
-            `users/${user.uid}/config/settings`,
+            `users/${user.uid}/config`,
+            'settings',
             (data) => {
                 if (data) {
                     setAppSettings(prev => ({ ...prev, ...data }));
@@ -123,7 +124,7 @@ const Settings = () => {
         if (user) {
             try {
                 // Merge update
-                await FirestoreService.setItem(`users/${user.uid}/config/settings`, { [key]: value }, true);
+                await FirestoreService.setItem(`users/${user.uid}/config`, 'settings', { [key]: value }, true);
             } catch (e) {
                 console.error("Failed to save setting", e);
                 // Revert? (Complex without previous state history, but typically safe to ignore strict revert for settings)
