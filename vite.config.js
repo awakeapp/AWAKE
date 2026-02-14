@@ -4,11 +4,18 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-    base: '/AWAKE/', // Correct base for GitHub Pages
+    base: '/AWAKE/', 
     plugins: [react()],
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './src'),
+        },
+    },
+    build: {
+        rollupOptions: {
+            input: {
+                main: path.resolve(__dirname, 'index.dev.html'),
+            },
         },
     },
     server: {
