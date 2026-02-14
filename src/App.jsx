@@ -15,12 +15,14 @@ import FullPageLoader from './components/molecules/FullPageLoader';
 import MainLayout from './components/templates/MainLayout';
 import WorkspaceLayout from './components/templates/WorkspaceLayout';
 import GlobalErrorBanner from './components/system/GlobalErrorBanner';
+import OnboardingModal from './components/system/OnboardingModal';
 
 // Lazy Pages
 const Login = lazy(() => import('./pages/Login'));
 // const SimpleLogin = lazy(() => import('./pages/SimpleLogin')); // Removed
 // const Signup = lazy(() => import('./pages/Signup')); // Removed
-const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Dashboard = lazy(() => import('./pages/Dashboard')); // Deprecated? Kept for ref.
+const Home = lazy(() => import('./pages/Home'));
 const Routine = lazy(() => import('./pages/Routine'));
 const History = lazy(() => import('./pages/History'));
 const Settings = lazy(() => import('./pages/Settings'));
@@ -43,7 +45,7 @@ const VehicleDashboard = lazy(() => import('./pages/vehicle/VehicleDashboard'));
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <AuthContextProvider>
         <ThemeContextProvider>
           <DateContextProvider>
@@ -53,6 +55,7 @@ function App() {
                   <FinanceContextProvider>
                     <VehicleContextProvider>
                       <GlobalErrorBanner />
+                      <OnboardingModal />
                       <Suspense fallback={<FullPageLoader />}>
                         <Routes>
                           {/* Public Routes */}
@@ -66,7 +69,7 @@ function App() {
 
                           {/* Protected Routes */}
                           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-                            <Route path="/" element={<Dashboard />} />
+                            <Route path="/" element={<Home />} />
                             <Route path="/routine" element={<Routine />} />
                             <Route path="/history" element={<History />} />
                             <Route path="/settings" element={<Settings />} />

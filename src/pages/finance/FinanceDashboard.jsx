@@ -252,7 +252,7 @@ const FinanceDashboard = () => {
                                                 {cat?.icon === 'Bus' && '🚌'}
                                                 {cat?.icon === 'ShoppingBag' && '🛍️'}
                                                 {cat?.icon === 'Zap' && '⚡'}
-                                                {cat?.icon === 'DollarSign' && '💰'}
+                                                {cat?.icon === 'IndianRupee' && '₹'}
                                                 {!cat?.icon && (cat?.name?.[0] || '?')}
                                             </div>
                                             <div>

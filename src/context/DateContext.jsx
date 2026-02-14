@@ -57,11 +57,7 @@ export const DateContextProvider = ({ children }) => {
         setSearchParams({ date: dateString });
     }, [currentDate, setSearchParams]);
 
-    const isToday = () => {
-        return currentDate.getTime() === getLocalToday().getTime();
-    };
-
-    const setDate = (dateOrString) => {
+    const setDate = useCallback((dateOrString) => {
         let newDate;
         if (typeof dateOrString === 'string') {
             newDate = parseLocalDate(dateOrString);
@@ -78,46 +74,51 @@ export const DateContextProvider = ({ children }) => {
             return;
         }
         setCurrentDate(newDate);
-    };
+    }, []); // getLocalToday and parseLocalDate are stable utils (defined outside or inside? They are inside, need to move out or memoize)
 
-    const prevDay = () => {
-        const newDate = new Date(currentDate);
-        newDate.setDate(currentDate.getDate() - 1);
-        setDate(newDate);
-    };
+    // Move utils inside component to be stable or use ref? 
+    // Actually, getLocalToday creates new object. 
+    // Let's rely on state.
 
-    const nextDay = () => {
-        const newDate = new Date(currentDate);
-        newDate.setDate(currentDate.getDate() + 1);
+    const prevDay = useCallback(() => {
+        setCurrentDate(prev => {
+            const newDate = new Date(prev);
+            newDate.setDate(prev.getDate() - 1);
+            return newDate;
+        });
+    }, []);
 
-        if (newDate > getLocalToday()) return; // Strict block
-        setDate(newDate);
-    };
+    const nextDay = useCallback(() => {
+        setCurrentDate(prev => {
+            const today = getLocalToday();
+            const newDate = new Date(prev);
+            newDate.setDate(prev.getDate() + 1);
+            if (newDate > today) return prev;
+            return newDate;
+        });
+    }, []);
 
-    const jumpToToday = () => {
+    const jumpToToday = useCallback(() => {
         setCurrentDate(getLocalToday());
-    };
+    }, []);
 
-    const formattedDate = formatLocalDate(currentDate);
+    const formattedDate = useMemo(() => formatLocalDate(currentDate), [currentDate]);
+    const maxDate = useMemo(() => formatLocalDate(getLocalToday()), []);
 
-    // Provide maxDate for pickers
-    const maxDate = formatLocalDate(getLocalToday());
-
-    const isPast = () => {
-        return currentDate < getLocalToday();
-    };
+    const isToday = currentDate.getTime() === getLocalToday().getTime();
+    const isPastDate = currentDate < getLocalToday();
 
     const value = useMemo(() => ({
         currentDate,
         formattedDate,
-        isToday: isToday(),
-        isPast: isPast(),
+        isToday,
+        isPast: isPastDate,
         setDate,
         prevDay,
         nextDay,
         jumpToToday,
         maxDate
-    }), [currentDate, formattedDate, maxDate]);
+    }), [currentDate, formattedDate, isToday, isPastDate, setDate, prevDay, nextDay, jumpToToday, maxDate]);
 
     return (
         <DateContext.Provider value={value}>

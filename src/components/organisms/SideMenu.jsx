@@ -16,7 +16,6 @@ const SideMenu = ({ isOpen, onClose }) => {
     const [isJumpModalOpen, setIsJumpModalOpen] = useState(false);
 
     const handleLogout = async () => {
-        console.log("Logout initiated...");
         try {
             await logout();
             // App.jsx ProtectedRoute should handle redirect, 

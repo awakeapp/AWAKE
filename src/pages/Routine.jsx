@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { useData } from '../context/DataContext';
 import { useDate } from '../context/DateContext';
 import RoutineCategory from '../components/organisms/RoutineCategory';
@@ -7,7 +7,7 @@ import DayOverviewModal from '../components/organisms/DayOverviewModal';
 import TaskManagerModal from '../components/organisms/TaskManagerModal';
 import UnifiedFeedbackModal from '../components/organisms/UnifiedFeedbackModal';
 import DateHeader from '../components/organisms/DateHeader';
-import UnlockDayModal from '../components/organisms/UnlockDayModal';
+const UnlockDayModal = lazy(() => import('../components/organisms/UnlockDayModal'));
 import Button from '../components/atoms/Button';
 import { Loader2, ArrowLeft, Lock, Edit2, Plus, List } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -233,11 +233,13 @@ const Routine = () => {
             />
 
             {/* Unlock Day Modal */}
-            <UnlockDayModal
-                isOpen={showUnlockModal}
-                onClose={() => setShowUnlockModal(false)}
-                onConfirm={handleUnlock}
-            />
+            <Suspense fallback={null}>
+                <UnlockDayModal
+                    isOpen={showUnlockModal}
+                    onClose={() => setShowUnlockModal(false)}
+                    onConfirm={handleUnlock}
+                />
+            </Suspense>
         </div>
     );
 };

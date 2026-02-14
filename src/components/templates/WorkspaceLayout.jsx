@@ -1,7 +1,8 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Home, Calendar, Layout, List, Settings, Plus, Bell, Search, Star, Clock, Menu, X, ChevronRight, ListTodo } from 'lucide-react';
+import BottomNavigation from '../organisms/BottomNavigation';
 import { useTheme } from '../../context/ThemeContext';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const WorkspaceLayout = ({ children }) => {
@@ -36,7 +37,7 @@ const WorkspaceLayout = ({ children }) => {
             {/* Mobile Header - Always Visible */}
             <header className="sticky top-0 left-0 right-0 h-16 glass-panel z-30 px-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
                 <div className="flex items-center gap-3" onClick={() => navigate('/')}>
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-indigo-500/20">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/20">
                         <ListTodo className="w-5 h-5" />
                     </div>
                     <div>
@@ -132,8 +133,12 @@ const WorkspaceLayout = ({ children }) => {
 
             {/* Main Content Area */}
             <main className="relative z-10 px-4 py-6 max-w-lg mx-auto w-full">
-                {children || <Outlet />}
+                <Suspense fallback={<div className="flex items-center justify-center p-12"><div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div></div>}>
+                    {children || <Outlet />}
+                </Suspense>
             </main>
+
+            <BottomNavigation />
         </div>
     );
 };

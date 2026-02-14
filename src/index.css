@@ -4,9 +4,27 @@
 @tailwind utilities;
 
 @layer base {
-    body {
-        @apply bg-slate-50 text-slate-900 antialiased dark:bg-primary-950 dark:text-slate-50 transition-colors duration-300;
+    html, body {
+        background-color: #ffffff;
+        /* Removed automatic transition here to prevent load flash. 
+           We now rely on .theme-transition class added by JS for smooth toggles. */
     }
+    html.dark, html.dark body {
+        background-color: #020617; /* match dark:bg-primary-950 */
+    }
+    body {
+        @apply bg-slate-50 text-slate-900 antialiased dark:bg-primary-950 dark:text-slate-50;
+        padding-top: env(safe-area-inset-top);
+    }
+}
+
+/* Global Theme Transition: Only active during switch to preserve hover speeds */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+    transition: all 0.3s ease-out !important;
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow !important;
 }
 
 @layer components {

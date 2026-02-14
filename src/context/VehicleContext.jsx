@@ -150,7 +150,6 @@ export const VehicleContextProvider = ({ children }) => {
             setError(null);
 
             await FirestoreService.deleteItem(`users/${user.uid}/vehicles/${vehicleId}`);
-            console.log("Vehicle deleted:", vehicleId);
         } catch (error) {
             const normalized = normalizeError(error);
             console.error("Error deleting vehicle:", normalized);
@@ -692,6 +691,8 @@ export const VehicleContextProvider = ({ children }) => {
         return risks;
     }, [vehicles, followUps, getLoanForVehicle, getLoanDetailedStatus, getVehicleStats]);
 
+    const loadMoreServiceRecords = useCallback(() => setRecordLimit(prev => prev + 20), []);
+
     const value = useMemo(() => ({
         vehicles,
         followUps,
@@ -719,12 +720,13 @@ export const VehicleContextProvider = ({ children }) => {
         deleteVehicle,
         error,
         isLoading, // Expose loading status
-        loadMoreServiceRecords: () => setRecordLimit(prev => prev + 20)
+        loadMoreServiceRecords
     }), [
         vehicles, followUps, serviceRecords, loans, isLoading,
         addVehicle, updateVehicle, toggleArchiveVehicle, setVehicleActive, getActiveVehicle, deleteVehicle,
         addFollowUp, deleteFollowUp, completeFollowUp, addServiceRecord, getVehicleStats, getLatestRecord, toggleMaintenanceItem,
-        addLoan, payEMI, getLoanForVehicle, getLoanDetailedStatus, getVehicleRisks
+        addLoan, payEMI, getLoanForVehicle, getLoanDetailedStatus, getVehicleRisks,
+        loadMoreServiceRecords
     ]);
 
     return (

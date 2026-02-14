@@ -22,7 +22,7 @@ export const FinanceContextProvider = ({ children }) => {
         { id: 'cat_transport', name: 'Transport', type: 'expense', budget: 2000, color: 'bg-blue-500', icon: 'Bus' },
         { id: 'cat_shopping', name: 'Shopping', type: 'expense', budget: 3000, color: 'bg-pink-500', icon: 'ShoppingBag' },
         { id: 'cat_bills', name: 'Bills & Utilities', type: 'expense', budget: 4000, color: 'bg-yellow-500', icon: 'Zap' },
-        { id: 'cat_salary', name: 'Salary', type: 'income', budget: 0, color: 'bg-emerald-500', icon: 'DollarSign' },
+        { id: 'cat_salary', name: 'Salary', type: 'income', budget: 0, color: 'bg-emerald-500', icon: 'IndianRupee' },
     ];
 
     const DEFAULT_ACCOUNTS = [
@@ -553,6 +553,8 @@ export const FinanceContextProvider = ({ children }) => {
     }, [user]);
 
 
+    const loadMoreTransactions = useCallback(() => setTxLimit(prev => prev + 50), []);
+
     const value = useMemo(() => ({
         transactions,
         categories,
@@ -587,13 +589,14 @@ export const FinanceContextProvider = ({ children }) => {
         getDailySpend,
         getWeeklySavings,
         isLoading,
-        loadMoreTransactions: () => setTxLimit(prev => prev + 50)
+        loadMoreTransactions
     }), [
         transactions, categories, accounts, savingsGoals, debts, subscriptions, recurringRules, isLoading,
         addTransaction, addTransfer, deleteTransaction, editTransaction, restoreTransaction, checkDuplicate,
         getAccountBalance, getTotalBalance, getMonthlySpend, getCategorySpend, updateCategoryBudget, addCategory,
         addDebt, addDebtPayment, settleDebt, addSubscription, updateSubscription, toggleSubscriptionStatus, deleteSubscription,
-        updateAccount, toggleArchiveAccount, addRecurringRule, getBudgetStats, getDailySpend, getWeeklySavings
+        updateAccount, toggleArchiveAccount, addRecurringRule, getBudgetStats, getDailySpend, getWeeklySavings,
+        loadMoreTransactions
     ]);
 
     return (

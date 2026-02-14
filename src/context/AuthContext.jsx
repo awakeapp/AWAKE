@@ -1,6 +1,8 @@
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useEffect, useState, useMemo, useCallback } from 'react';
 import { auth } from '../lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { getDoc, doc, setDoc, serverTimestamp } from 'firebase/firestore'; 
+import { db } from '../lib/firebase';
 import md5 from 'blueimp-md5';
 
 export const AuthContext = createContext();
@@ -53,26 +55,59 @@ export const AuthContextProvider = ({ children }) => {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
             if (firebaseUser) {
-                setUser(normalizeUser(firebaseUser));
+                const normalized = normalizeUser(firebaseUser);
+                
+                // Fetch Role and then set user
+                const userRef = doc(db, 'users', firebaseUser.uid);
+                getDoc(userRef).then((snapshot) => {
+                    let role = 'user';
+                    if (snapshot.exists()) {
+                        role = snapshot.data().role || 'user';
+                    } else {
+                        // Create doc if missing
+                        setDoc(userRef, {
+                            uid: firebaseUser.uid,
+                            email: firebaseUser.email,
+                            name: firebaseUser.displayName || 'User',
+                            role: 'user',
+                            createdAt: serverTimestamp()
+                        }).catch(err => console.error("Error creating user doc:", err));
+                    }
+                    
+                    setUser({ ...normalized, role });
+                    setLoading(false);
+                }).catch(err => {
+                    console.error("Error fetching user role:", err);
+                    setUser(normalized); // Fallback
+                    setLoading(false);
+                });
             } else {
                 setUser(null);
+                setLoading(false);
             }
-            setLoading(false);
         });
 
         return () => unsubscribe();
     }, []);
 
-    const logout = () => signOut(auth);
+    const logout = useCallback(() => signOut(auth), []);
 
     // Legacy dispatch for backward compatibility
-    const dispatch = (action) => {
+    const dispatch = useCallback((action) => {
         // No-op: State is managed by Firebase Auth listener
-        console.log('AuthContext dispatch called (ignored due to Firebase Auth listener):', action);
-    };
+    }, []);
+
+    const value = useMemo(() => ({
+        user,
+        loading,
+        logout,
+        dispatch,
+        authIsReady: !loading,
+        isAdmin: user?.role === 'admin'
+    }), [user, loading, logout, dispatch]);
 
     return (
-        <AuthContext.Provider value={{ user, loading, logout, dispatch, authIsReady: !loading }}>
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     );

@@ -19,6 +19,11 @@ try {
     if (!fs.existsSync(distPath)) {
         throw new Error('Dist directory not found!');
     }
+
+    // FIX: Create 404.html for SPA routing
+    console.log('📄 Creating 404.html for GitHub Pages SPA support...');
+    fs.copyFileSync(path.join(distPath, 'index.html'), path.join(distPath, '404.html'));
+
     process.chdir(distPath);
 
     // FIX: Trust this directory explicitly

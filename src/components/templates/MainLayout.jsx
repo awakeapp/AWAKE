@@ -1,6 +1,8 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Suspense } from 'react';
 
 import SideMenu from '../organisms/SideMenu';
+import BottomNavigation from '../organisms/BottomNavigation';
 import { LayoutGrid, ArrowLeft, Droplet, Moon, Sun } from 'lucide-react';
 
 import { useDate } from '../../context/DateContext';
@@ -69,13 +71,17 @@ const MainLayout = ({ children }) => {
                 </div>
             </header>
             <main className="px-4 py-6 max-w-md mx-auto w-full">
-                {children || <Outlet />}
+                <Suspense fallback={<div className="flex items-center justify-center p-12"><div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div></div>}>
+                    {children || <Outlet />}
+                </Suspense>
                 <div className="text-[10px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-[0.2em] text-center mt-8 mb-2 opacity-60">
                     Developed by CoolCraft
                 </div>
             </main>
 
             {/* Bottom Navigation (Mobile Only) */}
+            {/* Bottom Navigation (Mobile Only) */}
+            <BottomNavigation />
 
 
             {/* Overlay Menu */}
@@ -86,5 +92,7 @@ const MainLayout = ({ children }) => {
         </div>
     );
 };
+
+
 
 export default MainLayout;

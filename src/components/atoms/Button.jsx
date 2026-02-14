@@ -1,9 +1,12 @@
+import { memo } from 'react';
 import { cn } from '../../lib/utils';
 import { motion } from 'framer-motion';
 import awakeLogo from '../../assets/awake_logo_new.png';
 
-const Button = ({ children, variant = 'primary', className, isLoading, disabled, ...props }) => {
-    const baseStyles = "inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-white";
+const Button = memo(({ children, variant = 'primary', className, isLoading, disabled, forceScale, ...props }) => {
+    // forceScale allows overriding the scale effect if needed
+    
+    const baseStyles = "inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-white active:scale-95";
 
     const variants = {
         primary: "bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-600 shadow-sm",
@@ -18,10 +21,17 @@ const Button = ({ children, variant = 'primary', className, isLoading, disabled,
         lg: "h-11 px-8 rounded-md"
     }
 
+    // Determine specific scale behavior
+    // If it's a link or specialized button, we might want different behavior.
+    // However, active:scale-95 is now in baseStyles for instant CSS feedback.
+    // Framer motion 'whileTap' is JS based and might be slightly delayed.
+    // Let's keep framer motion for smooth spring release but CSS for instant press.
+
     return (
         <motion.button
             whileHover={{ scale: disabled || isLoading ? 1 : 1.02 }}
-            whileTap={{ scale: disabled || isLoading ? 1 : 0.95 }}
+            whileTap={{ scale: disabled || isLoading ? 1 : 0.98 }} // Reduced from 0.95 to avoid conflict with CSS active:scale-95
+            transition={{ duration: 0.1 }}
             className={cn(baseStyles, variants[variant], sizes.default, className)}
             disabled={disabled || isLoading}
             {...props}
@@ -43,6 +53,8 @@ const Button = ({ children, variant = 'primary', className, isLoading, disabled,
             )}
         </motion.button>
     );
-};
+});
+
+Button.displayName = 'Button';
 
 export default Button;

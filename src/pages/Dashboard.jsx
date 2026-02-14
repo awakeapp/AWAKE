@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { useData } from '../context/DataContext';
 import { useDate } from '../context/DateContext';
 import { useTasks } from '../context/TaskContext'; // Import TaskContext
@@ -8,12 +8,15 @@ import DayOverviewModal from '../components/organisms/DayOverviewModal';
 import TaskManagerModal from '../components/organisms/TaskManagerModal';
 import UnifiedFeedbackModal from '../components/organisms/UnifiedFeedbackModal';
 import DateHeader from '../components/organisms/DateHeader';
-import UnlockDayModal from '../components/organisms/UnlockDayModal';
+const UnlockDayModal = lazy(() => import('../components/organisms/UnlockDayModal'));
 import Button from '../components/atoms/Button';
 import { Loader2, Lock, Edit2, List, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Sparkles, Trophy, Target, Flame } from 'lucide-react';
+import { FirestoreService } from '../services/firestore-service';
+import { orderBy, limit } from 'firebase/firestore';
 
 const Dashboard = () => {
     // --- Routine Logic ---
@@ -23,6 +26,109 @@ const Dashboard = () => {
     const [showSubmitModal, setShowSubmitModal] = useState(false);
     const [showManagerModal, setShowManagerModal] = useState(false);
     const [showUnlockModal, setShowUnlockModal] = useState(false);
+    
+    // --- Streak Logic ---
+    const [streak, setStreak] = useState({ current: 0, longest: 0, loading: true });
+    
+    useEffect(() => {
+        if (!user) return;
+        const fetchStreak = async () => {
+            try {
+                // Fetch last year of data to calculate streak
+                const history = await FirestoreService.getCollection(
+                    `users/${user.uid}/days`,
+                    orderBy('date', 'desc'),
+                    limit(365)
+                );
+                
+                // Helper to check completion (100% routine)
+                const isComplete = (d) => {
+                    if (!d.tasks || d.tasks.length === 0) return false;
+                    const c = d.tasks.filter(t => t.status === 'checked').length;
+                    return Math.round((c / d.tasks.length) * 100) === 100;
+                };
+
+                let current = 0;
+                let longest = 0;
+                let tempStreak = 0;
+                
+                // Sort by date descending (newest first)
+                // history is already ordered by date desc from Firestore query
+                
+                // 1. Calculate Current Streak
+                // Check Today
+                const todayStr = new Date().toISOString().split('T')[0];
+                const todayDoc = history.find(d => d.date === todayStr); // or d.id
+                const todayComplete = todayDoc ? isComplete(todayDoc) : false;
+                
+                // If today is complete, start count at 1. Else 0.
+                // But if today is NOT complete, we check yesterday to see if streak is alive.
+                if (todayComplete) {
+                    current = 1;
+                }
+                
+                // Iterate backwards from yesterday
+                // We need to find "yesterday" relative to actual calendar, not just next doc
+                const getPrevDate = (dateStr) => {
+                    const d = new Date(dateStr);
+                    d.setDate(d.getDate() - 1);
+                    return d.toISOString().split('T')[0];
+                };
+                
+                let checkDate = getPrevDate(todayStr);
+                
+                // Robust check: look for checkDate in history
+                // Since history is sparse (only exists if user logged in), a missing day breaks streak?
+                // Yes, missing day = not completed.
+                
+                while (true) {
+                    const doc = history.find(d => d.date === checkDate || d.id === checkDate);
+                    if (doc && isComplete(doc)) {
+                        current++;
+                        checkDate = getPrevDate(checkDate);
+                    } else {
+                        break;
+                    }
+                }
+                
+                // 2. Calculate Longest Streak (Naive iteration over sorted history)
+                // We need to sort by date ASC to easily count streaks
+                const sortedHistory = [...history].sort((a, b) => a.date.localeCompare(b.date));
+                
+                // We must handle gaps in dates for longest streak too
+                if (sortedHistory.length > 0) {
+                     let iterDate = new Date(sortedHistory[0].date);
+                     const lastDate = new Date(sortedHistory[sortedHistory.length - 1].date);
+                     
+                     let running = 0;
+                     
+                     while (iterDate <= lastDate) {
+                         const dStr = iterDate.toISOString().split('T')[0];
+                         const doc = sortedHistory.find(d => d.date === dStr || d.id === dStr);
+                         
+                         if (doc && isComplete(doc)) {
+                             running++;
+                         } else {
+                             longest = Math.max(longest, running);
+                             running = 0;
+                         }
+                         
+                         // Next day
+                         iterDate.setDate(iterDate.getDate() + 1);
+                     }
+                     longest = Math.max(longest, running);
+                }
+                
+                setStreak({ current, longest, loading: false });
+
+            } catch (err) {
+                console.error("Streak calc error:", err);
+                setStreak({ current: 0, longest: 0, loading: false });
+            }
+        };
+        
+        fetchStreak();
+    }, [user, dailyData.tasks]); // Recalc if tasks change today (e.g. checking last item)
 
     // Unified Feedback Logic
     const [feedbackModal, setFeedbackModal] = useState({ isOpen: false, type: 'success', category: '' });
@@ -33,6 +139,24 @@ const Dashboard = () => {
     const topTasks = workspaceTasks
         .filter(t => t.status !== 'done') // Only pending
         .slice(0, 3); // Top 3
+
+    // --- Welcome Logic ---
+    const hour = new Date().getHours();
+    let greeting = 'Good Morning';
+    if (hour >= 12 && hour < 17) greeting = 'Good Afternoon';
+    else if (hour >= 17) greeting = 'Good Evening';
+
+    const completedRoutine = dailyData.tasks.filter(t => t.status === 'checked').length;
+    const totalRoutine = dailyData.tasks.length;
+    const routineProgress = totalRoutine > 0 ? Math.round((completedRoutine / totalRoutine) * 100) : 0;
+    
+    const remainingTasksCount = workspaceTasks.filter(t => t.status !== 'done').length;
+    
+    // Motivation Text
+    let motivation = "";
+    if (routineProgress >= 80) motivation = "Finishing strong.";
+    if (routineProgress === 100) motivation = "Discipline mastered.";
+    if (remainingTasksCount === 0 && routineProgress === 100) motivation = "All systems go.";
 
     // --- Routine Grouping ---
     if (!dailyData || !dailyData.tasks) {
@@ -140,28 +264,97 @@ const Dashboard = () => {
                 <DateHeader className="mb-0" />
             </div>
 
-            {/* COCKPIT HERO */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-4 flex items-center justify-between shadow-sm">
-                <div className="flex items-center gap-4">
-                    <div className={clsx(
-                        "p-2.5 rounded-xl",
-                        dailyData.tasks.every(t => t.status === 'checked') ? "bg-emerald-100 text-emerald-600" : "bg-slate-100 text-slate-500 dark:bg-slate-800"
-                    )}>
-                        <CheckCircle2 className="w-5 h-5 stroke-[1.5]" />
-                    </div>
+            {/* WELCOME & SUMMARY SECTION */}
+            <div className="space-y-4">
+                <div className="flex items-end justify-between px-1">
                     <div>
-                        <h2 className="text-[15px] font-semibold text-slate-700 dark:text-slate-200 tracking-tight">Today's Discipline</h2>
-                        <p className="text-[11px] text-slate-400 font-medium mt-0.5">
-                            {dailyData.tasks.filter(t => t.status === 'checked').length}/{dailyData.tasks.length} Routine Steps
-                        </p>
+                        <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">{greeting}, User</h1>
+                        {motivation && <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">{motivation}</p>}
+                    </div>
+                    <div className="text-right hidden sm:block">
+                        <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Workspace</div>
+                        <div className="text-lg font-semibold text-slate-700 dark:text-slate-200">{remainingTasksCount} tasks left</div>
                     </div>
                 </div>
-                <button
-                    onClick={() => setShowManagerModal(true)}
-                    className={clsx("text-slate-400 hover:text-indigo-600 transition-colors p-2", isLocked && "hidden")}
-                >
-                    <Edit2 className="w-4 h-4 stroke-[1.5]" />
-                </button>
+
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm relative overflow-hidden">
+                    {/* Progress Background */}
+                    <div 
+                        className="absolute bottom-0 left-0 h-1 bg-indigo-500/20 transition-all duration-1000"
+                        style={{ width: `${routineProgress}%` }}
+                    />
+
+                    <div className="flex items-center justify-between relative z-10">
+                        <div className="flex items-center gap-4">
+                            <div className={clsx(
+                                "w-12 h-12 rounded-2xl flex items-center justify-center transition-colors",
+                                routineProgress === 100 ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400" : "bg-slate-100 text-indigo-600 dark:bg-slate-800 dark:text-indigo-400"
+                            )}>
+                                {routineProgress === 100 ? <Trophy className="w-6 h-6" /> : <Target className="w-6 h-6" />}
+                            </div>
+                            <div>
+                                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Routine</div>
+                                <div className="text-xl font-bold text-slate-900 dark:text-white leading-none">
+                                    {routineProgress}% <span className="text-sm font-medium text-slate-400 ml-1">Complete</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                             {/* Mobile Task Count */}
+                             <div className="sm:hidden text-right mr-2">
+                                <div className="text-[10px] font-bold text-slate-400 uppercase">Tasks</div>
+                                <div className="text-sm font-bold text-slate-700 dark:text-slate-300">{remainingTasksCount}</div>
+                            </div>
+
+                            <button
+                                onClick={() => setShowManagerModal(true)}
+                                className={clsx(
+                                    "w-10 h-10 rounded-full flex items-center justify-center bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 transition-colors",
+                                    isLocked && "hidden"
+                                )}
+                            >
+                                <Edit2 className="w-4 h-4 stroke-[2]" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Success Banner */}
+                {routineProgress === 100 && (
+                    <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/30 rounded-xl p-3 flex items-center gap-3 text-emerald-700 dark:text-emerald-400"
+                    >
+                        <Sparkles className="w-5 h-5" />
+                        <span className="text-sm font-semibold">All daily routines completed. Excellent discipline.</span>
+                    </motion.div>
+                )}
+
+                {/* Streak Card */}
+                 <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className={clsx("p-2 rounded-lg", streak.current > 0 ? "bg-orange-100 text-orange-600 dark:bg-orange-900/20 dark:text-orange-500" : "bg-slate-200 text-slate-400 dark:bg-slate-800")}>
+                            <Flame className={clsx("w-5 h-5", streak.current > 0 && "fill-current")} />
+                        </div>
+                        <div>
+                            <div className="text-sm font-bold text-slate-700 dark:text-slate-200">
+                                {streak.current} Day Streak
+                            </div>
+                            <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
+                                Longest: {streak.longest}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 text-right">
+                        {streak.current > 0 ? (
+                            <span className="text-orange-600 dark:text-orange-500">Streak continues.</span>
+                        ) : (
+                            "Start a new streak today."
+                        )}
+                    </div>
+                </div>
             </div>
 
             {/* SECTOR 1: ROUTINE (Collapsible) */}
@@ -262,7 +455,10 @@ const Dashboard = () => {
             <DayOverviewModal isOpen={showSubmitModal} onClose={() => setShowSubmitModal(false)} data={dailyData} onConfirm={handleConfirmSubmit} />
             <TaskManagerModal isOpen={showManagerModal} onClose={() => setShowManagerModal(false)} tasks={dailyData.tasks} />
             <UnifiedFeedbackModal isOpen={feedbackModal.isOpen} onClose={() => setFeedbackModal(prev => ({ ...prev, isOpen: false }))} type={feedbackModal.type} category={feedbackModal.category} />
-            <UnlockDayModal isOpen={showUnlockModal} onClose={() => setShowUnlockModal(false)} onConfirm={handleUnlock} />
+            {/* Unlock Day Modal */}
+            <Suspense fallback={null}>
+                <UnlockDayModal isOpen={showUnlockModal} onClose={() => setShowUnlockModal(false)} onConfirm={handleUnlock} />
+            </Suspense>
 
             {/* Footer Links */}
             <div className="flex justify-center gap-6 opacity-40 pt-8 pb-4">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { useTasks } from '../../../context/TaskContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThreeStateCheckbox from '../../atoms/ThreeStateCheckbox';
@@ -8,7 +8,7 @@ import { Clock, ArrowUp, Trash2, Calendar as CalendarIcon, Tag } from 'lucide-re
 import DatePicker from '../../atoms/DatePicker';
 import { format } from 'date-fns';
 
-const TaskItem = ({ task, onUpdateStatus, isLocked, variant = 'default', onReschedule, onDelete, isRoutine = false }) => {
+const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', onReschedule, onDelete, isRoutine = false }) => {
     // Safely handle missing name/title
     const displayTitle = task.name || task.title || 'Untitled';
 
@@ -33,22 +33,7 @@ const TaskItem = ({ task, onUpdateStatus, isLocked, variant = 'default', onResch
     // Handle closing when clicking outside
     useEffect(() => {
         if (!isDatePickerOpen) return;
-
-        const handleClickOutside = (event) => {
-            // Close if clicking anywhere, the DatePicker stops propagation so this only fires 
-            // if clicking outside the picker content (captured by the backdrop logic or ensuring popover handles itself)
-            // Ideally we just check if the click target is NOT inside this specific container
-            // But for simplicity, we rely on the DatePicker's own backdrop or just use a window listener that checks ID
-            // Here, we'll keep it simple: if clicking outside, we close.
-            // But wait, the date picker button itself triggers this.
-            // Let's use a simpler approach: The DatePicker component renders a backdrop wrapper.
-            // We just need to ensure toggling works.
-        };
-
-        // We actually don't need a complex listener if we use a transparent fixed backdrop like before, 
-        // BUT the user said "sometimes overlapping". 
-        // The issue is likely z-index in a stack context (framer motion).
-        // By setting z-index high ONLY when active, we fix the overlap.
+        // Logic handled by backdrop
     }, [isDatePickerOpen]);
 
     const handleToggleDatePicker = (e) => {
@@ -65,9 +50,10 @@ const TaskItem = ({ task, onUpdateStatus, isLocked, variant = 'default', onResch
             layout
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: isCompleted ? 0.6 : 1, y: 0 }}
+            transition={{ duration: 0.2 }} // Faster enter/layout
             whileHover={{ y: -2 }}
             className={clsx(
-                "group relative flex items-center gap-3 sm:gap-5 p-3 sm:p-4 rounded-[1.5rem] border transition-all duration-300",
+                "group relative flex items-center gap-3 sm:gap-5 p-3 sm:p-4 rounded-[1.5rem] border transition-all duration-200", // Faster hover
                 isCarryOver
                     ? "bg-orange-50/40 dark:bg-orange-950/20 border-orange-100/50 dark:border-orange-900/30"
                     : isCompleted
@@ -79,7 +65,7 @@ const TaskItem = ({ task, onUpdateStatus, isLocked, variant = 'default', onResch
         >
             {/* Background Accent Glow (Subtle) */}
             {!isCompleted && !isCarryOver && (
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-transparent dark:from-indigo-900/5 dark:to-transparent rounded-[1.5rem] -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-transparent dark:from-indigo-900/5 dark:to-transparent rounded-[1.5rem] -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
             )}
 
             {/* 1. TIME Section - Redesigned for Premium Feel */}
@@ -99,19 +85,19 @@ const TaskItem = ({ task, onUpdateStatus, isLocked, variant = 'default', onResch
             <div className="flex items-center gap-2.5 sm:gap-4 flex-1 min-w-0">
                 {/* 2. ICON - Styled with depth */}
                 <div className={clsx(
-                    "flex-shrink-0 w-9 h-9 sm:w-11 sm:h-11 rounded-[1.1rem] flex items-center justify-center transition-all duration-300",
+                    "flex-shrink-0 w-9 h-9 sm:w-11 sm:h-11 rounded-[1.1rem] flex items-center justify-center transition-all duration-200",
                     isCarryOver
                         ? "bg-orange-100 dark:bg-orange-900/30 text-orange-500 shadow-sm"
                         : isCompleted
                             ? "bg-slate-100 dark:bg-slate-800 text-slate-400"
                             : "bg-indigo-50/80 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 shadow-sm group-hover:scale-110"
                 )}>
-                    <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:rotate-12" />
+                    <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:rotate-12 duration-200" />
                 </div>
 
                 <div className="flex flex-col min-w-0 flex-1">
                     <span className={clsx(
-                        "text-[14px] sm:text-[16px] font-normal tracking-tight transition-colors duration-300",
+                        "text-[14px] sm:text-[16px] font-normal tracking-tight transition-colors duration-200",
                         isCarryOver
                             ? "text-slate-600 dark:text-slate-400"
                             : isCompleted
@@ -163,7 +149,7 @@ const TaskItem = ({ task, onUpdateStatus, isLocked, variant = 'default', onResch
                         <button
                             onClick={handleToggleDatePicker}
                             className={clsx(
-                                "p-1.5 rounded-lg transition-colors z-20 relative",
+                                "p-1.5 rounded-lg transition-colors duration-150 z-20 relative active:scale-95",
                                 isDatePickerOpen ? "text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20" : "text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
                             )}
                             title="Reschedule Task"
@@ -205,21 +191,21 @@ const TaskItem = ({ task, onUpdateStatus, isLocked, variant = 'default', onResch
                     <div className="flex items-center gap-1.5">
                         <button
                             onClick={() => onReschedule && onReschedule(task.id, 'today')}
-                            className="p-2 text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 rounded-xl transition-all active:scale-90"
+                            className="p-2 text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 rounded-xl transition-all active:scale-90 duration-150"
                             title="Assign to Today"
                         >
                             <ArrowUp className="w-4 h-4" />
                         </button>
                         <button
                             onClick={() => onDelete && onDelete(task.id)}
-                            className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all active:scale-90"
+                            className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all active:scale-90 duration-150"
                             title="Remove"
                         >
                             <Trash2 className="w-4 h-4" />
                         </button>
                     </div>
                 ) : (
-                    <div className="scale-110 sm:scale-125 transition-transform hover:scale-[1.2] active:scale-95 px-1">
+                    <div className="scale-110 sm:scale-125 transition-transform hover:scale-[1.2] active:scale-95 px-1 duration-150">
                         <ThreeStateCheckbox
                             status={isCompleted ? 'checked' : task.status || 'unchecked'}
                             onClick={() => onUpdateStatus(task.id)}
@@ -230,6 +216,8 @@ const TaskItem = ({ task, onUpdateStatus, isLocked, variant = 'default', onResch
             </div>
         </motion.div>
     );
-};
+});
+
+TaskItem.displayName = 'TaskItem';
 
 export default TaskItem;

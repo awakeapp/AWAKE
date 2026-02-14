@@ -40,16 +40,17 @@ export const DataContextProvider = ({ children }) => {
     // --- Master Template Logic ---
 
     // Sanitize helper to prevent undefined values
-    const sanitizeTask = (t) => ({
+    // Stable reference (independent of state)
+    const sanitizeTask = useCallback((t) => ({
         id: t.id || `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         name: t.name || 'Untitled Task',
         time: t.time || '',
         category: t.category || 'EVE/NIGHT',
         icon: t.icon || 'CheckCircle',
         status: t.status || 'unchecked'
-    });
+    }), []);
 
-    const saveTemplate = async (tasks) => {
+    const saveTemplate = useCallback(async (tasks) => {
         if (!user) return;
         try {
             // Strip status/completion data, keep structure
@@ -59,8 +60,6 @@ export const DataContextProvider = ({ children }) => {
                 return clean;
             });
 
-            console.log("[DataContext] Saving Master Template:", templateTasks.length);
-
             await FirestoreService.setItem(`users/${user.uid}/modules`, 'routine', {
                 tasks: templateTasks,
                 lastModified: Date.now()
@@ -68,7 +67,7 @@ export const DataContextProvider = ({ children }) => {
         } catch (error) {
             console.error("[DataContext] Failed to save master template:", error);
         }
-    };
+    }, [user, sanitizeTask]);
 
     // --- Firestore Subscriptions ---
     useEffect(() => {
@@ -87,13 +86,13 @@ export const DataContextProvider = ({ children }) => {
                 // 2. If no template, try to copy "Last Active Day"
                 // 3. Else, use empty defaults.
 
-                console.log("[DataContext] Attempting to initialize day...");
+
 
                 // 1. Check Master Template
                 const templateDoc = await FirestoreService.getDocument(`users/${user.uid}/modules`, 'routine');
 
                 if (templateDoc && templateDoc.tasks && templateDoc.tasks.length > 0) {
-                    console.log("[DataContext] Found Master Template. Initializing from template.");
+
                     const templateTasks = templateDoc.tasks.map(t => ({
                         ...t,
                         status: 'unchecked' // Ensure fresh state
@@ -147,7 +146,7 @@ export const DataContextProvider = ({ children }) => {
                     // Prevent carrying over from FUTURE or SELF
                     if (lastDay.date === formattedDate) return null;
 
-                    console.log("[DataContext] No template found. Backfilling from:", lastDay.date);
+
 
                     const carriedTasks = (lastDay.tasks || []).map(t => ({
                         ...t,
@@ -213,7 +212,7 @@ export const DataContextProvider = ({ children }) => {
                     const isEmptyDay = loadedTasks.length === 0 && mergedHabits.length === 0;
 
                     if (isEmptyDay) {
-                        console.log("[DataContext] Found empty day, attempting backfill...");
+
                         doBackfill();
                         // We will receive a new snapshot shortly if backfill succeeds.
                         // Continue to render empty state for now.
@@ -234,7 +233,7 @@ export const DataContextProvider = ({ children }) => {
                             needsUpdate = true;
 
                             // computedCategory applied to local object
-                            console.log(`DataContext: Auto-categorizing task '${t.name}' to ${computedCategory}`);
+                            // console.log(`DataContext: Auto-categorizing task '${t.name}' to ${computedCategory}`);
                             return { ...t, category: computedCategory };
                         }
                         return t;
@@ -282,7 +281,7 @@ export const DataContextProvider = ({ children }) => {
     }, [formattedDate, user]);
 
     // --- Persistence ---
-    const saveData = async (newData) => {
+    const saveData = useCallback(async (newData) => {
         if (!user) return; // Guest mode deferred
 
         // Sanitize payloads
@@ -310,7 +309,7 @@ export const DataContextProvider = ({ children }) => {
         } catch (error) {
             console.error("[DataContext] Save failed:", error);
         }
-    };
+    }, [user, formattedDate, sanitizeTask]);
 
     // Derived State
     const isToday = formattedDate === new Date().toISOString().split('T')[0];
@@ -322,7 +321,7 @@ export const DataContextProvider = ({ children }) => {
 
     // --- Actions ---
 
-    const updateTaskStatus = async (taskId) => {
+    const updateTaskStatus = useCallback(async (taskId) => {
         if (isEffectivelyLocked) return;
 
         const newTasks = dailyData.tasks.map(t => {
@@ -338,9 +337,9 @@ export const DataContextProvider = ({ children }) => {
         });
 
         await saveData({ ...dailyData, tasks: newTasks });
-    };
+    }, [dailyData, isEffectivelyLocked, saveData]);
 
-    const updateHabit = async (habitId, value) => {
+    const updateHabit = useCallback(async (habitId, value) => {
         if (isEffectivelyLocked) return;
 
         const newHabits = dailyData.habits.map(h =>
@@ -348,9 +347,9 @@ export const DataContextProvider = ({ children }) => {
         );
 
         await saveData({ ...dailyData, habits: newHabits });
-    };
+    }, [dailyData, isEffectivelyLocked, saveData]);
 
-    const addHabit = async (label, type = 'toggle', unit = 'hrs', iconName) => {
+    const addHabit = useCallback(async (label, type = 'toggle', unit = 'hrs', iconName) => {
         if (isEffectivelyLocked) return;
 
         const newHabit = {
@@ -366,20 +365,20 @@ export const DataContextProvider = ({ children }) => {
             ...dailyData,
             habits: [...dailyData.habits, newHabit]
         });
-    };
+    }, [dailyData, isEffectivelyLocked, saveData]);
 
-    const deleteHabit = async (habitId) => {
+    const deleteHabit = useCallback(async (habitId) => {
         if (isEffectivelyLocked) return;
         const newHabits = dailyData.habits.filter(h => h.id !== habitId);
         await saveData({ ...dailyData, habits: newHabits });
-    };
+    }, [dailyData, isEffectivelyLocked, saveData]);
 
-    const submitDay = async () => {
+    const submitDay = useCallback(async () => {
         const lockedData = { ...dailyData, submitted: true, locked: true };
         await saveData(lockedData);
-    };
+    }, [dailyData, saveData]);
 
-    const unlockDay = async (reason) => {
+    const unlockDay = useCallback(async (reason) => {
         if (isPast) {
             console.warn("Cannot unlock past days.");
             return;
@@ -397,16 +396,16 @@ export const DataContextProvider = ({ children }) => {
             ]
         };
         await saveData(unlockedData);
-    };
+    }, [dailyData, isPast, saveData]);
 
-    const initTasks = async (defaultTasks) => {
+    const initTasks = useCallback(async (defaultTasks) => {
         if (dailyData.tasks.length === 0) {
             await saveData({ ...dailyData, tasks: defaultTasks });
         }
-    };
+    }, [dailyData, saveData]);
 
     // Task CRUD Operations (For Routine Tasks)
-    const addTask = async (taskData) => {
+    const addTask = useCallback(async (taskData) => {
         if (isEffectivelyLocked) return;
 
         const newTask = sanitizeTask({
@@ -427,9 +426,9 @@ export const DataContextProvider = ({ children }) => {
 
         // Sync to Template
         saveTemplate(newTasks);
-    };
+    }, [dailyData, isEffectivelyLocked, saveData, saveTemplate, sanitizeTask]);
 
-    const editTask = async (taskId, updates) => {
+    const editTask = useCallback(async (taskId, updates) => {
         if (isEffectivelyLocked) return;
 
         const newTasks = dailyData.tasks.map(t =>
@@ -448,38 +447,38 @@ export const DataContextProvider = ({ children }) => {
 
         // Sync to Template
         saveTemplate(newTasks);
-    };
+    }, [dailyData, isEffectivelyLocked, saveData, saveTemplate]);
 
-    const deleteTask = async (taskId) => {
+    const deleteTask = useCallback(async (taskId) => {
         if (isEffectivelyLocked) return;
         const newTasks = dailyData.tasks.filter(t => t.id !== taskId);
         await saveData({ ...dailyData, tasks: newTasks });
 
         // Sync to Template
         saveTemplate(newTasks);
-    };
+    }, [dailyData, isEffectivelyLocked, saveData, saveTemplate]);
 
-    const updateAllTasks = async (newTasks) => {
+    const updateAllTasks = useCallback(async (newTasks) => {
         if (isEffectivelyLocked) return;
         const cleanTasks = newTasks.map(sanitizeTask);
         await saveData({ ...dailyData, tasks: cleanTasks });
 
         // Sync to Template
         saveTemplate(cleanTasks);
-    };
+    }, [dailyData, isEffectivelyLocked, saveData, saveTemplate, sanitizeTask]);
 
     // --- Metrics & History ---
 
-    const getDisciplineScore = () => {
+    const getDisciplineScore = useCallback(() => {
         // Safe check for tasks existence
         if (!dailyData?.tasks || dailyData.tasks.length === 0) return 0;
         const total = dailyData.tasks.length;
         const checked = dailyData.tasks.filter(t => t.status === 'checked').length;
         return Math.round((checked / total) * 100);
-    };
+    }, [dailyData]);
 
     // Asynchronous History Implementation
-    const getHistory = async (days = 7) => {
+    const getHistory = useCallback(async (days = 7) => {
         if (!user) return [];
 
         const promises = [];
@@ -511,12 +510,12 @@ export const DataContextProvider = ({ children }) => {
         // If the UI expects data immediately, we are in trouble.
         // Let's return empty array and fix the UI to load history async.
         return [];
-    };
+    }, [user]);
 
-    const getAllHistory = async () => {
+    const getAllHistory = useCallback(async () => {
         if (!user) return [];
         return await DB.getAllHistory(user.uid);
-    };
+    }, [user]);
 
     const value = useMemo(() => ({
         dailyData,
@@ -537,7 +536,26 @@ export const DataContextProvider = ({ children }) => {
         getHistory,
         getAllHistory,
         isLoading
-    }), [dailyData, isEffectivelyLocked, user, isLoading]);
+    }), [
+        dailyData,
+        updateTaskStatus,
+        updateHabit,
+        addHabit,
+        deleteHabit,
+        submitDay,
+        unlockDay,
+        initTasks,
+        addTask,
+        editTask,
+        deleteTask,
+        updateAllTasks,
+        user,
+        isEffectivelyLocked,
+        getDisciplineScore,
+        getHistory,
+        getAllHistory,
+        isLoading
+    ]);
 
     return (
         <DataContext.Provider value={value}>
