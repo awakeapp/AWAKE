@@ -1,0 +1,1 @@
+import{j as e}from"./index-Dzj4KbXV.js";const s=()=>e.jsx("div",{className:"p-10",children:e.jsx("h1",{className:"text-4xl font-bold text-green-600",children:"Sanity Check: Home Loaded"})});export{s as default};
