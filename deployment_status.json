@@ -1,5 +1,5 @@
 {
-  "status": "redeployed",
-  "timestamp": "2026-02-15T01:50:00Z",
-  "version": "final-hybrid-fix-no-ci"
+  "status": "synchronized-deploy",
+  "timestamp": "2026-02-15T02:00:00Z",
+  "branches": ["main", "gh-pages"]
 }
