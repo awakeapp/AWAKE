@@ -38,20 +38,30 @@ const STYLES = [
 
 const MotivationBanner = () => {
     // Randomize start index to keep it fresh on reload
-    const [currentIndex, setCurrentIndex] = useState(() => Math.floor(Math.random() * QUOTES.length));
-
-    // Memoize the current quote to prevent jitter during renders if parent updates
-    const currentQuote = QUOTES[currentIndex];
+    // Safety check for empty quotes array
+    const hasQuotes = QUOTES && QUOTES.length > 0;
+    const maxIndex = hasQuotes ? QUOTES.length : 1;
     
-    // Deterministic style based on index (so it's stable for the same quote)
-    const currentStyle = STYLES[currentIndex % STYLES.length];
+    const [currentIndex, setCurrentIndex] = useState(() => Math.floor(Math.random() * maxIndex));
+
+    // Memoize the current quote to prevent jitter
+    const currentQuote = (hasQuotes && QUOTES[currentIndex]) ? QUOTES[currentIndex] : { 
+        quote: "Stay focused and never give up.", 
+        author: "Awake"
+    };
+    
+    // Deterministic style based on index (safe fallback)
+    const safeIndex = !isNaN(currentIndex) ? currentIndex : 0;
+    const currentStyle = STYLES[safeIndex % STYLES.length] || STYLES[0];
 
     useEffect(() => {
+        if (!hasQuotes) return;
+        
         const timer = setInterval(() => {
             setCurrentIndex((prev) => (prev + 1) % QUOTES.length);
-        }, 8000); // 8 seconds per slide
+        }, 8000); 
         return () => clearInterval(timer);
-    }, []);
+    }, [hasQuotes]);
 
     return (
         <div className="relative w-full overflow-hidden rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 h-64 sm:h-72">

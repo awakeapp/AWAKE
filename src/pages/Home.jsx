@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 import { useTasks } from '../context/TaskContext';
@@ -35,7 +35,7 @@ const Home = () => {
                 );
                 
                 const isComplete = (d) => {
-                    if (!d.tasks || d.tasks.length === 0) return false;
+                    if (!d || !d.tasks || d.tasks.length === 0) return false;
                     const c = d.tasks.filter(t => t.status === 'checked').length;
                     return Math.round((c / d.tasks.length) * 100) === 100;
                 };
@@ -43,21 +43,29 @@ const Home = () => {
                 let current = 0;
                 let longest = 0;
                 
-                const todayStr = new Date().toISOString().split('T')[0];
+                const today = new Date();
+                const todayStr = today.toISOString().split('T')[0];
+                
+                // Safe check for today's doc
                 const todayDoc = history.find(d => d.date === todayStr);
                 const todayComplete = todayDoc ? isComplete(todayDoc) : false;
                 
                 if (todayComplete) current = 1;
                 
                 const getPrevDate = (dateStr) => {
-                    const d = new Date(dateStr);
-                    d.setDate(d.getDate() - 1);
-                    return d.toISOString().split('T')[0];
+                    try {
+                        const d = new Date(dateStr);
+                        if (isNaN(d.getTime())) return null; 
+                        d.setDate(d.getDate() - 1);
+                        return d.toISOString().split('T')[0];
+                    } catch (e) { return null; }
                 };
                 
                 let checkDate = getPrevDate(todayStr);
                 
-                while (true) {
+                // Safety limiter
+                let loopLimit = 0;
+                while (checkDate && loopLimit < 366) {
                     const doc = history.find(d => d.date === checkDate || d.id === checkDate);
                     if (doc && isComplete(doc)) {
                         current++;
@@ -65,26 +73,32 @@ const Home = () => {
                     } else {
                         break;
                     }
+                    loopLimit++;
                 }
                 
-                // Longest (Simplified for performance, reuse Dashboard logic if needed strictly)
-                // Using same naive iteration
-                const sortedHistory = [...history].sort((a, b) => a.date.localeCompare(b.date));
+                // Longest Calculation (Simplified and Safe)
+                const sortedHistory = [...history].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
                 if (sortedHistory.length > 0) {
-                     let iterDate = new Date(sortedHistory[0].date);
-                     const lastDate = new Date(sortedHistory[sortedHistory.length - 1].date);
-                     let running = 0;
-                     while (iterDate <= lastDate) {
-                         const dStr = iterDate.toISOString().split('T')[0];
-                         const doc = sortedHistory.find(d => d.date === dStr || d.id === dStr);
-                         if (doc && isComplete(doc)) running++;
-                         else {
-                             longest = Math.max(longest, running);
-                             running = 0;
-                         }
-                         iterDate.setDate(iterDate.getDate() + 1);
+                     const validHistory = sortedHistory.filter(h => h.date && !isNaN(new Date(h.date).getTime()));
+                     if (validHistory.length > 0) {
+                        let iterDate = new Date(validHistory[0].date);
+                        const lastDate = new Date(validHistory[validHistory.length - 1].date);
+                        
+                        let running = 0;
+                        let iterCount = 0;
+                        while (iterDate <= lastDate && iterCount < 400) {
+                             const dStr = iterDate.toISOString().split('T')[0];
+                             const doc = validHistory.find(d => d.date === dStr || d.id === dStr);
+                             if (doc && isComplete(doc)) running++;
+                             else {
+                                 longest = Math.max(longest, running);
+                                 running = 0;
+                             }
+                             iterDate.setDate(iterDate.getDate() + 1);
+                             iterCount++;
+                        }
+                        longest = Math.max(longest, running);
                      }
-                     longest = Math.max(longest, running);
                 }
                 
                 setStreak({ current, longest, loading: false });
@@ -94,7 +108,7 @@ const Home = () => {
             }
         };
         fetchStreak();
-    }, [user, dailyData.tasks]); // Dependency on dailyData.tasks to refresh if user checks items
+    }, [user, dailyData.tasks]);
 
     // --- Welcome Logic ---
     const hour = new Date().getHours();

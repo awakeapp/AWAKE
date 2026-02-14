@@ -554,10 +554,13 @@ export const VehicleContextProvider = ({ children }) => {
         const currentMonth = now.getMonth();
         const dueDate = new Date(currentYear, currentMonth, loan.dueDateDay);
 
+        // Check for invalid dates
+        if (isNaN(dueDate.getTime())) return { status: 'error', dueDate: '', isPastDue: false, interestBalance: 0, daysLate: 0 };
+
         // Find if any EMI payment made this month
         const hasPaidThisMonth = loan.history?.some(p => {
             const pDate = new Date(p.date);
-            return pDate.getFullYear() === currentYear && pDate.getMonth() === currentMonth && p.type === 'EMI';
+            return !isNaN(pDate.getTime()) && pDate.getFullYear() === currentYear && pDate.getMonth() === currentMonth && p.type === 'EMI';
         });
 
         const status = !hasPaidThisMonth && now > dueDate ? 'overdue' : (hasPaidThisMonth ? 'paid' : 'pending');
@@ -593,18 +596,29 @@ export const VehicleContextProvider = ({ children }) => {
         const totalSpend = records.reduce((sum, r) => sum + (Number(r.cost) || 0), 0);
 
         const now = new Date();
-        const thisMonth = records.filter(r => new Date(r.date) > new Date(now.getFullYear(), now.getMonth(), 1));
+        const thisMonth = records.filter(r => {
+             const d = new Date(r.date);
+             return !isNaN(d.getTime()) && d > new Date(now.getFullYear(), now.getMonth(), 1);
+        });
         const monthSpend = thisMonth.reduce((sum, r) => sum + (Number(r.cost) || 0), 0);
 
         // Approximate ownership duration in months for ownership cost
         const purchaseDate = new Date(vehicle.purchaseDate);
-        const monthsOwned = Math.max(1, (now.getFullYear() - purchaseDate.getFullYear()) * 12 + (now.getMonth() - purchaseDate.getMonth()));
+        // Valid date check
+        const isValidPurchase = !isNaN(purchaseDate.getTime());
+        const monthsOwned = isValidPurchase 
+            ? Math.max(1, (now.getFullYear() - purchaseDate.getFullYear()) * 12 + (now.getMonth() - purchaseDate.getMonth()))
+            : 1;
         const costPerMonth = Math.round(totalSpend / monthsOwned);
 
         // Overdue & Soon calculation
         const alerts = vFollowUps.filter(f => {
             let isOverdue = false;
-            if ((f.frequencyType === 'date' || f.frequencyType === 'both') && f.dueDate && new Date(f.dueDate) < now) isOverdue = true;
+            // Validate date
+            if ((f.frequencyType === 'date' || f.frequencyType === 'both') && f.dueDate) {
+                const d = new Date(f.dueDate);
+                if (!isNaN(d.getTime()) && d < now) isOverdue = true;
+            }
             if ((f.frequencyType === 'odometer' || f.frequencyType === 'both') && f.dueOdometer && Number(vehicle.odometer) >= Number(f.dueOdometer)) isOverdue = true;
             return isOverdue;
         });
@@ -654,7 +668,8 @@ export const VehicleContextProvider = ({ children }) => {
 
         const insuranceTask = vFollowUps.find(f => (f.name || f.type || '').toLowerCase().includes('insurance'));
         if (insuranceTask) {
-            const daysLeft = insuranceTask.dueDate ? Math.ceil((new Date(insuranceTask.dueDate) - new Date()) / (1000 * 60 * 60 * 24)) : 999;
+             const d = insuranceTask.dueDate ? new Date(insuranceTask.dueDate) : null;
+             const daysLeft = d && !isNaN(d.getTime()) ? Math.ceil((d - new Date()) / (1000 * 60 * 60 * 24)) : 999;
             if (daysLeft < 0) {
                 risks.push({ type: 'critical', title: 'Insurance Expired', detail: ` expired ${Math.abs(daysLeft)} days ago. Do not drive.` });
             } else if (daysLeft <= 15) {

@@ -248,7 +248,11 @@ export const FinanceContextProvider = ({ children }) => {
         const end = endOfMonth(now);
 
         return transactions
-            .filter(t => !t.isDeleted && t.type === 'expense' && isWithinInterval(new Date(t.date), { start, end }))
+            .filter(t => {
+                if (t.isDeleted || t.type !== 'expense') return false;
+                const d = new Date(t.date || t.createdAt);
+                return !isNaN(d.getTime()) && isWithinInterval(d, { start, end });
+            })
             .reduce((acc, t) => acc + Number(t.amount), 0);
     }, [transactions]);
 
@@ -258,7 +262,12 @@ export const FinanceContextProvider = ({ children }) => {
         const end = endOfMonth(now);
 
         return transactions
-            .filter(t => !t.isDeleted && isWithinInterval(new Date(t.date), { start, end }))
+            .filter(t => {
+                if (t.isDeleted) return false;
+                const d = new Date(t.date || t.createdAt);
+                if (isNaN(d.getTime())) return false;
+                return isWithinInterval(d, { start, end });
+            })
             .reduce((acc, t) => {
                 if (t.categoryId === categoryId) {
                     return acc + Number(t.amount);
@@ -285,7 +294,12 @@ export const FinanceContextProvider = ({ children }) => {
 
     const getDailySpend = useCallback((date = new Date()) => {
         return transactions
-            .filter(t => !t.isDeleted && t.type === 'expense' && isSameDay(new Date(t.date || t.createdAt), date))
+            .filter(t => {
+                if (t.isDeleted || t.type !== 'expense') return false;
+                const d = new Date(t.date || t.createdAt);
+                if (isNaN(d.getTime())) return false;
+                return isSameDay(d, date);
+            })
             .reduce((acc, t) => acc + Number(t.amount), 0);
     }, [transactions]);
 
@@ -294,9 +308,12 @@ export const FinanceContextProvider = ({ children }) => {
         const start = startOfWeek(today, { weekStartsOn: 1 });
         const end = endOfWeek(today, { weekStartsOn: 1 });
 
-        const weeklyTx = transactions.filter(t =>
-            !t.isDeleted && isWithinInterval(new Date(t.date || t.createdAt), { start, end })
-        );
+        const weeklyTx = transactions.filter(t => {
+            if (t.isDeleted) return false;
+            const d = new Date(t.date || t.createdAt);
+            if (isNaN(d.getTime())) return false;
+            return isWithinInterval(d, { start, end });
+        });
 
         const income = weeklyTx.filter(t => t.type === 'income').reduce((sum, t) => sum + Number(t.amount), 0);
         const expense = weeklyTx.filter(t => t.type === 'expense').reduce((sum, t) => sum + Number(t.amount), 0);
