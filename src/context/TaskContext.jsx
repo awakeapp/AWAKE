@@ -320,7 +320,6 @@ export const TaskContextProvider = ({ children }) => {
         getDailyScore,
         getTaskCompletionStats,
         isDayLocked,
-        isDayLocked,
         clearAllTasks,
         updateSettings,
         activePopoverId,
