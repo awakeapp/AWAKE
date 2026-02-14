@@ -8,6 +8,7 @@ import { GlobalErrorProvider } from './context/GlobalErrorContext'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
+        {console.log("VERSION: DEBUG_001_FIXED_CONTEXTS")}
         <ErrorBoundary>
             <GlobalErrorProvider>
                 <App />
