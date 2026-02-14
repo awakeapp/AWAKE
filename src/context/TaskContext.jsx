@@ -280,11 +280,22 @@ export const TaskContextProvider = ({ children }) => {
     const clearAllTasks = useCallback(async () => {
         // Warning: This could be heavy if there are thousands. For now, we iterate.
         if (!user) return;
-        const allTasks = [...activeTasks, ...completedTasks];
+        const activeCopy = [...activeTasks];
+        const completedCopy = [...completedTasks];
+        const all = [...activeCopy, ...completedCopy];
         // Batching would be better but keeping it simple for now as requested.
-        const promises = allTasks.map(t => FirestoreService.deleteItem(`users/${user.uid}/tasks`, t.id));
+        const promises = all.map(t => FirestoreService.deleteItem(`users/${user.uid}/tasks`, t.id));
         await Promise.all(promises);
     }, [user, activeTasks, completedTasks]);
+
+    const getTaskCompletionStats = useCallback(() => {
+        const allTasks = [...activeTasks, ...completedTasks];
+        const dayTasks = allTasks.filter(t => t.date === currentDateStr);
+        const total = dayTasks.length;
+        const completed = dayTasks.filter(t => t.status === 'completed' || t.isCompleted).length;
+        const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
+        return { total, completed, percentage };
+    }, [activeTasks, completedTasks, currentDateStr]);
 
     const [activePopoverId, setActivePopoverId] = useState(null);
 
@@ -307,6 +318,8 @@ export const TaskContextProvider = ({ children }) => {
         rescheduleTask,
         completeDay,
         getDailyScore,
+        getTaskCompletionStats,
+        isDayLocked,
         isDayLocked,
         clearAllTasks,
         updateSettings,
