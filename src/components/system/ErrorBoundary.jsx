@@ -18,6 +18,7 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     console.error("Render Crash Caught:", error, errorInfo);
+    this.setState({ errorInfo });
   }
 
   handleReload = () => {
