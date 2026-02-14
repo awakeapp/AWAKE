@@ -19,6 +19,20 @@
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
   <script type="module" crossorigin src="/AWAKE/assets/index-CAdva34f.js"></script>
   <link rel="stylesheet" crossorigin href="/AWAKE/assets/index-B-NgtebZ.css">
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <!-- Pre-hydration Theme Script to prevent FOUC -->
+  <script>
+    console.log("HYBRID FIX DEPLOYED: " + new Date().toISOString());
+    (function() {
+      try {
+        const stored = localStorage.getItem('theme');
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        let isDark = stored === 'dark' || (!stored && systemDark);
 
         const root = document.documentElement;
         const metaTheme = document.querySelector('meta[name="theme-color"]');
@@ -36,8 +50,6 @@
       } catch (e) {}
     })();
   </script>
-
-
 </body>
 
 </html>
