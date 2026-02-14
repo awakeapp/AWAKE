@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 import { useData } from '../context/DataContext';
 import { useTasks } from '../context/TaskContext';
 import { useAuthContext } from '../hooks/useAuthContext';
@@ -27,13 +28,6 @@ const Home = () => {
     const { formattedDate } = useDate();
     const navigate = useNavigate();
 
-    const getGreeting = () => {
-        const hour = new Date().getHours();
-        if (hour < 12) return 'Good Morning';
-        if (hour < 18) return 'Good Afternoon';
-        return 'Good Evening';
-    };
-
     const [streak, setStreak] = useState(0);
 
     useEffect(() => {
@@ -49,20 +43,33 @@ const Home = () => {
     const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
 
     return (
-        <div className="space-y-8 pb-20">
-            {/* Header */}
-            <div className="flex justify-between items-start">
-                <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2 leading-tight">
-                        {getGreeting()},<br />
-                        <span className="text-indigo-600 dark:text-indigo-400">{user?.displayName?.split(' ')[0] || 'Friend'}</span>
-                    </h1>
-                    <p className="text-slate-500 font-medium dark:text-slate-400">{formattedDate}</p>
+        <div className="space-y-6 pb-20">
+            {/* Minimal Header */}
+            <div className="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar py-1">
+                {/* Date Pill */}
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full px-4 py-2 flex items-center gap-2 shadow-sm whitespace-nowrap">
+                    <Calendar className="w-4 h-4 text-slate-500" />
+                    <span className="text-sm font-bold text-slate-700 dark:text-slate-200">
+                        Today, <span className="text-slate-500 font-medium">{format(new Date(), 'MMM dd')}</span>
+                    </span>
                 </div>
-                
-                <div className="bg-orange-50 dark:bg-orange-900/20 px-3 py-1.5 rounded-full flex items-center gap-2 border border-orange-100 dark:border-orange-800/50 shadow-sm">
-                    <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
-                    <span className="font-bold text-orange-700 dark:text-orange-400 text-sm">{streak} Day Streak</span>
+
+                <div className="flex items-center gap-2">
+                     {/* Routine Overview Pill */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full px-4 py-2 flex items-center gap-2 shadow-sm whitespace-nowrap">
+                        <ListTodo className="w-4 h-4 text-indigo-500" />
+                        <span className="text-sm font-bold text-slate-700 dark:text-slate-200">
+                            {stats.completed}/{stats.total}
+                        </span>
+                    </div>
+
+                    {/* Streak Pill */}
+                    <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-800/50 rounded-full px-4 py-2 flex items-center gap-2 shadow-sm whitespace-nowrap">
+                        <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
+                        <span className="text-sm font-bold text-orange-700 dark:text-orange-400">
+                            {streak}
+                        </span>
+                    </div>
                 </div>
             </div>
 
