@@ -1,0 +1,1 @@
+import{j as e}from"./main-BAqytH2k.js";const s=()=>e.jsxs("div",{className:"p-10 text-center",children:[e.jsx("h1",{className:"text-4xl font-bold text-indigo-600",children:"Good Morning"}),e.jsx("p",{children:"System is operational."})]});export{s as default};
