@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-    base: '/AWAKE/', // Correct base for GitHub Pages
+    base: '/', // Updated for Cloudflare Pages
     plugins: [react()],
     resolve: {
         alias: {
