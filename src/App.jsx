@@ -1,5 +1,5 @@
-import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import React, { Suspense, lazy, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { AuthContextProvider } from './context/AuthContext';
 import { ThemeContextProvider } from './context/ThemeContext';
 import { DateContextProvider } from './context/DateContext';
@@ -16,6 +16,10 @@ import MainLayout from './components/templates/MainLayout';
 import WorkspaceLayout from './components/templates/WorkspaceLayout';
 import GlobalErrorBanner from './components/system/GlobalErrorBanner';
 import OnboardingModal from './components/system/OnboardingModal';
+
+// Firebase services
+import { trackScreenView } from './lib/analytics';
+import { initRemoteConfig } from './lib/remoteConfig';
 
 // Lazy Pages
 const Login = lazy(() => import('./pages/Login'));
@@ -43,7 +47,25 @@ const AccountDetail = lazy(() => import('./pages/finance/AccountDetail'));
 const MonthlyOverview = lazy(() => import('./pages/finance/MonthlyOverview'));
 const VehicleDashboard = lazy(() => import('./pages/vehicle/VehicleDashboard'));
 
+// Analytics tracker component
+function AnalyticsTracker() {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Track screen view on route change
+    const screenName = location.pathname.replace('/', '') || 'home';
+    trackScreenView(screenName);
+  }, [location]);
+
+  return null;
+}
+
 function App() {
+  useEffect(() => {
+    // Initialize remote config on app load
+    initRemoteConfig().catch(console.error);
+  }, []);
+
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <AuthContextProvider>
@@ -54,6 +76,7 @@ function App() {
                 <TaskContextProvider>
                   <FinanceContextProvider>
                     <VehicleContextProvider>
+                      <AnalyticsTracker />
                       <GlobalErrorBanner />
                       <OnboardingModal />
                       <Suspense fallback={<FullPageLoader />}>

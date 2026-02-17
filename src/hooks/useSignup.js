@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuthContext } from './useAuthContext';
 import { auth } from '../lib/firebase';
 import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification, signOut } from 'firebase/auth';
+import { trackSignup } from '../lib/analytics';
 
 export const useSignup = () => {
     const [error, setError] = useState(null);
@@ -38,6 +39,10 @@ export const useSignup = () => {
  
 
             setIsPending(false);
+            
+            // Track successful signup
+            trackSignup('email');
+            
             return { verificationRequired: true };
 
         } catch (err) {
