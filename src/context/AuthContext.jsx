@@ -4,6 +4,7 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { getDoc, doc, setDoc, serverTimestamp } from 'firebase/firestore'; 
 import { db } from '../lib/firebase';
 import md5 from 'blueimp-md5';
+import { setAnalyticsUserId, setAnalyticsUserProperties } from '../lib/analytics';
 
 export const AuthContext = createContext();
 
@@ -76,6 +77,13 @@ export const AuthContextProvider = ({ children }) => {
                     
                     setUser({ ...normalized, role });
                     setLoading(false);
+                    
+                    // Track user in analytics
+                    setAnalyticsUserId(firebaseUser.uid);
+                    setAnalyticsUserProperties({
+                        user_role: role,
+                        user_email: firebaseUser.email
+                    });
                 }).catch(err => {
                     console.error("Error fetching user role:", err);
                     setUser(normalized); // Fallback
@@ -90,7 +98,10 @@ export const AuthContextProvider = ({ children }) => {
         return () => unsubscribe();
     }, []);
 
-    const logout = useCallback(() => signOut(auth), []);
+    const logout = useCallback(async () => {
+        await signOut(auth);
+        // Analytics logout event is tracked in useLogin/useLogout hooks
+    }, []);
 
     // Legacy dispatch for backward compatibility
     const dispatch = useCallback((action) => {
