@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useAuthContext } from './useAuthContext';
 import { auth } from '../lib/firebase';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { trackLogin } from '../lib/analytics';
 
 export const useLogin = () => {
     const [isCancelled, setIsCancelled] = useState(false);
@@ -33,10 +32,6 @@ export const useLogin = () => {
                 setIsPending(false);
                 setError(null);
             }
-            
-            // Track successful login
-            trackLogin('email');
-            
             return res.user;
         } catch (err) {
             if (!isCancelled) {
