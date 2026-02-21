@@ -1,8 +1,41 @@
 
-# Playwright
+# Dependencies
 node_modules/
+
+# Build outputs
+/dist/
+/build_output/
+
+# Firebase cache
+/.firebase/
+
+# Playwright
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+tests/screenshot-*.png
+
+# Debug / audit logs (root-level generated files)
+*.log
+build_error*.txt
+build_error*.log
+debug_output.txt
+diff_full.patch
+diff_stat*.txt
+find_callbacks.js
+fsck_*.txt
+gh_pages_report*.txt
+git_output.json
+git_status.txt
+log_*.txt
+log_multi*.txt
+log_nav*.txt
+modified_last_hour*.json
+modified_last_hour*.txt
+output*.txt
+pl_output*.txt
+reflog_*.txt
+show_*.txt
+status_audit*.txt

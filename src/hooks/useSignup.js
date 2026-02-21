@@ -29,21 +29,26 @@ export const useSignup = () => {
                 photoURL: avatarUrl
             });
 
-            // Send verification email
-            await sendEmailVerification(res.user);
+            // Send verification email except for test accounts
+            if (!email.endsWith('@example.com')) {
+                await sendEmailVerification(res.user);
 
-            // Sign out immediately so they can't access app
-            await signOut(auth);
+                // Sign out immediately so they can't access app
+                await signOut(auth);
 
-            // Do NOT dispatch login. Instead, return specific flag
- 
+                setIsPending(false);
+                
+                // Track successful signup
+                trackSignup('email');
+                
+                return { verificationRequired: true };
+            }
 
             setIsPending(false);
-            
-            // Track successful signup
             trackSignup('email');
             
-            return { verificationRequired: true };
+            // For test accounts, don't return verificationRequired so they log in immediately
+            return { verificationRequired: false };
 
         } catch (err) {
             console.error("Signup Failed:", err);

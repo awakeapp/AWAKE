@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Quote } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { QUOTES } from '../../data/quotes';
 
 const STYLES = [
@@ -37,18 +38,25 @@ const STYLES = [
 ];
 
 const MotivationBanner = () => {
+    const { i18n } = useTranslation();
+    const currentLanguage = i18n.language || 'en';
+    const currentQuotes = QUOTES[currentLanguage] || QUOTES['en'];
+
     // Randomize start index to keep it fresh on reload
-    const [currentIndex, setCurrentIndex] = useState(() => Math.floor(Math.random() * QUOTES.length));
+    const [currentIndex, setCurrentIndex] = useState(() => Math.floor(Math.random() * currentQuotes.length));
+
+    // Ensure index is valid for current language quotes
+    const safeIndex = currentIndex % currentQuotes.length;
 
     // Memoize the current quote to prevent jitter during renders if parent updates
-    const currentQuote = QUOTES[currentIndex];
+    const currentQuote = currentQuotes[safeIndex];
     
     // Deterministic style based on index (so it's stable for the same quote)
-    const currentStyle = STYLES[currentIndex % STYLES.length];
+    const currentStyle = STYLES[safeIndex % STYLES.length];
 
     useEffect(() => {
         const timer = setInterval(() => {
-            setCurrentIndex((prev) => (prev + 1) % QUOTES.length);
+            setCurrentIndex((prev) => prev + 1);
         }, 8000); // 8 seconds per slide
         return () => clearInterval(timer);
     }, []);

@@ -38,8 +38,8 @@ const FastingTracker = ({ todayKey, ramadanData, updateDay }) => {
     };
 
     return (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded p-4 shadow-sm">
-            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Today's Fast</h2>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Today's Fast</h2>
             
             <div className="flex gap-3 mb-4">
                 <button 
@@ -144,8 +144,8 @@ const NightPrayersTracker = ({ todayKey, ramadanData, updateDay }) => {
     };
 
     return (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded p-4 shadow-sm">
-            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Night Prayers</h2>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Night Prayers</h2>
             <div className="flex flex-col">
                 <PrayerRow 
                     title="Taraweeh" 
@@ -257,7 +257,7 @@ const RamadanDashboard = () => {
 
             {/* Location Warning Banner */}
             {location?.isDefault && (
-                <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-500/20 rounded p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-500/20 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p className="text-amber-800 dark:text-amber-200 text-sm font-medium">
                         Using default South India timing. Please set your location for accurate prayer times.
                     </p>
@@ -270,26 +270,23 @@ const RamadanDashboard = () => {
                 </div>
             )}
             
-            <div className="bg-indigo-600 dark:bg-indigo-900/50 rounded p-6 shadow-md shadow-indigo-200 dark:shadow-none text-white overflow-hidden relative border border-transparent dark:border-indigo-500/20">
-                 {/* Decorative background circle */}
-                 <div className="absolute -top-24 -right-12 w-48 h-48 bg-white/10 rounded-full blur-2xl"></div>
-                 
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm overflow-hidden relative">
                  <div className="relative z-10">
                      <div className="flex justify-between items-center mb-6">
                         <div>
-                            <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-semibold tracking-wider">
-                                {isRamadanActive ? `DAY ${hijriDate.day}` : 'PRE-RAMADAN'}
+                            <span className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase">
+                                {isRamadanActive ? `Day ${hijriDate.day}` : 'Pre-Ramadan'}
                             </span>
                         </div>
                         <div className="text-right">
-                             <p className="font-semibold text-sm">{hijriDate?.day} Ramadan {hijriDate?.year}</p>
-                             <p className="text-indigo-100 text-xs opacity-80 mt-px">{now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
+                             <p className="font-bold text-slate-900 dark:text-white text-sm">{hijriDate?.day} Ramadan {hijriDate?.year}</p>
+                             <p className="text-slate-500 text-xs mt-px">{now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
                         </div>
                      </div>
 
-                     <div className="mt-8 text-center">
-                         <p className="text-indigo-100 uppercase tracking-[0.2em] text-xs font-bold mb-2">{nextEvent}</p>
-                         <div className="text-5xl font-black tabular-nums tracking-tight">
+                     <div className="mt-8 text-center pb-2">
+                         <p className="text-slate-500 uppercase tracking-wider text-xs font-bold mb-2">{nextEvent}</p>
+                         <div className="text-4xl sm:text-5xl font-bold tabular-nums tracking-tight text-slate-900 dark:text-white">
                              {countdownStr}
                          </div>
                      </div>
@@ -299,15 +296,13 @@ const RamadanDashboard = () => {
             {/* Suhoor and Iftar Highlights */}
             {todayPrayers && (
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200/50 dark:border-amber-700/30 rounded-2xl p-4 flex flex-col items-center justify-center relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-16 h-16 bg-amber-400/10 rounded-full blur-xl -mr-8 -mt-8 pointer-events-none"></div>
-                        <span className="text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-widest mb-1 z-10">Suhoor Ends</span>
-                        <span className="text-amber-900 dark:text-amber-100 text-2xl font-black z-10">{suhoorTimeStr}</span>
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col items-center justify-center shadow-sm">
+                        <span className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Suhoor Ends</span>
+                        <span className="text-slate-900 dark:text-white text-2xl font-bold">{suhoorTimeStr}</span>
                     </div>
-                    <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200/50 dark:border-indigo-700/30 rounded-2xl p-4 flex flex-col items-center justify-center relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-16 h-16 bg-indigo-400/10 rounded-full blur-xl -ml-8 -mt-8 pointer-events-none"></div>
-                        <span className="text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-widest mb-1 z-10">Iftar Time</span>
-                        <span className="text-indigo-900 dark:text-indigo-100 text-2xl font-black z-10">{iftarTimeStr}</span>
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col items-center justify-center shadow-sm">
+                        <span className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Iftar Time</span>
+                        <span className="text-slate-900 dark:text-white text-2xl font-bold">{iftarTimeStr}</span>
                     </div>
                 </div>
             )}

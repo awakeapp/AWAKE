@@ -139,10 +139,10 @@ const NotificationSettings = () => {
     );
 
     return (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded p-4 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
-                <Bell className="w-4 h-4 text-slate-400" />
-                <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Reminders</h2>
+                <Bell className="w-5 h-5 text-indigo-500" />
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Reminders</h2>
             </div>
             
             {permission === 'denied' && (
