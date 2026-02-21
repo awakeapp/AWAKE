@@ -1,5 +1,7 @@
 import { logEvent, setUserProperties, setUserId } from 'firebase/analytics';
-import { analytics } from './firebase';
+// analytics is not initialized in this project — use null fallback
+const analytics = null;
+
 
 /**
  * Log a custom analytics event
