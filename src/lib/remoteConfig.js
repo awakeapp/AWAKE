@@ -1,5 +1,5 @@
 import { fetchAndActivate, getValue, getBoolean, getString, getNumber } from 'firebase/remote-config';
-import { remoteConfig } from './firebase';
+const remoteConfig = null;
 
 /**
  * Fetch and activate remote config
