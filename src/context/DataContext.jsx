@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useMemo } from 'react';
+import { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import { useDate } from './DateContext';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { DEFAULT_ROUTINE } from '../data/defaultRoutine';
