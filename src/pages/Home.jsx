@@ -11,6 +11,7 @@ import { Sparkles, Trophy, Target, Flame, IndianRupee, ArrowRight, List, CheckCi
 import clsx from 'clsx';
 import Button from '../components/atoms/Button';
 import MotivationBanner from '../components/organisms/MotivationBanner';
+import { useTranslation } from 'react-i18next'; // Added i18n support
 
 // Lazy load components if needed, but for Home simple cards are fine.
 
@@ -20,6 +21,7 @@ const Home = () => {
     const { tasks: workspaceTasks } = useTasks();
     const { getDailySpend } = useFinance();
     const navigate = useNavigate();
+    const { t } = useTranslation(); // Enable translations
 
     // --- Streak Logic (Copied from Dashboard) ---
     const [streak, setStreak] = useState({ current: 0, longest: 0, loading: true });
@@ -98,9 +100,9 @@ const Home = () => {
 
     // --- Welcome Logic ---
     const hour = new Date().getHours();
-    let greeting = 'Good Morning';
-    if (hour >= 12 && hour < 17) greeting = 'Good Afternoon';
-    else if (hour >= 17) greeting = 'Good Evening';
+    let greeting = t('home.greeting_morning', 'Good Morning');
+    if (hour >= 12 && hour < 17) greeting = t('home.greeting_afternoon', 'Good Afternoon');
+    else if (hour >= 17) greeting = t('home.greeting_evening', 'Good Evening');
 
     const outputTasks = dailyData?.tasks || [];
     const completedRoutine = outputTasks.filter(t => t.status === 'checked').length;
@@ -111,8 +113,8 @@ const Home = () => {
 
     // Motivation
     let motivation = "";
-    if (routineProgress >= 80) motivation = "Finishing strong.";
-    if (routineProgress === 100) motivation = "Discipline mastered.";
+    if (routineProgress >= 80) motivation = t('home.motivation_finishing', "Finishing strong.");
+    if (routineProgress === 100) motivation = t('home.motivation_mastered', "Discipline mastered.");
 
     return (
         <div className="space-y-6 pb-24 pt-4 px-1">
@@ -148,9 +150,9 @@ const Home = () => {
                             {routineProgress === 100 ? <Trophy className="w-7 h-7" /> : <Target className="w-7 h-7" />}
                         </div>
                         <div>
-                            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Daily Routine</div>
+                            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{t('home.daily_routine', 'Daily Routine')}</div>
                             <div className="text-2xl font-bold text-slate-900 dark:text-white leading-none">
-                                {routineProgress}% <span className="text-base font-medium text-slate-400 ml-1">Done</span>
+                                {routineProgress}% <span className="text-base font-medium text-slate-400 ml-1">{t('home.done', 'Done')}</span>
                             </div>
                         </div>
                     </div>
@@ -172,7 +174,7 @@ const Home = () => {
                     </div>
                     <div>
                         <div className="text-2xl font-bold text-slate-800 dark:text-slate-100 leading-none mb-1">
-                            {streak.current} <span className="text-sm text-slate-400 font-medium">Days</span>
+                            {streak.current} <span className="text-sm text-slate-400 font-medium">{t('home.days', 'Days')}</span>
                         </div>
                         <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                             Longest: {streak.longest}
@@ -189,14 +191,14 @@ const Home = () => {
                          <div className="p-2 bg-white dark:bg-slate-900/50 rounded-xl text-blue-500 shadow-sm">
                             <List className="w-5 h-5" />
                         </div>
-                        <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Tasks</span>
+                        <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider">{t('home.tasks', 'Tasks')}</span>
                     </div>
                     <div>
                         <div className="text-2xl font-bold text-slate-800 dark:text-slate-100 leading-none mb-1">
-                            {remainingTasksCount} <span className="text-sm text-slate-400 font-medium">Left</span>
+                            {remainingTasksCount} <span className="text-sm text-slate-400 font-medium">{t('home.left', 'Left')}</span>
                         </div>
                         <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                            Workspace
+                            {t('home.workspace', 'Workspace')}
                         </div>
                     </div>
                 </div>
@@ -212,7 +214,7 @@ const Home = () => {
                         <IndianRupee className="w-6 h-6" />
                     </div>
                     <div>
-                        <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Today's Spend</div>
+                        <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">{t('home.todays_spend', "Today's Spend")}</div>
                         <div className="text-xl font-bold text-slate-900 dark:text-white">
                             ₹{dailySpend.toLocaleString()}
                         </div>

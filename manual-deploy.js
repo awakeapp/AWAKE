@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 // URL of the repository
-const REPO_URL = 'https://github.com/coolcraftadv/AWAKE.git';
+const REPO_URL = 'https://github.com/awakeapp/AWAKE.git';
 const DIST_DIR = 'dist';
 
 console.log('🚀 Starting Manual Deployment...');

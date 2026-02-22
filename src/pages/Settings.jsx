@@ -13,11 +13,13 @@ import LegacyMigrator from '../components/molecules/LegacyMigrator'; // Added
 import DataExportSection from '../components/organisms/DataExportSection';
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { auth } from '../lib/firebase';
+import { useTranslation } from 'react-i18next'; // Added i18n support
 
 const Settings = () => {
     const { user } = useAuthContext();
     const { logout } = useLogout();
     const { theme, toggleTheme } = useTheme();
+    const { t, i18n } = useTranslation(); // Extracted i18n
     const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
     // Password state
@@ -45,7 +47,7 @@ const Settings = () => {
         setIsPasswordLoading(true);
 
         if (!currentPassword || !newPassword) {
-            setPasswordError("All fields are required");
+            setPasswordError(t('common.error_general', "All fields are required"));
             setIsPasswordLoading(false);
             return;
         }
@@ -66,7 +68,7 @@ const Settings = () => {
             // Update Password
             await updatePassword(auth.currentUser, newPassword);
 
-            setPasswordSuccess("Password updated successfully");
+            setPasswordSuccess(t('common.success_saved', "Password updated successfully"));
             setCurrentPassword('');
             setNewPassword('');
             setTimeout(() => {
@@ -95,7 +97,7 @@ const Settings = () => {
 
     // --- App Settings States ---
     const [appSettings, setAppSettings] = useState({
-        language: 'English',
+        language: i18n.language || 'en', // default to i18n detected lang
         timeFormat: '12h',
         appLock: false,
         biometrics: false,
@@ -111,13 +113,21 @@ const Settings = () => {
             (data) => {
                 if (data) {
                     setAppSettings(prev => ({ ...prev, ...data }));
+                    if (data.language && data.language !== i18n.language) {
+                        i18n.changeLanguage(data.language);
+                    }
                 }
             }
         );
         return () => unsub();
-    }, [user]);
+    }, [user, i18n]);
 
     const updateSetting = async (key, value) => {
+        // Handle explicit local language change immediately
+        if (key === 'language') {
+            i18n.changeLanguage(value);
+        }
+
         // Optimistic update
         const newSettings = { ...appSettings, [key]: value };
         setAppSettings(newSettings);
@@ -134,7 +144,7 @@ const Settings = () => {
     };
 
     const handleClearData = async () => {
-        if (window.confirm("Are you sure you want to sign out and clear local cache? This will NOT delete your cloud data.")) {
+        if (window.confirm(t('common.confirm_reset', "Are you sure you want to sign out and clear local cache? This will NOT delete your cloud data."))) {
             // We just logout and clear localStorage. 
             // Firestore data persists.
             try {
@@ -164,7 +174,7 @@ const Settings = () => {
                     <button
                         onClick={() => setIsEditProfileOpen(true)}
                         className="p-3 bg-white/20 hover:bg-white/30 rounded-full transition-all backdrop-blur-md text-white shadow-lg"
-                        title="Edit Profile"
+                        title={t('settings.edit_profile', "Edit Profile")}
                     >
                         <Edit2 size={20} />
                     </button>
@@ -197,10 +207,10 @@ const Settings = () => {
                     {/* Status Badges */}
                     <div className="pt-2 flex justify-center gap-2">
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[10px] font-bold tracking-widest uppercase">
-                            <ShieldCheck size={10} /> Verified ID
+                            <ShieldCheck size={10} /> {t('settings.verified_account', 'Verified ID')}
                         </span>
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-[10px] font-bold tracking-widest uppercase text-emerald-300">
-                            Active
+                            {t('settings.active_account', 'Active')}
                         </span>
                     </div>
                 </div>
@@ -208,7 +218,7 @@ const Settings = () => {
 
             {/* Application Settings */}
             <section className="space-y-4">
-                <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] px-1">Global Preferences</h3>
+                <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] px-1">{t('settings.global_preferences', 'Global Preferences')}</h3>
 
                 <Card className="border-none shadow-premium overflow-hidden">
                     <CardContent className="p-0 divide-y divide-slate-50 dark:divide-slate-800">
@@ -219,19 +229,19 @@ const Settings = () => {
                                     <User className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <p className="font-bold text-slate-700 dark:text-slate-200 text-sm">Language</p>
-                                    <p className="text-xs text-slate-500">System default language</p>
+                                    <p className="font-bold text-slate-700 dark:text-slate-200 text-sm">{t('settings.language', 'Language')}</p>
+                                    <p className="text-xs text-slate-500">{t('settings.language_desc', 'System default language')}</p>
                                 </div>
                             </div>
                             <select
-                                value={appSettings.language}
+                                value={i18n.language.split('-')[0]}
                                 onChange={(e) => updateSetting('language', e.target.value)}
                                 className="bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-xs font-bold px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500"
                             >
-                                <option>English</option>
-                                <option>Spanish</option>
-                                <option>French</option>
-                                <option>German</option>
+                                <option value="en">English (English)</option>
+                                <option value="ar">العربية (Arabic)</option>
+                                <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                                <option value="ml">മലയാളം (Malayalam)</option>
                             </select>
                         </div>
 

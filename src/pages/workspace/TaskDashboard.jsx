@@ -6,8 +6,10 @@ import AddTaskModal from '../../components/molecules/workspace/AddTaskModal';
 import { format, addDays, subDays, isBefore, isSameDay, startOfDay } from 'date-fns';
 import { useLocation, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next'; // Added i18n support
 
 const TaskDashboard = () => {
+    const { t } = useTranslation(); // Enable translations
     const {
         tasks,
         addTask,
@@ -196,7 +198,7 @@ const TaskDashboard = () => {
                                 )}
                             >
                                 {/* Tasks Section */}
-                                <div className="font-mono text-[9px] text-slate-400 dark:text-white/20 tracking-[0.1em] uppercase px-2.5 pt-1.5 pb-1">Tasks</div>
+                                <div className="font-mono text-[9px] text-slate-400 dark:text-white/20 tracking-[0.1em] uppercase px-2.5 pt-1.5 pb-1">{t('home.tasks', 'Tasks')}</div>
                                 <button
                                     onClick={() => { setMenuOpen(false); /* future edit */ }}
                                     className="flex items-center gap-2.5 px-2.5 py-2 rounded-[9px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[12px] font-semibold"

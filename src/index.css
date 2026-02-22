@@ -1,21 +1,42 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-    html, body {
-        background-color: #ffffff;
-        /* Removed automatic transition here to prevent load flash. 
+  html,
+  body {
+    background-color: #ffffff;
+    /* Removed automatic transition here to prevent load flash. 
            We now rely on .theme-transition class added by JS for smooth toggles. */
-    }
-    html.dark, html.dark body {
-        background-color: #020617; /* match dark:bg-primary-950 */
-    }
-    body {
-        @apply bg-slate-50 text-slate-900 antialiased dark:bg-primary-950 dark:text-slate-50;
-        padding-top: env(safe-area-inset-top);
-    }
+  }
+
+  /* Regional Typography Overrides */
+  html[lang="ar"],
+  html[lang="ar"] body {
+    font-family: "Cairo", sans-serif !important;
+    letter-spacing: 0.02em;
+    line-height: var(--lh-arabic, 1.8);
+  }
+
+  html[lang="kn"],
+  html[lang="kn"] body {
+    font-family: "Anek Kannada", sans-serif !important;
+  }
+
+  html[lang="ml"],
+  html[lang="ml"] body {
+    font-family: "Anek Malayalam", sans-serif !important;
+  }
+
+  html.dark,
+  html.dark body {
+    background-color: #020617; /* match dark:bg-primary-950 */
+  }
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased dark:bg-primary-950 dark:text-slate-50;
+    padding-top: env(safe-area-inset-top);
+  }
 }
 
 /* Global Theme Transition: Only active during switch to preserve hover speeds */
@@ -23,174 +44,171 @@
 .theme-transition *,
 .theme-transition *::before,
 .theme-transition *::after {
-    transition: all 0.3s ease-out !important;
-    transition-property: background-color, border-color, color, fill, stroke, box-shadow !important;
+  transition: all 0.3s ease-out !important;
+  transition-property:
+    background-color, border-color, color, fill, stroke, box-shadow !important;
 }
 
 @layer components {
-    .btn-primary {
-        @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none transition-colors dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800;
-    }
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none transition-colors dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800;
+  }
 
-    .btn-secondary {
-        @apply py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-slate-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700;
-    }
+  .btn-secondary {
+    @apply py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-slate-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700;
+  }
 
-    .input-field {
-        @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500;
-    }
+  .input-field {
+    @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500;
+  }
 
-    .card {
-        @apply block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-700;
-    }
+  .card {
+    @apply block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-700;
+  }
 }
 
 /* Premium Workspace Utilities (Additive) */
 @layer components {
-    .glass-panel {
-        @apply bg-white/70 backdrop-blur-xl border border-white/20 shadow-xl dark:bg-slate-900/70 dark:border-white/10;
-    }
+  .glass-panel {
+    @apply bg-white/70 backdrop-blur-xl border border-white/20 shadow-xl dark:bg-slate-900/70 dark:border-white/10;
+  }
 
-    .glass-button {
-        @apply bg-white/20 hover:bg-white/30 active:bg-white/40 backdrop-blur-md border border-white/20 text-slate-800 dark:text-white transition-all duration-300;
-    }
+  .glass-button {
+    @apply bg-white/20 hover:bg-white/30 active:bg-white/40 backdrop-blur-md border border-white/20 text-slate-800 dark:text-white transition-all duration-300;
+  }
 
-    .premium-gradient-text {
-        @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-500 via-purple-500 to-pink-500 font-bold;
-    }
+  .premium-gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-500 via-purple-500 to-pink-500 font-bold;
+  }
 
-    /* Hyper-Modern Design System */
-    .glass-card {
-        @apply bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-lg transition-all duration-300;
-    }
+  /* Hyper-Modern Design System */
+  .glass-card {
+    @apply bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-lg transition-all duration-300;
+  }
 
-    .neumorphic-soft {
-        box-shadow:
-            8px 8px 16px rgba(0, 0, 0, 0.05),
-            -8px -8px 16px rgba(255, 255, 255, 0.8);
-    }
+  .neumorphic-soft {
+    box-shadow:
+      8px 8px 16px rgba(0, 0, 0, 0.05),
+      -8px -8px 16px rgba(255, 255, 255, 0.8);
+  }
 
-    .dark .neumorphic-soft {
-        box-shadow:
-            8px 8px 16px rgba(0, 0, 0, 0.3),
-            -8px -8px 16px rgba(255, 255, 255, 0.02);
-    }
+  .dark .neumorphic-soft {
+    box-shadow:
+      8px 8px 16px rgba(0, 0, 0, 0.3),
+      -8px -8px 16px rgba(255, 255, 255, 0.02);
+  }
 
-    .bg-radial {
-        background: radial-gradient(ellipse at top, #f8fafc 0%, #e2e8f0 100%);
-    }
+  .bg-radial {
+    background: radial-gradient(ellipse at top, #f8fafc 0%, #e2e8f0 100%);
+  }
 
-    .dark .bg-radial {
-        background: radial-gradient(ellipse at top, #0f172a 0%, #020617 100%);
-    }
+  .dark .bg-radial {
+    background: radial-gradient(ellipse at top, #0f172a 0%, #020617 100%);
+  }
 }
 
 @layer utilities {
-    .animate-float {
-        animation: float 6s ease-in-out infinite;
-    }
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
 
-    .animate-fade-in-up {
-        animation: fadeInUp 0.5s ease-out forwards;
-    }
+  .animate-fade-in-up {
+    animation: fadeInUp 0.5s ease-out forwards;
+  }
 
-    .animate-pulse-aura {
-        animation: pulseAura 3s ease-in-out infinite;
-    }
+  .animate-pulse-aura {
+    animation: pulseAura 3s ease-in-out infinite;
+  }
 
-    .animate-micro-bounce {
-        animation: microBounce 0.3s ease-out;
-    }
+  .animate-micro-bounce {
+    animation: microBounce 0.3s ease-out;
+  }
 
-    .animate-leaf-float {
-        animation: leafFloat 4s ease-in-out infinite;
-    }
+  .animate-leaf-float {
+    animation: leafFloat 4s ease-in-out infinite;
+  }
 
-    .animate-gradient-flow {
-        animation: gradientFlow 8s ease-in-out infinite;
-    }
+  .animate-gradient-flow {
+    animation: gradientFlow 8s ease-in-out infinite;
+  }
 
-    .perspective-1000 {
-        perspective: 1000px;
-    }
+  .perspective-1000 {
+    perspective: 1000px;
+  }
 
-    .preserve-3d {
-        transform-style: preserve-3d;
-    }
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
 }
 
 @keyframes float {
-    0% {
-        transform: translateY(0px);
-    }
+  0% {
+    transform: translateY(0px);
+  }
 
-    50% {
-        transform: translateY(-10px);
-    }
+  50% {
+    transform: translateY(-10px);
+  }
 
-    100% {
-        transform: translateY(0px);
-    }
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes pulseAura {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
 
-    0%,
-    100% {
-        opacity: 0.6;
-        transform: scale(1);
-    }
-
-    50% {
-        opacity: 0.8;
-        transform: scale(1.05);
-    }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
 }
 
 @keyframes microBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
 
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-4px);
-    }
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
 @keyframes leafFloat {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
 
-    0%,
-    100% {
-        transform: translateY(0) rotate(0deg);
-    }
-
-    50% {
-        transform: translateY(-8px) rotate(2deg);
-    }
+  50% {
+    transform: translateY(-8px) rotate(2deg);
+  }
 }
 
 @keyframes gradientFlow {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
 
-    0%,
-    100% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
+  50% {
+    background-position: 100% 50%;
+  }
 }
