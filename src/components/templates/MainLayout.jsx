@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 
 import SideMenu from '../organisms/SideMenu';
 import BottomNavigation from '../organisms/BottomNavigation';
+import { AppHeader } from '../ui/AppHeader';
 import { LayoutGrid, ArrowLeft, Droplet, Moon, Sun } from 'lucide-react';
 
 import { useDate } from '../../context/DateContext';
@@ -20,56 +21,51 @@ const MainLayout = ({ children }) => {
     const topLevelRoutes = ['/', '/routine', '/history', '/settings'];
     const isTopLevel = topLevelRoutes.includes(location.pathname);
 
+    // Completely hide top header on these sections
+    const hiddenHeaderRoutes = ['/routine', '/history', '/settings', '/finance', '/vehicle', '/diet', '/analytics'];
+    const showHeader = !hiddenHeaderRoutes.some(route => location.pathname.startsWith(route));
+
     const { isDark, toggleTheme } = useTheme();
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-24 dark:bg-slate-950 dark:text-slate-50 transition-colors">
-            {/* Top Navigation */}
-            <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between dark:bg-slate-900/80 dark:border-slate-800 transition-colors">
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
+            {/* Top Navigation using unified AppHeader */}
+            {showHeader && (
+                <AppHeader 
+                    title=""
+                    showBack={!isTopLevel}
+                onBack={() => navigate(-1)}
+                leftNode={
+                    <button
+                        onClick={() => navigate('/')}
+                        className="focus:outline-none hover:opacity-80 transition-opacity"
+                    >
+                        <img
+                            src={awakeLogo}
+                            alt="HUMI AWAKE"
+                            className="h-8 w-auto object-cover dark:brightness-0 dark:invert"
+                        />
+                    </button>
+                }
+                rightNode={
+                    <>
+                        <button
+                            onClick={toggleTheme}
+                            className="p-2 rounded-full text-slate-500 hover:bg-slate-100 transition-colors dark:text-slate-400 dark:hover:bg-slate-800"
+                        >
+                            {isDark ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+                        </button>
 
                         <button
-                            onClick={() => navigate('/')}
-                            className="focus:outline-none hover:opacity-80 transition-opacity"
+                            onClick={() => setIsMenuOpen(true)}
+                            className="p-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors dark:text-slate-300 dark:hover:bg-slate-800"
                         >
-                            <img
-                                src={awakeLogo}
-                                alt="HUMI AWAKE"
-                                className="h-8 w-auto object-cover dark:brightness-0 dark:invert"
-                            />
+                            <LayoutGrid className="w-6 h-6" />
                         </button>
-                    </div>
-
-                    {!isTopLevel && (
-                        <div className="flex items-center gap-1 pl-2 border-l border-slate-200 dark:border-slate-800">
-                            <button
-                                onClick={() => navigate(-1)}
-                                className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-full transition-colors dark:text-slate-400 dark:hover:bg-slate-800"
-                                title="Go Back"
-                            >
-                                <ArrowLeft className="w-5 h-5" />
-                            </button>
-                        </div>
-                    )}
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={toggleTheme}
-                        className="p-2 rounded-full text-slate-500 hover:bg-slate-100 transition-colors dark:text-slate-400 dark:hover:bg-slate-800"
-                    >
-                        {isDark ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-                    </button>
-
-                    <button
-                        onClick={() => setIsMenuOpen(true)}
-                        className="p-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors dark:text-slate-300 dark:hover:bg-slate-800"
-                    >
-                        <LayoutGrid className="w-6 h-6" />
-                    </button>
-                </div>
-            </header>
+                    </>
+                }
+            />
+            )}
             <main className="px-4 py-6 max-w-md mx-auto w-full">
                 <Suspense fallback={<div className="flex items-center justify-center p-12"><div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div></div>}>
                     {children || <Outlet />}

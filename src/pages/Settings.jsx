@@ -10,6 +10,7 @@ import { getReportData, generateUserReportPDF } from '../utils/reportUtils';
 import EditProfileModal from '../components/organisms/EditProfileModal';
 import { FirestoreService } from '../services/firestore-service';
 import LegacyMigrator from '../components/molecules/LegacyMigrator'; // Added
+import DataExportSection from '../components/organisms/DataExportSection';
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 
@@ -421,6 +422,9 @@ const Settings = () => {
                     <LegacyMigrator />
                 </div>
             </section>
+
+            {/* Data Export Center */}
+            <DataExportSection />
 
             {/* Logout Section */}
             <div className="pt-4 px-2">

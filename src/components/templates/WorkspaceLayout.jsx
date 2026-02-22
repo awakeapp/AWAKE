@@ -34,24 +34,6 @@ const WorkspaceLayout = ({ children }) => {
                 <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl opacity-50 mix-blend-multiply animate-float" style={{ animationDelay: '2s' }} />
             </div>
 
-            {/* Mobile Header - Always Visible */}
-            <header className="sticky top-0 left-0 right-0 h-16 glass-panel z-30 px-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
-                <div className="flex items-center gap-3" onClick={() => navigate('/')}>
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/20">
-                        <ListTodo className="w-5 h-5" />
-                    </div>
-                    <div>
-                        <span className="block font-bold text-slate-900 dark:text-white leading-none">Todo</span>
-                    </div>
-                </div>
-                <button
-                    onClick={toggleSidebar}
-                    className="p-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                >
-                    <Menu className="w-6 h-6" />
-                </button>
-            </header>
-
             {/* Sidebar Drawer */}
             <AnimatePresence>
                 {isSidebarOpen && (

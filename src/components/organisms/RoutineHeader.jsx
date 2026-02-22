@@ -101,15 +101,7 @@ const RoutineHeader = ({ onEditClick, isLocked }) => {
 
                 {/* Progress bar (Minimalist full-width layout) */}
                 <div className="px-5 pb-5 pt-1">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">
-                            {t('routine.daily_progress', 'Daily Progress')}
-                        </span>
-                        <span className="text-[10px] font-black text-slate-500 dark:text-slate-400">
-                            {pct}%
-                        </span>
-                    </div>
-                    <div className="h-2 rounded-full bg-slate-100 dark:bg-slate-800 shadow-inner overflow-hidden">
+                    <div className="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 shadow-inner overflow-hidden">
                         <div
                             className={cn(
                                 "h-full rounded-full transition-all duration-700 ease-out",
@@ -126,15 +118,17 @@ const RoutineHeader = ({ onEditClick, isLocked }) => {
 
                 {/* "Viewing past date" indicator */}
                 {!isToday && (
-                    <div className="flex items-center justify-between px-5 py-2.5 bg-indigo-50 dark:bg-indigo-950/50 border-t border-indigo-100/50 dark:border-slate-800/60 text-[10px]">
-                        <span className="font-black text-indigo-600 dark:text-indigo-300 tracking-wider uppercase">
-                            VIEWING {displayDate}
-                        </span>
+                    <div className="flex items-center justify-between px-5 py-3 bg-amber-50 dark:bg-amber-950/30 border-t border-amber-100/50 dark:border-amber-900/50 text-[11px]">
+                        <div className="flex items-center gap-2 text-amber-600 dark:text-amber-500">
+                             <span className="font-extrabold tracking-wider uppercase">
+                                VIEWING PAST DATE: {displayDate}
+                             </span>
+                        </div>
                         <button
                             onClick={jumpToToday}
-                            className="text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-bold uppercase tracking-wider"
+                            className="bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-800 transition-colors font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg active:scale-95"
                         >
-                            tap TODAY to return →
+                            RETURN TO TODAY
                         </button>
                     </div>
                 )}

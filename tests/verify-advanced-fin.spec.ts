@@ -10,7 +10,8 @@ test('Advanced Finance: Recurring & Split', async ({ page }) => {
     await page.getByText('Create Account').click();
     await page.getByPlaceholder('Display Name').fill(name);
     await page.getByPlaceholder('Email address').fill(email);
-    await page.getByPlaceholder('Password').fill('Password123!');
+    // Use an explicitly complex password that passes the new regex
+    await page.getByPlaceholder('Password').fill('AwakeAdmin@2026!');
     await page.getByRole('button', { name: 'Create Account' }).click();
     await page.waitForTimeout(2000); // give it a little time to process
     await page.screenshot({ path: 'tests/screenshot-after-signup.png' });
@@ -18,9 +19,9 @@ test('Advanced Finance: Recurring & Split', async ({ page }) => {
     await page.waitForURL('http://localhost:3000/AWAKE/', { timeout: 10000 });
     await page.goto('http://localhost:3000/AWAKE/finance');
     
-    // Wait for the Finance page to load by expecting a key element
-    const addBtn = page.getByRole('button', { name: 'Add First Transaction' }).or(page.locator('button:has(.lucide-plus)'));
-    await expect(addBtn.first()).toBeVisible({ timeout: 15000 });
+    // Wait for the Finance page to load by expecting a key element (no networkidle due to Firebase)
+    const addBtn = page.getByRole('button', { name: 'Add First Transaction' }).or(page.locator('button', { hasText: 'Create' })).or(page.locator('button:has(.lucide-plus)'));
+    await expect(addBtn.first()).toBeVisible({ timeout: 20000 });
 
     // 2. Add Split Transaction
     await addBtn.first().click();
