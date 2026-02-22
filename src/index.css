@@ -12,23 +12,23 @@
 
   /* Regional Typography Overrides */
   html[lang="en"],
-  html[lang="en"] body {
+  html[lang="en"] * {
     font-family: "DM Sans", sans-serif !important;
   }
   html[lang="ar"],
-  html[lang="ar"] body {
+  html[lang="ar"] * {
     font-family: "Cairo", sans-serif !important;
     letter-spacing: 0.02em;
     line-height: var(--lh-arabic, 1.8);
   }
 
   html[lang="kn"],
-  html[lang="kn"] body {
+  html[lang="kn"] * {
     font-family: "Anek Kannada", sans-serif !important;
   }
 
   html[lang="ml"],
-  html[lang="ml"] body {
+  html[lang="ml"] * {
     font-family: "Anek Malayalam", sans-serif !important;
   }
 
