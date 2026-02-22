@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -12,6 +11,10 @@
   }
 
   /* Regional Typography Overrides */
+  html[lang="en"],
+  html[lang="en"] body {
+    font-family: "DM Sans", sans-serif !important;
+  }
   html[lang="ar"],
   html[lang="ar"] body {
     font-family: "Cairo", sans-serif !important;
