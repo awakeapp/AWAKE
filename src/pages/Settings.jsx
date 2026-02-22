@@ -1,25 +1,65 @@
 import { useState, useEffect } from 'react';
 import clsx from 'clsx';
-import { Card, CardContent } from '../components/atoms/Card';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLogout } from '../hooks/useLogout';
-import { User, Lock, Edit2, Check, X, Download, ShieldCheck, LogOut, Moon, Sun } from 'lucide-react';
+import { User, Lock, Edit2, Check, X, Download, ShieldCheck, LogOut, Moon, Sun, Clock, ChevronRight, FileDown } from 'lucide-react';
 import Button from '../components/atoms/Button';
 import { getReportData, generateUserReportPDF } from '../utils/reportUtils';
 import EditProfileModal from '../components/organisms/EditProfileModal';
 import { FirestoreService } from '../services/firestore-service';
-import LegacyMigrator from '../components/molecules/LegacyMigrator'; // Added
+import LegacyMigrator from '../components/molecules/LegacyMigrator';
 import DataExportSection from '../components/organisms/DataExportSection';
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { auth } from '../lib/firebase';
-import { useTranslation } from 'react-i18next'; // Added i18n support
+import { useTranslation } from 'react-i18next';
+
+// Shared Row Component
+const SettingsRow = ({ icon: Icon, title, subtitle, right, onClick, className }) => (
+    <div 
+        onClick={onClick}
+        className={clsx(
+            "flex items-center justify-between px-4 min-h-[56px] bg-white dark:bg-slate-900",
+            onClick && "cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors",
+            className
+        )}
+    >
+        <div className="flex items-center gap-4">
+            {Icon && (
+                <div className="text-slate-400 shrink-0">
+                    <Icon strokeWidth={2} className="w-5 h-5 flex-shrink-0" />
+                </div>
+            )}
+            <div className="text-left py-2">
+                <p className="font-semibold text-slate-900 dark:text-slate-100 text-sm leading-tight">{title}</p>
+                {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
+            </div>
+        </div>
+        {right && (
+            <div className="shrink-0 ml-4 flex items-center">
+                {right}
+            </div>
+        )}
+    </div>
+);
+
+// Shared Section Component
+const SettingsSection = ({ title, children }) => (
+    <div className="mb-8">
+        <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest px-4 mb-2">
+            {title}
+        </h3>
+        <div className="border-y sm:border sm:rounded-2xl border-slate-200 dark:border-slate-800/60 overflow-hidden divide-y divide-slate-200 dark:divide-slate-800/60">
+            {children}
+        </div>
+    </div>
+);
 
 const Settings = () => {
     const { user } = useAuthContext();
     const { logout } = useLogout();
     const { theme, toggleTheme } = useTheme();
-    const { t, i18n } = useTranslation(); // Extracted i18n
+    const { t, i18n } = useTranslation();
     const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
     // Password state
@@ -61,11 +101,8 @@ const Settings = () => {
         try {
             if (!auth.currentUser) throw new Error("No user logged in");
 
-            // Re-authenticate
             const credential = EmailAuthProvider.credential(auth.currentUser.email, currentPassword);
             await reauthenticateWithCredential(auth.currentUser, credential);
-
-            // Update Password
             await updatePassword(auth.currentUser, newPassword);
 
             setPasswordSuccess(t('common.success_saved', "Password updated successfully"));
@@ -75,7 +112,6 @@ const Settings = () => {
                 setIsEditingPassword(false);
                 setPasswordSuccess('');
             }, 1500);
-
         } catch (e) {
             console.error("Password Update Error", e);
             if (e.code === 'auth/wrong-password') {
@@ -95,16 +131,14 @@ const Settings = () => {
         generateUserReportPDF(user, stats);
     };
 
-    // --- App Settings States ---
     const [appSettings, setAppSettings] = useState({
-        language: i18n.language || 'en', // default to i18n detected lang
+        language: i18n.language || 'en',
         timeFormat: '12h',
         appLock: false,
         biometrics: false,
         notifications: true
     });
 
-    // Load Settings from Firestore
     useEffect(() => {
         if (!user) return;
         const unsub = FirestoreService.subscribeToDocument(
@@ -123,30 +157,23 @@ const Settings = () => {
     }, [user, i18n]);
 
     const updateSetting = async (key, value) => {
-        // Handle explicit local language change immediately
         if (key === 'language') {
             i18n.changeLanguage(value);
         }
-
-        // Optimistic update
         const newSettings = { ...appSettings, [key]: value };
         setAppSettings(newSettings);
 
         if (user) {
             try {
-                // Merge update
                 await FirestoreService.setItem(`users/${user.uid}/config`, 'settings', { [key]: value }, true);
             } catch (e) {
                 console.error("Failed to save setting", e);
-                // Revert? (Complex without previous state history, but typically safe to ignore strict revert for settings)
             }
         }
     };
 
     const handleClearData = async () => {
         if (window.confirm(t('common.confirm_reset', "Are you sure you want to sign out and clear local cache? This will NOT delete your cloud data."))) {
-            // We just logout and clear localStorage. 
-            // Firestore data persists.
             try {
                 await logout();
                 localStorage.clear();
@@ -158,298 +185,209 @@ const Settings = () => {
     };
 
     return (
-        <div className="space-y-6 animate-in slide-in-from-right-4 duration-500 pb-24">
-
+        <div className="pb-24 animate-in slide-in-from-right-4 duration-300">
             <EditProfileModal isOpen={isEditProfileOpen} onClose={() => setIsEditProfileOpen(false)} />
 
-            {/* Header / Letterhead Style */}
-            <div className="relative overflow-hidden rounded-[2rem] bg-cyan-500 text-white shadow-2xl">
-                {/* Background Pattern */}
-                <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
-                    <ShieldCheck size={180} />
-                </div>
-
-                {/* Edit Button (Top Right) */}
-                <div className="absolute top-6 right-6 z-20">
-                    <button
+            {/* 1. PROFILE HEADER */}
+            <div className="flex flex-col items-center pt-8 pb-10">
+                <div className="relative mb-4">
+                    <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-2xl font-bold text-slate-400 overflow-hidden">
+                        {user?.photoURL ? (
+                            <img src={user.photoURL} alt={user?.name} className="w-full h-full object-cover" />
+                        ) : (
+                            <span className="uppercase">{user?.initials || user?.name?.charAt(0) || 'U'}</span>
+                        )}
+                    </div>
+                    <button 
                         onClick={() => setIsEditProfileOpen(true)}
-                        className="p-3 bg-white/20 hover:bg-white/30 rounded-full transition-all backdrop-blur-md text-white shadow-lg"
-                        title={t('settings.edit_profile', "Edit Profile")}
+                        className="absolute bottom-0 right-0 w-8 h-8 bg-white dark:bg-slate-700 border flex items-center justify-center border-slate-200 dark:border-slate-600 rounded-full text-slate-600 dark:text-slate-300 shadow-sm hover:scale-105 transition-transform"
                     >
-                        <Edit2 size={20} />
+                        <Edit2 strokeWidth={2} className="w-4 h-4" />
                     </button>
                 </div>
-
-                <div className="relative z-10 p-10 text-center space-y-6">
-                    {/* Avatar */}
-                    <div className="relative w-32 h-32 mx-auto">
-                        <div className={`w-full h-full backdrop-blur-sm rounded-full p-2 border-4 border-white/30 shadow-2xl overflow-hidden flex items-center justify-center ${user?.profileColor || 'bg-cyan-400'}`}>
-                            {user?.photoURL ? (
-                                <img
-                                    src={user.photoURL}
-                                    alt={user?.name}
-                                    className="w-full h-full object-cover rounded-full bg-slate-100"
-                                />
-                            ) : (
-                                <div className="w-full h-full rounded-full flex items-center justify-center text-4xl font-black !text-white uppercase tracking-wider">
-                                    {user?.initials || user?.name?.charAt(0) || 'U'}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Name & Info */}
-                    <div className="space-y-1">
-                        <h2 className="text-4xl font-black tracking-tight">{user?.name}</h2>
-                        <p className="text-white/80 text-lg font-medium">{user?.email}</p>
-                    </div>
-
-                    {/* Status Badges */}
-                    <div className="pt-2 flex justify-center gap-2">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[10px] font-bold tracking-widest uppercase">
-                            <ShieldCheck size={10} /> {t('settings.verified_account', 'Verified ID')}
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-[10px] font-bold tracking-widest uppercase text-emerald-300">
-                            {t('settings.active_account', 'Active')}
-                        </span>
-                    </div>
-                </div>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-white leading-tight">{user?.name}</h2>
+                <p className="text-sm text-slate-500 mt-1">{user?.email}</p>
             </div>
 
-            {/* Application Settings */}
-            <section className="space-y-4">
-                <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] px-1">{t('settings.global_preferences', 'Global Preferences')}</h3>
-
-                <Card className="border-none shadow-premium overflow-hidden">
-                    <CardContent className="p-0 divide-y divide-slate-50 dark:divide-slate-800">
-                        {/* Language */}
-                        <div className="p-4 flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="p-2.5 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 rounded-xl">
-                                    <User className="w-5 h-5" />
-                                </div>
-                                <div>
-                                    <p className="font-bold text-slate-700 dark:text-slate-200 text-sm">{t('settings.language', 'Language')}</p>
-                                    <p className="text-xs text-slate-500">{t('settings.language_desc', 'System default language')}</p>
-                                </div>
-                            </div>
+            <div className="max-w-screen-md mx-auto sm:px-4">
+                {/* 2. PREFERENCES */}
+                <SettingsSection title="Preferences">
+                    <SettingsRow 
+                        icon={User} 
+                        title={t('settings.language', 'Language')} 
+                        subtitle={t('settings.language_desc', 'System default language')} 
+                        right={
                             <select
                                 value={i18n.language.split('-')[0]}
                                 onChange={(e) => updateSetting('language', e.target.value)}
-                                className="bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-xs font-bold px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500"
+                                className="bg-transparent text-sm font-medium text-slate-600 dark:text-slate-300 outline-none cursor-pointer pr-1"
                             >
-                                <option value="en">English (English)</option>
-                                <option value="ar">العربية (Arabic)</option>
-                                <option value="kn">ಕನ್ನಡ (Kannada)</option>
-                                <option value="ml">മലയാളം (Malayalam)</option>
+                                <option value="en">English</option>
+                                <option value="ar">العربية</option>
+                                <option value="kn">ಕನ್ನಡ</option>
+                                <option value="ml">മലയാളം</option>
                             </select>
-                        </div>
-
-                        {/* Time Format */}
-                        <div className="p-4 flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="p-2.5 bg-amber-50 dark:bg-amber-900/20 text-amber-600 rounded-xl">
-                                    <Lock className="w-5 h-5" />
-                                </div>
-                                <div>
-                                    <p className="font-bold text-slate-700 dark:text-slate-200 text-sm">Time Format</p>
-                                    <p className="text-xs text-slate-500">Display preference</p>
-                                </div>
-                            </div>
-                            <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+                        }
+                    />
+                    <SettingsRow 
+                        icon={Clock} 
+                        title="Time Format" 
+                        subtitle="Display preference" 
+                        right={
+                            <div className="flex bg-slate-100 dark:bg-slate-800 rounded p-1">
                                 <button
                                     onClick={() => updateSetting('timeFormat', '12h')}
                                     className={clsx(
-                                        "px-3 py-1 text-[10px] font-black rounded-md transition-all",
-                                        appSettings.timeFormat === '12h' ? "bg-white dark:bg-slate-700 shadow-sm text-indigo-600" : "text-slate-500"
+                                        "px-3 py-1 text-xs font-semibold rounded transition-colors duration-200",
+                                        appSettings.timeFormat === '12h' ? "bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white" : "text-slate-500"
                                     )}
                                 >12H</button>
                                 <button
                                     onClick={() => updateSetting('timeFormat', '24h')}
                                     className={clsx(
-                                        "px-3 py-1 text-[10px] font-black rounded-md transition-all",
-                                        appSettings.timeFormat === '24h' ? "bg-white dark:bg-slate-700 shadow-sm text-indigo-600" : "text-slate-500"
+                                        "px-3 py-1 text-xs font-semibold rounded transition-colors duration-200",
+                                        appSettings.timeFormat === '24h' ? "bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white" : "text-slate-500"
                                     )}
                                 >24H</button>
                             </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            </section>
+                        }
+                    />
+                    <SettingsRow 
+                        icon={Moon} 
+                        title="Ramadan Hub" 
+                        subtitle="Manage fasts & prayers" 
+                        onClick={() => {}} 
+                        right={<ChevronRight className="w-5 h-5 text-slate-300" />} 
+                    />
+                    <SettingsRow 
+                        icon={Check} 
+                        title="Daily Routine" 
+                        subtitle="Configure habit tracking" 
+                        onClick={() => {}} 
+                        right={<ChevronRight className="w-5 h-5 text-slate-300" />} 
+                    />
+                </SettingsSection>
 
-            {/* Appearance */}
-            <section className="space-y-4">
-                <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] px-1">Appearance</h3>
-                <Card className="border-none shadow-premium overflow-hidden">
-                    <CardContent className="p-4 flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className="p-2.5 bg-sky-50 dark:bg-sky-900/20 text-sky-600 rounded-xl">
-                                {theme === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-                            </div>
-                            <div>
-                                <p className="font-bold text-slate-700 dark:text-slate-200 text-sm">Dark Mode</p>
-                                <p className="text-xs text-slate-500">Adjust app appearance</p>
-                            </div>
-                        </div>
-                        <button
-                            onClick={toggleTheme}
-                            className={clsx(
-                                "relative w-12 h-6 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900",
-                                theme === 'dark' ? "bg-indigo-600" : "bg-slate-200"
-                            )}
-                        >
-                            <span
-                                className={clsx(
-                                    "absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300",
-                                    theme === 'dark' ? "translate-x-6" : "translate-x-0"
-                                )}
-                            />
-                        </button>
-                    </CardContent>
-                </Card>
-            </section>
-
-            {/* Security */}
-            <section className="space-y-4">
-                <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] px-1">Security & Access</h3>
-                <Card className="border-none shadow-premium overflow-hidden">
-                    <CardContent className="p-0 divide-y divide-slate-50 dark:divide-slate-800">
-                        {/* Manage Password */}
-                        <div className="p-4">
+                {/* 3. APPEARANCE */}
+                <SettingsSection title="Appearance">
+                    <SettingsRow 
+                        icon={theme === 'dark' ? Moon : Sun} 
+                        title="Dark Mode" 
+                        subtitle="Adjust application appearance" 
+                        right={
                             <button
-                                onClick={() => setIsEditingPassword(!isEditingPassword)}
-                                className="w-full flex items-center justify-between group"
+                                onClick={() => {
+                                    if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50);
+                                    toggleTheme();
+                                }}
+                                className={clsx(
+                                    "relative w-12 h-6 rounded-full transition-colors duration-150 ease-in-out border border-transparent",
+                                    theme === 'dark' ? "bg-indigo-500" : "bg-slate-200 dark:bg-slate-700"
+                                )}
                             >
-                                <div className="flex items-center gap-4">
-                                    <div className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-xl group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/20 group-hover:text-indigo-600 transition-colors">
-                                        <ShieldCheck className="w-5 h-5" />
-                                    </div>
-                                    <div className="text-left">
-                                        <p className="font-bold text-slate-700 dark:text-slate-200 text-sm">Update Password</p>
-                                        <p className="text-xs text-slate-500">Last changed: --</p>
-                                    </div>
-                                </div>
-                                <Edit2 className="w-4 h-4 text-slate-400 group-hover:text-indigo-500 transition-colors" />
+                                <span
+                                    className={clsx(
+                                        "absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transform transition-transform duration-150 ease-in-out",
+                                        theme === 'dark' ? "translate-x-6" : "translate-x-0"
+                                    )}
+                                />
                             </button>
+                        }
+                    />
+                </SettingsSection>
 
-                            {isEditingPassword && (
-                                <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
-                                    <div className="grid gap-4">
-                                        <div>
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block">Current Password</label>
-                                            <input
-                                                type="password"
-                                                value={currentPassword}
-                                                onChange={(e) => setCurrentPassword(e.target.value)}
-                                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
-                                                placeholder="••••••••"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block">New Password</label>
-                                            <input
-                                                type="password"
-                                                value={newPassword}
-                                                onChange={(e) => setNewPassword(e.target.value)}
-                                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
-                                                placeholder="Min. 6 characters"
-                                            />
-                                        </div>
-                                    </div>
-
+                {/* 4. SECURITY */}
+                <SettingsSection title="Security">
+                    <div className="bg-white dark:bg-slate-900 flex flex-col">
+                        <SettingsRow 
+                            icon={Lock} 
+                            title="Update Password" 
+                            subtitle="Manage security credentials" 
+                            onClick={() => setIsEditingPassword(!isEditingPassword)}
+                            right={<ChevronRight className={clsx("w-5 h-5 text-slate-300 transition-transform duration-200", isEditingPassword && "rotate-90")} />} 
+                            className="bg-transparent"
+                        />
+                        {isEditingPassword && (
+                            <div className="px-4 pb-4 animate-in fade-in slide-in-from-top-2 duration-150">
+                                <div className="space-y-3 pt-2">
+                                    <input
+                                        type="password"
+                                        value={currentPassword}
+                                        onChange={(e) => setCurrentPassword(e.target.value)}
+                                        className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-lg px-4 py-3 text-sm font-medium outline-none focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-600 transition-all placeholder:text-slate-400"
+                                        placeholder="Current password"
+                                    />
+                                    <input
+                                        type="password"
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-lg px-4 py-3 text-sm font-medium outline-none focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-600 transition-all placeholder:text-slate-400"
+                                        placeholder="New password (min. 6 chars)"
+                                    />
                                     {passwordError && (
-                                        <div className="bg-rose-50 dark:bg-rose-900/20 text-rose-600 text-[11px] font-bold p-3 rounded-lg flex items-center gap-2">
-                                            <X size={14} /> {passwordError}
-                                        </div>
+                                        <p className="text-rose-500 text-xs font-semibold px-1 flex items-center gap-1.5"><X size={14} /> {passwordError}</p>
                                     )}
                                     {passwordSuccess && (
-                                        <div className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 text-[11px] font-bold p-3 rounded-lg flex items-center gap-2">
-                                            <Check size={14} /> {passwordSuccess}
-                                        </div>
+                                        <p className="text-emerald-500 text-xs font-semibold px-1 flex items-center gap-1.5"><Check size={14} /> {passwordSuccess}</p>
                                     )}
-
-                                    <div className="flex gap-3 pt-2">
-                                        <Button variant="outline" className="flex-1 rounded-xl h-11" onClick={() => setIsEditingPassword(false)}>Cancel</Button>
-                                        <Button
-                                            className="flex-1 rounded-xl h-11 shadow-lg shadow-indigo-100 dark:shadow-none"
+                                    <div className="flex gap-2 pt-2">
+                                        <button 
                                             onClick={handleSavePassword}
-                                            isLoading={isPasswordLoading}
+                                            disabled={isPasswordLoading}
+                                            className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50"
                                         >
-                                            Save Changes
-                                        </Button>
+                                            {isPasswordLoading ? 'Saving...' : 'Save Password'}
+                                        </button>
+                                        <button 
+                                            onClick={() => setIsEditingPassword(false)}
+                                            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-semibold rounded-lg transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
                                     </div>
                                 </div>
-                            )}
-                        </div>
-                    </CardContent>
-                </Card>
-            </section>
-
-            {/* Data Management & Reports */}
-            <section className="space-y-4">
-                <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] px-1">Storage & Reports</h3>
-
-                <div className="grid gap-4">
-                    {/* Download Report */}
-                    <Card className="border-none shadow-premium bg-indigo-50/30 dark:bg-indigo-950/10">
-                        <CardContent className="p-4 flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="p-2.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 rounded-xl">
-                                    <Download className="w-5 h-5" />
-                                </div>
-                                <div>
-                                    <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">Download Report</p>
-                                    <p className="text-xs text-slate-500">Get your performance as PDF</p>
-                                </div>
                             </div>
+                        )}
+                    </div>
+                </SettingsSection>
+
+                {/* 5. STORAGE */}
+                <SettingsSection title="Storage">
+                    <DataExportSection />
+                    <SettingsRow 
+                        icon={Download} 
+                        title="Download Report" 
+                        subtitle="Get your performance as PDF" 
+                        right={
                             <button
                                 onClick={handleDownloadReport}
-                                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-black rounded-lg transition-transform active:scale-95 shadow-lg shadow-indigo-200 dark:shadow-none"
-                            >DOWNLOAD</button>
-                        </CardContent>
-                    </Card>
+                                className="px-3 py-1.5 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded transition-colors whitespace-nowrap"
+                            >PDF</button>
+                        }
+                    />
+                </SettingsSection>
 
-                    {/* Clear Configuration */}
-                    <Card className="border-none shadow-premium bg-amber-50/30 dark:bg-amber-950/10">
-                        <CardContent className="p-4 flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="p-2.5 bg-amber-100 dark:bg-amber-900/30 text-amber-600 rounded-xl">
-                                    <ShieldCheck className="w-5 h-5" />
-                                </div>
-                                <div>
-                                    <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">Reset Cache</p>
-                                    <p className="text-xs text-slate-500">Fix sync issues by clearing local cache</p>
-                                </div>
-                            </div>
-                            <button
-                                onClick={handleClearData}
-                                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-black rounded-lg transition-transform active:scale-95 shadow-lg shadow-amber-200 dark:shadow-none"
-                            >RESET</button>
-                        </CardContent>
-                    </Card>
+                {/* 6. DANGER ZONE */}
+                <SettingsSection title="Danger Zone">
+                    <SettingsRow 
+                        icon={ShieldCheck} 
+                        title={<span className="text-rose-600">Reset Cache</span>} 
+                        subtitle={<span className="text-rose-500/80">Fix sync issues (Local only)</span>} 
+                        onClick={handleClearData}
+                    />
+                    <SettingsRow 
+                        icon={LogOut} 
+                        title={<span className="text-rose-600">Sign Out</span>} 
+                        subtitle={<span className="text-rose-500/80">End current session</span>} 
+                        onClick={logout}
+                    />
+                </SettingsSection>
 
-                    {/* Migration Tool */}
-                    <LegacyMigrator />
-                </div>
-            </section>
-
-            {/* Data Export Center */}
-            <DataExportSection />
-
-            {/* Logout Section */}
-            <div className="pt-4 px-2">
-                <button
-                    onClick={logout}
-                    className="w-full flex items-center justify-center gap-2 py-4 px-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[1.5rem] font-black text-sm shadow-xl transition-all hover:bg-slate-800 dark:hover:bg-slate-100 active:scale-[0.98]"
-                >
-                    <LogOut className="w-5 h-5" />
-                    SIGN OUT
-                </button>
-                <p className="text-center text-[10px] font-black text-slate-300 dark:text-slate-600 uppercase tracking-[0.3em] mt-6">
-                    Humi Awake v1.2.0 • Build ID: 88AF2
+                <p className="text-center text-[10px] font-semibold text-slate-400 mt-10 mb-4">
+                    AWAKE v1.2.0 • Build ID: 88AF2
                 </p>
             </div>
-        </div >
+        </div>
     );
 };
 

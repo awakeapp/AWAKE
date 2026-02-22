@@ -1,25 +1,22 @@
 import { useState } from 'react';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { FirestoreService } from '../../services/firestore-service';
-import Button from '../atoms/Button';
-import { CloudUpload, CheckCircle, AlertTriangle } from 'lucide-react';
-import { Card, CardContent } from '../atoms/Card';
+import { CloudUpload, CheckCircle, Database } from 'lucide-react';
+import clsx from 'clsx';
 
 const LegacyMigrator = () => {
     const { user } = useAuthContext();
-    const [status, setStatus] = useState('idle'); // idle, scanning, migrating, done, error
+    const [status, setStatus] = useState('idle'); // idle, migrating, done, error
     const [stats, setStats] = useState({ keysFound: 0, keysMigrated: 0 });
 
     const handleBackup = async () => {
-        if (!user) return;
+        if (!user || status === 'migrating') return;
         setStatus('migrating');
 
         try {
-            // 1. Identify candidate keys
             const keysToBackup = [];
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
-                // Filter out system or irrelevant keys
                 if (key === 'theme' || key === 'firebase:authUser' || key.startsWith('firebase:')) continue;
                 keysToBackup.push(key);
             }
@@ -31,8 +28,6 @@ const LegacyMigrator = () => {
                 return;
             }
 
-            // 2. Upload to Firestore under a backup path
-            // users/{uid}/legacy_backup/{key}
             const backupPromises = keysToBackup.map(async (key) => {
                 const rawValue = localStorage.getItem(key);
                 let parsedValue = rawValue;
@@ -44,9 +39,9 @@ const LegacyMigrator = () => {
 
                 await FirestoreService.setItem(
                     `users/${user.uid}/legacy_backup`,
-                    key, // Document ID is the localStorage key
+                    key,
                     {
-                        key: key,
+                        key,
                         value: parsedValue,
                         backedUpAt: Date.now(),
                         deviceAgent: navigator.userAgent
@@ -65,46 +60,47 @@ const LegacyMigrator = () => {
 
     if (status === 'done') {
         return (
-            <Card className="border-emerald-100 bg-emerald-50/50 dark:border-emerald-900/50 dark:bg-emerald-900/10">
-                <CardContent className="p-4 flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-emerald-600" />
-                    <div className="flex-1">
-                        <p className="text-sm font-bold text-emerald-700 dark:text-emerald-400">Backup Complete</p>
-                        <p className="text-xs text-emerald-600/80">Successfully saved {stats.keysMigrated} local data items to the cloud.</p>
+            <div className="flex items-center justify-between px-4 min-h-[56px] bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800/60 last:border-none">
+                <div className="flex items-center gap-4">
+                    <div className="text-emerald-500 shrink-0">
+                        <CheckCircle strokeWidth={2} className="w-5 h-5 flex-shrink-0" />
                     </div>
-                </CardContent>
-            </Card>
+                    <div className="text-left py-2">
+                        <p className="font-semibold text-slate-900 dark:text-slate-100 text-sm leading-tight">Backup Complete</p>
+                        <p className="text-xs text-slate-500 mt-0.5">Successfully saved {stats.keysMigrated || 'all'} items to cloud.</p>
+                    </div>
+                </div>
+            </div>
         );
     }
 
     return (
-        <Card className="border-amber-100 bg-amber-50/50 dark:border-amber-900/50 dark:bg-amber-900/10">
-            <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                    <div className="p-2 bg-amber-100 dark:bg-amber-900/30 text-amber-600 rounded-lg">
-                        <AlertTriangle className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1 space-y-2">
-                        <div>
-                            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Device Data Backup</p>
-                            <p className="text-xs text-slate-500 mt-1">
-                                If you have data on this device from before the update, click below to upload it to the cloud so it's not lost.
-                            </p>
-                        </div>
-                        <Button
-                            size="sm"
-                            onClick={handleBackup}
-                            isLoading={status === 'migrating'}
-                            variant="default"
-                            className="w-full bg-amber-600 hover:bg-amber-700 text-white border-none"
-                        >
-                            <CloudUpload className="w-4 h-4 mr-2" />
-                            {status === 'migrating' ? 'Backing up...' : 'Sync Local Data to Cloud'}
-                        </Button>
-                    </div>
+        <div className="flex items-center justify-between px-4 min-h-[56px] bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800/60 last:border-none">
+            <div className="flex items-center gap-4 py-2">
+                <div className="text-slate-400 shrink-0">
+                    <Database strokeWidth={2} className="w-5 h-5 flex-shrink-0" />
                 </div>
-            </CardContent>
-        </Card>
+                <div className="text-left pr-4">
+                    <p className="font-semibold text-slate-900 dark:text-slate-100 text-sm leading-tight">Sync Local Data</p>
+                    <p className="text-xs text-slate-500 mt-0.5 max-w-[200px] truncate sm:max-w-none">Upload device data to cloud backup</p>
+                </div>
+            </div>
+            <div className="shrink-0">
+                <button
+                    onClick={handleBackup}
+                    disabled={status === 'migrating'}
+                    className={clsx(
+                        "flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap",
+                        status === 'migrating' 
+                            ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-400 cursor-not-allowed"
+                            : "bg-indigo-500 hover:bg-indigo-600 text-white shadow-sm"
+                    )}
+                >
+                    <CloudUpload className="w-4 h-4" />
+                    {status === 'migrating' ? 'Syncing...' : 'Sync Now'}
+                </button>
+            </div>
+        </div>
     );
 };
 

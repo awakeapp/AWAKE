@@ -104,7 +104,7 @@ function App() {
 
                             {/* Finance Routes */}
                             <Route path="/finance" element={<FinanceDashboard />} />
-                            <Route path="/finance/debt" element={<DebtManager />} />
+                            <Route path="/finance/debts" element={<DebtManager />} />
                             <Route path="/finance/account/:id" element={<AccountDetail />} />
                             <Route path="/finance/monthly" element={<MonthlyOverview />} />
 

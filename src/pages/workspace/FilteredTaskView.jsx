@@ -3,8 +3,10 @@ import TaskItem from '../../components/molecules/workspace/TaskItem';
 import { useMemo } from 'react';
 import { Calendar, Star, Clock } from 'lucide-react';
 import { format } from 'date-fns';
+import { useParams } from 'react-router-dom';
 
-const FilteredTaskView = ({ filterType }) => {
+const FilteredTaskView = () => {
+    const { filterType } = useParams();
     const { tasks, toggleTask, deleteTask, updateTask, rescheduleTask } = useTasks();
 
     const filteredTasks = useMemo(() => {

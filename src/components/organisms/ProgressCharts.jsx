@@ -6,9 +6,13 @@ const ProgressCharts = ({ data }) => {
     // Data expected format: [{ date: 'Mon', score: 80, habits: { sugar: false, ... } }, ...]
 
     // Calculate Stats
-    const currentStreak = data.length > 0 ? 5 : 0; // Mock logic for now implies we need real calculation
-    const averageScore = Math.round(data.reduce((acc, curr) => acc + curr.score, 0) / (data.length || 1));
     const totalDays = data.length;
+    const averageScore = Math.round(data.reduce((acc, curr) => acc + curr.score, 0) / (totalDays || 1));
+    let currentStreak = 0;
+    for (let i = 0; i < data.length; i++) {
+        if (data[i].score >= 80) currentStreak++;
+        else break;
+    }
 
     // Custom Tooltip
     const CustomTooltip = ({ active, payload, label }) => {

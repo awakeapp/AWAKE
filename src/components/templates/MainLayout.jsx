@@ -25,7 +25,7 @@ const MainLayout = ({ children }) => {
     const hiddenHeaderRoutes = ['/routine', '/history', '/settings', '/finance', '/vehicle', '/diet', '/analytics'];
     const showHeader = !hiddenHeaderRoutes.some(route => location.pathname.startsWith(route));
 
-    const { isDark, toggleTheme } = useTheme();
+    const { isDark } = useTheme();
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-24 dark:bg-slate-950 dark:text-slate-50 transition-colors">
@@ -49,13 +49,6 @@ const MainLayout = ({ children }) => {
                 }
                 rightNode={
                     <>
-                        <button
-                            onClick={toggleTheme}
-                            className="p-2 rounded-full text-slate-500 hover:bg-slate-100 transition-colors dark:text-slate-400 dark:hover:bg-slate-800"
-                        >
-                            {isDark ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-                        </button>
-
                         <button
                             onClick={() => setIsMenuOpen(true)}
                             className="p-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors dark:text-slate-300 dark:hover:bg-slate-800"

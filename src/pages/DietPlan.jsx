@@ -1,13 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Utensils, Droplets, Flame, RotateCcw, ChevronDown, ChevronUp, ArrowLeft, Heart, AlertCircle, Activity, Info } from 'lucide-react';
 import Button from '../components/atoms/Button';
 import { calculateTDEE, generatePlan, RECOMMENDED_FOODS, FOODS_TO_AVOID } from '../utils/dietUtils';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '../components/atoms/Card';
+import { DB } from '../services/db';
+import { useAuthContext } from '../hooks/useAuthContext';
 
 const DietPlan = () => {
     const navigate = useNavigate();
+    const { user } = useAuthContext();
     const [step, setStep] = useState('input'); // 'input' | 'plan'
     const [formData, setFormData] = useState({
         age: '',
@@ -21,12 +24,27 @@ const DietPlan = () => {
     const [result, setResult] = useState(null);
     const [expandedDay, setExpandedDay] = useState(null);
 
+    // Load saved plan
+    useEffect(() => {
+        if (!user) return;
+        const unsub = DB.subscribeToModule(user.uid, 'diet', (data) => {
+            if (data && data.plan) {
+                setResult(data.plan);
+                if (data.profile) {
+                    setFormData(prev => ({ ...prev, ...data.profile }));
+                }
+                setStep('plan');
+            }
+        });
+        return () => unsub();
+    }, [user]);
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleGenerate = (e) => {
+    const handleGenerate = async (e) => {
         e.preventDefault();
         const tdee = calculateTDEE(
             formData.age,
@@ -38,6 +56,14 @@ const DietPlan = () => {
         const plan = generatePlan(tdee, formData.weight, formData.goalSpeed, formData.preference);
         setResult(plan);
         setStep('plan');
+
+        if (user) {
+            await DB.saveModule(user.uid, 'diet', {
+                plan,
+                profile: formData,
+                updatedAt: new Date().toISOString()
+            });
+        }
     };
 
     const toggleDay = (index) => {
