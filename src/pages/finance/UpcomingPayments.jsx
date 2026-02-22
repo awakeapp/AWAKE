@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useFinance } from '../../context/FinanceContext';
 import { Plus, Trash2, Calendar, Zap, CreditCard, Music, Monitor, Smartphone, Briefcase, ShoppingBag, Pause, Play, RefreshCw } from 'lucide-react';
 import { format, differenceInDays, isBefore, addMonths } from 'date-fns';
+import { useTranslation } from 'react-i18next'; // Added i18n support
 
 const ICONS = [
     { icon: Zap, label: 'Utility' },
@@ -25,6 +26,7 @@ const COLORS = [
 const UpcomingPayments = () => {
     const { subscriptions, addSubscription, deleteSubscription, toggleSubscriptionStatus } = useFinance();
     const [isAdding, setIsAdding] = useState(false);
+    const { t } = useTranslation(); // Enable translations
 
     // Form State
     const [name, setName] = useState('');
@@ -86,12 +88,12 @@ const UpcomingPayments = () => {
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between px-2">
-                <h3 className="font-bold text-slate-900 dark:text-white">Upcoming Payments</h3>
+                <h3 className="font-bold text-slate-900 dark:text-white">{t('finance.upcoming_payments', 'Upcoming Payments')}</h3>
                 <button
                     onClick={() => setIsAdding(true)}
                     className="text-xs text-indigo-500 font-bold uppercase hover:bg-indigo-50 px-2 py-1 rounded-lg transition-colors"
                 >
-                    + Add New
+                    {t('finance.add_new', '+ Add New')}
                 </button>
             </div>
 
@@ -104,8 +106,8 @@ const UpcomingPayments = () => {
                         <RefreshCw className="w-5 h-5 text-slate-500 dark:text-slate-400" />
                     </div>
                     <div>
-                        <p className="text-xs text-slate-400 uppercase font-bold tracking-wider">Monthly Recurring</p>
-                        <p className="text-lg font-bold text-slate-900 dark:text-white">₹{totalMonthlyCost.toLocaleString()}</p>
+                        <p className="text-xs text-slate-400 uppercase font-bold tracking-wider">{t('finance.monthly_recurring', 'Monthly Recurring')}</p>
+                        <p className="text-lg font-bold text-slate-900 dark:text-white"><span dir="ltr">₹{totalMonthlyCost.toLocaleString()}</span></p>
                     </div>
                 </div>
             </div >
@@ -115,8 +117,8 @@ const UpcomingPayments = () => {
                 {
                     sortedSubs.length === 0 && !isAdding && (
                         <div className="w-full text-center py-6 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
-                            <p className="text-slate-400 text-sm mb-2">No upcoming bills.</p>
-                            <button onClick={() => setIsAdding(true)} className="text-indigo-500 font-bold text-sm">+ Add Bill</button>
+                            <p className="text-slate-400 text-sm mb-2">{t('finance.no_upcoming_bills', 'No upcoming bills.')}</p>
+                            <button onClick={() => setIsAdding(true)} className="text-indigo-500 font-bold text-sm">{t('finance.add_bill', '+ Add Bill')}</button>
                         </div>
                     )
                 }
@@ -152,7 +154,7 @@ const UpcomingPayments = () => {
                                 </div>
 
                                 <h4 className="font-bold text-lg leading-tight mb-1 truncate">{sub.name}</h4>
-                                <p className="text-white/80 text-xs font-medium mb-3">₹{Number(sub.amount).toLocaleString()}/mo</p>
+                                <p className="text-white/80 text-xs font-medium mb-3"><span dir="ltr">₹{Number(sub.amount).toLocaleString()}/mo</span></p>
 
                                 <div className="flex items-center justify-between">
                                     <div className={`bg-black/20 rounded-lg px-2 py-1 inline-block ${sub.status !== 'active' ? 'opacity-50' : ''}`}>

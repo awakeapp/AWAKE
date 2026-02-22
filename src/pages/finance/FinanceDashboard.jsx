@@ -7,9 +7,11 @@ import AddTransactionModal from './AddTransactionModal';
 import UpcomingPayments from './UpcomingPayments';
 import BudgetSummary from './BudgetSummary';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next'; // Added i18n support
 
 const FinanceDashboard = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation(); // Enable translations
     const {
         getTotalBalance,
         categories,
@@ -120,9 +122,9 @@ const FinanceDashboard = () => {
                     </div>
 
                     <div className="text-center mb-8">
-                        <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">Total Net Balance</p>
+                        <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">{t('finance.total_net_balance', 'Total Net Balance')}</p>
                         <h2 className="text-4xl font-black bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-                            ₹{totalBalance.toLocaleString()}
+                            <span dir="ltr">₹{totalBalance.toLocaleString()}</span>
                         </h2>
                     </div>
 
@@ -133,8 +135,8 @@ const FinanceDashboard = () => {
                             <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center mb-2">
                                 <ArrowDown className="w-4 h-4 text-emerald-400" />
                             </div>
-                            <p className="text-[10px] text-slate-400 uppercase font-bold mb-1">Income</p>
-                            <p className="font-bold text-white text-sm">₹{monthStats.income.toLocaleString()}</p>
+                            <p className="text-[10px] text-slate-400 uppercase font-bold mb-1">{t('finance.income', 'Income')}</p>
+                            <p className="font-bold text-white text-sm"><span dir="ltr">₹{monthStats.income.toLocaleString()}</span></p>
                         </div>
 
                         {/* Savings (New) */}
@@ -148,9 +150,9 @@ const FinanceDashboard = () => {
                             <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center mb-2">
                                 <PiggyBank className="w-4 h-4 text-indigo-400" />
                             </div>
-                            <p className="text-[10px] text-slate-400 uppercase font-bold mb-1">Savings</p>
+                            <p className="text-[10px] text-slate-400 uppercase font-bold mb-1">{t('finance.savings', 'Savings')}</p>
                             <p className={`font-bold text-sm ${monthStats.savings >= 0 ? 'text-indigo-300' : 'text-red-400'}`}>
-                                {monthStats.savings >= 0 ? '+' : ''}₹{monthStats.savings.toLocaleString()}
+                                {monthStats.savings >= 0 ? '+' : ''}<span dir="ltr">₹{Math.abs(monthStats.savings).toLocaleString()}</span>
                             </p>
                         </div>
 
@@ -162,8 +164,8 @@ const FinanceDashboard = () => {
                             <div className="w-8 h-8 rounded-full bg-rose-500/20 flex items-center justify-center mb-2">
                                 <Wallet className="w-4 h-4 text-rose-400" />
                             </div>
-                            <p className="text-[10px] text-slate-400 uppercase font-bold mb-1">Debts</p>
-                            <p className="font-bold text-rose-300 text-xs">Manage →</p>
+                            <p className="text-[10px] text-slate-400 uppercase font-bold mb-1">{t('finance.debts', 'Debts')}</p>
+                            <p className="font-bold text-rose-300 text-xs">{t('finance.manage', 'Manage →')}</p>
                         </button>
                     </div>
                 </div>
@@ -183,8 +185,8 @@ const FinanceDashboard = () => {
                                 <PieChart className="w-4 h-4 text-white" />
                             </div>
                             <div>
-                                <p className="text-xs text-indigo-200 font-bold uppercase tracking-wider mb-1">Overview</p>
-                                <p className="text-lg font-bold">Budgets</p>
+                                <p className="text-xs text-indigo-200 font-bold uppercase tracking-wider mb-1">{t('finance.overview', 'Overview')}</p>
+                                <p className="text-lg font-bold">{t('finance.budgets', 'Budgets')}</p>
                             </div>
                         </div>
 
@@ -195,7 +197,7 @@ const FinanceDashboard = () => {
                                 className="min-w-[140px] bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-lg shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 cursor-pointer hover:scale-[1.02] transition-transform"
                             >
                                 <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2">{acc.name}</p>
-                                <p className="text-lg font-bold text-slate-900 dark:text-white">₹{acc.balance.toLocaleString()}</p>
+                                <p className="text-lg font-bold text-slate-900 dark:text-white"><span dir="ltr">₹{acc.balance.toLocaleString()}</span></p>
                             </div>
                         ))}
                     </div>
@@ -210,7 +212,7 @@ const FinanceDashboard = () => {
                 <section>
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
-                            <h3 className="font-bold text-slate-900 dark:text-white text-lg">Transactions</h3>
+                            <h3 className="font-bold text-slate-900 dark:text-white text-lg">{t('finance.transactions', 'Transactions')}</h3>
                             <span className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-xs font-bold px-2 py-1 rounded-full">
                                 {format(selectedDate, 'MMM')}
                             </span>
@@ -223,9 +225,9 @@ const FinanceDashboard = () => {
                                 <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
                                     <TrendingUp className="w-8 h-8" />
                                 </div>
-                                <p className="text-slate-900 dark:text-white font-bold text-lg mb-2">No expenses yet</p>
+                                <p className="text-slate-900 dark:text-white font-bold text-lg mb-2">{t('finance.no_expenses', 'No expenses yet')}</p>
                                 <p className="text-slate-500 text-sm mb-6 max-w-[240px] mx-auto leading-relaxed">
-                                    Start tracking where your money goes. Record purchases, bills, or any income.
+                                    {t('finance.start_tracking', 'Start tracking where your money goes. Record purchases, bills, or any income.')}
                                 </p>
                                 <button
                                     onClick={() => {
@@ -234,7 +236,7 @@ const FinanceDashboard = () => {
                                     }}
                                     className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold transition-transform active:scale-95 shadow-lg shadow-indigo-500/20"
                                 >
-                                    + Add First Record
+                                    {t('finance.add_first_record', '+ Add First Record')}
                                 </button>
                             </div>
                         ) : (
@@ -262,7 +264,7 @@ const FinanceDashboard = () => {
                                         </div>
                                         <div className="text-right relative z-10">
                                             <p className={`font-bold ${tx.type === 'income' ? 'text-emerald-500' : 'text-slate-900 dark:text-white'}`}>
-                                                {tx.type === 'income' ? '+' : '-'}₹{Number(tx.amount).toLocaleString()}
+                                                {tx.type === 'income' ? '+' : '-'}<span dir="ltr">₹{Number(tx.amount).toLocaleString()}</span>
                                             </p>
                                             <p className="text-[10px] text-slate-300 font-medium uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity">
                                                 {accounts.find(a => a.id === tx.accountId)?.name}
@@ -325,7 +327,7 @@ const FinanceDashboard = () => {
                             className="text-indigo-300 hover:text-white text-sm font-bold flex items-center gap-1"
                         >
                             <Undo className="w-4 h-4" />
-                            Undo
+                            {t('finance.undo', 'Undo')}
                         </button>
                     </motion.div>
                 )}

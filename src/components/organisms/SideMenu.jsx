@@ -33,8 +33,8 @@ const SideMenu = ({ isOpen, onClose }) => {
     };
 
     const menuItems = [
-        { icon: Home, label: t('nav.home', 'Dashboard'), path: '/' },
-        { icon: CheckSquare, label: t('nav.routine', 'Daily Routine'), path: '/routine' },
+        { icon: Home, label: t('nav.dashboard', 'Dashboard'), path: '/' },
+        { icon: CheckSquare, label: t('nav.daily_routine', 'Daily Routine'), path: '/routine' },
         { icon: Calendar, label: t('nav.history', 'History'), path: '/history' },
         { icon: Settings, label: t('nav.settings', 'Settings'), path: '/settings' },
     ];

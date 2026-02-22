@@ -216,7 +216,7 @@ const Home = () => {
                     <div>
                         <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">{t('home.todays_spend', "Today's Spend")}</div>
                         <div className="text-xl font-bold text-slate-900 dark:text-white">
-                            ₹{dailySpend.toLocaleString()}
+                            <span dir="ltr">₹{dailySpend.toLocaleString()}</span>
                         </div>
                     </div>
                 </div>

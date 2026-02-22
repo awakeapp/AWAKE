@@ -195,7 +195,12 @@
     "add_first_record": "إضافة عملية",
     "undo": "تراجع",
     "analytics": "تحليل المصروفات",
-    "loading_analytics": "جاري تجهيز التحليلات..."
+    "loading_analytics": "جاري تجهيز التحليلات...",
+    "upcoming_payments": "المدفوعات القادمة",
+    "add_new": "+ إضافة",
+    "monthly_recurring": "الدفعات الشهرية",
+    "no_upcoming_bills": "لا توجد فواتير قادمة.",
+    "add_bill": "+ إضافة فاتورة"
   },
   "tasks": {
     "edit_routine": "تعديل الروتين",

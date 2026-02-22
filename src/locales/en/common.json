@@ -195,7 +195,12 @@
     "add_first_record": "Add Transaction",
     "undo": "Undo",
     "analytics": "Insights",
-    "loading_analytics": " crunching numbers..."
+    "loading_analytics": " crunching numbers...",
+    "upcoming_payments": "Upcoming Payments",
+    "add_new": "+ Add New",
+    "monthly_recurring": "Monthly Recurring",
+    "no_upcoming_bills": "No upcoming bills.",
+    "add_bill": "+ Add Bill"
   },
   "tasks": {
     "edit_routine": "Edit Routine",
