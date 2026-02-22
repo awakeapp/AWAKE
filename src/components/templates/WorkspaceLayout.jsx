@@ -1,27 +1,29 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Home, Calendar, Layout, List, Settings, Plus, Bell, Search, Star, Clock, Menu, X, ChevronRight, ListTodo } from 'lucide-react';
+import { Home, Calendar, Layout, List, Settings, Plus, Bell, Search, Star, Clock, Menu as MenuIcon, X, ChevronRight, ListTodo } from 'lucide-react';
 import BottomNavigation from '../organisms/BottomNavigation';
 import { useTheme } from '../../context/ThemeContext';
 import { useState, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next'; // Added i18n support
 
 const WorkspaceLayout = ({ children }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { isDark } = useTheme();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const { t } = useTranslation();
 
     const isActive = (path) => location.pathname === path;
 
     const navItems = [
-        { icon: List, label: 'Active Tasks', path: '/workspace/tasks' },
-        { icon: Calendar, label: 'Calendar', path: '/workspace/calendar' },
-        { icon: Layout, label: 'Overview', path: '/workspace/overview' },
-        { icon: Settings, label: 'Settings', path: '/workspace/settings' },
+        { icon: List, label: t('workspace.active_tasks', 'Active Tasks'), path: '/workspace/tasks' },
+        { icon: Calendar, label: t('workspace.calendar', 'Calendar'), path: '/workspace/calendar' },
+        { icon: Layout, label: t('workspace.overview', 'Overview'), path: '/workspace/overview' },
+        { icon: Settings, label: t('workspace.settings', 'Settings'), path: '/workspace/settings' },
     ];
 
     const quickAccess = [
-        { icon: Clock, label: 'Recent', color: 'text-blue-500' },
+        { icon: Clock, label: t('workspace.recent', 'Recent'), color: 'text-blue-500' },
     ];
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -57,7 +59,7 @@ const WorkspaceLayout = ({ children }) => {
                         >
                             {/* Drawer Header */}
                             <div className="p-5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
-                                <h2 className="font-bold text-lg">Menu</h2>
+                                <h2 className="font-bold text-lg">{t('common.menu', 'Menu')}</h2>
                                 <button onClick={() => setIsSidebarOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
                                     <X className="w-5 h-5 text-slate-500" />
                                 </button>
@@ -66,7 +68,7 @@ const WorkspaceLayout = ({ children }) => {
                             {/* Drawer Content */}
                             <div className="flex-1 overflow-y-auto p-4 space-y-6">
                                 <section>
-                                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">Navigation</h3>
+                                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">{t('workspace.navigation', 'Navigation')}</h3>
                                     <div className="space-y-1">
                                         {navItems.map((item) => (
                                             <button
@@ -91,13 +93,13 @@ const WorkspaceLayout = ({ children }) => {
                                 </section>
 
                                 <section>
-                                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">Favorites</h3>
+                                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">{t('workspace.favorites', 'Favorites')}</h3>
                                     {quickAccess.map((item, idx) => (
                                         <button
                                             key={idx}
                                             onClick={() => {
-                                                if (item.label === 'Important') navigate('/workspace/important');
-                                                if (item.label === 'Recent') navigate('/workspace/recent');
+                                                if (item.label === t('workspace.important', 'Important')) navigate('/workspace/important');
+                                                if (item.label === t('workspace.recent', 'Recent')) navigate('/workspace/recent');
                                                 setIsSidebarOpen(false);
                                             }}
                                             className="w-full flex items-center gap-3 px-3 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-xl transition-colors"

@@ -8,12 +8,15 @@ import { useRef, useState } from 'react';
 import { useDate } from '../../context/DateContext';
 import JumpDateModal from './JumpDateModal';
 
+import { useTranslation } from 'react-i18next';
+
 const SideMenu = ({ isOpen, onClose }) => {
     const { user } = useAuthContext();
     const { logout } = useLogout();
     const { setDate, formattedDate, maxDate } = useDate();
     const navigate = useNavigate();
     const [isJumpModalOpen, setIsJumpModalOpen] = useState(false);
+    const { t } = useTranslation();
 
     const handleLogout = async () => {
         try {
@@ -30,16 +33,16 @@ const SideMenu = ({ isOpen, onClose }) => {
     };
 
     const menuItems = [
-        { icon: Home, label: 'Dashboard', path: '/' },
-        { icon: CheckSquare, label: 'Daily Routine', path: '/routine' },
-        { icon: Calendar, label: 'History', path: '/history' },
-        { icon: Settings, label: 'Settings', path: '/settings' },
+        { icon: Home, label: t('nav.home', 'Dashboard'), path: '/' },
+        { icon: CheckSquare, label: t('nav.routine', 'Daily Routine'), path: '/routine' },
+        { icon: Calendar, label: t('nav.history', 'History'), path: '/history' },
+        { icon: Settings, label: t('nav.settings', 'Settings'), path: '/settings' },
     ];
 
     const advancedFeatures = [
-        { icon: Utensils, label: 'Plan Diet', path: '/diet-plan', color: 'text-orange-500', bg: 'bg-orange-50' },
-        { icon: PieChart, label: 'Analytics', path: '/analytics', color: 'text-indigo-500', bg: 'bg-indigo-50' },
-        { icon: Wallet, label: 'Finance', path: '/finance', color: 'text-emerald-500', bg: 'bg-emerald-50' },
+        { icon: Utensils, label: t('nav.plan_diet', 'Plan Diet'), path: '/diet-plan', color: 'text-orange-500', bg: 'bg-orange-50' },
+        { icon: PieChart, label: t('nav.analytics', 'Analytics'), path: '/analytics', color: 'text-indigo-500', bg: 'bg-indigo-50' },
+        { icon: Wallet, label: t('nav.finance', 'Finance'), path: '/finance', color: 'text-emerald-500', bg: 'bg-emerald-50' },
     ];
 
     return (
@@ -65,7 +68,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                     >
                         {/* Header */}
                         <div className="p-5 border-b flex items-center justify-between dark:border-slate-800">
-                            <h2 className="text-lg font-bold text-slate-800 dark:text-white">Menu</h2>
+                            <h2 className="text-lg font-bold text-slate-800 dark:text-white">{t('common.menu', 'Menu')}</h2>
                             <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full">
                                 <X className="w-5 h-5 text-slate-500" />
                             </button>
@@ -96,7 +99,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                                         <p className="font-bold text-slate-900 truncate dark:text-white">{user?.name}</p>
                                         <ChevronRight className="w-4 h-4 text-slate-400" />
                                     </div>
-                                    <p className="text-[10px] text-slate-500 font-medium">Member ID: AWK-{user?.uid?.slice(-4).toUpperCase() || 'GUEST'}</p>
+                                    <p className="text-[10px] text-slate-500 font-medium">{t('settings.member_id', 'Member ID')}: AWK-{user?.uid?.slice(-4).toUpperCase() || 'GUEST'}</p>
                                     <p className="text-[10px] text-indigo-500 font-semibold">{user?.email}</p>
                                 </div>
                             </div>
@@ -129,7 +132,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                                     className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-50 text-slate-700 font-medium transition-colors w-full text-left dark:text-slate-300 dark:hover:bg-slate-800"
                                 >
                                     <Calendar className="w-5 h-5 text-slate-400" />
-                                    Jump to Date
+                                    {t('date.jump_to_date', 'Jump to Date')}
                                 </button>
 
                                 {isJumpModalOpen && (
@@ -146,7 +149,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                             {/* Advanced Tools */}
                             <div>
                                 <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-3">
-                                    Tools
+                                    {t('nav.tools', 'Tools')}
                                 </h3>
                                 <div className="space-y-2">
                                     {advancedFeatures.map((feat) => (
@@ -177,7 +180,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                                 className="flex items-center gap-3 w-full px-3 py-3 rounded-xl text-red-600 hover:bg-red-50 font-medium transition-colors active:scale-95 z-[60]"
                             >
                                 <LogOut className="w-5 h-5" />
-                                Sign Out
+                                {t('settings.sign_out', 'Sign Out')}
                             </button>
                             <p className="text-center text-xs text-slate-300 mt-4">
                                 Version 1.0.0
