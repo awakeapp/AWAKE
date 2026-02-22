@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { useTranslation } from 'react-i18next'; // Added i18n support
 
 const TaskDashboard = () => {
-    const { t } = useTranslation(); // Enable translations
+    const { t: translate } = useTranslation(); // Enable translations
     const {
         tasks,
         addTask,
@@ -26,6 +26,7 @@ const TaskDashboard = () => {
 
     // Dropdown State
     const [menuOpen, setMenuOpen] = useState(false);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const menuRef = useRef(null);
 
     // Close menu on outside click
@@ -49,19 +50,19 @@ const TaskDashboard = () => {
     const isLocked = isDayLocked(selectedDateStr);
 
     // Filter Tasks
-    const currentTasks = tasks.filter(t => t.date === selectedDateStr);
+    const currentTasks = tasks.filter(taskItem => taskItem.date === selectedDateStr);
 
     // Stats
     const totalCurrent = currentTasks.length;
-    const completedCurrent = currentTasks.filter(t => t.status === 'completed' || t.isCompleted).length;
+    const completedCurrent = currentTasks.filter(taskItem => taskItem.status === 'completed' || taskItem.isCompleted).length;
 
     // Filter Pending from Previous Days (Relative to Selected Date)
     // "Carried Over" means tasks that should have been done BEFORE the selected date
-    const pendingTasks = tasks.filter(t => {
-        return t.status !== 'completed' &&
-            !t.isCompleted &&
-            t.date &&
-            isBefore(startOfDay(new Date(t.date)), startOfDay(selectedDate));
+    const pendingTasks = tasks.filter(taskItem => {
+        return taskItem.status !== 'completed' &&
+            !taskItem.isCompleted &&
+            taskItem.date &&
+            isBefore(startOfDay(new Date(taskItem.date)), startOfDay(selectedDate));
     });
 
     // Modal State
@@ -198,7 +199,7 @@ const TaskDashboard = () => {
                                 )}
                             >
                                 {/* Tasks Section */}
-                                <div className="font-mono text-[9px] text-slate-400 dark:text-white/20 tracking-[0.1em] uppercase px-2.5 pt-1.5 pb-1">{t('home.tasks', 'Tasks')}</div>
+                                <div className="font-mono text-[9px] text-slate-400 dark:text-white/20 tracking-[0.1em] uppercase px-2.5 pt-1.5 pb-1">{translate('home.tasks', 'Tasks')}</div>
                                 <button
                                     onClick={() => { setMenuOpen(false); /* future edit */ }}
                                     className="flex items-center gap-2.5 px-2.5 py-2 rounded-[9px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[12px] font-semibold"
