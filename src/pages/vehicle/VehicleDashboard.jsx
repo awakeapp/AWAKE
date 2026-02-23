@@ -116,12 +116,6 @@ const VehicleDashboard = () => {
                 >
                     <Plus className="w-5 h-5" /> Add First Vehicle
                 </button>
-                <button
-                    onClick={() => navigate(-1)}
-                    className="mt-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-sm font-bold flex items-center gap-2 transition-colors px-4 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
-                >
-                    <ArrowLeft className="w-4 h-4" /> Go Back
-                </button>
                 <AddVehicleModal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} onSave={handleSaveVehicle} />
             </div>
         );
@@ -130,12 +124,9 @@ const VehicleDashboard = () => {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24">
             {/* Header */}
-            <header className="bg-white dark:bg-slate-900 sticky top-0 z-20 shadow-sm">
+            <header className="bg-white dark:bg-slate-900 sticky top-0 z-20 shadow-sm animate-in slide-in-from-top-4 duration-300">
                 <div className="px-6 pt-6 pb-4 flex items-center justify-between">
-                    <button onClick={() => navigate('/')} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
-                        <ArrowLeft className="w-6 h-6 text-slate-700 dark:text-slate-300" />
-                    </button>
-                    <h1 className="text-lg font-bold text-slate-900 dark:text-white">
+                    <h1 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">
                         {showArchived ? 'Archived Vehicles' : 'Vehicle Dashboard'}
                     </h1>
                     <button

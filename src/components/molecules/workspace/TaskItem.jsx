@@ -48,8 +48,8 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
     return (
         <motion.div
             layout
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: isCompleted ? 0.6 : 1, y: 0 }}
+            initial={false}
+            animate={{ opacity: isCompleted ? 0.6 : 1 }}
             transition={{ duration: 0.2 }} // Faster enter/layout
             whileHover={{ y: -2 }}
             className={clsx(

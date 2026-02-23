@@ -96,10 +96,6 @@ const FinanceDashboard = () => {
 
                 <div className="relative z-10">
                     <div className="flex items-center justify-between mb-6">
-                        <button onClick={() => navigate('/')} className="p-2 bg-white/10 rounded-xl hover:bg-white/20 transition-colors">
-                            <ArrowLeft className="w-5 h-5 text-white" />
-                        </button>
-
                         {/* Month Selector */}
                         <div className="flex items-center gap-3 bg-white/10 rounded-full px-1 p-1">
                             <button onClick={() => changeMonth(-1)} className="p-1 hover:bg-white/10 rounded-full transition-colors">

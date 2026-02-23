@@ -65,9 +65,9 @@ const MonthlyOverview = () => {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
             {/* Header */}
-            <header className="bg-slate-900 text-white p-6 pb-12 rounded-b-[2.5rem] shadow-2xl shadow-slate-900/20">
+            <header className="bg-slate-900 text-white p-6 pb-12 rounded-b-[2.5rem] shadow-2xl shadow-slate-900/20 animate-in slide-in-from-top-4 duration-300">
                 <div className="flex items-center justify-between mb-8">
-                    <button onClick={() => navigate('/finance')} className="p-2 bg-white/10 rounded-xl hover:bg-white/20 transition-colors">
+                    <button onClick={() => window.history.back()} className="p-2 bg-white/10 rounded-xl hover:bg-white/20 transition-colors">
                         <ArrowLeft className="w-5 h-5 text-white" />
                     </button>
                     <div className="flex items-center gap-3 bg-white/10 rounded-full px-1 p-1">

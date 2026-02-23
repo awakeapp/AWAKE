@@ -1,13 +1,12 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Home, CheckSquare, Calendar, Settings, Utensils, PieChart, ChevronRight, Heart, Wallet, Activity } from 'lucide-react';
+import { X, Home, CheckSquare, Calendar, Settings, Utensils, PieChart, ChevronRight, Wallet } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../hooks/useAuthContext';
 
-import { useRef, useState } from 'react';
-import { useDate } from '../../context/DateContext';
+import { useState } from 'react';
 import JumpDateModal from './JumpDateModal';
-
 import { useTranslation } from 'react-i18next';
+import clsx from 'clsx';
 
 const SideMenu = ({ isOpen, onClose }) => {
     const { user } = useAuthContext();
@@ -16,17 +15,48 @@ const SideMenu = ({ isOpen, onClose }) => {
     const { t } = useTranslation();
 
     const menuItems = [
-        { icon: Home, label: t('nav.dashboard', 'Dashboard'), path: '/' },
-        { icon: CheckSquare, label: t('nav.daily_routine', 'Daily Routine'), path: '/routine' },
-        { icon: Calendar, label: t('nav.history', 'History'), path: '/history' },
-        { icon: Settings, label: t('nav.settings', 'Settings'), path: '/settings' },
+        { icon: Home, label: t('nav.dashboard', 'Dashboard'), path: '/', iconBg: 'bg-indigo-500' },
+        { icon: CheckSquare, label: t('nav.daily_routine', 'Daily Routine'), path: '/routine', iconBg: 'bg-emerald-500' },
+        { icon: Calendar, label: t('nav.history', 'History'), path: '/history', iconBg: 'bg-blue-500' },
+        { icon: Settings, label: t('nav.settings', 'Settings'), path: '/settings', iconBg: 'bg-slate-500 dark:bg-slate-700' },
     ];
 
     const advancedFeatures = [
-        { icon: Utensils, label: t('nav.plan_diet', 'Plan Diet'), path: '/diet-plan', color: 'text-orange-500', bg: 'bg-orange-50' },
-        { icon: PieChart, label: t('nav.analytics', 'Analytics'), path: '/analytics', color: 'text-indigo-500', bg: 'bg-indigo-50' },
-        { icon: Wallet, label: t('nav.finance', 'Finance'), path: '/finance', color: 'text-emerald-500', bg: 'bg-emerald-50' },
+        { icon: Utensils, label: t('nav.plan_diet', 'Plan Diet'), path: '/diet-plan', iconBg: 'bg-orange-500' },
+        { icon: PieChart, label: t('nav.analytics', 'Analytics'), path: '/analytics', iconBg: 'bg-indigo-500' },
+        { icon: Wallet, label: t('nav.finance', 'Finance'), path: '/finance', iconBg: 'bg-[#34C759]' },
     ];
+
+    const MenuRow = ({ item, isLast, onClick, isButton = false }) => {
+        const Content = (
+            <div className={clsx(
+                "flex items-center min-h-[44px] sm:min-h-[50px] bg-white dark:bg-[#1C1C1E] active:bg-slate-100 dark:active:bg-[#2C2C2E] transition-colors ml-4 pr-4",
+                !isLast && "border-b border-slate-200 dark:border-[#38383A]"
+            )}>
+                <div className="flex items-center gap-3.5 py-2.5 flex-1 min-w-0">
+                    <div className={clsx("w-[30px] h-[30px] rounded-lg shrink-0 flex items-center justify-center shadow-sm text-white", item.iconBg)}>
+                        <item.icon strokeWidth={2} className="w-[18px] h-[18px]" />
+                    </div>
+                    <span className="text-[16px] xl:text-[17px] text-black dark:text-white leading-tight font-medium truncate">{item.label}</span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-slate-300 dark:text-[#5C5C5E] shrink-0 ml-2 relative top-[1px]" />
+            </div>
+        );
+
+        if (isButton) {
+            return (
+                <button onClick={onClick} className="w-full text-left border-none outline-none">
+                    {Content}
+                </button>
+            );
+        }
+
+        return (
+            <Link to={item.path} onClick={onClick} className="block w-full">
+                {Content}
+            </Link>
+        );
+    };
 
     return (
         <AnimatePresence>
@@ -46,87 +76,73 @@ const SideMenu = ({ isOpen, onClose }) => {
                         initial={{ x: '100%' }}
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
-                        transition={{ duration: 0.25, ease: 'easeOut' }}
-                        className="fixed inset-y-0 right-0 z-50 w-3/4 max-w-sm bg-white shadow-2xl flex flex-col dark:bg-slate-900 dark:border-l dark:border-slate-800"
+                        transition={{ duration: 0.25, ease: 'easeOut', type: 'tween' }}
+                        className="fixed inset-y-0 right-0 z-50 w-[85%] max-w-sm bg-[#F2F2F7] dark:bg-black shadow-2xl flex flex-col font-sans"
                     >
-                        <div className="p-5 border-b flex items-center justify-between dark:border-slate-800">
-                            <h2 className="text-base font-semibold text-slate-800 dark:text-white">{t('common.menu', 'Menu')}</h2>
-                            <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full">
-                                <X className="w-5 h-5 text-slate-500" />
+                        {/* Header */}
+                        <div className="p-4 pt-6 flex items-center justify-between mt-2">
+                            <h2 className="text-[22px] font-bold tracking-tight text-black dark:text-white ml-2">{t('common.menu', 'Menu')}</h2>
+                            <button onClick={onClose} className="p-2 bg-slate-200 dark:bg-[#2C2C2E] rounded-full text-slate-500 dark:text-[#8E8E93] active:scale-95 transition-transform mr-1">
+                                <X className="w-5 h-5" strokeWidth={2.5} />
                             </button>
                         </div>
 
-                        {/* Navigation */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-6">
-                            {/* Main Links */}
-                            <nav className="space-y-1">
-                                {menuItems.map((item) => (
-                                    <Link
-                                        key={item.path}
-                                        to={item.path}
-                                        onClick={onClose}
-                                        className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-medium transition-colors dark:text-slate-300 dark:hover:bg-slate-800/80 dark:active:bg-slate-800"
-                                    >
-                                        <item.icon className="w-5 h-5 text-slate-400" />
-                                        {item.label}
-                                    </Link>
+                        {/* Navigation Body */}
+                        <div className="flex-1 overflow-y-auto p-4 pt-2 space-y-6">
+                            
+                            {/* Main Links Group */}
+                            <div className="bg-white dark:bg-[#1C1C1E] rounded-xl overflow-hidden shadow-sm dark:shadow-none border border-slate-200 dark:border-[#2C2C2E]">
+                                {menuItems.map((item, idx) => (
+                                    <MenuRow 
+                                        key={item.path} 
+                                        item={item} 
+                                        onClick={onClose} 
+                                        isLast={idx === menuItems.length - 1} 
+                                    />
                                 ))}
+                            </div>
 
-                                {/* Jump to Date - Custom Modal */}
-                                <button
-                                    onClick={() => {
-                                        setIsJumpModalOpen(true);
-                                        // onClose(); // Optional: Close side menu immediately or wait? better wait until date selected or keep overlaid?
-                                        // Let's keep side menu open, or close it when Jump is clicked?
-                                        // The JumpModal is z-[60], SideMenu is z-50. So JumpModal will be on top.
-                                    }}
-                                    className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-medium transition-colors w-full text-left dark:text-slate-300 dark:hover:bg-slate-800/80 dark:active:bg-slate-800"
-                                >
-                                    <Calendar className="w-5 h-5 text-slate-400" />
-                                    {t('date.jump_to_date', 'Jump to Date')}
-                                </button>
-
+                            {/* Calendar/Date Group */}
+                            <div className="bg-white dark:bg-[#1C1C1E] rounded-xl overflow-hidden shadow-sm dark:shadow-none border border-slate-200 dark:border-[#2C2C2E]">
+                                <MenuRow 
+                                    item={{ icon: Calendar, label: t('date.jump_to_date', 'Jump to Date'), iconBg: 'bg-blue-400' }} 
+                                    isButton 
+                                    onClick={() => setIsJumpModalOpen(true)}
+                                    isLast
+                                />
                                 {isJumpModalOpen && (
                                     <JumpDateModal
                                         isOpen={isJumpModalOpen}
                                         onClose={() => {
                                             setIsJumpModalOpen(false);
-                                            onClose(); // Close menu after date is picked/cancelled
+                                            onClose(); 
                                         }}
                                     />
                                 )}
-                            </nav>
+                            </div>
 
-                            {/* Advanced Tools */}
+                            {/* Advanced Tools Group */}
                             <div>
-                                <h3 className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2 px-3">
-                                    {t('nav.tools', 'Tools')}
+                                <h3 className="text-[13px] font-medium text-slate-500 dark:text-[#8E8E93] uppercase tracking-wider mb-2 px-4">
+                                    {t('nav.tools', 'Advanced')}
                                 </h3>
-                                <div className="space-y-2">
-                                    {advancedFeatures.map((feat) => (
-                                        <Link
-                                            key={feat.path}
-                                            to={feat.path}
-                                            onClick={onClose}
-                                            className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:border-slate-200 active:bg-slate-50 dark:active:bg-slate-800/50 transition-colors group"
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${feat.bg} ${feat.color}`}>
-                                                    <feat.icon className="w-4 h-4" />
-                                                </div>
-                                                <span className="font-medium text-slate-700">{feat.label}</span>
-                                            </div>
-                                            <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500" />
-                                        </Link>
+                                <div className="bg-white dark:bg-[#1C1C1E] rounded-xl overflow-hidden shadow-sm dark:shadow-none border border-slate-200 dark:border-[#2C2C2E]">
+                                    {advancedFeatures.map((feat, idx) => (
+                                        <MenuRow 
+                                            key={feat.path} 
+                                            item={feat} 
+                                            onClick={onClose} 
+                                            isLast={idx === advancedFeatures.length - 1} 
+                                        />
                                     ))}
                                 </div>
                             </div>
                         </div>
 
                         {/* Footer */}
-                        <div className="p-4 border-t border-slate-100 dark:border-slate-800">
-                            <p className="text-center text-xs text-slate-300 mt-4">
-                                Version 1.0.0
+                        <div className="p-4 pb-8">
+                            <p className="text-center text-[12px] font-medium tracking-wide text-slate-400 dark:text-[#5C5C5E]">
+                                HUMI AWAKE v1.2.0
                             </p>
                         </div>
                     </motion.div>

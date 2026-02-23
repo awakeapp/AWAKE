@@ -18,16 +18,6 @@ const RoutineCategory = ({ title, tasks, onUpdateStatus, isLocked }) => {
         }
     };
 
-    const container = {
-        hidden: { opacity: 0 },
-        show: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.05
-            }
-        }
-    };
-
     // Calculate completion for header
     const completed = tasks.filter(t => t.status === 'checked').length;
     const total = tasks.length;
@@ -56,12 +46,7 @@ const RoutineCategory = ({ title, tasks, onUpdateStatus, isLocked }) => {
 
             {/* Content (Always Visible) */}
             <div className="overflow-hidden mt-2">
-                <motion.div
-                    className="grid gap-3 px-1 pb-4"
-                    variants={container}
-                    initial="hidden"
-                    animate="show"
-                >
+                <div className="grid gap-3 px-1 pb-4">
                     {tasks.map((task) => (
                         <TaskItem
                             key={task.id}
@@ -71,7 +56,7 @@ const RoutineCategory = ({ title, tasks, onUpdateStatus, isLocked }) => {
                             isRoutine={true}
                         />
                     ))}
-                </motion.div>
+                </div>
             </div>
         </section>
     );

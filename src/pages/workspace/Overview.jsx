@@ -46,10 +46,17 @@ const Overview = () => {
     const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ec4899'];
 
     return (
-        <div className="space-y-8 pb-24">
-            <div>
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Overview</h1>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Your productivity report & discipline tracking</p>
+        <div className="space-y-8 pb-24 animate-in slide-in-from-right-4 duration-300">
+            <div className="flex items-center gap-3">
+                <button onClick={() => window.history.back()} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex-shrink-0">
+                    <svg className="w-6 h-6 text-slate-700 dark:text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <div>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white leading-tight">Overview</h1>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Your productivity report & discipline tracking</p>
+                </div>
             </div>
 
             {/* Key Metrics Grid */}

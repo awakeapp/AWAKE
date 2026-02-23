@@ -32,10 +32,18 @@ const History = () => {
     ];
 
     return (
-        <div className="pb-24 space-y-6">
+        <div className="pb-24 space-y-6 animate-in slide-in-from-right-4 duration-300">
             {/* Header */}
             <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Report History</h2>
+                <div className="flex items-center gap-3">
+                    <button onClick={() => window.history.back()} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex-shrink-0">
+                        <CalendarIcon className="w-6 h-6 rotate-180 hidden" />
+                        <svg className="w-6 h-6 text-slate-700 dark:text-slate-300 transform rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">Report History</h2>
+                </div>
                 <button
                     onClick={() => setShowJumpModal(true)}
                     className="p-2 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-indigo-600 rounded-full transition-colors dark:bg-slate-800 dark:hover:bg-slate-700 dark:active:bg-slate-600 dark:text-indigo-400"

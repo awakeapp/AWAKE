@@ -50,12 +50,12 @@ const DebtManager = () => {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
             {/* Header */}
-            <header className="bg-slate-900 text-white p-6 rounded-b-[2.5rem] shadow-2xl shadow-slate-900/30">
+            <header className="bg-slate-900 text-white p-6 rounded-b-[2.5rem] shadow-2xl shadow-slate-900/30 animate-in slide-in-from-top-4 duration-300">
                 <div className="flex items-center justify-between mb-6">
-                    <button onClick={() => navigate('/finance')} className="p-2 bg-white/10 rounded-xl hover:bg-white/20 transition-colors">
+                    <button onClick={() => window.history.back()} className="p-2 bg-white/10 rounded-xl hover:bg-white/20 transition-colors">
                         <ArrowLeft className="w-5 h-5 text-white" />
                     </button>
-                    <h1 className="text-lg font-bold tracking-wide">Debts & Lending</h1>
+                    <h1 className="text-lg font-bold tracking-wide leading-tight">Debts & Lending</h1>
                     <div className="w-10" />
                 </div>
 

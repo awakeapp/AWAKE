@@ -74,15 +74,10 @@ const DietPlan = () => {
         <div className="min-h-screen bg-slate-50 dark:bg-slate-900 pb-20">
             {/* Header */}
             <div className="bg-white dark:bg-slate-800 shadow-sm p-4 sticky top-0 z-10 flex items-center gap-3">
-                <button onClick={() => step === 'plan' ? setStep('input') : navigate('/')} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full">
-                    <ArrowLeft className="w-5 h-5 text-slate-600 dark:text-slate-300" />
+                <button onClick={() => step === 'plan' ? setStep('input') : window.history.back()} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex-shrink-0">
+                    <ArrowLeft className="w-6 h-6 text-slate-700 dark:text-slate-300" />
                 </button>
-                <div className="flex items-center gap-2">
-                    <div className="bg-orange-100 dark:bg-orange-900/30 p-2 rounded-lg">
-                        <Utensils className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-                    </div>
-                    <h1 className="font-bold text-lg text-slate-800 dark:text-white">Kerala Diet Plan</h1>
-                </div>
+                <h1 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">Diet Plan Manager</h1>
             </div>
 
             <main className="p-4 max-w-lg mx-auto">

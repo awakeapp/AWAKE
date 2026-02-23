@@ -44,12 +44,17 @@ const WorkspaceCalendar = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white capitalize">
-                    {format(currentMonth, 'MMMM yyyy')}
-                </h2>
+                <div className="flex items-center gap-3">
+                    <button onClick={() => window.history.back()} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex-shrink-0">
+                        <ChevronLeft className="w-6 h-6 text-slate-700 dark:text-slate-300" />
+                    </button>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white capitalize leading-tight">
+                        {format(currentMonth, 'MMMM yyyy')}
+                    </h2>
+                </div>
                 <div className="flex items-center gap-2">
                     <button onClick={prevMonth} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                         <ChevronLeft className="w-5 h-5 text-slate-600 dark:text-slate-400" />

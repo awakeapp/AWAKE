@@ -2,46 +2,47 @@ import { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { User, Moon, Sun, Clock, ChevronRight } from 'lucide-react';
+import { User, Moon, Sun, Clock, ChevronRight, Download, ShieldCheck, HelpCircle, UserPlus, FileText } from 'lucide-react';
 import { FirestoreService } from '../services/firestore-service';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
-// Shared Row Component
-const SettingsRow = ({ icon: Icon, title, subtitle, right, onClick, className }) => (
+// Shared Row Component matching iOS style
+const SettingsRow = ({ icon: Icon, title, subtitle, right, onClick, className, isLast, iconBgClass }) => (
     <div 
         onClick={onClick}
         className={clsx(
-            "flex items-center justify-between px-4 min-h-[56px] bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800/50 last:border-0",
-            onClick && "cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors",
+            "flex items-center min-h-[44px] sm:min-h-[50px] bg-white dark:bg-[#1C1C1E] active:bg-slate-100 dark:active:bg-[#2C2C2E] transition-colors ml-4 pr-4",
+            !isLast && "border-b border-slate-200 dark:border-[#38383A]",
+            onClick && "cursor-pointer",
             className
         )}
     >
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3.5 py-2.5 flex-1 min-w-0">
             {Icon && (
-                <div className="text-slate-400 shrink-0">
-                    <Icon strokeWidth={2} className="w-5 h-5 flex-shrink-0" />
+                <div className={clsx("w-[30px] h-[30px] rounded-lg shrink-0 flex items-center justify-center shadow-sm text-white", iconBgClass || "bg-indigo-500")}>
+                    <Icon strokeWidth={2} className="w-[18px] h-[18px]" />
                 </div>
             )}
-            <div className="text-left py-2">
-                <p className="font-semibold text-slate-900 dark:text-slate-100 text-sm leading-tight">{title}</p>
-                {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
+            <div className="flex-1 min-w-0 flex items-center justify-between">
+                <p className="text-[16px] xl:text-[17px] text-black dark:text-white leading-tight truncate">{title}</p>
+                {subtitle && <p className="text-[15px] xl:text-[16px] text-slate-500 dark:text-[#8E8E93] ml-2 truncate">{subtitle}</p>}
             </div>
         </div>
-        {right && (
-            <div className="shrink-0 ml-4 flex items-center">
+        {right ? (
+            <div className="shrink-0 ml-2 flex items-center">
                 {right}
             </div>
-        )}
+        ) : onClick ? (
+            <ChevronRight className="w-5 h-5 text-slate-300 dark:text-[#5C5C5E] ml-2 shrink-0 relative top-[1px]" />
+        ) : null}
     </div>
 );
 
-// Shared Section Component
-const SettingsSection = ({ title, children }) => (
-    <div className="mb-8 p-4 pt-0 sm:p-0">
-        <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest px-4 sm:px-0 mb-2">
-            {title}
-        </h3>
-        <div className="border border-slate-200 dark:border-slate-800/60 rounded-2xl overflow-hidden">
+// Shared Group Component
+const SettingsGroup = ({ children, className }) => (
+    <div className={clsx("mb-6 sm:mb-8", className)}>
+        <div className="bg-white dark:bg-[#1C1C1E] rounded-xl overflow-hidden shadow-sm dark:shadow-none sm:border sm:border-slate-200 sm:dark:border-[#2C2C2E]">
             {children}
         </div>
     </div>
@@ -51,13 +52,11 @@ const Settings = () => {
     const { user } = useAuthContext();
     const { theme, toggleTheme } = useTheme();
     const { t, i18n } = useTranslation();
+    const navigate = useNavigate();
 
     const [appSettings, setAppSettings] = useState({
         language: i18n.language || 'en',
-        timeFormat: '12h',
-        appLock: false,
-        biometrics: false,
-        notifications: true
+        timeFormat: '12h'
     });
 
     useEffect(() => {
@@ -94,87 +93,137 @@ const Settings = () => {
     };
 
     return (
-        <div className="pb-24 pt-6 animate-in slide-in-from-right-4 duration-300">
+        <div className="pb-24 pt-4 sm:pt-8 bg-[#F2F2F7] dark:bg-black min-h-screen text-black dark:text-white font-sans animate-in slide-in-from-right-4 duration-300">
             <div className="max-w-screen-md mx-auto sm:px-4">
-                <div className="px-4 sm:px-0 mb-8">
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Settings</h1>
-                    <p className="text-slate-500 text-sm mt-1">Manage app preferences and display.</p>
+                
+                {/* Header Title */}
+                <div className="px-4 flex items-center gap-3 sm:px-0 mb-4 sm:mb-6 mt-2">
+                    <button onClick={() => window.history.back()} className="p-2 -ml-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors flex-shrink-0 lg:hidden">
+                        <ChevronRight className="w-6 h-6 rotate-180 text-black dark:text-white" />
+                    </button>
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight text-black dark:text-white">{t('nav.settings', 'Settings')}</h1>
+                    </div>
                 </div>
 
-                {/* PREFERENCES */}
-                <SettingsSection title="Preferences">
-                    <SettingsRow 
-                        icon={User} 
-                        title={t('settings.language', 'Language')} 
-                        subtitle={t('settings.language_desc', 'System default language')} 
-                        right={
-                            <select
-                                value={i18n.language.split('-')[0]}
-                                onChange={(e) => updateSetting('language', e.target.value)}
-                                className="bg-transparent text-sm font-medium text-slate-600 dark:text-slate-300 outline-none cursor-pointer pr-1"
-                            >
-                                <option value="en">English</option>
-                                <option value="ar">العربية</option>
-                                <option value="kn">ಕನ್ನಡ</option>
-                                <option value="ml">മലയാളം</option>
-                            </select>
-                        }
-                    />
-                    <SettingsRow 
-                        icon={Clock} 
-                        title="Time Format" 
-                        subtitle="Display preference" 
-                        right={
-                            <div className="flex bg-slate-100 dark:bg-slate-800 rounded p-1">
-                                <button
-                                    onClick={() => updateSetting('timeFormat', '12h')}
-                                    className={clsx(
-                                        "px-3 py-1 text-xs font-semibold rounded transition-colors duration-200",
-                                        appSettings.timeFormat === '12h' ? "bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white" : "text-slate-500"
-                                    )}
-                                >12H</button>
-                                <button
-                                    onClick={() => updateSetting('timeFormat', '24h')}
-                                    className={clsx(
-                                        "px-3 py-1 text-xs font-semibold rounded transition-colors duration-200",
-                                        appSettings.timeFormat === '24h' ? "bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white" : "text-slate-500"
-                                    )}
-                                >24H</button>
-                            </div>
-                        }
-                    />
-                </SettingsSection>
+                <div className="px-0 sm:px-0">
+                    
+                    {/* User Profile Card - iOS Style */}
+                    <div 
+                        onClick={() => navigate('/profile')}
+                        className="bg-white dark:bg-[#1C1C1E] p-4 flex items-center gap-4 cursor-pointer active:bg-slate-100 dark:active:bg-[#2C2C2E] transition-colors mb-6 sm:mb-8 sm:rounded-xl sm:border sm:border-slate-200 sm:dark:border-[#2C2C2E] shadow-sm dark:shadow-none"
+                    >
+                        <div className="w-[60px] h-[60px] rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xl font-bold text-slate-500 dark:text-slate-300 overflow-hidden shrink-0 border border-black/5 dark:border-white/10">
+                            {user?.photoURL ? (
+                                <img src={user.photoURL} alt={user?.name} className="w-full h-full object-cover" />
+                            ) : (
+                                <span className="uppercase">{user?.initials || user?.name?.charAt(0) || 'U'}</span>
+                            )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <h2 className="text-[20px] font-semibold text-black dark:text-white leading-tight truncate">{user?.name}</h2>
+                            <p className="text-[14px] text-emerald-600 dark:text-emerald-400 font-medium mt-0.5 mt-1 border border-emerald-500/30 rounded-full px-2 py-0.5 inline-flex items-center gap-1.5 shrink-0 bg-emerald-500/10">
+                                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> Share a thought
+                            </p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-slate-300 dark:text-[#5C5C5E] shrink-0" />
+                    </div>
 
-                {/* APPEARANCE */}
-                <SettingsSection title="Appearance">
-                    <SettingsRow 
-                        icon={theme === 'dark' ? Moon : Sun} 
-                        title="Dark Mode" 
-                        subtitle="Adjust application appearance" 
-                        right={
-                            <button
-                                onClick={() => {
-                                    if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50);
-                                    toggleTheme();
-                                }}
-                                className={clsx(
-                                    "relative w-12 h-6 rounded-full transition-colors duration-150 ease-in-out border border-transparent",
-                                    theme === 'dark' ? "bg-indigo-500" : "bg-slate-200 dark:bg-slate-700"
-                                )}
-                            >
-                                <span
-                                    className={clsx(
-                                        "absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transform transition-transform duration-150 ease-in-out",
-                                        theme === 'dark' ? "translate-x-6" : "translate-x-0"
-                                    )}
-                                />
-                            </button>
-                        }
-                    />
-                </SettingsSection>
+                    {/* Preferences Group */}
+                    <SettingsGroup>
+                        <SettingsRow 
+                            icon={FileText} 
+                            iconBgClass="bg-red-500"
+                            title={t('settings.language', 'Language')} 
+                            right={
+                                <select
+                                    value={i18n.language.split('-')[0]}
+                                    onChange={(e) => updateSetting('language', e.target.value)}
+                                    className="bg-transparent text-[16px] text-slate-500 dark:text-[#8E8E93] outline-none cursor-pointer pr-1 text-right max-w-[120px]"
+                                >
+                                    <option value="en">English</option>
+                                    <option value="ar">العربية</option>
+                                    <option value="kn">ಕನ್ನಡ</option>
+                                    <option value="ml">മലയാളം</option>
+                                </select>
+                            }
+                        />
+                        <SettingsRow 
+                            icon={Clock} 
+                            iconBgClass="bg-blue-500"
+                            title="Time Format" 
+                            isLast
+                            right={
+                                <div className="flex bg-slate-100 dark:bg-[#2C2C2E] rounded p-[2px]">
+                                    <button
+                                        onClick={() => updateSetting('timeFormat', '12h')}
+                                        className={clsx(
+                                            "px-3 py-1 text-[13px] font-medium rounded transition-colors duration-200",
+                                            appSettings.timeFormat === '12h' ? "bg-white dark:bg-[#636366] text-black dark:text-white shadow-sm" : "text-slate-500 dark:text-[#8E8E93]"
+                                        )}
+                                    >12H</button>
+                                    <button
+                                        onClick={() => updateSetting('timeFormat', '24h')}
+                                        className={clsx(
+                                            "px-3 py-1 text-[13px] font-medium rounded transition-colors duration-200",
+                                            appSettings.timeFormat === '24h' ? "bg-white dark:bg-[#636366] text-black dark:text-white shadow-sm" : "text-slate-500 dark:text-[#8E8E93]"
+                                        )}
+                                    >24H</button>
+                                </div>
+                            }
+                        />
+                    </SettingsGroup>
 
-                <p className="text-center text-[10px] font-semibold text-slate-400 mt-10 mb-4">
-                    AWAKE v1.2.0 • Build ID: 88AF2
+                    {/* Appearance Group (iOS Toggle style) */}
+                    <SettingsGroup>
+                        <SettingsRow 
+                            icon={theme === 'dark' ? Moon : Sun} 
+                            iconBgClass="bg-slate-800 dark:bg-slate-700"
+                            title="Dark Mode" 
+                            isLast
+                            right={
+                                <button
+                                    onClick={() => {
+                                        if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50);
+                                        toggleTheme();
+                                    }}
+                                    className={clsx(
+                                        "relative w-[51px] h-[31px] rounded-full transition-colors duration-300 ease-in-out shrink-0",
+                                        theme === 'dark' ? "bg-[#34C759]" : "bg-[#E9E9EA]"
+                                    )}
+                                >
+                                    <span
+                                        className={clsx(
+                                            "absolute top-[2px] left-[2px] w-[27px] h-[27px] bg-white rounded-full shadow-[0_3px_8px_rgba(0,0,0,0.15)] transform transition-transform duration-300 ease-in-out",
+                                            theme === 'dark' ? "translate-x-[20px]" : "translate-x-0"
+                                        )}
+                                    />
+                                </button>
+                            }
+                        />
+                    </SettingsGroup>
+
+                    {/* Support Group */}
+                    <SettingsGroup>
+                        <SettingsRow 
+                            icon={HelpCircle} 
+                            iconBgClass="bg-indigo-500"
+                            title="Help and feedback" 
+                            onClick={() => {}}
+                        />
+                        <SettingsRow 
+                            icon={UserPlus} 
+                            iconBgClass="bg-[#34C759]"
+                            title="Invite a friend" 
+                            isLast
+                            onClick={() => {}}
+                        />
+                    </SettingsGroup>
+
+                </div>
+
+                <p className="text-center text-[12px] text-slate-400 dark:text-[#8E8E93] mt-8 mb-4 tracking-wide font-medium">
+                    HUMI AWAKE v1.2.0 • Build ID: 88AF2
                 </p>
             </div>
         </div>

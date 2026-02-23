@@ -6,6 +6,8 @@
   html,
   body {
     background-color: #ffffff;
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
     /* Removed automatic transition here to prevent load flash. 
            We now rely on .theme-transition class added by JS for smooth toggles. */
   }

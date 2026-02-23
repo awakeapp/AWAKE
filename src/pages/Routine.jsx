@@ -38,8 +38,13 @@ const Routine = () => {
 
     if (!dailyData || !dailyData.tasks) {
         return (
-            <div className="flex items-center justify-center min-h-[50vh]">
-                <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+            <div className="pb-24">
+                <div className="sticky top-[60px] z-20 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md pt-3 pb-3 mb-4 border-b border-slate-200 dark:border-slate-800 -mx-4 px-4">
+                    <DateHeader className="mb-0" />
+                </div>
+                <div className="flex items-center justify-center min-h-[40vh]">
+                    <Loader2 className="w-8 h-8 animate-spin text-slate-300 dark:text-slate-700" />
+                </div>
             </div>
         );
     }

@@ -51,10 +51,10 @@ const AccountDetail = () => {
             {/* Header */}
             <div className="bg-slate-900 text-white p-6 pb-12 rounded-b-[2rem] shadow-xl">
                 <div className="flex items-center justify-between mb-6">
-                    <button onClick={() => navigate('/finance')} className="p-2 bg-white/10 rounded-xl hover:bg-white/20 transition-colors">
+                    <button onClick={() => window.history.back()} className="p-2 bg-white/10 rounded-xl hover:bg-white/20 transition-colors">
                         <ArrowLeft className="w-5 h-5 text-white" />
                     </button>
-                    <h1 className="text-lg font-bold">Account Details</h1>
+                    <h1 className="text-lg font-bold leading-tight">Account Details</h1>
                     <button
                         onClick={handleArchiveClick}
                         className={`p-2 rounded-xl transition-all duration-300 flex items-center gap-2 ${showArchiveConfirm

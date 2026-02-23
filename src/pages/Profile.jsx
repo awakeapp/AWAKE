@@ -2,51 +2,38 @@ import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useLogout } from '../hooks/useLogout';
-import { Lock, Edit2, Check, X, Download, ShieldCheck, LogOut, ChevronRight } from 'lucide-react';
+import { Lock, Edit2, Check, X, Download, ShieldCheck, LogOut, ChevronRight, ChevronLeft } from 'lucide-react';
 import { getReportData, generateUserReportPDF } from '../utils/reportUtils';
 import EditProfileModal from '../components/organisms/EditProfileModal';
 import DataExportSection from '../components/organisms/DataExportSection';
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
-// Shared Row Component
-const ProfileRow = ({ icon: Icon, title, subtitle, right, onClick, className }) => (
+// Shared Row Component matching new style
+const ProfileRow = ({ title, value, onClick, className, isDefaultActions, isDanger, isAction }) => (
     <div 
         onClick={onClick}
         className={clsx(
-            "flex items-center justify-between px-4 min-h-[56px] bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800/50 last:border-0",
-            onClick && "cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors",
+            "px-4 py-3.5 bg-white dark:bg-[#1C1C1E] active:bg-slate-100 dark:active:bg-[#2C2C2E] transition-colors rounded-xl border border-slate-200 dark:border-[#2C2C2E] shadow-sm dark:shadow-none mb-4",
+            onClick && "cursor-pointer",
             className
         )}
     >
-        <div className="flex items-center gap-4">
-            {Icon && (
-                <div className="text-slate-400 shrink-0">
-                    <Icon strokeWidth={2} className="w-5 h-5 flex-shrink-0" />
-                </div>
+        <p className="text-[13px] font-medium text-slate-500 dark:text-[#8E8E93] mb-1">{title}</p>
+        <div className="flex items-center justify-between">
+            {isAction ? (
+                <p className={clsx("text-[16px] xl:text-[17px] leading-tight font-medium", isDanger ? "text-rose-500" : "text-emerald-500")}>
+                    {value}
+                </p>
+            ) : (
+                <p className={clsx("text-[16px] xl:text-[17px] text-black dark:text-white leading-tight font-medium truncate", !value && "text-slate-400 dark:text-slate-500 italic")}>
+                    {value || 'Not set'}
+                </p>
             )}
-            <div className="text-left py-2">
-                <p className="font-semibold text-slate-900 dark:text-slate-100 text-sm leading-tight">{title}</p>
-                {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
-            </div>
-        </div>
-        {right && (
-            <div className="shrink-0 ml-4 flex items-center">
-                {right}
-            </div>
-        )}
-    </div>
-);
-
-// Shared Section Component
-const ProfileSection = ({ title, children }) => (
-    <div className="mb-8">
-        <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest px-4 mb-2">
-            {title}
-        </h3>
-        <div className="border-y sm:border sm:rounded-2xl border-slate-200 dark:border-slate-800/60 overflow-hidden">
-            {children}
+            
+            {(onClick && !isDefaultActions) && <ChevronRight className="w-5 h-5 text-slate-300 dark:text-[#5C5C5E] shrink-0" />}
         </div>
     </div>
 );
@@ -55,6 +42,7 @@ const Profile = () => {
     const { user } = useAuthContext();
     const { logout } = useLogout();
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
     // Password state
@@ -139,121 +127,130 @@ const Profile = () => {
     };
 
     return (
-        <div className="pb-24 animate-in slide-in-from-right-4 duration-300">
+        <div className="pb-24 pt-4 sm:pt-8 bg-[#F2F2F7] dark:bg-black min-h-screen animate-in slide-in-from-right-4 duration-300">
             <EditProfileModal isOpen={isEditProfileOpen} onClose={() => setIsEditProfileOpen(false)} />
-
-            {/* PROFILE HEADER */}
-            <div className="flex flex-col items-center pt-8 pb-10">
-                <div className="relative mb-4">
-                    <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-2xl font-bold text-slate-400 overflow-hidden">
-                        {user?.photoURL ? (
-                            <img src={user.photoURL} alt={user?.name} className="w-full h-full object-cover" />
-                        ) : (
-                            <span className="uppercase">{user?.initials || user?.name?.charAt(0) || 'U'}</span>
-                        )}
-                    </div>
-                    <button 
-                        onClick={() => setIsEditProfileOpen(true)}
-                        className="absolute bottom-0 right-0 w-8 h-8 bg-white dark:bg-slate-700 border flex items-center justify-center border-slate-200 dark:border-slate-600 rounded-full text-slate-600 dark:text-slate-300 shadow-sm hover:scale-105 transition-transform"
-                    >
-                        <Edit2 strokeWidth={2} className="w-4 h-4" />
-                    </button>
-                </div>
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white leading-tight">{user?.name}</h2>
-                <p className="text-sm text-slate-500 mt-1">{user?.email}</p>
-                <div className="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700 w-auto">
-                    AWK-{user?.uid?.slice(-4).toUpperCase() || 'GUEST'}
-                </div>
-            </div>
 
             <div className="max-w-screen-md mx-auto sm:px-4">
                 
-                {/* SECURITY */}
-                <ProfileSection title="Security">
-                    <div className="bg-white dark:bg-slate-900 flex flex-col">
+                {/* Header */}
+                <div className="px-4 flex items-center justify-between sm:px-0 mb-6 mt-2 relative">
+                    <button onClick={() => window.history.back()} className="p-2 -ml-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors flex-shrink-0 z-10 w-10">
+                        <ChevronLeft className="w-6 h-6 text-black dark:text-white" />
+                    </button>
+                    <h1 className="text-[17px] font-semibold tracking-tight text-black dark:text-white absolute left-0 right-0 text-center pointer-events-none">Profile</h1>
+                    <div className="w-10"></div> {/* Spacer for symmetry */}
+                </div>
+
+                {/* Concentric Avatar Header */}
+                <div className="flex flex-col items-center pt-4 pb-8">
+                    <div className="relative mb-6">
+                        {/* Concentric Circles Background */}
+                        <div className="absolute inset-0 m-auto w-[180px] h-[180px] rounded-full bg-[#E5E5EA] dark:bg-[#2C2C2E] opacity-50 blur-[2px] scale-110"></div>
+                        <div className="absolute inset-0 m-auto w-[160px] h-[160px] rounded-full bg-[#D1D1D6] dark:bg-[#3A3A3C] opacity-70 blur-[1px] scale-105"></div>
+                        
+                        <div className="relative w-[140px] h-[140px] rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-4xl font-bold text-slate-400 overflow-hidden border-2 border-[#F2F2F7] dark:border-black shadow-lg z-10">
+                            {user?.photoURL ? (
+                                <img src={user.photoURL} alt={user?.name} className="w-full h-full object-cover" />
+                            ) : (
+                                <span className="uppercase">{user?.initials || user?.name?.charAt(0) || 'U'}</span>
+                            )}
+                        </div>
+                    </div>
+                    
+                    <button 
+                        onClick={() => setIsEditProfileOpen(true)}
+                        className="text-[17px] font-medium text-emerald-500 active:text-emerald-600 transition-colors"
+                    >
+                        Edit
+                    </button>
+                </div>
+
+                {/* Profile Fields Grouped Blocks */}
+                <div className="px-4 sm:px-0 mt-2">
+                    
+                    <ProfileRow title="About" value={user?.email} />
+                    <ProfileRow title="Name" value={user?.name} />
+                    <ProfileRow title="Member ID" value={`AWK-${user?.uid?.slice(-4).toUpperCase() || 'GUEST'}`} />
+
+                    {/* Security Sub-section */}
+                    <div className="mt-8 mb-4">
+                        <h3 className="text-xs font-semibold text-slate-500 dark:text-[#8E8E93] uppercase tracking-widest px-2 mb-2">Account Security</h3>
                         <ProfileRow 
-                            icon={Lock} 
                             title="Update Password" 
-                            subtitle="Manage security credentials" 
+                            value={isEditingPassword ? "Cancel Editing" : "Manage Security"} 
                             onClick={() => setIsEditingPassword(!isEditingPassword)}
-                            right={<ChevronRight className={clsx("w-5 h-5 text-slate-300 transition-transform duration-200", isEditingPassword && "rotate-90")} />} 
-                            className="bg-transparent"
+                            isDefaultActions
                         />
                         {isEditingPassword && (
-                            <div className="px-4 pb-4 animate-in fade-in slide-in-from-top-2 duration-150">
-                                <div className="space-y-3 pt-2">
+                            <div className="px-4 py-4 bg-white dark:bg-[#1C1C1E] border border-slate-200 dark:border-[#2C2C2E] rounded-xl mb-6 shadow-sm dark:shadow-none animate-in fade-in slide-in-from-top-2 duration-150">
+                                <div className="space-y-3">
                                     <input
                                         type="password"
                                         value={currentPassword}
                                         onChange={(e) => setCurrentPassword(e.target.value)}
-                                        className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-lg px-4 py-3 text-sm font-medium outline-none focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-600 transition-all placeholder:text-slate-400"
+                                        className="w-full bg-[#F2F2F7] dark:bg-black border-none rounded-lg px-4 py-3 text-[16px] font-medium outline-none focus:ring-2 focus:ring-emerald-500 transition-all placeholder:text-slate-400 dark:placeholder:text-[#8E8E93] text-black dark:text-white"
                                         placeholder="Current password"
                                     />
                                     <input
                                         type="password"
                                         value={newPassword}
                                         onChange={(e) => setNewPassword(e.target.value)}
-                                        className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-lg px-4 py-3 text-sm font-medium outline-none focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-600 transition-all placeholder:text-slate-400"
+                                        className="w-full bg-[#F2F2F7] dark:bg-black border-none rounded-lg px-4 py-3 text-[16px] font-medium outline-none focus:ring-2 focus:ring-emerald-500 transition-all placeholder:text-slate-400 dark:placeholder:text-[#8E8E93] text-black dark:text-white"
                                         placeholder="New password (min. 6 chars)"
                                     />
                                     {passwordError && (
-                                        <p className="text-rose-500 text-xs font-semibold px-1 flex items-center gap-1.5"><X size={14} /> {passwordError}</p>
+                                        <p className="text-rose-500 text-[13px] font-medium px-1 flex items-center gap-1.5"><X size={14} /> {passwordError}</p>
                                     )}
                                     {passwordSuccess && (
-                                        <p className="text-emerald-500 text-xs font-semibold px-1 flex items-center gap-1.5"><Check size={14} /> {passwordSuccess}</p>
+                                        <p className="text-emerald-500 text-[13px] font-medium px-1 flex items-center gap-1.5"><Check size={14} /> {passwordSuccess}</p>
                                     )}
-                                    <div className="flex gap-2 pt-2">
+                                    <div className="pt-2">
                                         <button 
                                             onClick={handleSavePassword}
                                             disabled={isPasswordLoading}
-                                            className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50"
+                                            className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white text-[16px] font-semibold rounded-lg transition-colors disabled:opacity-50"
                                         >
                                             {isPasswordLoading ? 'Saving...' : 'Save Password'}
-                                        </button>
-                                        <button 
-                                            onClick={() => setIsEditingPassword(false)}
-                                            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-semibold rounded-lg transition-colors"
-                                        >
-                                            Cancel
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         )}
                     </div>
-                </ProfileSection>
 
-                {/* STORAGE */}
-                <ProfileSection title="Storage">
-                    <DataExportSection />
-                    <ProfileRow 
-                        icon={Download} 
-                        title="Download Report" 
-                        subtitle="Get your performance as PDF" 
-                        right={
-                            <button
-                                onClick={handleDownloadReport}
-                                className="px-3 py-1.5 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded transition-colors whitespace-nowrap"
-                            >PDF</button>
-                        }
-                    />
-                </ProfileSection>
+                    {/* Data Sub-section */}
+                    <div className="mb-4">
+                        <h3 className="text-xs font-semibold text-slate-500 dark:text-[#8E8E93] uppercase tracking-widest px-2 mb-2">Storage & Data</h3>
+                        <div className="bg-white dark:bg-[#1C1C1E] border border-slate-200 dark:border-[#2C2C2E] rounded-xl mb-4 p-4 shadow-sm dark:shadow-none">
+                            <DataExportSection />
+                        </div>
+                        <ProfileRow 
+                            title="Reports" 
+                            value="Download Performance PDF" 
+                            onClick={handleDownloadReport} 
+                            isAction
+                        />
+                    </div>
 
-                {/* DANGER ZONE */}
-                <ProfileSection title="Danger Zone">
-                    <ProfileRow 
-                        icon={ShieldCheck} 
-                        title={<span className="text-rose-600">Reset Cache</span>} 
-                        subtitle={<span className="text-rose-500/80">Fix sync issues (Local only)</span>} 
-                        onClick={handleClearData}
-                    />
-                    <ProfileRow 
-                        icon={LogOut} 
-                        title={<span className="text-rose-600">Sign Out</span>} 
-                        subtitle={<span className="text-rose-500/80">End current session</span>} 
-                        onClick={logout}
-                    />
-                </ProfileSection>
+                    {/* Danger Sub-section */}
+                    <div className="mt-8">
+                        <ProfileRow 
+                            title="Troubleshooting" 
+                            value="Reset Local Cache" 
+                            onClick={handleClearData} 
+                            isAction
+                            isDanger
+                        />
+                        <ProfileRow 
+                            title="Session" 
+                            value="Sign Out" 
+                            onClick={logout} 
+                            isAction
+                            isDanger
+                        />
+                    </div>
+
+                </div>
 
             </div>
         </div>
