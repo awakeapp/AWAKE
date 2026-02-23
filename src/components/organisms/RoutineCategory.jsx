@@ -23,25 +23,18 @@ const RoutineCategory = ({ title, tasks, onUpdateStatus, isLocked }) => {
     const total = tasks.length;
 
     return (
-        <section className={`mb-4 transition-all duration-300 ${isLocked ? 'opacity-70 grayscale-[0.5] pointer-events-none' : ''}`}>
-            {/* Header (Non-Interactive, just label) */}
-            <div
-                className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-white dark:bg-slate-900 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200"
-            >
-                <div className="flex items-center gap-3">
-                    <div className={cn("w-1.5 h-6 rounded-full", getTheme())} />
-                    <div className="text-left">
-                        <h3 className="text-[11px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-widest">
-                            {title}
-                        </h3>
-                    </div>
+        <section className={`mb-3 transition-all duration-300 ${isLocked ? 'opacity-70 grayscale-[0.5] pointer-events-none' : ''}`}>
+            {/* Compact Category Header */}
+            <div className="w-full flex items-center justify-between px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200">
+                <div className="flex items-center gap-2.5">
+                    <div className={cn("w-1 h-4 rounded-full", getTheme())} />
+                    <h3 className="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest leading-none">
+                        {title}
+                    </h3>
                 </div>
-
-                <div className="flex items-center gap-3">
-                    <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md">
-                        {completed}/{total}
-                    </span>
-                </div>
+                <span className="text-[9px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-md">
+                    {completed}/{total}
+                </span>
             </div>
 
             {/* Content (Always Visible) */}

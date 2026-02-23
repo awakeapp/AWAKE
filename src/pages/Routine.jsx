@@ -205,12 +205,13 @@ const Routine = () => {
                         )}
                     </div>
                 ) : (
-                    <Button
-                        className="w-full py-4 text-sm font-semibold transition-opacity duration-150 active:opacity-80"
-                        onClick={handleInitialSubmit}
+                    <button
+                        className="w-full py-3.5 text-sm font-semibold rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 shadow-sm ring-1 ring-slate-900/5 flex items-center justify-center gap-2 active:opacity-70 transition-opacity"
+                        onClick={() => setShowSubmitModal(true)}
                     >
-                        Complete Day
-                    </Button>
+                        <List className="w-4 h-4 stroke-[1.5]" />
+                        Today's Overview
+                    </button>
                 )}
             </div>
 
