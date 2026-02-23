@@ -157,7 +157,7 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="pb-32 px-4 pt-24 space-y-6">
+        <div className="pb-32 px-4 pt-[156px] space-y-6">
             {/* Header / Date */}
             <div className="fixed top-[56px] left-0 right-0 z-40 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-transparent">
                 <div className="max-w-md mx-auto w-full px-4 pt-2 pb-3">
