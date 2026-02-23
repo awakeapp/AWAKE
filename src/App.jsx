@@ -49,6 +49,7 @@ const DebtManager = lazy(() => import('./pages/finance/DebtManager'));
 const AccountDetail = lazy(() => import('./pages/finance/AccountDetail'));
 const MonthlyOverview = lazy(() => import('./pages/finance/MonthlyOverview'));
 const VehicleDashboard = lazy(() => import('./pages/vehicle/VehicleDashboard'));
+const About = lazy(() => import('./pages/About'));
 
 // Analytics tracker component
 function AnalyticsTracker() {
@@ -153,6 +154,7 @@ function App() {
                             <Route path="/history" element={<History />} />
                             <Route path="/settings" element={<Settings />} />
                             <Route path="/profile" element={<Profile />} />
+                            <Route path="/about" element={<About />} />
 
                             {/* <Route path="/users" element={<UserManagement />} /> */}
                             <Route path="/analytics" element={<Analytics />} />

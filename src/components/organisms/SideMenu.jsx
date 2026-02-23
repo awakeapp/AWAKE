@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Home, CheckSquare, Calendar, Settings, Utensils, PieChart, ChevronRight, Wallet } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { X, History, PieChart, Settings, Info, Utensils, ChevronRight, CalendarDays } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useAuthContext } from '../../hooks/useAuthContext';
 
 import { useState } from 'react';
@@ -10,21 +10,18 @@ import clsx from 'clsx';
 
 const SideMenu = ({ isOpen, onClose }) => {
     const { user } = useAuthContext();
-    const navigate = useNavigate();
     const [isJumpModalOpen, setIsJumpModalOpen] = useState(false);
     const { t } = useTranslation();
 
     const menuItems = [
-        { icon: Home, label: t('nav.dashboard', 'Dashboard'), path: '/', iconBg: 'bg-indigo-500' },
-        { icon: CheckSquare, label: t('nav.daily_routine', 'Daily Routine'), path: '/routine', iconBg: 'bg-emerald-500' },
-        { icon: Calendar, label: t('nav.history', 'History'), path: '/history', iconBg: 'bg-blue-500' },
-        { icon: Settings, label: t('nav.settings', 'Settings'), path: '/settings', iconBg: 'bg-slate-500 dark:bg-slate-700' },
+        { icon: History,  label: t('nav.history', 'Order History'), path: '/history',   iconBg: 'bg-blue-500' },
+        { icon: PieChart, label: t('nav.insights', 'Insights'),     path: '/analytics', iconBg: 'bg-indigo-500' },
+        { icon: Settings, label: t('nav.settings', 'Settings'),     path: '/settings',  iconBg: 'bg-slate-500 dark:bg-slate-700' },
+        { icon: Info,     label: t('nav.about', 'About Awake'),     path: '/about',     iconBg: 'bg-teal-500' },
     ];
 
-    const advancedFeatures = [
-        { icon: Utensils, label: t('nav.plan_diet', 'Plan Diet'), path: '/diet-plan', iconBg: 'bg-orange-500' },
-        { icon: PieChart, label: t('nav.analytics', 'Analytics'), path: '/analytics', iconBg: 'bg-indigo-500' },
-        { icon: Wallet, label: t('nav.finance', 'Finance'), path: '/finance', iconBg: 'bg-[#34C759]' },
+    const toolItems = [
+        { icon: Utensils, label: t('nav.diet_planner', 'Diet Planner'), path: '/diet', iconBg: 'bg-orange-500' },
     ];
 
     const MenuRow = ({ item, isLast, onClick, isButton = false }) => {
@@ -89,24 +86,24 @@ const SideMenu = ({ isOpen, onClose }) => {
 
                         {/* Navigation Body */}
                         <div className="flex-1 overflow-y-auto p-4 pt-2 space-y-6">
-                            
+
                             {/* Main Links Group */}
                             <div className="bg-white dark:bg-[#1C1C1E] rounded-xl overflow-hidden shadow-sm dark:shadow-none border border-slate-200 dark:border-[#2C2C2E]">
                                 {menuItems.map((item, idx) => (
-                                    <MenuRow 
-                                        key={item.path} 
-                                        item={item} 
-                                        onClick={onClose} 
-                                        isLast={idx === menuItems.length - 1} 
+                                    <MenuRow
+                                        key={item.path}
+                                        item={item}
+                                        onClick={onClose}
+                                        isLast={idx === menuItems.length - 1}
                                     />
                                 ))}
                             </div>
 
-                            {/* Calendar/Date Group */}
+                            {/* Calendar / Jump Date Group */}
                             <div className="bg-white dark:bg-[#1C1C1E] rounded-xl overflow-hidden shadow-sm dark:shadow-none border border-slate-200 dark:border-[#2C2C2E]">
-                                <MenuRow 
-                                    item={{ icon: Calendar, label: t('date.jump_to_date', 'Jump to Date'), iconBg: 'bg-blue-400' }} 
-                                    isButton 
+                                <MenuRow
+                                    item={{ icon: CalendarDays, label: t('date.jump_to_date', 'Jump to Date'), iconBg: 'bg-violet-500' }}
+                                    isButton
                                     onClick={() => setIsJumpModalOpen(true)}
                                     isLast
                                 />
@@ -115,24 +112,24 @@ const SideMenu = ({ isOpen, onClose }) => {
                                         isOpen={isJumpModalOpen}
                                         onClose={() => {
                                             setIsJumpModalOpen(false);
-                                            onClose(); 
+                                            onClose();
                                         }}
                                     />
                                 )}
                             </div>
 
-                            {/* Advanced Tools Group */}
+                            {/* Tools Group */}
                             <div>
                                 <h3 className="text-[13px] font-medium text-slate-500 dark:text-[#8E8E93] uppercase tracking-wider mb-2 px-4">
-                                    {t('nav.tools', 'Advanced')}
+                                    {t('nav.tools', 'Tools')}
                                 </h3>
                                 <div className="bg-white dark:bg-[#1C1C1E] rounded-xl overflow-hidden shadow-sm dark:shadow-none border border-slate-200 dark:border-[#2C2C2E]">
-                                    {advancedFeatures.map((feat, idx) => (
-                                        <MenuRow 
-                                            key={feat.path} 
-                                            item={feat} 
-                                            onClick={onClose} 
-                                            isLast={idx === advancedFeatures.length - 1} 
+                                    {toolItems.map((item, idx) => (
+                                        <MenuRow
+                                            key={item.path}
+                                            item={item}
+                                            onClick={onClose}
+                                            isLast={idx === toolItems.length - 1}
                                         />
                                     ))}
                                 </div>
