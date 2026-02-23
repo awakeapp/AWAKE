@@ -8,6 +8,28 @@ import JumpDateModal from './JumpDateModal';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 
+// Pure button row — no Link wrapper that could race with navigation
+const MenuRow = ({ item, isLast, onTap }) => (
+    <button
+        onClick={onTap}
+        // touch-action: manipulation removes 300ms iOS tap delay in PWA/WebView
+        style={{ touchAction: 'manipulation' }}
+        className={clsx(
+            "w-full text-left border-none outline-none bg-transparent",
+            "flex items-center min-h-[50px] sm:min-h-[54px] active:bg-slate-100 dark:active:bg-[#2C2C2E] transition-colors ml-4 pr-4",
+            !isLast && "border-b border-slate-200 dark:border-[#38383A]"
+        )}
+    >
+        <div className="flex items-center gap-3.5 py-2.5 flex-1 min-w-0">
+            <div className="w-[30px] h-[30px] rounded-lg shrink-0 flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                <item.icon strokeWidth={2} className="w-[18px] h-[18px]" />
+            </div>
+            <span className="text-[16px] xl:text-[17px] text-black dark:text-white leading-tight font-medium truncate">{item.label}</span>
+        </div>
+        <ChevronRight className="w-5 h-5 text-slate-300 dark:text-[#5C5C5E] shrink-0 ml-2 relative top-[1px]" />
+    </button>
+);
+
 const SideMenu = ({ isOpen, onClose }) => {
     const { user } = useAuthContext();
     const navigate = useNavigate();
@@ -30,28 +52,6 @@ const SideMenu = ({ isOpen, onClose }) => {
         onClose();
         navigate(path);
     };
-
-    // Pure button row — no Link wrapper that could race with navigation
-    const MenuRow = ({ item, isLast, onTap }) => (
-        <button
-            onClick={onTap}
-            // touch-action: manipulation removes 300ms iOS tap delay in PWA/WebView
-            style={{ touchAction: 'manipulation' }}
-            className={clsx(
-                "w-full text-left border-none outline-none bg-transparent",
-                "flex items-center min-h-[50px] sm:min-h-[54px] active:bg-slate-100 dark:active:bg-[#2C2C2E] transition-colors ml-4 pr-4",
-                !isLast && "border-b border-slate-200 dark:border-[#38383A]"
-            )}
-        >
-            <div className="flex items-center gap-3.5 py-2.5 flex-1 min-w-0">
-                <div className="w-[30px] h-[30px] rounded-lg shrink-0 flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    <item.icon strokeWidth={2} className="w-[18px] h-[18px]" />
-                </div>
-                <span className="text-[16px] xl:text-[17px] text-black dark:text-white leading-tight font-medium truncate">{item.label}</span>
-            </div>
-            <ChevronRight className="w-5 h-5 text-slate-300 dark:text-[#5C5C5E] shrink-0 ml-2 relative top-[1px]" />
-        </button>
-    );
 
     return (
         <AnimatePresence>
@@ -118,6 +118,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                                     />
                                 )}
                             </div>
+                
 
                             {/* Tools Group */}
                             <div>
@@ -129,7 +130,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                                         <MenuRow
                                             key={item.path}
                                             item={item}
-                                            onTap={() => handleNavigate(item.path)}
+                                            onclicks={() => handleNavigate(item.path)}
                                             isLast={idx === toolItems.length - 1}
                                         />
                                     ))}
