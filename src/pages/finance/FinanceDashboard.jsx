@@ -1,16 +1,21 @@
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { ArrowLeft, Plus, Wallet, PieChart, ChevronLeft, ChevronRight, PiggyBank, ArrowDown, TrendingUp, Undo, X } from 'lucide-react';
+import { Plus, Wallet, PieChart, ChevronLeft, ChevronRight, PiggyBank, ArrowDown, TrendingUp, Undo, X } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, isWithinInterval, subMonths, addMonths } from 'date-fns';
 import { useState, useMemo } from 'react';
 import AddTransactionModal from './AddTransactionModal';
 import UpcomingPayments from './UpcomingPayments';
 import BudgetSummary from './BudgetSummary';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslation } from 'react-i18next'; // Added i18n support
+import { useTranslation } from 'react-i18next';
+import { useThemeColor } from '../../hooks/useThemeColor';
+import { useTheme } from '../../context/ThemeContext';
 
 const FinanceDashboard = () => {
     const navigate = useNavigate();
+    const { isDark } = useTheme();
+    // Lock status bar to Finance header colour while this page is mounted
+    useThemeColor(isDark ? '#0f172a' : '#0f172a'); // slate-900 in both modes
     const { t } = useTranslation(); // Enable translations
     const {
         getTotalBalance,
@@ -88,6 +93,12 @@ const FinanceDashboard = () => {
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24">
+            {/* Status-bar colour strip — fills env(safe-area-inset-top) flush with header bg */}
+            <div
+                className="fixed top-0 inset-x-0 z-50 bg-slate-900"
+                style={{ height: 'env(safe-area-inset-top, 0px)' }}
+            />
+
             {/* Header / Month Context */}
             <header
                 className="bg-slate-900 text-white px-6 pb-8 rounded-b-[2.5rem] shadow-2xl shadow-slate-900/20 relative overflow-hidden"
