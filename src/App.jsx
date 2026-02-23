@@ -55,6 +55,7 @@ const VehicleDashboard = lazy(() => import('./pages/vehicle/VehicleDashboard'));
 const RamadanDashboard = RAMADAN_MODE ? lazy(() => import('./pages/ramadan/RamadanDashboard')) : null;
 const RamadanStats     = RAMADAN_MODE ? lazy(() => import('./pages/ramadan/RamadanStats'))     : null;
 const RamadanDhikr    = RAMADAN_MODE ? lazy(() => import('./pages/ramadan/RamadanDhikr'))    : null;
+const RamadanSettings = RAMADAN_MODE ? lazy(() => import('./pages/ramadan/RamadanSettings')) : null;
 
 // Analytics tracker component
 function AnalyticsTracker() {
@@ -154,6 +155,7 @@ function App() {
                               <Route path="/ramadan" element={<RamadanDashboard />} />
                               <Route path="/ramadan/stats" element={<RamadanStats />} />
                               <Route path="/ramadan/dhikr" element={<RamadanDhikr />} />
+                              <Route path="/ramadan/settings" element={<RamadanSettings />} />
                             </Route>
                           )}
 

@@ -8,7 +8,7 @@ export const useSwipeNavigation = () => {
     const [touchStart, setTouchStart] = useState(null);
     const [touchEnd, setTouchEnd] = useState(null);
 
-    const minSwipeDistance = 75;
+    const minSwipeDistance = 50;
 
     const onTouchStart = (e) => {
         // Avoid intercepting swipes on horizontally scrollable elements or interactive charts
