@@ -173,12 +173,12 @@ const FinanceDashboard = () => {
             <div className="px-4 py-6 space-y-8 -mt-4 relative z-10">
 
                 {/* Accounts Strip */}
-                <section className="overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+                <section className="overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide scroll-smooth-x">
                     <div className="flex gap-3 w-max">
-                        {/* Budget Button (New) */}
+                        {/* Budget Button */}
                         <div
                             onClick={() => setIsBudgetOpen(true)}
-                            className="min-w-[140px] bg-indigo-500 p-4 rounded-2xl shadow-lg shadow-indigo-500/20 cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-between text-white"
+                            className="min-w-[140px] bg-indigo-500 p-4 rounded-2xl shadow-lg shadow-indigo-500/20 cursor-pointer active:opacity-80 transition-opacity flex flex-col justify-between text-white"
                         >
                             <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mb-2">
                                 <PieChart className="w-4 h-4 text-white" />
@@ -193,7 +193,7 @@ const FinanceDashboard = () => {
                             <div
                                 key={acc.id}
                                 onClick={() => navigate(`/finance/account/${acc.id}`)}
-                                className="min-w-[140px] bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-lg shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 cursor-pointer hover:scale-[1.02] transition-transform"
+                                className="min-w-[140px] bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-lg shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 cursor-pointer active:opacity-80 transition-opacity"
                             >
                                 <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2">{acc.name}</p>
                                 <p className="text-lg font-bold text-slate-900 dark:text-white"><span dir="ltr">₹{acc.balance.toLocaleString()}</span></p>

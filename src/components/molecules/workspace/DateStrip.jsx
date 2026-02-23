@@ -13,7 +13,7 @@ const DateStrip = ({ selectedDate, onSelectDate }) => {
     // Implementation for later polish.
 
     return (
-        <div className="flex items-center gap-3 overflow-x-auto pb-4 no-scrollbar px-1" ref={scrollRef}>
+        <div className="flex items-center gap-3 overflow-x-auto pb-4 no-scrollbar px-1 -webkit-overflow-scrolling-touch" ref={scrollRef}>
             {dates.map((date) => {
                 const isSelected = isSameDay(date, new Date(selectedDate));
                 const dayName = format(date, 'd');
@@ -23,10 +23,11 @@ const DateStrip = ({ selectedDate, onSelectDate }) => {
                     <button
                         key={date.toISOString()}
                         onClick={() => onSelectDate(format(date, 'yyyy-MM-dd'))}
-                        className={`flex flex-col items-center justify-center min-w-[3.5rem] h-[5rem] rounded-[20px] transition-all duration-300 flex-shrink-0 ${isSelected
-                                ? 'bg-[#4F46E5] text-white shadow-lg shadow-indigo-500/40 transform scale-105'
+                        className={`flex flex-col items-center justify-center min-w-[3.5rem] h-[5rem] rounded-[20px] transition-colors flex-shrink-0 scroll-snap-align-start ${
+                            isSelected
+                                ? 'bg-[#4F46E5] text-white shadow-lg shadow-indigo-500/30'
                                 : 'bg-white text-slate-400 hover:bg-slate-50'
-                            }`}
+                        }`}
                     >
                         <span className={`text-[20px] font-bold leading-none mb-1 ${isSelected ? 'text-white' : 'text-slate-800'}`}>
                             {dayName}

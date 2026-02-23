@@ -16,8 +16,8 @@ export function AppBottomNav({ items = [], className }) {
       className={cn(
         // Fixed exactly to bottom, 64px height min, safe-area padded
         "fixed bottom-0 left-0 right-0 z-40 w-full",
-        "bg-surface/90 dark:bg-surface-dark/90 backdrop-blur-md",
-        "border-t border-slate-100 dark:border-slate-800",
+        "bg-white dark:bg-slate-950",
+        "border-t border-slate-200 dark:border-slate-800",
         "pb-[env(safe-area-inset-bottom)]",
         className
       )}

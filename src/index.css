@@ -144,6 +144,18 @@
   .preserve-3d {
     transform-style: preserve-3d;
   }
+
+  /* Smooth horizontal scroll — momentum on iOS, no 300ms touch delay */
+  .scroll-smooth-x {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    touch-action: pan-x;
+  }
+
+  /* Utility: tap highlight removed for native feel */
+  .tap-highlight-transparent {
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
 @keyframes float {

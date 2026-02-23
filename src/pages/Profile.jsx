@@ -127,7 +127,7 @@ const Profile = () => {
     };
 
     return (
-        <div className="pb-24 pt-4 sm:pt-8 bg-[#F2F2F7] dark:bg-black min-h-screen animate-in slide-in-from-right-4 duration-300">
+        <div className="pb-24 pt-4 sm:pt-8 bg-[#F2F2F7] dark:bg-black min-h-screen">
             <EditProfileModal isOpen={isEditProfileOpen} onClose={() => setIsEditProfileOpen(false)} />
 
             <div className="max-w-screen-md mx-auto sm:px-4">
