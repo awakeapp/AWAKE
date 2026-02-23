@@ -5,8 +5,13 @@ import { cn } from '../../lib/utils';
 import JumpDateModal from './JumpDateModal';
 import clsx from 'clsx';
 
-const DateHeader = ({ className, showControls = true, overviewText, onEditClick, isLocked }) => {
-    const { currentDate, isToday, prevDay, nextDay, jumpToToday } = useDate();
+const DateHeader = ({ className, showControls = true, overviewText, onEditClick, isLocked, rightNode, dateStateOverride }) => {
+    const contextDate = useDate();
+    
+    // Allow overriding global date context (used heavily in TaskDashboard for local state isolation)
+    const activeDateState = dateStateOverride || contextDate;
+    const { currentDate, isToday, prevDay, nextDay, jumpToToday } = activeDateState;
+    
     const [isJumpModalOpen, setIsJumpModalOpen] = useState(false);
 
     // Date formatting logic
@@ -21,6 +26,8 @@ const DateHeader = ({ className, showControls = true, overviewText, onEditClick,
             <JumpDateModal
                 isOpen={isJumpModalOpen}
                 onClose={() => setIsJumpModalOpen(false)}
+                initialDate={dateStateOverride ? currentDate : undefined}
+                onSelect={dateStateOverride ? (d) => { if(d) activeDateState.jumpToToday(d); setIsJumpModalOpen(false); } : undefined} // Using jumpToToday temporarily just to set date unless they provide specific method, but we should just have jumpToToday accept a date or pass a specific setter. Wait, actually we don't have a setter in dateStateOverride yet.
             />
 
             {/* Left Block: Nav Arrows, Date, Today Button */}
@@ -79,26 +86,30 @@ const DateHeader = ({ className, showControls = true, overviewText, onEditClick,
                 )}
             </div>
 
-            {/* Right Block: Counter, Edit */}
-            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 pl-1">
-                {/* Counter / Overview Text */}
-                {overviewText && (
-                    <div className="flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-sm sm:text-base font-extrabold tracking-wide px-3 sm:px-4 py-2 rounded-xl min-w-[3rem] sm:min-w-[4rem]">
-                        {overviewText}
-                    </div>
-                )}
+            {/* Right Block: Custom or Default */}
+            {rightNode ? (
+                rightNode
+            ) : (
+                <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 pl-1">
+                    {/* Counter / Overview Text */}
+                    {overviewText && (
+                        <div className="flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-sm sm:text-base font-extrabold tracking-wide px-3 sm:px-4 py-2 rounded-xl min-w-[3rem] sm:min-w-[4rem]">
+                            {overviewText}
+                        </div>
+                    )}
 
-                {/* Edit Button */}
-                {onEditClick && !isLocked && (
-                    <button
-                        onClick={onEditClick}
-                        className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-800 transition-all active:scale-95 flex-shrink-0"
-                        aria-label="Edit Routine"
-                    >
-                        <Edit2 className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
-                    </button>
-                )}
-            </div>
+                    {/* Edit Button */}
+                    {onEditClick && !isLocked && (
+                        <button
+                            onClick={onEditClick}
+                            className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-800 transition-all active:scale-95 flex-shrink-0"
+                            aria-label="Edit Routine"
+                        >
+                            <Edit2 className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
+                        </button>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

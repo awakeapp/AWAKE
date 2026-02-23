@@ -6,7 +6,8 @@ import AddTaskModal from '../../components/molecules/workspace/AddTaskModal';
 import { format, addDays, subDays, isBefore, isSameDay, startOfDay } from 'date-fns';
 import { useLocation, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
-import { useTranslation } from 'react-i18next'; // Added i18n support
+import { useTranslation } from 'react-i18next';
+import DateHeader from '../../components/organisms/DateHeader';
 
 const TaskDashboard = () => {
     const { t: translate } = useTranslation(); // Enable translations
@@ -100,94 +101,42 @@ const TaskDashboard = () => {
     const [isPickerOpen, setIsPickerOpen] = useState(false);
 
     return (
-        <div className="space-y-6 pb-24 h-full relative">
-            {/* ── TODO HEADER BAR ── */}
-            <div className="rounded-2xl overflow-visible bg-white dark:bg-gradient-to-br dark:from-[#141b27] dark:to-[#111827] border border-slate-200 dark:border-white/[0.07] shadow-sm dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] relative mt-2 shrink-0 transition-colors">
-                {/* Top highlight line (dark mode only) */}
-                <div className="absolute top-0 left-0 right-0 h-px rounded-t-2xl bg-gradient-to-r from-transparent via-sky-400/25 to-transparent hidden dark:block" />
-
-                <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3">
-                    {/* ‹ Prev */}
-                    <button
-                        onClick={() => navigateDate('prev')}
-                        className="w-[44px] h-[44px] rounded-[12px] border border-slate-200 dark:border-white/[0.07] bg-slate-50 dark:bg-white/[0.04] text-slate-500 dark:text-white/40 flex items-center justify-center shrink-0 hover:bg-slate-100 dark:hover:bg-white/[0.09] hover:text-slate-700 dark:hover:text-white/80 active:bg-slate-200 dark:active:bg-white/[0.15] transition-colors"
-                    >
-                        <ChevronLeft className="w-5 h-5" />
-                    </button>
-
-                    {/* ── Date Center ── */}
-                    <div
-                        className="flex-1 flex items-center justify-center gap-2 min-w-0 cursor-pointer relative group/picker"
-                    >
-                        {/* Hidden Date Input for Picking */}
-                        <input
-                            type="date"
-                            value={selectedDateStr}
-                            onChange={(e) => setSelectedDate(new Date(e.target.value))}
-                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-                        />
-                        <CalendarIcon className="w-5 h-5 text-indigo-500 dark:text-sky-400 shrink-0" />
-                        <span className="text-base font-bold text-slate-800 dark:text-white/90 tracking-wide whitespace-nowrap">
-                            {format(selectedDate, 'MMM do')}
-                        </span>
-                        <div className="w-px h-5 bg-slate-200 dark:bg-white/[0.12] shrink-0" />
-                        {isToday ? (
-                            <div className="flex items-center gap-1.5 z-10 pointer-events-none">
-                                <div className="w-2 h-2 bg-indigo-500 dark:bg-sky-400 rounded-full shadow-[0_0_8px_2px_rgba(99,102,241,0.2)] dark:shadow-[0_0_8px_2px_rgba(56,189,248,0.2)] animate-pulse" />
-                                <span className="font-mono text-xs font-bold tracking-[0.07em] text-indigo-600 dark:text-sky-400 whitespace-nowrap">
-                                    TODAY
-                                </span>
-                            </div>
-                        ) : (
-                            <button
-                                onClick={(e) => { e.stopPropagation(); setSelectedDate(new Date()); }}
-                                className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-indigo-50 dark:bg-indigo-400/[0.08] border border-indigo-100 dark:border-indigo-400/20 hover:bg-indigo-100 dark:hover:bg-indigo-400/[0.15] transition-all z-30"
-                            >
-                                <div className="w-2 h-2 bg-indigo-500 dark:bg-indigo-400 rounded-full" />
-                                <span className="font-mono text-xs font-bold tracking-[0.07em] text-indigo-600 dark:text-indigo-400 whitespace-nowrap">
-                                    TODAY ↩
-                                </span>
-                            </button>
-                        )}
-                    </div>
-
-                    {/* › Next */}
-                    <button
-                        onClick={() => navigateDate('next')}
-                        className="w-[44px] h-[44px] rounded-[12px] border border-slate-200 dark:border-white/[0.07] bg-slate-50 dark:bg-white/[0.04] text-slate-500 dark:text-white/40 flex items-center justify-center shrink-0 hover:bg-slate-100 dark:hover:bg-white/[0.09] hover:text-slate-700 dark:hover:text-white/80 active:bg-slate-200 dark:active:bg-white/[0.15] transition-colors"
-                    >
-                        <ChevronRight className="w-5 h-5" />
-                    </button>
-
-                    {/* Vertical Divider */}
-                    <div className="w-px h-[36px] bg-slate-200 dark:bg-white/[0.07] shrink-0 hidden md:block" />
-
-                    {/* ＋ ADD TASK & MORE OPTIONS */}
-                    <div className="flex items-center gap-2 shrink-0">
-                        {canAddTask ? (
-                            <button
-                                onClick={() => setIsModalOpen(true)}
-                                className="flex flex-col items-center justify-center h-[44px] w-[60px] rounded-[12px] border border-dashed border-indigo-200 dark:border-sky-400/25 bg-indigo-50/50 dark:bg-sky-400/[0.05] text-indigo-600 dark:text-sky-400/80 hover:bg-indigo-50 dark:hover:bg-sky-400/[0.12] hover:border-indigo-300 dark:hover:border-sky-400/50 hover:text-indigo-700 dark:focus:border-solid hover:border-solid active:bg-indigo-100 dark:active:bg-sky-400/20 transition-colors"
-                            >
-                                <Plus className="w-4 h-4 mb-0.5" />
-                                <span className="font-mono text-[9px] font-bold tracking-[0.05em] uppercase">Task</span>
-                            </button>
-                        ) : (
-                            <div className="w-[60px]" />
-                        )}
-
-                        {/* ··· More Menu */}
-                        <div className="relative shrink-0" ref={menuRef}>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
-                                className={clsx(
-                                    "flex flex-col items-center justify-center h-[44px] w-[60px] rounded-[12px] border border-slate-200 dark:border-white/[0.07] bg-slate-50 dark:bg-white/[0.04] text-slate-500 dark:text-white/60 hover:bg-slate-100 dark:hover:bg-white/[0.09] hover:text-slate-700 dark:hover:text-white/90 active:bg-slate-200 dark:active:bg-white/[0.15] transition-colors",
-                                    menuOpen && "bg-slate-200 dark:bg-white/[0.09] text-slate-800 dark:text-white/90 border-slate-300 dark:border-white/[0.15]"
+        <div className="space-y-6 pb-24 pt-24 h-full relative">
+            {/* ── FIXED TODO HEADER BAR ── */}
+            <div className="fixed top-0 left-0 right-0 z-40 bg-slate-50/90 dark:bg-[#020617]/90 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 pt-1 pb-2 transition-all duration-300">
+                <div className="max-w-md mx-auto w-full px-4">
+                    <DateHeader 
+                        dateStateOverride={{
+                            currentDate: selectedDate,
+                            isToday,
+                            prevDay: () => navigateDate('prev'),
+                            nextDay: () => navigateDate('next'),
+                            jumpToToday: (d) => setSelectedDate(d || new Date())
+                        }}
+                        rightNode={
+                            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 pl-1">
+                                {/* Add Task Button */}
+                                {canAddTask && (
+                                    <button
+                                        onClick={() => setIsModalOpen(true)}
+                                        className="flex flex-col items-center justify-center p-1 sm:p-2 text-indigo-600 dark:text-sky-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all active:scale-95 group"
+                                    >
+                                        <Plus className="w-7 h-7 sm:w-8 sm:h-8 stroke-[2.5]" />
+                                        <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider mt-0.5 group-hover:text-indigo-700">Add Task</span>
+                                    </button>
                                 )}
-                            >
-                                <MoreHorizontal className="w-4 h-4 mb-0.5" />
-                                <span className="font-mono text-[9px] font-bold tracking-[0.05em] uppercase">More</span>
-                            </button>
+                                
+                                {/* More Menu */}
+                                <div className="relative shrink-0" ref={menuRef}>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
+                                        className={clsx(
+                                            "flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-800 transition-all active:scale-95",
+                                            menuOpen && "bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white"
+                                        )}
+                                    >
+                                        <MoreHorizontal className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2]" />
+                                    </button>
 
                             {/* Dropdown */}
                             <div
@@ -276,22 +225,9 @@ const TaskDashboard = () => {
                             </div>
                         </div>
                     </div>
+                }
+            />
                 </div>
-
-                {/* ── Past-day ribbon ── */}
-                {!isToday && (
-                    <div className="flex items-center justify-between px-5 py-2.5 bg-slate-50 dark:bg-indigo-950/40 border-t border-slate-100 dark:border-white/[0.05] text-[11px] rounded-b-2xl">
-                        <span className="font-mono font-bold text-slate-500 dark:text-indigo-300/80 tracking-[0.06em]">
-                            VIEWING {format(selectedDate, 'MMMM do, yyyy').toUpperCase()}
-                        </span>
-                        <button
-                            onClick={() => setSelectedDate(new Date())}
-                            className="font-mono font-bold text-indigo-500 dark:text-white/40 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors tracking-wide uppercase"
-                        >
-                            tap TODAY to return →
-                        </button>
-                    </div>
-                )}
             </div>
 
             {/* Task Lists */}
