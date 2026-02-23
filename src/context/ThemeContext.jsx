@@ -36,10 +36,6 @@ export const ThemeContextProvider = ({ children }) => {
         const lightColor = '#ffffff';
         const darkColor = '#020617';
 
-        // Add minimal transition class to avoid hover lag
-        // We add it here to ensure it's present during the class switch
-        root.classList.add('theme-transition');
-
         if (theme === 'dark') {
             root.classList.add('dark');
             root.style.colorScheme = 'dark';
@@ -58,14 +54,20 @@ export const ThemeContextProvider = ({ children }) => {
         if (metaThemeColor) metaThemeColor.setAttribute('content', newColor);
 
         localStorage.setItem('theme', theme);
-
-        // Remove transition class after animation completes
-        const timer = setTimeout(() => {
-            root.classList.remove('theme-transition');
-        }, 300); // Matches CSS duration
-
-        return () => clearTimeout(timer);
     }, [theme]);
+
+    // Listen for system theme changes if no explicit user preference
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handleChange = (e) => {
+            const stored = localStorage.getItem('theme');
+            if (stored) return; // Ignore if user has set a preference
+            setTheme(e.matches ? 'dark' : 'light');
+        };
+
+        mediaQuery.addEventListener('change', handleChange);
+        return () => mediaQuery.removeEventListener('change', handleChange);
+    }, []);
     
     // ... Sync from Firestore on load (unchanged) ...
 

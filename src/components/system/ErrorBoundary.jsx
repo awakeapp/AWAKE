@@ -36,7 +36,10 @@ class ErrorBoundary extends React.Component {
         >
           <h2>Something went wrong.</h2>
           <p>Please refresh the application.</p>
-          <button onClick={this.handleReload}>
+          <pre style={{textAlign: 'left', background: '#f8d7da', color: '#721c24', padding: '10px', overflowX: 'auto'}}>
+            {this.state.error && this.state.error.toString()}
+          </pre>
+          <button onClick={this.handleReload} style={{marginTop: '20px'}}>
             Reload App
           </button>
         </div>

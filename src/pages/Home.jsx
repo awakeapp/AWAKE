@@ -6,9 +6,10 @@ import { useFinance } from '../context/FinanceContext';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useRamadan } from '../context/RamadanContext';
 import { motion } from 'framer-motion';
-import { Trophy, Target, List, IndianRupee, ArrowRight, Zap, Moon, ChevronRight } from 'lucide-react';
+import { Trophy, Target, List, IndianRupee, ArrowRight, Zap, Moon, ChevronRight, Fuel } from 'lucide-react';
 import clsx from 'clsx';
-import QuickActionModal from '../components/organisms/QuickActionModal';
+import FuelLogModal from '../components/organisms/FuelLogModal';
+import FinanceLogModal from '../components/organisms/FinanceLogModal';
 import MotivationBanner from '../components/organisms/MotivationBanner';
 import { useTranslation } from 'react-i18next';
 import { RAMADAN_MODE } from '../lib/featureFlags';
@@ -22,7 +23,8 @@ const Home = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
 
-    const [isQuickActionOpen, setIsQuickActionOpen] = useState(false);
+    const [isFuelModalOpen, setIsFuelModalOpen] = useState(false);
+    const [isFinanceModalOpen, setIsFinanceModalOpen] = useState(false);
     const [now, setNow] = useState(new Date());
 
     useEffect(() => {
@@ -84,7 +86,8 @@ const Home = () => {
 
     return (
         <div className="space-y-6 pb-24 pt-4 px-1">
-            <QuickActionModal isOpen={isQuickActionOpen} onClose={() => setIsQuickActionOpen(false)} />
+            <FuelLogModal isOpen={isFuelModalOpen} onClose={() => setIsFuelModalOpen(false)} />
+            <FinanceLogModal isOpen={isFinanceModalOpen} onClose={() => setIsFinanceModalOpen(false)} />
 
             {/* Header */}
             <div className="space-y-4">
@@ -208,22 +211,42 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* Minimal Quick Action Bar */}
-            <div 
-                className="bg-slate-900 dark:bg-white rounded-2xl p-4 flex items-center justify-between cursor-pointer active:opacity-80 transition-opacity shadow-lg shadow-slate-900/20 dark:shadow-white/10"
-                onClick={() => setIsQuickActionOpen(true)}
-            >
-                <div className="flex items-center gap-3">
-                    <div className="bg-white/20 dark:bg-slate-900/10 p-2 rounded-xl text-white dark:text-slate-900">
-                        <Zap className="w-5 h-5 fill-current" />
+            {/* Minimal Quick Action Bar -> Two Buttons */}
+            <div className="grid grid-cols-2 gap-3">
+                <div 
+                    className="bg-slate-900 dark:bg-white rounded-2xl p-4 flex flex-col justify-between cursor-pointer active:opacity-80 transition-opacity shadow-lg shadow-slate-900/10 dark:shadow-white/5 h-28"
+                    onClick={() => setIsFuelModalOpen(true)}
+                >
+                    <div className="flex items-start justify-between">
+                        <div className="bg-white/20 dark:bg-slate-900/10 p-2 rounded-xl text-white dark:text-slate-900">
+                            <Fuel className="w-5 h-5 fill-current" />
+                        </div>
+                        <div className="bg-white/10 dark:bg-slate-900/5 p-1 rounded-full text-white dark:text-slate-900">
+                            <span className="text-lg leading-none font-medium px-1">+</span>
+                        </div>
                     </div>
                     <div>
-                        <p className="text-sm font-semibold text-white dark:text-slate-900">Quick Log</p>
-                        <p className="text-xs text-slate-300 dark:text-slate-500 font-normal uppercase tracking-wide">Add Task or Expense</p>
+                        <p className="text-sm font-semibold text-white dark:text-slate-900">Fuel Log</p>
+                        <p className="text-[11px] text-slate-300 dark:text-slate-500 font-medium uppercase tracking-wide">Add Fill-up</p>
                     </div>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-white/20 dark:bg-slate-900/10 flex items-center justify-center text-white dark:text-slate-900">
-                    <span className="text-lg leading-none font-medium pb-0.5">+</span>
+
+                <div 
+                    className="bg-emerald-600 dark:bg-emerald-500 rounded-2xl p-4 flex flex-col justify-between cursor-pointer active:opacity-80 transition-opacity flex-1 shadow-lg shadow-emerald-500/20 h-28"
+                    onClick={() => setIsFinanceModalOpen(true)}
+                >
+                    <div className="flex items-start justify-between">
+                        <div className="bg-white/20 dark:bg-black/10 p-2 rounded-xl text-white dark:text-slate-900">
+                            <IndianRupee className="w-5 h-5 fill-current" />
+                        </div>
+                        <div className="bg-white/10 dark:bg-black/5 p-1 rounded-full text-white dark:text-slate-900">
+                            <span className="text-lg leading-none font-medium px-1">+</span>
+                        </div>
+                    </div>
+                    <div>
+                        <p className="text-sm font-semibold text-white dark:text-slate-900">Finance Log</p>
+                        <p className="text-[11px] text-emerald-100 dark:text-slate-800 font-medium uppercase tracking-wide">Add Expense</p>
+                    </div>
                 </div>
             </div>
 

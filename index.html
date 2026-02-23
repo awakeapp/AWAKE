@@ -77,8 +77,7 @@
               registration.unregister().then(function (boolean) {
                 if (boolean) {
                   console.log("Successfully unregistered old service worker.");
-                  // Force reload if we found and killed a SW
-                  window.location.reload(true);
+                  // Reload removed to prevent endless loops in some environments
                 }
               });
             }

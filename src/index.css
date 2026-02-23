@@ -39,7 +39,7 @@
     background-color: #020617; /* match dark:bg-primary-950 */
   }
   body {
-    @apply bg-slate-50 text-slate-900 antialiased dark:bg-primary-950 dark:text-slate-50;
+    @apply bg-white text-slate-900 antialiased dark:bg-primary-950 dark:text-slate-50;
     padding-top: env(safe-area-inset-top);
   }
 
@@ -50,16 +50,6 @@
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
-}
-
-/* Global Theme Transition: Only active during switch to preserve hover speeds */
-.theme-transition,
-.theme-transition *,
-.theme-transition *::before,
-.theme-transition *::after {
-  transition: all 0.3s ease-out !important;
-  transition-property:
-    background-color, border-color, color, fill, stroke, box-shadow !important;
 }
 
 @layer components {

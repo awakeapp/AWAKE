@@ -10,7 +10,7 @@ export default function DynamicThemeColor() {
         // Universal Native System Blend
         // Always match the base body background color precisely.
         // This solves P3 color space mismatches between Solid CSS and Meta-Tags on iOS.
-        let color = isDark ? '#020617' : '#f8fafc'; // Default: bg-slate-950 / bg-slate-50
+        let color = isDark ? '#020617' : '#ffffff'; // Default: bg-slate-950 / bg-white
 
         // 1. Update Meta Theme Color for Android/PWA
         let metaTheme = document.querySelector('meta[name="theme-color"]');

@@ -310,16 +310,24 @@ export const FinanceContextProvider = ({ children }) => {
     const addTransaction = useCallback(async (tx) => {
         if (!user) return;
 
-        await CloudFunctionService.commitFinancialTransaction({
+        const newTx = {
             transactionId: crypto.randomUUID(),
             accountId: tx.accountId,
             type: tx.type,
             amount: Number(tx.amount),
             categoryId: tx.categoryId,
             date: tx.date || new Date().toISOString(),
-            description: tx.note || tx.description,
-            metadata: { ...tx } // Keep other fields as metadata
-        });
+            description: tx.note || tx.description || 'Transaction',
+            createdAt: Date.now(),
+            metadata: { ...tx }
+        };
+
+        try {
+            await FirestoreService.addItem(`users/${user.uid}/transactions`, newTx);
+        } catch (error) {
+            console.error("Failed to add transaction via FirestoreService:", error);
+            throw error;
+        }
     }, [user]);
 
     const addTransfer = useCallback(async ({ amount, fromAccountId, toAccountId, note, date }) => {

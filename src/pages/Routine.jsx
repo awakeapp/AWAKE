@@ -134,10 +134,10 @@ const Routine = () => {
 
     return (
         <div className="pb-24">
-            <div className="sticky top-[60px] z-20 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md py-2 mb-6 border-b border-slate-200 dark:border-slate-800 -mx-4 px-4 transition-all duration-150">
+            <div className="sticky top-0 z-50 -mx-4 px-2 sm:px-4 bg-slate-50/90 dark:bg-[#020617]/90 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 mb-6 pt-1 transition-all duration-300">
                 <DateHeader 
-                    className="mb-0 w-full" 
-                    overviewText={`${dailyData.tasks.filter(t => t.status === 'checked').length}/${dailyData.tasks.length} Completed`}
+                    className="w-full" 
+                    overviewText={`${dailyData.tasks.filter(t => t.status === 'checked').length}/${dailyData.tasks.length}`}
                     onEditClick={() => setShowManagerModal(true)}
                     isLocked={isLocked}
                 />
