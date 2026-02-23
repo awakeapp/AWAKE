@@ -7,8 +7,10 @@ import JumpDateModal from '../components/organisms/JumpDateModal';
 import { Calendar as CalendarIcon, PieChart, AlertCircle, CheckCircle2, XCircle, TrendingUp } from 'lucide-react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const History = () => {
+    const navigate = useNavigate();
     const { dailyData } = useData();
     const { formattedDate, setDate, isToday } = useDate();
     const { user } = useAuthContext();
@@ -32,11 +34,11 @@ const History = () => {
     ];
 
     return (
-        <div className="pb-24 space-y-6 animate-in slide-in-from-right-4 duration-300">
+        <div className="pb-24 space-y-6">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <button onClick={() => window.history.back()} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex-shrink-0">
+                    <button onClick={() => navigate(-1)} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex-shrink-0">
                         <CalendarIcon className="w-6 h-6 rotate-180 hidden" />
                         <svg className="w-6 h-6 text-slate-700 dark:text-slate-300 transform rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

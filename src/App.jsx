@@ -13,10 +13,7 @@ import { RAMADAN_MODE } from './lib/featureFlags';
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
-import FullPageLoader from './components/molecules/FullPageLoader';
-import MainLayout from './components/templates/MainLayout';
-import WorkspaceLayout from './components/templates/WorkspaceLayout';
-import GlobalErrorBanner from './components/system/GlobalErrorBanner';
+
 import OnboardingModal from './components/system/OnboardingModal';
 import WelcomeSequence from './components/molecules/WelcomeSequence';
 
@@ -35,6 +32,7 @@ const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const Analytics = lazy(() => import('./pages/Analytics'));
 const DietPlan = lazy(() => import('./pages/DietPlan'));
 const About = lazy(() => import('./pages/About'));
+import ComingSoon from './pages/ComingSoon';
 
 const TaskDashboard = lazy(() => import('./pages/workspace/TaskDashboard'));
 const WorkspaceCalendar = lazy(() => import('./pages/workspace/WorkspaceCalendar'));
@@ -129,6 +127,7 @@ function App() {
                             <Route path="/routine" element={<Routine />} />
                             <Route path="/history" element={<History />} />
                             <Route path="/settings" element={<Settings />} />
+                            <Route path="/coming-soon" element={<ComingSoon />} />
                             <Route path="/profile" element={<Profile />} />
                             <Route path="/about" element={<About />} />
                             <Route path="/analytics" element={<Analytics />} />

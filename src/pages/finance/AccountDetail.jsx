@@ -47,11 +47,11 @@ const AccountDetail = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 animate-in slide-in-from-right-4">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24">
             {/* Header */}
             <div className="bg-slate-900 text-white p-6 pb-12 rounded-b-[2rem] shadow-xl">
                 <div className="flex items-center justify-between mb-6">
-                    <button onClick={() => window.history.back()} className="p-2 bg-white/10 rounded-xl hover:bg-white/20 transition-colors">
+                    <button onClick={() => navigate(-1)} className="p-2 bg-white/10 rounded-xl hover:bg-white/20 transition-colors">
                         <ArrowLeft className="w-5 h-5 text-white" />
                     </button>
                     <h1 className="text-lg font-bold leading-tight">Account Details</h1>

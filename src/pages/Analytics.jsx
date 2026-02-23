@@ -32,10 +32,10 @@ const Analytics = () => {
     }, [user, getAllHistory]);
 
     return (
-        <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
+        <div className="space-y-6">
             {/* Header */}
             <div className="flex items-center gap-3 mb-6 px-4">
-                <button onClick={() => window.history.back()} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex-shrink-0">
+                <button onClick={() => navigate(-1)} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex-shrink-0">
                     <ArrowLeft className="w-6 h-6 text-slate-700 dark:text-slate-300" />
                 </button>
                 <div>

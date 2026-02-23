@@ -93,12 +93,12 @@ const Settings = () => {
     };
 
     return (
-        <div className="pb-24 pt-4 sm:pt-8 bg-[#F2F2F7] dark:bg-black min-h-screen text-black dark:text-white font-sans animate-in slide-in-from-right-4 duration-300">
+        <div className="pb-12 pt-2 sm:pt-4 bg-[#F2F2F7] dark:bg-black min-h-screen text-black dark:text-white font-sans">
             <div className="max-w-screen-md mx-auto sm:px-4">
                 
                 {/* Header Title */}
                 <div className="px-4 flex items-center gap-3 sm:px-0 mb-4 sm:mb-6 mt-2">
-                    <button onClick={() => window.history.back()} className="p-2 -ml-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors flex-shrink-0 lg:hidden">
+                    <button onClick={() => navigate(-1)} className="p-2 -ml-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors flex-shrink-0 lg:hidden">
                         <ChevronRight className="w-6 h-6 rotate-180 text-black dark:text-white" />
                     </button>
                     <div>
@@ -108,26 +108,7 @@ const Settings = () => {
 
                 <div className="px-0 sm:px-0">
                     
-                    {/* User Profile Card - iOS Style */}
-                    <div 
-                        onClick={() => navigate('/profile')}
-                        className="bg-white dark:bg-[#1C1C1E] p-4 flex items-center gap-4 cursor-pointer active:bg-slate-100 dark:active:bg-[#2C2C2E] transition-colors mb-6 sm:mb-8 sm:rounded-xl sm:border sm:border-slate-200 sm:dark:border-[#2C2C2E] shadow-sm dark:shadow-none"
-                    >
-                        <div className="w-[60px] h-[60px] rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xl font-bold text-slate-500 dark:text-slate-300 overflow-hidden shrink-0 border border-black/5 dark:border-white/10">
-                            {user?.photoURL ? (
-                                <img src={user.photoURL} alt={user?.name} className="w-full h-full object-cover" />
-                            ) : (
-                                <span className="uppercase">{user?.initials || user?.name?.charAt(0) || 'U'}</span>
-                            )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <h2 className="text-[20px] font-semibold text-black dark:text-white leading-tight truncate">{user?.name}</h2>
-                            <p className="text-[14px] text-emerald-600 dark:text-emerald-400 font-medium mt-0.5 mt-1 border border-emerald-500/30 rounded-full px-2 py-0.5 inline-flex items-center gap-1.5 shrink-0 bg-emerald-500/10">
-                                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> Share a thought
-                            </p>
-                        </div>
-                        <ChevronRight className="w-5 h-5 text-slate-300 dark:text-[#5C5C5E] shrink-0" />
-                    </div>
+
 
                     {/* Preferences Group */}
                     <SettingsGroup>
@@ -209,14 +190,19 @@ const Settings = () => {
                             icon={HelpCircle} 
                             iconBgClass="bg-indigo-500"
                             title="Help and feedback" 
-                            onClick={() => {}}
+                            onClick={() => navigate('/coming-soon?feature=Help')}
                         />
                         <SettingsRow 
                             icon={UserPlus} 
                             iconBgClass="bg-[#34C759]"
                             title="Invite a friend" 
-                            isLast
-                            onClick={() => {}}
+                            onClick={() => navigate('/coming-soon?feature=Invite')}
+                        />
+                        <SettingsRow 
+                            icon={FileText} 
+                            iconBgClass="bg-red-500"
+                            title="Feedback" 
+                            onClick={() => navigate('/coming-soon?feature=Feedback')}
                         />
                     </SettingsGroup>
 

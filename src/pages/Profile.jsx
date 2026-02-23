@@ -134,7 +134,7 @@ const Profile = () => {
                 
                 {/* Header */}
                 <div className="px-4 flex items-center justify-between sm:px-0 mb-6 mt-2 relative">
-                    <button onClick={() => window.history.back()} className="p-2 -ml-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors flex-shrink-0 z-10 w-10">
+                    <button onClick={() => navigate(-1)} className="p-2 -ml-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors flex-shrink-0 z-10 w-10">
                         <ChevronLeft className="w-6 h-6 text-black dark:text-white" />
                     </button>
                     <h1 className="text-[17px] font-semibold tracking-tight text-black dark:text-white absolute left-0 right-0 text-center pointer-events-none">Profile</h1>
