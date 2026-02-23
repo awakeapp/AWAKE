@@ -42,7 +42,7 @@ const MainLayout = ({ children }) => {
 
     return (
         <div
-            className="min-h-screen bg-slate-50 font-sans text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors"
+            className={`min-h-screen bg-slate-50 font-sans text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors ${showHeader && !isFullBleed ? 'pt-[56px]' : ''}`}
             style={isFullBleed ? undefined : { paddingBottom: '5rem' }}
             {...swipeHandlers}
         >

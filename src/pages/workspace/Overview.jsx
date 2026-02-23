@@ -50,17 +50,20 @@ const Overview = () => {
     const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ec4899'];
 
     return (
-        <div className="space-y-8 pb-24">
-            <div className="flex items-center gap-3">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors active:scale-95 text-slate-700 dark:text-slate-300 -ml-2 focus:outline-none"
-                >
-                    <ArrowLeft className="w-6 h-6" />
-                </button>
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white leading-tight">Overview</h1>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Your productivity report & discipline tracking</p>
+        <div className="space-y-8 pb-24 pt-20">
+            {/* Fixed Header */}
+            <div className="fixed top-0 left-0 right-0 z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-transparent">
+                <div className="max-w-lg mx-auto w-full px-4 h-16 flex items-center gap-3">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors active:scale-95 text-slate-700 dark:text-slate-300 -ml-2 focus:outline-none"
+                    >
+                        <ArrowLeft className="w-6 h-6" />
+                    </button>
+                    <div>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white leading-tight">Overview</h1>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Your productivity report & discipline tracking</p>
+                    </div>
                 </div>
             </div>
 

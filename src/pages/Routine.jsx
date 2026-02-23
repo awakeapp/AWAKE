@@ -38,9 +38,11 @@ const Routine = () => {
 
     if (!dailyData || !dailyData.tasks) {
         return (
-            <div className="pb-24">
-                <div className="sticky top-[60px] z-20 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md pt-3 pb-3 mb-4 border-b border-slate-200 dark:border-slate-800 -mx-4 px-4">
-                    <DateHeader className="mb-0" />
+            <div className="pb-24 pt-20">
+                <div className="fixed top-0 left-0 right-0 z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md pt-3 pb-3 border-b border-slate-200 dark:border-slate-800">
+                    <div className="max-w-md mx-auto w-full px-4">
+                        <DateHeader className="mb-0" />
+                    </div>
                 </div>
                 <div className="flex items-center justify-center min-h-[40vh]">
                     <Loader2 className="w-8 h-8 animate-spin text-slate-300 dark:text-slate-700" />
@@ -133,14 +135,16 @@ const Routine = () => {
     };
 
     return (
-        <div className="pb-24">
-            <div className="sticky top-0 z-50 -mx-4 px-2 sm:px-4 bg-slate-50/90 dark:bg-[#020617]/90 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 mb-6 pt-1 transition-all duration-300">
-                <DateHeader 
-                    className="w-full" 
-                    overviewText={`${dailyData.tasks.filter(t => t.status === 'checked').length}/${dailyData.tasks.length}`}
-                    onEditClick={() => setShowManagerModal(true)}
-                    isLocked={isLocked}
-                />
+        <div className="pb-24 pt-[4rem]">
+            <div className="fixed top-0 left-0 right-0 z-40 bg-slate-50/90 dark:bg-[#020617]/90 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 pt-1 pb-2 transition-all duration-300">
+                <div className="max-w-md mx-auto w-full px-4">
+                    <DateHeader 
+                        className="w-full" 
+                        overviewText={`${dailyData.tasks.filter(t => t.status === 'checked').length}/${dailyData.tasks.length}`}
+                        onEditClick={() => setShowManagerModal(true)}
+                        isLocked={isLocked}
+                    />
+                </div>
             </div>
 
             <div className="space-y-6">
