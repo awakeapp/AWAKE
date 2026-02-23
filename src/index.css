@@ -42,6 +42,14 @@
     @apply bg-slate-50 text-slate-900 antialiased dark:bg-primary-950 dark:text-slate-50;
     padding-top: env(safe-area-inset-top);
   }
+
+  /* Global fix: eliminate 300ms tap delay on all interactive elements */
+  button,
+  a,
+  [role="button"] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
 /* Global Theme Transition: Only active during switch to preserve hover speeds */
