@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRamadan } from '../../context/RamadanContext';
+import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, Circle, Edit3, Settings } from 'lucide-react';
 import clsx from 'clsx';
 import NotificationSettings from '../../components/ramadan/NotificationSettings';
-import RamadanSettingsModal from '../../components/ramadan/RamadanSettingsModal';
 import PrayerTracker from '../../components/ramadan/PrayerTracker';
 
 const FastingTracker = ({ todayKey, ramadanData, updateDay }) => {
@@ -173,9 +173,9 @@ const NightPrayersTracker = ({ todayKey, ramadanData, updateDay }) => {
 };
 
 const RamadanDashboard = () => {
+    const navigate = useNavigate();
     const { loading, error, prayerTimes, hijriDate, location, requestLocation, ramadanData, updateRamadanDay } = useRamadan();
     const [now, setNow] = useState(new Date());
-    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     useEffect(() => {
         const timer = setInterval(() => setNow(new Date()), 1000);
@@ -242,7 +242,7 @@ const RamadanDashboard = () => {
             <header className="px-4 sm:px-0 flex items-center justify-between mb-6">
                 <h1 className="text-[28px] font-bold tracking-tight text-black dark:text-white">Ramadan</h1>
                 <button 
-                    onClick={() => setIsSettingsOpen(true)}
+                    onClick={() => navigate('/ramadan/settings')}
                     className="p-2 -mr-2 text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors"
                 >
                     <Settings className="w-6 h-6" />
@@ -320,11 +320,6 @@ const RamadanDashboard = () => {
             )}
             
             </div>
-
-            <RamadanSettingsModal 
-                isOpen={isSettingsOpen} 
-                onClose={() => setIsSettingsOpen(false)} 
-            />
         </div>
     );
 };

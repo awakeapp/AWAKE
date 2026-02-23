@@ -45,17 +45,17 @@ export function AppModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.15 }}
             onClick={onClose}
             className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
           />
 
           {/* Modal Panel - iOS Spring Feel */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.98, y: 10 }}
+            initial={{ opacity: 0, scale: 0.99, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98, y: 10 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            exit={{ opacity: 0, scale: 0.99, y: 10 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
             className={cn(
               "relative w-full overflow-hidden flex flex-col max-h-[90vh]",
               "bg-surface dark:bg-surface-dark border border-slate-100 dark:border-slate-800",
