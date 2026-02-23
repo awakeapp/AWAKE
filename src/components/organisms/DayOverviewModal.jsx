@@ -28,7 +28,7 @@ const DayOverviewModal = ({ isOpen, onClose, data, onConfirm }) => {
                     initial={{ y: "100%", opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: "100%", opacity: 0 }}
-                    transition={{ duration: 0.25, ease: "easeOut" }}
+                    transition={{ duration: 0.15, ease: "easeOut" }}
                     className="w-full sm:max-w-md bg-white/95 dark:bg-slate-950/95 backdrop-blur-3xl rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl overflow-hidden ring-1 ring-black/5 dark:ring-white/10"
                 >
                     <div className="p-8">

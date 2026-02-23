@@ -59,7 +59,7 @@ const WorkspaceLayout = ({ children }) => {
                             initial={{ x: '100%' }}
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
-                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            transition={{ duration: 0.15, ease: "easeOut" }}
                             className="fixed inset-y-0 right-0 z-50 w-80 bg-white dark:bg-slate-900 shadow-2xl flex flex-col h-full border-l border-slate-100 dark:border-slate-800"
                         >
                             {/* Drawer Header */}

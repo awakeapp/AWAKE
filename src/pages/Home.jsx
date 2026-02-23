@@ -104,7 +104,7 @@ const Home = () => {
             {RAMADAN_MODE && (
                 <div
                     onClick={() => navigate('/ramadan')}
-                    className="w-full bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800 rounded-3xl p-5 shadow-lg shadow-indigo-500/25 active:opacity-90 transition-opacity cursor-pointer relative overflow-hidden"
+                    className="w-full bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800 rounded-3xl p-5 shadow-lg shadow-indigo-500/25 active:from-indigo-700 active:to-violet-900 transition-colors duration-75 cursor-pointer relative overflow-hidden"
                 >
                     {/* Glow background orbs */}
                     <div className="absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full blur-2xl" />
@@ -138,7 +138,7 @@ const Home = () => {
             {/* Routine Summary Card */}
             <div 
                 onClick={() => navigate('/routine')}
-                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm relative overflow-hidden active:opacity-80 transition-opacity cursor-pointer group"
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm relative overflow-hidden active:bg-slate-50 dark:active:bg-slate-800/80 transition-colors duration-75 cursor-pointer group"
             >
                 <div 
                     className="absolute bottom-0 left-0 h-1 bg-indigo-500/20 transition-all duration-1000"
@@ -171,7 +171,7 @@ const Home = () => {
                 {/* Tasks */}
                 <div 
                     onClick={() => navigate('/workspace')} 
-                    className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-2xl p-4 flex flex-col justify-between h-32 active:opacity-80 transition-opacity cursor-pointer"
+                    className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-2xl p-4 flex flex-col justify-between h-32 active:bg-blue-100/50 dark:active:bg-blue-900/30 transition-colors duration-75 cursor-pointer"
                 >
                     <div className="flex items-start justify-between">
                          <div className="p-2 bg-white dark:bg-slate-900/50 rounded-xl text-blue-500 shadow-sm">
@@ -192,7 +192,7 @@ const Home = () => {
                 {/* Finance Summary */}
                 <div 
                     onClick={() => navigate('/finance')}
-                    className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl p-4 flex flex-col justify-between h-32 active:opacity-80 transition-opacity cursor-pointer"
+                    className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl p-4 flex flex-col justify-between h-32 active:bg-emerald-100/50 dark:active:bg-emerald-900/30 transition-colors duration-75 cursor-pointer"
                 >
                     <div className="flex items-start justify-between">
                         <div className="p-2 bg-white dark:bg-slate-900/50 rounded-xl text-emerald-500 shadow-sm">
@@ -214,7 +214,7 @@ const Home = () => {
             {/* Minimal Quick Action Bar -> Two Buttons */}
             <div className="grid grid-cols-2 gap-3">
                 <div 
-                    className="bg-slate-900 dark:bg-white rounded-2xl p-4 flex flex-col justify-between cursor-pointer active:opacity-80 transition-opacity shadow-lg shadow-slate-900/10 dark:shadow-white/5 h-28"
+                    className="bg-slate-900 dark:bg-white rounded-2xl p-4 flex flex-col justify-between cursor-pointer active:bg-slate-800 dark:active:bg-slate-100 transition-colors duration-75 shadow-lg shadow-slate-900/10 dark:shadow-white/5 h-28"
                     onClick={() => setIsFuelModalOpen(true)}
                 >
                     <div className="flex items-start justify-between">
@@ -232,7 +232,7 @@ const Home = () => {
                 </div>
 
                 <div 
-                    className="bg-emerald-600 dark:bg-emerald-500 rounded-2xl p-4 flex flex-col justify-between cursor-pointer active:opacity-80 transition-opacity flex-1 shadow-lg shadow-emerald-500/20 h-28"
+                    className="bg-emerald-600 dark:bg-emerald-500 rounded-2xl p-4 flex flex-col justify-between cursor-pointer active:bg-emerald-700 dark:active:bg-emerald-600 transition-colors duration-75 flex-1 shadow-lg shadow-emerald-500/20 h-28"
                     onClick={() => setIsFinanceModalOpen(true)}
                 >
                     <div className="flex items-start justify-between">

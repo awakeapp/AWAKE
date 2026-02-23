@@ -71,7 +71,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                         initial={{ x: '100%' }}
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
-                        transition={{ duration: 0.25, ease: 'easeOut', type: 'tween' }}
+                        transition={{ duration: 0.15, ease: 'easeOut', type: 'tween' }}
                         className="fixed inset-y-0 right-0 z-[60] w-[85%] max-w-sm bg-[#F2F2F7] dark:bg-black shadow-2xl flex flex-col font-sans"
                     >
                         {/* Header */}

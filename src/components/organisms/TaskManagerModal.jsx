@@ -144,7 +144,7 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
                     initial={{ opacity: 0, scale: 0.95, y: 10 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                    transition={{ duration: 0.25, ease: "easeOut" }}
+                    transition={{ duration: 0.15, ease: "easeOut" }}
                     className="w-full max-w-lg bg-white dark:bg-slate-950 rounded-[2rem] shadow-2xl shadow-slate-200/50 dark:shadow-black/50 overflow-hidden flex flex-col max-h-[75vh] ring-1 ring-slate-100 dark:ring-slate-800"
                 >
                     {/* Header */}
