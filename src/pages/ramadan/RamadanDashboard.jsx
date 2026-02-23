@@ -4,6 +4,7 @@ import { CheckCircle2, Circle, Edit3, Settings } from 'lucide-react';
 import clsx from 'clsx';
 import NotificationSettings from '../../components/ramadan/NotificationSettings';
 import RamadanSettingsModal from '../../components/ramadan/RamadanSettingsModal';
+import PrayerTracker from '../../components/ramadan/PrayerTracker';
 
 const FastingTracker = ({ todayKey, ramadanData, updateDay }) => {
     const todayData = ramadanData?.days?.[todayKey] || {};
@@ -307,28 +308,15 @@ const RamadanDashboard = () => {
                 </div>
             )}
 
-            {/* Fasting Tracker Section */
-             isRamadanActive && (
-                 <FastingTracker 
-                    todayKey={now.toLocaleDateString('en-CA')} 
-                    ramadanData={ramadanData} 
-                    updateDay={updateRamadanDay} 
-                 />
-             )}
+            {/* Full Prayer Tracker (Daily + Night) */}
+            {isRamadanActive && (
+                <PrayerTracker />
+            )}
 
-            {/* Night Prayers Tracker Section */
-             isRamadanActive && (
-                 <NightPrayersTracker 
-                    todayKey={now.toLocaleDateString('en-CA')} 
-                    ramadanData={ramadanData} 
-                    updateDay={updateRamadanDay} 
-                 />
-             )}
-
-            {/* Notification Reminders Section */
-             isRamadanActive && (
-                 <NotificationSettings />
-             )}
+            {/* Notification Reminders Section */}
+            {isRamadanActive && (
+                <NotificationSettings />
+            )}
 
             {!isRamadanActive && (
                 <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-500/20 rounded p-4 text-center text-amber-800 dark:text-amber-200 text-sm">

@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, History, PieChart, Settings, Info, Utensils, ChevronRight, CalendarDays } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../hooks/useAuthContext';
 
 import { useState } from 'react';
@@ -10,6 +10,7 @@ import clsx from 'clsx';
 
 const SideMenu = ({ isOpen, onClose }) => {
     const { user } = useAuthContext();
+    const navigate = useNavigate();
     const [isJumpModalOpen, setIsJumpModalOpen] = useState(false);
     const { t } = useTranslation();
 
@@ -24,64 +25,63 @@ const SideMenu = ({ isOpen, onClose }) => {
         { icon: Utensils, label: t('nav.diet_planner', 'Diet Planner'), path: '/diet' },
     ];
 
-    const MenuRow = ({ item, isLast, onClick, isButton = false }) => {
-        const Content = (
-            <div className={clsx(
-                "flex items-center min-h-[44px] sm:min-h-[50px] bg-white dark:bg-[#1C1C1E] active:bg-slate-100 dark:active:bg-[#2C2C2E] transition-colors ml-4 pr-4",
-                !isLast && "border-b border-slate-200 dark:border-[#38383A]"
-            )}>
-                <div className="flex items-center gap-3.5 py-2.5 flex-1 min-w-0">
-                    <div className={clsx(
-                        "w-[30px] h-[30px] rounded-lg shrink-0 flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
-                    )}>
-                        <item.icon strokeWidth={2} className="w-[18px] h-[18px]" />
-                    </div>
-                    <span className="text-[16px] xl:text-[17px] text-black dark:text-white leading-tight font-medium truncate">{item.label}</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-slate-300 dark:text-[#5C5C5E] shrink-0 ml-2 relative top-[1px]" />
-            </div>
-        );
-
-        if (isButton) {
-            return (
-                <button onClick={onClick} className="w-full text-left border-none outline-none">
-                    {Content}
-                </button>
-            );
-        }
-
-        return (
-            <Link to={item.path} onClick={onClick} className="block w-full">
-                {Content}
-            </Link>
-        );
+    // Navigate then close — avoids Link's own click-to-navigate overhead and race conditions
+    const handleNavigate = (path) => {
+        onClose();
+        navigate(path);
     };
+
+    // Pure button row — no Link wrapper that could race with navigation
+    const MenuRow = ({ item, isLast, onTap }) => (
+        <button
+            onClick={onTap}
+            // touch-action: manipulation removes 300ms iOS tap delay in PWA/WebView
+            style={{ touchAction: 'manipulation' }}
+            className={clsx(
+                "w-full text-left border-none outline-none bg-transparent",
+                "flex items-center min-h-[50px] sm:min-h-[54px] active:bg-slate-100 dark:active:bg-[#2C2C2E] transition-colors ml-4 pr-4",
+                !isLast && "border-b border-slate-200 dark:border-[#38383A]"
+            )}
+        >
+            <div className="flex items-center gap-3.5 py-2.5 flex-1 min-w-0">
+                <div className="w-[30px] h-[30px] rounded-lg shrink-0 flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                    <item.icon strokeWidth={2} className="w-[18px] h-[18px]" />
+                </div>
+                <span className="text-[16px] xl:text-[17px] text-black dark:text-white leading-tight font-medium truncate">{item.label}</span>
+            </div>
+            <ChevronRight className="w-5 h-5 text-slate-300 dark:text-[#5C5C5E] shrink-0 ml-2 relative top-[1px]" />
+        </button>
+    );
 
     return (
         <AnimatePresence>
             {isOpen && (
                 <>
-                    {/* Backdrop */}
+                    {/* Backdrop — z-[59]: strictly BELOW the drawer so taps never get intercepted here */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
+                        className="fixed inset-0 z-[59] bg-black/40 backdrop-blur-sm"
                     />
 
-                    {/* Drawer */}
+                    {/* Drawer — z-[60]: strictly ABOVE backdrop, clicks always land inside here */}
                     <motion.div
                         initial={{ x: '100%' }}
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
                         transition={{ duration: 0.25, ease: 'easeOut', type: 'tween' }}
-                        className="fixed inset-y-0 right-0 z-50 w-[85%] max-w-sm bg-[#F2F2F7] dark:bg-black shadow-2xl flex flex-col font-sans"
+                        className="fixed inset-y-0 right-0 z-[60] w-[85%] max-w-sm bg-[#F2F2F7] dark:bg-black shadow-2xl flex flex-col font-sans"
                     >
                         {/* Header */}
                         <div className="p-4 pt-6 flex items-center justify-between mt-2">
                             <h2 className="text-[22px] font-bold tracking-tight text-black dark:text-white ml-2">{t('common.menu', 'Menu')}</h2>
-                            <button onClick={onClose} className="p-2 bg-slate-200 dark:bg-[#2C2C2E] rounded-full text-slate-500 dark:text-[#8E8E93] active:opacity-70 transition-opacity mr-1">
+                            <button
+                                onClick={onClose}
+                                style={{ touchAction: 'manipulation' }}
+                                className="p-2 bg-slate-200 dark:bg-[#2C2C2E] rounded-full text-slate-500 dark:text-[#8E8E93] active:opacity-70 transition-opacity mr-1"
+                            >
                                 <X className="w-5 h-5" strokeWidth={2.5} />
                             </button>
                         </div>
@@ -95,7 +95,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                                     <MenuRow
                                         key={item.path}
                                         item={item}
-                                        onClick={onClose}
+                                        onTap={() => handleNavigate(item.path)}
                                         isLast={idx === menuItems.length - 1}
                                     />
                                 ))}
@@ -105,8 +105,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                             <div className="bg-white dark:bg-[#1C1C1E] rounded-xl overflow-hidden shadow-sm dark:shadow-none border border-slate-200 dark:border-[#2C2C2E]">
                                 <MenuRow
                                     item={{ icon: CalendarDays, label: t('date.jump_to_date', 'Jump to Date') }}
-                                    isButton
-                                    onClick={() => setIsJumpModalOpen(true)}
+                                    onTap={() => setIsJumpModalOpen(true)}
                                     isLast
                                 />
                                 {isJumpModalOpen && (
@@ -130,7 +129,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                                         <MenuRow
                                             key={item.path}
                                             item={item}
-                                            onClick={onClose}
+                                            onTap={() => handleNavigate(item.path)}
                                             isLast={idx === toolItems.length - 1}
                                         />
                                     ))}

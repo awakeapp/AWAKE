@@ -72,6 +72,14 @@ const RamadanStats = () => {
     const totalQuranCount = daysLog.reduce((sum, d) => sum + (goalData.type === 'juz' ? (d.quranJuz || 0) : (d.quranPages || 0)), 0);
     const quranPercent = goalData.value > 0 ? (totalQuranCount / goalData.value) * 100 : 0;
 
+    // Compute 5 Daily Prayers completion (Fajr+Dhuhr+Asr+Maghrib+Isha)
+    const DAILY_PRAYERS = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+    const totalPossiblePrayers = currentDay * DAILY_PRAYERS.length;
+    const totalCompletedPrayers = daysLog.reduce((sum, d) =>
+        sum + DAILY_PRAYERS.filter(p => d[p]).length, 0
+    );
+    const prayerPercent = totalPossiblePrayers > 0 ? (totalCompletedPrayers / totalPossiblePrayers) * 100 : 0;
+
     // Compute Total Dhikr
     const totalTahlil = daysLog.reduce((sum, d) => sum + (d.tahlil || 0), 0);
     const totalSalawat = daysLog.reduce((sum, d) => sum + (d.salawat || 0), 0);
@@ -112,6 +120,15 @@ const RamadanStats = () => {
                     percent={fastingPercent} 
                     colorClass="bg-emerald-500" 
                     textClass="text-emerald-500"
+                />
+                <StatCard 
+                    title="Daily Prayers" 
+                    icon={CheckCircle2} 
+                    value={totalCompletedPrayers} 
+                    target={totalPossiblePrayers} 
+                    percent={prayerPercent} 
+                    colorClass="bg-blue-500" 
+                    textClass="text-blue-500"
                 />
                 <StatCard 
                     title="Taraweeh Completed" 

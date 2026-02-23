@@ -11,6 +11,7 @@ import clsx from 'clsx';
 import QuickActionModal from '../components/organisms/QuickActionModal';
 import MotivationBanner from '../components/organisms/MotivationBanner';
 import { useTranslation } from 'react-i18next';
+import { RAMADAN_MODE } from '../lib/featureFlags';
 
 const Home = () => {
     const { user } = useAuthContext();
@@ -96,35 +97,37 @@ const Home = () => {
                 <MotivationBanner />
             </div>
 
-            {/* Ramadan Tracker Widget */}
-            {!ramadanLoading && isRamadanActive && (
-                <div 
+            {/* Ramadan Tracker Entry Card — only when RAMADAN_MODE=true */}
+            {RAMADAN_MODE && (
+                <div
                     onClick={() => navigate('/ramadan')}
-                    className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/50 rounded-3xl p-5 shadow-sm active:opacity-80 transition-opacity cursor-pointer relative overflow-hidden"
+                    className="w-full bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800 rounded-3xl p-5 shadow-lg shadow-indigo-500/25 active:opacity-90 transition-opacity cursor-pointer relative overflow-hidden"
                 >
-                    {/* Background embellishment */}
-                    <Moon className="absolute -right-4 -bottom-4 w-24 h-24 text-indigo-500/5 rotate-[-15deg]" />
-                    
+                    {/* Glow background orbs */}
+                    <div className="absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full blur-2xl" />
+                    <div className="absolute -left-4 -bottom-6 w-20 h-20 bg-violet-400/20 rounded-full blur-xl" />
+
                     <div className="flex items-center justify-between relative z-10">
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-indigo-500 text-white flex items-center justify-center shadow-md shadow-indigo-500/30">
-                                <Moon className="w-6 h-6 fill-current" />
+                            <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-inner">
+                                <Moon className="w-6 h-6 text-white fill-white/30" />
                             </div>
                             <div>
-                                <div className="text-xs font-medium text-indigo-500 dark:text-indigo-400 uppercase tracking-wider mb-1">
-                                    Day {hijriDate?.day} Ramadan
-                                </div>
-                                <div className="flex items-end gap-2 text-indigo-900 dark:text-indigo-100">
-                                    <span className="text-xl font-semibold leading-none tabular-nums tracking-tight">{countdownStr}</span>
-                                </div>
+                                <p className="text-[11px] font-semibold text-indigo-200 uppercase tracking-widest mb-0.5">Ramadan Hub</p>
+                                {isRamadanActive ? (
+                                    <>
+                                        <p className="text-[13px] font-medium text-indigo-100">Day {hijriDate?.day} · {nextEvent}</p>
+                                        <p className="text-[22px] font-bold text-white tabular-nums leading-tight">{countdownStr}</p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <p className="text-[15px] font-semibold text-white leading-tight">Track Fasting &amp; Worship</p>
+                                        <p className="text-[12px] text-indigo-200">Prayers · Dhikr · Stats</p>
+                                    </>
+                                )}
                             </div>
                         </div>
-                        <div className="flex flex-col items-end">
-                            <span className="text-xs font-medium text-indigo-500/80 mb-1">{nextEvent}</span>
-                            <div className="p-1 px-3 bg-white dark:bg-indigo-950 rounded-lg text-xs font-medium text-indigo-600 shadow-sm flex items-center gap-1">
-                                Hub <ChevronRight className="w-3 h-3" />
-                            </div>
-                        </div>
+                        <ChevronRight className="w-5 h-5 text-white/60 shrink-0" />
                     </div>
                 </div>
             )}
