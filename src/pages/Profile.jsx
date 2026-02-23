@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useLogout } from '../hooks/useLogout';
-import { Lock, Edit2, Check, X, Download, ShieldCheck, LogOut, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Lock, Edit2, Check, X, Download, ShieldCheck, LogOut, ChevronRight, ChevronLeft, ArrowLeft } from 'lucide-react';
 import { getReportData, generateUserReportPDF } from '../utils/reportUtils';
 import EditProfileModal from '../components/organisms/EditProfileModal';
 import DataExportSection from '../components/organisms/DataExportSection';
@@ -10,7 +10,7 @@ import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 
 import { auth } from '../lib/firebase';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import BackButton from '../components/atoms/BackButton';
+
 
 // Shared Row Component matching new style
 const ProfileRow = ({ title, value, onClick, className, isDefaultActions, isDanger, isAction }) => (
@@ -136,7 +136,12 @@ const Profile = () => {
                 {/* Header */}
                 <div className="px-4 flex items-center justify-between sm:px-0 mb-6 mt-2 relative">
                     <div className="w-10 z-10 flex items-center justify-center -ml-2">
-                        <BackButton className="bg-transparent hover:bg-black/5 dark:bg-transparent dark:hover:bg-white/10 text-black dark:text-white" />
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="p-2 bg-transparent hover:bg-black/5 dark:bg-transparent dark:hover:bg-white/10 rounded-full transition-colors active:scale-95 text-black dark:text-white focus:outline-none"
+                        >
+                            <ArrowLeft className="w-6 h-6" />
+                        </button>
                     </div>
                     <h1 className="text-[17px] font-semibold tracking-tight text-black dark:text-white absolute left-0 right-0 text-center pointer-events-none">Profile</h1>
                     <div className="w-10"></div> {/* Spacer for symmetry */}

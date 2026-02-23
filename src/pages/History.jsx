@@ -8,7 +8,7 @@ import { Calendar as CalendarIcon, PieChart, AlertCircle, CheckCircle2, XCircle,
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import BackButton from '../components/atoms/BackButton';
+import { ArrowLeft } from 'lucide-react';
 
 const History = () => {
     const navigate = useNavigate();
@@ -39,7 +39,12 @@ const History = () => {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <BackButton className="bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 -ml-2" />
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors active:scale-95 text-slate-700 dark:text-slate-300 -ml-2 focus:outline-none"
+                    >
+                        <ArrowLeft className="w-6 h-6" />
+                    </button>
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">Report History</h2>
                 </div>
                 <button

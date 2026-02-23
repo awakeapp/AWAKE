@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Utensils, Droplets, Flame, RotateCcw, ChevronDown, ChevronUp, Heart, AlertCircle, Activity, Info } from 'lucide-react';
+import { Utensils, Droplets, Flame, RotateCcw, ChevronDown, ChevronUp, Heart, AlertCircle, Activity, Info, ArrowLeft } from 'lucide-react';
 import Button from '../components/atoms/Button';
 import { calculateTDEE, generatePlan, RECOMMENDED_FOODS, FOODS_TO_AVOID } from '../utils/dietUtils';
 import { useNavigate } from 'react-router-dom';
@@ -74,10 +74,18 @@ const DietPlan = () => {
         <div className="min-h-screen bg-slate-50 dark:bg-slate-900 pb-20">
             {/* Header */}
             <div className="bg-white dark:bg-slate-800 shadow-sm p-4 sticky top-0 z-10 flex items-center gap-3">
-                <BackButton 
-                    onClick={() => step === 'plan' ? setStep('input') : navigate(-1)} 
-                    className="bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 -ml-2" 
-                />
+                <button
+                    onClick={() => {
+                        if (step === 'plan') {
+                            setStep('input');
+                        } else {
+                            navigate(-1);
+                        }
+                    }}
+                    className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors active:scale-95 text-slate-700 dark:text-slate-300 -ml-2 focus:outline-none"
+                >
+                    <ArrowLeft className="w-6 h-6" />
+                </button>
                 <h1 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">Diet Plan Manager</h1>
             </div>
 

@@ -1,11 +1,13 @@
 import React from 'react';
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import BackButton from '../atoms/BackButton';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 
 function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
+
 export function AppHeader({ 
   title, 
   leftNode, 
@@ -14,6 +16,23 @@ export function AppHeader({
   onBack,
   className 
 }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleBack = (e) => {
+      if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+      }
+
+      if (onBack) {
+          onBack(e);
+          return;
+      }
+
+      navigate(-1);
+  };
+
   return (
     <header
       className={cn(
@@ -30,7 +49,12 @@ export function AppHeader({
       <div className="flex-1 flex justify-start items-center">
         {showBack ? (
           <div className="-ml-2">
-            <BackButton onClick={onBack} className="bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 text-primary-600 dark:text-primary-400" />
+            <button
+                onClick={handleBack}
+                className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors active:scale-95 text-primary-600 dark:text-primary-400 focus:outline-none"
+            >
+                <ArrowLeft className="w-6 h-6" />
+            </button>
           </div>
         ) : (
           leftNode

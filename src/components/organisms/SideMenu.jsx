@@ -130,7 +130,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                                         <MenuRow
                                             key={item.path}
                                             item={item}
-                                            onclicks={() => handleNavigate(item.path)}
+                                            onTap={() => handleNavigate(item.path)}
                                             isLast={idx === toolItems.length - 1}
                                         />
                                     ))}

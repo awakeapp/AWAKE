@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { User, Moon, Sun, Clock, ChevronRight, Download, ShieldCheck, HelpCircle, UserPlus, FileText } from 'lucide-react';
+import { User, Moon, Sun, Clock, ChevronRight, Download, ShieldCheck, HelpCircle, UserPlus, FileText, ArrowLeft } from 'lucide-react';
 import { FirestoreService } from '../services/firestore-service';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import BackButton from '../components/atoms/BackButton';
+
 
 // Shared Row Component matching iOS style
 const SettingsRow = ({ icon: Icon, title, subtitle, right, onClick, className, isLast, iconBgClass }) => (
@@ -99,7 +99,12 @@ const Settings = () => {
                 
                 {/* Header Title */}
                 <div className="px-4 flex items-center gap-3 sm:px-0 mb-4 sm:mb-6 mt-2">
-                    <BackButton className="bg-transparent hover:bg-black/5 dark:bg-transparent dark:hover:bg-white/10 text-black dark:text-white lg:hidden -ml-2" />
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="p-2 bg-transparent hover:bg-black/5 dark:bg-transparent dark:hover:bg-white/10 rounded-full transition-colors active:scale-95 text-black dark:text-white lg:hidden -ml-2 focus:outline-none"
+                    >
+                        <ArrowLeft className="w-6 h-6" />
+                    </button>
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight text-black dark:text-white">{t('nav.settings', 'Settings')}</h1>
                     </div>

@@ -1,13 +1,15 @@
-import { useParams, useNavigate } from 'react-router-dom';
+
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { Archive, RefreshCw, Save, History, TrendingUp, TrendingDown, ArrowRightLeft } from 'lucide-react';
-import BackButton from '../../components/atoms/BackButton';
+import { Archive, ArrowLeft, Edit2, Trash2, Calendar, FileText, TrendingUp, Save, Wallet, History, TrendingDown, ArrowRightLeft } from 'lucide-react';
+
 import { useState, useMemo } from 'react';
 import { format } from 'date-fns';
 
 const AccountDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const { accounts, transactions, updateAccount, toggleArchiveAccount, categories } = useFinance();
 
     const account = accounts.find(a => a.id === id);
@@ -52,8 +54,15 @@ const AccountDetail = () => {
             {/* Header */}
             <div className="bg-slate-900 text-white p-6 pb-12 rounded-b-[2rem] shadow-xl">
                 <div className="flex items-center justify-between mb-6">
-                    <BackButton className="bg-transparent hover:bg-white/20 text-white -ml-2" />
-                    <h1 className="text-lg font-bold leading-tight">Account Details</h1>
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors active:scale-95 text-white -ml-2 focus:outline-none"
+                        >
+                            <ArrowLeft className="w-6 h-6" />
+                        </button>
+                        <h1 className="text-xl font-bold text-white leading-tight">Account Detail</h1>
+                    </div>
                     <button
                         onClick={handleArchiveClick}
                         className={`p-2 rounded-xl transition-all duration-300 flex items-center gap-2 ${showArchiveConfirm
