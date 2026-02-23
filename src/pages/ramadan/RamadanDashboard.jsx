@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRamadan } from '../../context/RamadanContext';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, Circle, Edit3, Settings } from 'lucide-react';
+import { CheckCircle2, Circle, Edit3, Settings, MapPin } from 'lucide-react';
 import clsx from 'clsx';
 import NotificationSettings from '../../components/ramadan/NotificationSettings';
 import PrayerTracker from '../../components/ramadan/PrayerTracker';
+import RamadanImageSlider from '../../components/ramadan/RamadanImageSlider';
 
 const FastingTracker = ({ todayKey, ramadanData, updateDay }) => {
     const todayData = ramadanData?.days?.[todayKey] || {};
@@ -176,11 +177,46 @@ const RamadanDashboard = () => {
     const navigate = useNavigate();
     const { loading, error, prayerTimes, hijriDate, location, requestLocation, ramadanData, updateRamadanDay } = useRamadan();
     const [now, setNow] = useState(new Date());
+    const [resolvedLocation, setResolvedLocation] = useState('');
 
     useEffect(() => {
         const timer = setInterval(() => setNow(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
+
+    // Fetch formatted location for the top widget
+    useEffect(() => {
+        if (!location?.lat || !location?.lng) return;
+        
+        const cacheKey = `location_${location.lat}_${location.lng}`;
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+            setResolvedLocation(cached);
+            return;
+        }
+
+        // Silent reverse geocode if not cached
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.lat}&lon=${location.lng}&zoom=18&addressdetails=1`)
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.address) {
+                    const addr = data.address;
+                    const locality = addr.suburb || addr.neighbourhood || addr.residential || addr.village || addr.town || addr.city_district || '';
+                    const city = addr.city || addr.town || addr.county || '';
+                    const state = addr.state || '';
+                    
+                    const parts = [locality, city, state].filter(p => p && p.trim() !== '');
+                    const uniqueParts = parts.filter((item, pos, arr) => pos === 0 || item !== arr[pos - 1]);
+                    
+                    const resolvedName = uniqueParts.join(', ');
+                    if (resolvedName) {
+                        setResolvedLocation(resolvedName);
+                        localStorage.setItem(cacheKey, resolvedName);
+                    }
+                }
+            })
+            .catch(() => {}); // silent fail, keep blank
+    }, [location?.lat, location?.lng]);
 
     if (loading) {
         return <div className="p-4 text-center mt-16 text-slate-500 animate-pulse">Initializing Ramadan Hub...</div>;
@@ -266,23 +302,33 @@ const RamadanDashboard = () => {
                 </div>
             )}
             
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl p-6 shadow-sm overflow-hidden relative">
-                 <div className="relative z-10">
-                     <div className="flex justify-between items-center mb-6">
+            <div className="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl shadow-xl overflow-hidden relative min-h-[220px] sm:min-h-[260px] flex flex-col justify-between">
+                 {/* Cinematic Image Slider Background */}
+                 <RamadanImageSlider />
+
+                 <div className="relative z-20 p-6 sm:p-8 flex-1 flex flex-col justify-between">
+                     <div className="flex justify-between items-start mb-6">
                         <div>
-                            <span className="bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full text-[11px] font-semibold tracking-wider uppercase">
+                            <span className="bg-white/10 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-[11px] font-bold tracking-wider uppercase border border-white/10 shadow-sm">
                                 {isRamadanActive ? `Day ${hijriDate.day}` : 'Pre-Ramadan'}
                             </span>
                         </div>
                         <div className="text-right">
-                             <p className="font-semibold text-black dark:text-white text-[15px]">{hijriDate?.day} Ramadan {hijriDate?.year}</p>
-                             <p className="text-slate-500 text-[13px] mt-0.5">{now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
+                             <p className="font-semibold text-white text-[16px] drop-shadow-md">{hijriDate?.day} Ramadan {hijriDate?.year}</p>
+                             <p className="text-slate-300 text-[13px] mt-0.5 drop-shadow-md">{now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
+                             {resolvedLocation && (
+                                <p className="text-slate-400 text-[11px] mt-1.5 font-medium flex items-center justify-end gap-1 drop-shadow-md">
+                                    <MapPin className="w-3 h-3" />
+                                    {resolvedLocation}
+                                </p>
+                             )}
                         </div>
                      </div>
 
-                     <div className="mt-8 text-center pb-2">
-                         <p className="text-slate-500 uppercase tracking-wider text-xs font-bold mb-2">{nextEvent}</p>
-                         <div className="text-4xl sm:text-5xl font-bold tabular-nums tracking-tight text-slate-900 dark:text-white">
+                     <div className="mt-auto text-center pb-2">
+                         <p className="text-slate-300 uppercase tracking-widest text-[11px] sm:text-xs font-bold mb-2 drop-shadow-md">{nextEvent}</p>
+                         {/* Massive tabular countdown timer */}
+                         <div className="text-5xl sm:text-7xl font-bold tabular-nums tracking-tighter text-white drop-shadow-lg">
                              {countdownStr}
                          </div>
                      </div>
