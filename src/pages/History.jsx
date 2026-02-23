@@ -13,37 +13,6 @@ const History = () => {
     const { formattedDate, setDate, isToday } = useDate();
     const { user } = useAuthContext();
     const [showJumpModal, setShowJumpModal] = useState(false);
-    const [streakData, setStreakData] = useState([]);
-
-    // --- Streak Logic (Last 30 Days) ---
-    // --- Streak Logic (Last 30 Days) ---
-    const { getHistory } = useData();
-
-    useEffect(() => {
-        const historyData = getHistory(30);
-        // Map to format expected by UI
-        const mapped = historyData.map(day => {
-            let status = 'none';
-            if (day.score === 100) status = 'perfect';
-            else if (day.score >= 50) status = 'good';
-            else if (day.score > 0) status = 'partial';
-            else if (day.data && day.data.tasks) status = 'empty'; // Was accessed but no completion
-
-            // Format format:
-            // "keyDate" for logic (YYYY-MM-DD from getHistory)
-            // "date" object for UI
-            const parts = day.date.split('-');
-            const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
-
-            return {
-                date: dateObj,
-                keyDate: day.date,
-                status,
-                score: day.score
-            };
-        });
-        setStreakData(mapped);
-    }, [dailyData]); // Re-run if today's data changes
 
     // --- Report Calculations ---
     const totalTasks = dailyData.tasks?.length || 0;
@@ -73,41 +42,6 @@ const History = () => {
                 >
                     <CalendarIcon className="w-5 h-5" />
                 </button>
-            </div>
-
-            {/* Streak Tape */}
-            <div className="overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
-                <div className="flex gap-3 w-max">
-                    {streakData.map((day) => {
-                        const isSelected = day.keyDate === formattedDate;
-                        return (
-                            <button
-                                key={day.keyDate}
-                                onClick={() => setDate(day.date)}
-                                className={clsx(
-                                    "flex flex-col items-center gap-1 min-w-[3.5rem] p-2 rounded-2xl transition-all border",
-                                    isSelected
-                                        ? "bg-indigo-600 border-indigo-600 shadow-lg shadow-indigo-500/30 scale-105"
-                                        : "bg-white border-slate-100 dark:bg-slate-900 dark:border-slate-800 hover:border-indigo-200"
-                                )}
-                            >
-                                <span className={clsx("text-[10px] font-bold uppercase", isSelected ? "text-indigo-200" : "text-slate-400")}>
-                                    {day.date.toLocaleDateString('en-US', { weekday: 'short' })}
-                                </span>
-                                <div className={clsx(
-                                    "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2",
-                                    isSelected ? "bg-white text-indigo-700 border-transparent" : "",
-                                    !isSelected && day.status === 'perfect' && "bg-emerald-100 text-emerald-700 border-emerald-200",
-                                    !isSelected && day.status === 'good' && "bg-blue-100 text-blue-700 border-blue-200",
-                                    !isSelected && day.status === 'partial' && "bg-orange-100 text-orange-700 border-orange-200",
-                                    !isSelected && (day.status === 'none' || day.status === 'empty') && "bg-slate-50 text-slate-300 border-slate-100 dark:bg-slate-800 dark:border-slate-700"
-                                )}>
-                                    {day.date.getDate()}
-                                </div>
-                            </button>
-                        );
-                    })}
-                </div>
             </div>
 
             {/* Selected Date Report */}

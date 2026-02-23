@@ -27,108 +27,7 @@ const Dashboard = () => {
     const [showManagerModal, setShowManagerModal] = useState(false);
     const [showUnlockModal, setShowUnlockModal] = useState(false);
     
-    // --- Streak Logic ---
-    const [streak, setStreak] = useState({ current: 0, longest: 0, loading: true });
-    
-    useEffect(() => {
-        if (!user) return;
-        const fetchStreak = async () => {
-            try {
-                // Fetch last year of data to calculate streak
-                const history = await FirestoreService.getCollection(
-                    `users/${user.uid}/days`,
-                    orderBy('date', 'desc'),
-                    limit(365)
-                );
-                
-                // Helper to check completion (100% routine)
-                const isComplete = (d) => {
-                    if (!d.tasks || d.tasks.length === 0) return false;
-                    const c = d.tasks.filter(t => t.status === 'checked').length;
-                    return Math.round((c / d.tasks.length) * 100) === 100;
-                };
-
-                let current = 0;
-                let longest = 0;
-                let tempStreak = 0;
-                
-                // Sort by date descending (newest first)
-                // history is already ordered by date desc from Firestore query
-                
-                // 1. Calculate Current Streak
-                // Check Today
-                const todayStr = new Date().toISOString().split('T')[0];
-                const todayDoc = history.find(d => d.date === todayStr); // or d.id
-                const todayComplete = todayDoc ? isComplete(todayDoc) : false;
-                
-                // If today is complete, start count at 1. Else 0.
-                // But if today is NOT complete, we check yesterday to see if streak is alive.
-                if (todayComplete) {
-                    current = 1;
-                }
-                
-                // Iterate backwards from yesterday
-                // We need to find "yesterday" relative to actual calendar, not just next doc
-                const getPrevDate = (dateStr) => {
-                    const d = new Date(dateStr);
-                    d.setDate(d.getDate() - 1);
-                    return d.toISOString().split('T')[0];
-                };
-                
-                let checkDate = getPrevDate(todayStr);
-                
-                // Robust check: look for checkDate in history
-                // Since history is sparse (only exists if user logged in), a missing day breaks streak?
-                // Yes, missing day = not completed.
-                
-                while (true) {
-                    const doc = history.find(d => d.date === checkDate || d.id === checkDate);
-                    if (doc && isComplete(doc)) {
-                        current++;
-                        checkDate = getPrevDate(checkDate);
-                    } else {
-                        break;
-                    }
-                }
-                
-                // 2. Calculate Longest Streak (Naive iteration over sorted history)
-                // We need to sort by date ASC to easily count streaks
-                const sortedHistory = [...history].sort((a, b) => a.date.localeCompare(b.date));
-                
-                // We must handle gaps in dates for longest streak too
-                if (sortedHistory.length > 0) {
-                     let iterDate = new Date(sortedHistory[0].date);
-                     const lastDate = new Date(sortedHistory[sortedHistory.length - 1].date);
-                     
-                     let running = 0;
-                     
-                     while (iterDate <= lastDate) {
-                         const dStr = iterDate.toISOString().split('T')[0];
-                         const doc = sortedHistory.find(d => d.date === dStr || d.id === dStr);
-                         
-                         if (doc && isComplete(doc)) {
-                             running++;
-                         } else {
-                             longest = Math.max(longest, running);
-                             running = 0;
-                         }
-                         
-                         // Next day
-                         iterDate.setDate(iterDate.getDate() + 1);
-                     }
-                     longest = Math.max(longest, running);
-                }
-                
-                setStreak({ current, longest, loading: false });
-
-            } catch (err) {
-                console.error("Streak calc error:", err);
-                setStreak({ current: 0, longest: 0, loading: false });
-            }
-        };
-        
-        fetchStreak();
-    }, [user, dailyData.tasks]); // Recalc if tasks change today (e.g. checking last item)
+    // Removed Streak Logic
 
     // Unified Feedback Logic
     const [feedbackModal, setFeedbackModal] = useState({ isOpen: false, type: 'success', category: '' });
@@ -332,29 +231,7 @@ const Dashboard = () => {
                     </motion.div>
                 )}
 
-                {/* Streak Card */}
-                 <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-3 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className={clsx("p-2 rounded-lg", streak.current > 0 ? "bg-orange-100 text-orange-600 dark:bg-orange-900/20 dark:text-orange-500" : "bg-slate-200 text-slate-400 dark:bg-slate-800")}>
-                            <Flame className={clsx("w-5 h-5", streak.current > 0 && "fill-current")} />
-                        </div>
-                        <div>
-                            <div className="text-sm font-bold text-slate-700 dark:text-slate-200">
-                                {streak.current} Day Streak
-                            </div>
-                            <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
-                                Longest: {streak.longest}
-                            </div>
-                        </div>
-                    </div>
-                    <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 text-right">
-                        {streak.current > 0 ? (
-                            <span className="text-orange-600 dark:text-orange-500">Streak continues.</span>
-                        ) : (
-                            "Start a new streak today."
-                        )}
-                    </div>
-                </div>
+                {/* Streak Card Removed */}
             </div>
 
             {/* SECTOR 1: ROUTINE (Collapsible) */}

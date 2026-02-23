@@ -39,18 +39,20 @@ export default function WelcomeSequence({ onComplete }) {
                 <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-500/10 rounded-full blur-[100px]" />
             </div>
 
-            <AnimatePresence mode="wait">
-                <motion.h1
-                    key={currentIndex}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="text-3xl md:text-5xl font-bold text-slate-800 dark:text-slate-100 text-center tracking-tight px-4"
-                >
-                    {MESSAGES[currentIndex]}
-                </motion.h1>
-            </AnimatePresence>
+            <div className="relative w-full h-full flex items-center justify-center">
+                <AnimatePresence mode="wait">
+                    <motion.h1
+                        key={currentIndex}
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -15 }}
+                        transition={{ duration: 0.25, ease: "easeInOut" }}
+                        className="absolute text-3xl md:text-5xl font-bold text-slate-800 dark:text-slate-100 text-center tracking-tight px-4 w-full"
+                    >
+                        {MESSAGES[currentIndex]}
+                    </motion.h1>
+                </AnimatePresence>
+            </div>
         </div>
     );
 }
