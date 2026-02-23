@@ -36,22 +36,24 @@ export function AppBottomNav({ items = [], className }) {
               key={item.path}
               onClick={() => navigate(item.path)}
               className={cn(
-                "flex flex-col items-center justify-center w-full h-full gap-1 tap-highlight-transparent",
+                "flex flex-col items-center justify-center w-full h-full gap-0.5 tap-highlight-transparent",
                 isActive 
                   ? "text-primary-600 dark:text-primary-500" 
-                  : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+                  : "text-slate-400 dark:text-slate-500"
               )}
             >
-              <div className={cn(
-                "flex items-center justify-center transition-transform duration-200",
-                isActive && "scale-110"
-              )}>
+              <div className="flex items-center justify-center">
                 {/* Standardize Navigation icons at 24px (w-6 h-6) */}
-                <Icon className={cn("w-6 h-6", isActive ? "stroke-[2.5px]" : "stroke-2")} />
+                <Icon className={cn("w-6 h-6", isActive ? "stroke-[2.5px]" : "stroke-[1.75px]")} />
               </div>
               <span className="text-[10px] font-medium tracking-tight">
                 {item.label}
               </span>
+              {/* Dot indicator — appears instantly on tap, no transition delay */}
+              <div className={cn(
+                "h-[3px] w-[3px] rounded-full bg-primary-600 dark:bg-primary-500 mt-0.5 transition-opacity duration-150",
+                isActive ? "opacity-100" : "opacity-0"
+              )} />
             </button>
           );
         })}

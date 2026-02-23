@@ -14,14 +14,14 @@ const SideMenu = ({ isOpen, onClose }) => {
     const { t } = useTranslation();
 
     const menuItems = [
-        { icon: History,  label: t('nav.history', 'Order History'), path: '/history',   iconBg: 'bg-blue-500' },
-        { icon: PieChart, label: t('nav.insights', 'Insights'),     path: '/analytics', iconBg: 'bg-indigo-500' },
-        { icon: Settings, label: t('nav.settings', 'Settings'),     path: '/settings',  iconBg: 'bg-slate-500 dark:bg-slate-700' },
-        { icon: Info,     label: t('nav.about', 'About Awake'),     path: '/about',     iconBg: 'bg-teal-500' },
+        { icon: History,  label: t('nav.history', 'Order History'), path: '/history'   },
+        { icon: PieChart, label: t('nav.insights', 'Insights'),     path: '/analytics' },
+        { icon: Settings, label: t('nav.settings', 'Settings'),     path: '/settings'  },
+        { icon: Info,     label: t('nav.about', 'About Awake'),     path: '/about'     },
     ];
 
     const toolItems = [
-        { icon: Utensils, label: t('nav.diet_planner', 'Diet Planner'), path: '/diet', iconBg: 'bg-orange-500' },
+        { icon: Utensils, label: t('nav.diet_planner', 'Diet Planner'), path: '/diet' },
     ];
 
     const MenuRow = ({ item, isLast, onClick, isButton = false }) => {
@@ -31,7 +31,9 @@ const SideMenu = ({ isOpen, onClose }) => {
                 !isLast && "border-b border-slate-200 dark:border-[#38383A]"
             )}>
                 <div className="flex items-center gap-3.5 py-2.5 flex-1 min-w-0">
-                    <div className={clsx("w-[30px] h-[30px] rounded-lg shrink-0 flex items-center justify-center shadow-sm text-white", item.iconBg)}>
+                    <div className={clsx(
+                        "w-[30px] h-[30px] rounded-lg shrink-0 flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                    )}>
                         <item.icon strokeWidth={2} className="w-[18px] h-[18px]" />
                     </div>
                     <span className="text-[16px] xl:text-[17px] text-black dark:text-white leading-tight font-medium truncate">{item.label}</span>
@@ -79,7 +81,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                         {/* Header */}
                         <div className="p-4 pt-6 flex items-center justify-between mt-2">
                             <h2 className="text-[22px] font-bold tracking-tight text-black dark:text-white ml-2">{t('common.menu', 'Menu')}</h2>
-                            <button onClick={onClose} className="p-2 bg-slate-200 dark:bg-[#2C2C2E] rounded-full text-slate-500 dark:text-[#8E8E93] active:scale-95 transition-transform mr-1">
+                            <button onClick={onClose} className="p-2 bg-slate-200 dark:bg-[#2C2C2E] rounded-full text-slate-500 dark:text-[#8E8E93] active:opacity-70 transition-opacity mr-1">
                                 <X className="w-5 h-5" strokeWidth={2.5} />
                             </button>
                         </div>
@@ -102,7 +104,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                             {/* Calendar / Jump Date Group */}
                             <div className="bg-white dark:bg-[#1C1C1E] rounded-xl overflow-hidden shadow-sm dark:shadow-none border border-slate-200 dark:border-[#2C2C2E]">
                                 <MenuRow
-                                    item={{ icon: CalendarDays, label: t('date.jump_to_date', 'Jump to Date'), iconBg: 'bg-violet-500' }}
+                                    item={{ icon: CalendarDays, label: t('date.jump_to_date', 'Jump to Date') }}
                                     isButton
                                     onClick={() => setIsJumpModalOpen(true)}
                                     isLast

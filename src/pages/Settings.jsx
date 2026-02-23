@@ -20,7 +20,7 @@ const SettingsRow = ({ icon: Icon, title, subtitle, right, onClick, className, i
     >
         <div className="flex items-center gap-3.5 py-2.5 flex-1 min-w-0">
             {Icon && (
-                <div className={clsx("w-[30px] h-[30px] rounded-lg shrink-0 flex items-center justify-center shadow-sm text-white", iconBgClass || "bg-indigo-500")}>
+                <div className="w-[30px] h-[30px] rounded-lg shrink-0 flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                     <Icon strokeWidth={2} className="w-[18px] h-[18px]" />
                 </div>
             )}
