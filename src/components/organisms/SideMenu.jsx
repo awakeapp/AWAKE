@@ -16,7 +16,7 @@ const MenuRow = ({ item, isLast, onTap }) => (
         style={{ touchAction: 'manipulation' }}
         className={clsx(
             "w-full text-left border-none outline-none bg-transparent",
-            "flex items-center min-h-[50px] sm:min-h-[54px] active:bg-slate-100 dark:active:bg-[#2C2C2E] transition-colors ml-4 pr-4",
+            "flex items-center min-h-[50px] sm:min-h-[54px] active:bg-slate-100 dark:active:bg-[#2C2C2E] transition-colors duration-75 ml-4 pr-4",
             !isLast && "border-b border-slate-200 dark:border-[#38383A]"
         )}
     >
@@ -80,7 +80,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                             <button
                                 onClick={onClose}
                                 style={{ touchAction: 'manipulation' }}
-                                className="p-2 bg-slate-200 dark:bg-[#2C2C2E] rounded-full text-slate-500 dark:text-[#8E8E93] active:opacity-70 transition-opacity mr-1"
+                                className="p-2 bg-slate-200 dark:bg-[#2C2C2E] rounded-full text-slate-500 dark:text-[#8E8E93] active:bg-slate-300 dark:active:bg-[#3C3C3E] transition-colors duration-75 mr-1"
                             >
                                 <X className="w-5 h-5" strokeWidth={2.5} />
                             </button>

@@ -17,7 +17,7 @@ const ProfileRow = ({ title, value, onClick, className, isDefaultActions, isDang
     <div 
         onClick={onClick}
         className={clsx(
-            "px-4 py-3.5 bg-white dark:bg-[#1C1C1E] active:bg-slate-100 dark:active:bg-[#2C2C2E] transition-colors rounded-xl border border-slate-200 dark:border-[#2C2C2E] shadow-sm dark:shadow-none mb-4",
+            "px-4 py-3.5 bg-white dark:bg-[#1C1C1E] active:bg-slate-100 dark:active:bg-[#2C2C2E] transition-colors duration-75 rounded-xl border border-slate-200 dark:border-[#2C2C2E] shadow-sm dark:shadow-none mb-4",
             onClick && "cursor-pointer",
             className
         )}

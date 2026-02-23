@@ -18,7 +18,7 @@ const SettingsRow = ({ icon: Icon, iconBgClass, title, subtitle, right, rightEle
     <div 
         onClick={onClick}
         className={clsx(
-            "flex items-center min-h-[44px] sm:min-h-[50px] bg-white dark:bg-[#1C1C1E] active:bg-slate-100 dark:active:bg-[#2C2C2E] transition-colors ml-4 pr-4",
+            "flex items-center min-h-[44px] sm:min-h-[50px] bg-white dark:bg-[#1C1C1E] active:bg-slate-100 dark:active:bg-[#2C2C2E] transition-colors duration-75 ml-4 pr-4",
             !isLast && "border-b border-slate-200 dark:border-[#38383A]",
             onClick && "cursor-pointer",
             className
