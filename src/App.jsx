@@ -50,6 +50,9 @@ const AccountDetail = lazy(() => import('./pages/finance/AccountDetail'));
 const MonthlyOverview = lazy(() => import('./pages/finance/MonthlyOverview'));
 const VehicleDashboard = lazy(() => import('./pages/vehicle/VehicleDashboard'));
 const About = lazy(() => import('./pages/About'));
+const RamadanDashboard = lazy(() => import('./pages/ramadan/RamadanDashboard'));
+const RamadanStats = lazy(() => import('./pages/ramadan/RamadanStats'));
+const RamadanDhikr = lazy(() => import('./pages/ramadan/RamadanDhikr'));
 
 // Analytics tracker component
 function AnalyticsTracker() {
@@ -169,6 +172,11 @@ function App() {
 
                             {/* Vehicle Routes */}
                             <Route path="/vehicle" element={<VehicleDashboard />} />
+
+                            {/* Ramadan Routes */}
+                            <Route path="/ramadan" element={<RamadanDashboard />} />
+                            <Route path="/ramadan/stats" element={<RamadanStats />} />
+                            <Route path="/ramadan/dhikr" element={<RamadanDhikr />} />
                           </Route>
 
 

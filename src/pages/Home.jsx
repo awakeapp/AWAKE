@@ -99,7 +99,7 @@ const Home = () => {
             {/* Ramadan Tracker Widget */}
             {!ramadanLoading && isRamadanActive && (
                 <div 
-                    onClick={() => navigate('/settings')} // Routing to Ramadan Hub via settings mapping later, or creating specific route
+                    onClick={() => navigate('/ramadan')}
                     className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/50 rounded-3xl p-5 shadow-sm active:opacity-80 transition-opacity cursor-pointer relative overflow-hidden"
                 >
                     {/* Background embellishment */}
