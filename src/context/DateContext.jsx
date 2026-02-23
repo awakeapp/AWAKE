@@ -54,7 +54,7 @@ export const DateContextProvider = ({ children }) => {
     // Sync URL when date changes
     useEffect(() => {
         const dateString = formatLocalDate(currentDate);
-        setSearchParams({ date: dateString });
+        setSearchParams({ date: dateString }, { replace: true });
     }, [currentDate, setSearchParams]);
 
     const setDate = useCallback((dateOrString) => {

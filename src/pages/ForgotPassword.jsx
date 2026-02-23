@@ -88,12 +88,13 @@ const ForgotPassword = () => {
                                 </Button>
 
                                 <div className="text-center">
-                                    <Link
-                                        to="/login"
+                                    <button
+                                        type="button"
+                                        onClick={() => navigate(-1)}
                                         className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors"
                                     >
                                         <ArrowLeft className="w-4 h-4" /> Back to Sign In
-                                    </Link>
+                                    </button>
                                 </div>
                             </form>
                         )}

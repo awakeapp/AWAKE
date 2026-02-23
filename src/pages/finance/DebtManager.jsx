@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { User, Plus, Check, RotateCcw } from 'lucide-react';
-import BackButton from '../../components/atoms/BackButton';
+import { User, Plus, Check, RotateCcw, ArrowLeft } from 'lucide-react';
+
 import { useState } from 'react';
 
 const DebtManager = () => {
@@ -53,7 +53,12 @@ const DebtManager = () => {
             {/* Header */}
             <header className="bg-slate-900 text-white p-6 rounded-b-[2.5rem] shadow-2xl shadow-slate-900/30 animate-in slide-in-from-top-4 duration-300">
                 <div className="flex items-center justify-between mb-6">
-                    <BackButton className="bg-transparent hover:bg-white/20 text-white -ml-2" />
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="p-2 bg-transparent hover:bg-white/20 rounded-full transition-colors active:scale-95 text-white -ml-2 focus:outline-none"
+                    >
+                        <ArrowLeft className="w-6 h-6" />
+                    </button>
                     <h1 className="text-lg font-bold tracking-wide leading-tight">Debts & Lending</h1>
                     <div className="w-10" />
                 </div>

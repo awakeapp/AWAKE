@@ -1,10 +1,13 @@
 import { useTasks } from '../../context/TaskContext';
 import { startOfWeek, endOfWeek, eachDayOfInterval, format, isSameDay, subDays } from 'date-fns';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from 'recharts';
-import { CheckCircle2, Circle, Clock, TrendingUp, AlertCircle } from 'lucide-react';
-import BackButton from '../../components/atoms/BackButton';
+import { CheckCircle2, Circle, Clock, TrendingUp, AlertCircle, ArrowLeft } from 'lucide-react';
+
+
+import { useNavigate } from 'react-router-dom';
 
 const Overview = () => {
+    const navigate = useNavigate();
     const { tasks } = useTasks();
 
     // --- Stats Calculation ---
@@ -49,7 +52,12 @@ const Overview = () => {
     return (
         <div className="space-y-8 pb-24">
             <div className="flex items-center gap-3">
-                <BackButton className="bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 -ml-2" />
+                <button
+                    onClick={() => navigate(-1)}
+                    className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors active:scale-95 text-slate-700 dark:text-slate-300 -ml-2 focus:outline-none"
+                >
+                    <ArrowLeft className="w-6 h-6" />
+                </button>
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white leading-tight">Overview</h1>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Your productivity report & discipline tracking</p>

@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, AlertCircle, Award } from 'lucide-react';
-import BackButton from '../../components/atoms/BackButton';
+import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, AlertCircle, Award, ArrowLeft } from 'lucide-react';
+
 import { format, startOfMonth, endOfMonth, isWithinInterval, subMonths, addMonths } from 'date-fns';
 
 const MonthlyOverview = () => {
@@ -68,7 +68,12 @@ const MonthlyOverview = () => {
             {/* Header */}
             <header className="bg-slate-900 text-white p-6 pb-12 rounded-b-[2.5rem] shadow-2xl shadow-slate-900/20">
                 <div className="flex items-center justify-between mb-8">
-                    <BackButton className="bg-transparent hover:bg-white/20 text-white -ml-2" />
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="p-2 bg-transparent hover:bg-white/20 rounded-full transition-colors active:scale-95 text-white -ml-2 focus:outline-none"
+                    >
+                        <ArrowLeft className="w-6 h-6" />
+                    </button>
                     <div className="flex items-center gap-3 bg-white/10 rounded-full px-1 p-1">
                         <button onClick={() => changeMonth(-1)} className="p-1 hover:bg-white/10 rounded-full transition-colors">
                             <ChevronLeft className="w-4 h-4 text-slate-300" />
