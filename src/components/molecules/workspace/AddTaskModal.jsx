@@ -3,7 +3,7 @@ import { X, Clock, Calendar as CalendarIcon, Tag, AlertCircle } from 'lucide-rea
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { format } from 'date-fns';
-import DatePicker from '../../atoms/DatePicker';
+import JumpDateModal from '../../organisms/JumpDateModal';
 
 const AddTaskModal = ({ isOpen, onClose, onAdd, initialDate }) => {
     const [title, setTitle] = useState('');
@@ -157,32 +157,19 @@ const AddTaskModal = ({ isOpen, onClose, onAdd, initialDate }) => {
                                                 <span>{date ? format(new Date(date), 'MMM do, yyyy') : 'Select date'}</span>
                                             </button>
 
-                                            <AnimatePresence>
-                                                {showDatePicker && (
-                                                    <>
-                                                        {/* Responsive Backdrop */}
-                                                        <div
-                                                            className="fixed inset-0 z-[60] bg-slate-900/20 backdrop-blur-sm sm:bg-transparent sm:backdrop-blur-none"
-                                                            onClick={() => setShowDatePicker(false)}
-                                                        />
-
-                                                        {/* Positioning Container */}
-                                                        <div className="fixed inset-0 z-[70] flex items-center justify-center pointer-events-none sm:absolute sm:inset-auto sm:top-full sm:left-0 sm:mt-2 sm:w-full">
-                                                            <div className="pointer-events-auto">
-                                                                <DatePicker
-                                                                    selectedDate={date ? new Date(date) : new Date()}
-                                                                    onChange={(newDate) => {
-                                                                        setDate(newDate.toISOString().split('T')[0]);
-                                                                        setShowDatePicker(false);
-                                                                    }}
-                                                                    minDate={new Date().toISOString().split('T')[0]}
-                                                                    onClose={() => setShowDatePicker(false)}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </>
-                                                )}
-                                            </AnimatePresence>
+                                        <JumpDateModal
+                                            isOpen={showDatePicker}
+                                            initialDate={date ? new Date(date) : new Date()}
+                                            onSelect={(newDate) => {
+                                                if (newDate) {
+                                                    setDate(newDate.toISOString().split('T')[0]);
+                                                } else {
+                                                    setDate(null);
+                                                }
+                                            }}
+                                            minDate={new Date()}
+                                            onClose={() => setShowDatePicker(false)}
+                                        />
                                         </div>
                                     </div>
                                 </div>

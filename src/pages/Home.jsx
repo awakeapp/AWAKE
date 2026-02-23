@@ -85,7 +85,7 @@ const Home = () => {
     }
 
     return (
-        <div className="space-y-6 pb-24 pt-4 px-1">
+        <div className="space-y-6 pb-24  px-1">
             <FuelLogModal isOpen={isFuelModalOpen} onClose={() => setIsFuelModalOpen(false)} />
             <FinanceLogModal isOpen={isFinanceModalOpen} onClose={() => setIsFinanceModalOpen(false)} />
 

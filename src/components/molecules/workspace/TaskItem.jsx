@@ -5,7 +5,7 @@ import ThreeStateCheckbox from '../../atoms/ThreeStateCheckbox';
 import { inferIcon, getIconComponent } from '../../../utils/iconInference';
 import clsx from 'clsx';
 import { Clock, ArrowUp, Trash2, Calendar as CalendarIcon, Tag } from 'lucide-react';
-import DatePicker from '../../atoms/DatePicker';
+import JumpDateModal from '../../organisms/JumpDateModal';
 import { format } from 'date-fns';
 
 const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', onReschedule, onDelete, isRoutine = false }) => {
@@ -168,16 +168,19 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                                         }}
                                     />
                                     <div className="absolute top-full right-0 mt-2 z-[70]">
-                                        <DatePicker
-                                            selectedDate={task.date ? new Date(task.date) : new Date()}
-                                            onChange={(newDate) => {
-                                                if (newDate) {
-                                                    const formattedDate = format(newDate, 'yyyy-MM-dd');
+                                        <JumpDateModal
+                                            isOpen={isDatePickerOpen}
+                                            initialDate={task.date ? new Date(task.date) : null}
+                                            onSelect={(date) => {
+                                                if (date) {
+                                                    const formattedDate = format(date, 'yyyy-MM-dd');
                                                     onReschedule && onReschedule(task.id, formattedDate);
+                                                } else {
+                                                    onReschedule && onReschedule(task.id, null); // Allow clearing date
                                                 }
                                                 setActivePopoverId(null);
                                             }}
-                                            minDate={new Date().toISOString().split('T')[0]}
+                                            minDate={new Date()}
                                             onClose={() => setActivePopoverId(null)}
                                         />
                                     </div>

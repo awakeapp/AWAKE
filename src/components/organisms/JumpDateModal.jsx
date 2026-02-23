@@ -1,26 +1,41 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { useDate } from '../../context/DateContext';
 import Button from '../atoms/Button';
 
-const JumpDateModal = ({ isOpen, onClose }) => {
-    const { currentDate, setDate, maxDate } = useDate();
+const JumpDateModal = ({ isOpen, onClose, initialDate, onSelect, minDate }) => {
+    const { currentDate, setDate } = useDate();
+
+    // Use provided initialDate or fallback to global currentDate
+    const baseDate = initialDate || currentDate;
 
     // Internal state for the selection before confirming
-    const [selectedDate, setSelectedDate] = useState(new Date(currentDate));
+    const [selectedDate, setSelectedDate] = useState(new Date(baseDate));
     const [view, setView] = useState('day'); // 'day', 'month', 'year'
 
     // Reset selection when modal opens
     useEffect(() => {
         if (isOpen) {
-            setSelectedDate(new Date(currentDate));
+            setSelectedDate(new Date(baseDate));
             setView('day');
         }
-    }, [isOpen, currentDate]);
+    }, [isOpen, baseDate]);
 
     const handleJump = () => {
-        setDate(selectedDate);
+        if (onSelect) {
+            onSelect(selectedDate);
+        } else {
+            setDate(selectedDate);
+        }
+        onClose();
+    };
+
+    const handleClear = () => {
+        if (onSelect) {
+            onSelect(null);
+        }
         onClose();
     };
 
@@ -28,6 +43,25 @@ const JumpDateModal = ({ isOpen, onClose }) => {
     today.setHours(0, 0, 0, 0);
 
     const isFuture = (d) => d > today;
+    
+    // Check if date is before minDate (ignores time)
+    const isBeforeMin = (d) => {
+        if (!minDate) return false;
+        const min = new Date(minDate);
+        min.setHours(0, 0, 0, 0);
+        return d < min;
+    };
+    
+    // Check if date is disabled (either future if no onSelect/minDate, or strictly before minDate)
+    const isDisabledDate = (d) => {
+        // If we have an onSelect, it means we are picking a generic date (like a task due date).
+        // In this mode, future dates are ALLOWED, but past dates might be restricted by `minDate`.
+        if (onSelect) {
+            return isBeforeMin(d);
+        }
+        // If NO onSelect, it means we are jumping global app time. Future is NOT allowed.
+        return isFuture(d);
+    };
 
     // --- Calendar Logic ---
     const daysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
@@ -65,10 +99,10 @@ const JumpDateModal = ({ isOpen, onClose }) => {
         setView('day');
     };
 
-    return (
+    const modalContent = (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
                     <motion.div
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
@@ -131,13 +165,13 @@ const JumpDateModal = ({ isOpen, onClose }) => {
                                                     {date && (
                                                         <button
                                                             onClick={() => setSelectedDate(date)}
-                                                            disabled={isFuture(date)}
+                                                            disabled={isDisabledDate(date)}
                                                             className={`
                                                                 w-8 h-8 rounded-full text-sm font-medium transition-colors
                                                                 ${date.getDate() === selectedDate.getDate() && date.getMonth() === selectedDate.getMonth()
-                                                                    ? 'bg-indigo-600 text-white'
-                                                                    : isFuture(date)
-                                                                        ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed'
+                                                                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                                                                    : isDisabledDate(date)
+                                                                        ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed opacity-50'
                                                                         : 'hover:bg-slate-100 text-slate-700 dark:text-slate-300 dark:hover:bg-slate-800'
                                                                 }
                                                             `}
@@ -187,15 +221,31 @@ const JumpDateModal = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Footer */}
-                        <div className="p-4 bg-slate-50 border-t dark:bg-slate-900 dark:border-slate-800 flex justify-end gap-2">
-                            <Button variant="ghost" onClick={onClose} className="dark:text-slate-400">Cancel</Button>
-                            <Button onClick={handleJump}>Jump</Button>
+                        <div className="p-4 bg-slate-50 border-t dark:bg-slate-900 dark:border-slate-800 flex justify-between items-center">
+                            <div>
+                                {onSelect && (
+                                    <button
+                                        onClick={handleClear}
+                                        className="text-sm font-bold text-slate-400 hover:text-red-500 transition-colors px-2 py-1"
+                                    >
+                                        Clear
+                                    </button>
+                                )}
+                            </div>
+                            <div className="flex gap-2">
+                                <Button variant="ghost" onClick={onClose} className="dark:text-slate-400">Cancel</Button>
+                                <Button onClick={handleJump}>{onSelect ? 'Save' : 'Jump'}</Button>
+                            </div>
                         </div>
                     </motion.div>
                 </div>
             )}
         </AnimatePresence>
     );
+
+    // Render nothing if not in browser, else render to document.body
+    if (typeof window === 'undefined') return null;
+    return createPortal(modalContent, document.body);
 };
 
 export default JumpDateModal;
