@@ -5,7 +5,7 @@ import { cn } from '../../lib/utils';
 import JumpDateModal from './JumpDateModal';
 import clsx from 'clsx';
 
-const DateHeader = ({ className, showControls = true, overviewText, onEditClick, isLocked, rightNode, dateStateOverride }) => {
+const DateHeader = ({ className, showControls = true, overviewText, onEditClick, isLocked, rightNode, dateStateOverride, allowFuture = false }) => {
     const contextDate = useDate();
     
     // Allow overriding global date context (used heavily in TaskDashboard for local state isolation)
@@ -69,7 +69,7 @@ const DateHeader = ({ className, showControls = true, overviewText, onEditClick,
                 {showControls && (
                     <button
                         onClick={nextDay}
-                        disabled={isToday}
+                        disabled={!allowFuture && isToday}
                         className="p-1.5 sm:p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all active:scale-95 disabled:opacity-20 disabled:hover:bg-transparent flex-shrink-0"
                     >
                         <ChevronRight className="w-6 h-6 sm:w-7 sm:h-7" />
