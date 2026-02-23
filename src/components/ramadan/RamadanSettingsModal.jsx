@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Globe2, Save, Moon, MapPin, Navigation } from 'lucide-react';
+import { X, Globe2, Save, Moon, MapPin, Navigation, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { useRamadan } from '../../context/RamadanContext';
@@ -12,13 +12,39 @@ const RamadanSettingsModal = ({ isOpen, onClose }) => {
     const [localSettings, setLocalSettings] = useState(settings);
     const [manualLat, setManualLat] = useState(location?.lat || '');
     const [manualLng, setManualLng] = useState(location?.lng || '');
+    const [locationName, setLocationName] = useState('Resolving location...');
+    const [showManualLocation, setShowManualLocation] = useState(false);
 
     // Reset local state when modal opens
     useEffect(() => {
         if (isOpen) {
             setLocalSettings(settings);
+            setManualLat(location?.lat || '');
+            setManualLng(location?.lng || '');
+            setShowManualLocation(false);
         }
-    }, [isOpen, settings]);
+    }, [isOpen, settings, location]);
+
+    // Reverse geocode location
+    useEffect(() => {
+        if (location?.lat && location?.lng) {
+            fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${location.lat}&longitude=${location.lng}&localityLanguage=en`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.city || data.locality || data.principalSubdivision) {
+                        const city = data.city || data.locality || '';
+                        const state = data.principalSubdivision || '';
+                        const country = data.countryName || '';
+                        setLocationName([city, state, country].filter(Boolean).join(', '));
+                    } else {
+                        setLocationName('Location Resolved');
+                    }
+                })
+                .catch(() => setLocationName('Location Resolved'));
+        } else {
+            setLocationName('Location not set');
+        }
+    }, [location?.lat, location?.lng]);
 
     if (!isOpen) return null;
 
@@ -96,11 +122,13 @@ const RamadanSettingsModal = ({ isOpen, onClose }) => {
                 {/* Body */}
                 <div className="p-6 overflow-y-auto space-y-6">
                     
-                    {/* Calculation Method */}
                     <div className="space-y-2">
-                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                            <Globe2 className="w-4 h-4 text-slate-400" />
-                            Calculation Method (Region)
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center justify-between">
+                            <span className="flex items-center gap-2">
+                                <Globe2 className="w-4 h-4 text-slate-400" />
+                                Calculation Method (Region)
+                            </span>
+                            <Info className="w-4 h-4 text-slate-400 cursor-help" title="Determines Fajr and Isha angles based on your region." />
                         </label>
                         <select
                             value={localSettings.calcMethod}
@@ -111,13 +139,13 @@ const RamadanSettingsModal = ({ isOpen, onClose }) => {
                                 <option key={method.id} value={method.id}>{method.name}</option>
                             ))}
                         </select>
-                        <p className="text-xs text-slate-500">Determines Fajr and Isha angles based on your region.</p>
                     </div>
 
                     {/* Asr Madhab */}
                     <div className="space-y-2">
-                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center justify-between">
                             Asr Calculation (Madhab)
+                            <Info className="w-4 h-4 text-slate-400 cursor-help" title="Standard is Shafi, Maliki, Hanbali. Hanafi applies later Asr times." />
                         </label>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             {MADHABS.map(madhab => (
@@ -138,13 +166,11 @@ const RamadanSettingsModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Hijri Adjustment Slider */}
-                    <div className="space-y-2 pt-4 border-t border-slate-100 dark:border-slate-800">
-                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center justify-between">
                             Hijri Date Adjustment
+                            <Info className="w-4 h-4 text-slate-400 cursor-help" title="The Islamic calendar depends on local moonsighting. Use this to offset the date." />
                         </label>
-                        <p className="text-xs text-slate-500 mb-4 tracking-tight leading-relaxed">
-                            The Islamic calendar depends on local moonsighting. If the app shows the wrong day of Ramadan, use this to offset the date forward or backward.
-                        </p>
                         
                         <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
                              <input 
@@ -181,51 +207,73 @@ const RamadanSettingsModal = ({ isOpen, onClose }) => {
                             <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                                 <MapPin className="w-4 h-4 text-slate-400" />
                                 Your Location
+                                <Info className="w-4 h-4 text-slate-400 cursor-help ml-2" title="Accurate prayer times require an exact location." />
                             </label>
                             {location?.isDefault && (
                                 <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">Default Active</span>
                             )}
                         </div>
-                        <p className="text-xs text-slate-500 tracking-tight leading-relaxed">
-                            Accurate prayer times require an exact location. Allow GPS detection or manually enter latitude and longitude coordinates.
-                        </p>
-                        
-                        <div className="flex gap-3">
-                            <div className="flex-1 space-y-1">
-                                <span className="text-[10px] font-semibold text-slate-400 uppercase ml-1">Latitude</span>
-                                <input 
-                                    type="number" 
-                                    value={manualLat}
-                                    onChange={(e) => setManualLat(e.target.value)}
-                                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                                    placeholder="e.g. 12.9716"
-                                />
-                            </div>
-                            <div className="flex-1 space-y-1">
-                                <span className="text-[10px] font-semibold text-slate-400 uppercase ml-1">Longitude</span>
-                                <input 
-                                    type="number" 
-                                    value={manualLng}
-                                    onChange={(e) => setManualLng(e.target.value)}
-                                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                                    placeholder="e.g. 77.5946"
-                                />
-                            </div>
-                        </div>
 
-                        <button 
-                            onClick={requestLocation}
-                            className="w-full py-2.5 mt-2 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 transition-colors shadow-sm"
-                        >
-                            <Navigation className="w-4 h-4 text-indigo-500" />
-                            Auto-Detect using GPS
-                        </button>
+                        {showManualLocation ? (
+                            <div className="space-y-3 animate-in fade-in zoom-in-95 duration-200">
+                                <div className="flex gap-3">
+                                    <div className="flex-1 space-y-1">
+                                        <span className="text-[10px] font-semibold text-slate-400 uppercase ml-1">Latitude</span>
+                                        <input 
+                                            type="number" 
+                                            value={manualLat}
+                                            onChange={(e) => setManualLat(e.target.value)}
+                                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                                            placeholder="e.g. 12.9716"
+                                        />
+                                    </div>
+                                    <div className="flex-1 space-y-1">
+                                        <span className="text-[10px] font-semibold text-slate-400 uppercase ml-1">Longitude</span>
+                                        <input 
+                                            type="number" 
+                                            value={manualLng}
+                                            onChange={(e) => setManualLng(e.target.value)}
+                                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                                            placeholder="e.g. 77.5946"
+                                        />
+                                    </div>
+                                </div>
+                                <button 
+                                    onClick={requestLocation}
+                                    className="w-full py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 transition-colors shadow-sm"
+                                >
+                                    <Navigation className="w-4 h-4 text-indigo-500" />
+                                    Auto-Detect using GPS
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                <div className="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                                    <span className="truncate">{locationName}</span>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button 
+                                        onClick={requestLocation}
+                                        className="flex-1 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors shadow-sm"
+                                    >
+                                        <Navigation className="w-4 h-4 text-indigo-500" />
+                                        Auto-Detect
+                                    </button>
+                                    <button 
+                                        onClick={() => setShowManualLocation(true)}
+                                        className="flex-1 py-2 rounded-xl text-xs font-semibold flex items-center justify-center border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors shadow-sm"
+                                    >
+                                        Change Location
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 rounded-b-3xl">
+                <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-b-3xl">
                     <button
                         onClick={handleSave}
                         className="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-[0.98]"
