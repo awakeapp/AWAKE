@@ -62,8 +62,46 @@ function AnalyticsTracker() {
   return null;
 }
 
+let hasRunSessionWelcome = false;
+
 function App() {
-  const [showWelcome, setShowWelcome] = useState(() => !sessionStorage.getItem('hasSeenWelcome'));
+  const [showWelcome, setShowWelcome] = useState(() => {
+    // 1. If we already ran it in this JS context, don't run again (handles React re-renders).
+    if (hasRunSessionWelcome) return false;
+
+    // 2. Check navigation type to detect refresh vs fresh launch
+    let isRefresh = false;
+
+    if (window.performance) {
+      // Modern Performance API
+      if (typeof window.performance.getEntriesByType === 'function') {
+        const navEntries = window.performance.getEntriesByType('navigation');
+        if (navEntries.length > 0) {
+          const type = navEntries[0].type;
+          // 'reload' = manual refresh. 'back_forward' = hitting back button to enter app
+          if (type === 'reload' || type === 'back_forward') {
+            isRefresh = true;
+          }
+        }
+      } 
+      // Fallback for older browsers
+      else if (window.performance.navigation) {
+        const type = window.performance.navigation.type;
+        if (type === 1 /* TYPE_RELOAD */ || type === 2 /* TYPE_BACK_FORWARD */) {
+          isRefresh = true;
+        }
+      }
+    }
+
+    // 3. If it is a refresh, mark as run and skip
+    if (isRefresh) {
+      hasRunSessionWelcome = true;
+      return false;
+    }
+
+    // 4. Otherwise (cold start, fresh open, app icon tap), show it!
+    return true;
+  });
 
   useEffect(() => {
     // Initialize remote config on app load
@@ -75,7 +113,7 @@ function App() {
         <AuthContextProvider>
             <ThemeContextProvider>
                 <WelcomeSequence onComplete={() => {
-                    sessionStorage.setItem('hasSeenWelcome', 'true');
+                    hasRunSessionWelcome = true;
                     setShowWelcome(false);
                 }} />
             </ThemeContextProvider>
