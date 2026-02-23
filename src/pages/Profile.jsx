@@ -10,6 +10,7 @@ import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 
 import { auth } from '../lib/firebase';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import BackButton from '../components/atoms/BackButton';
 
 // Shared Row Component matching new style
 const ProfileRow = ({ title, value, onClick, className, isDefaultActions, isDanger, isAction }) => (
