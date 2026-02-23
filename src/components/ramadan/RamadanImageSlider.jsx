@@ -30,7 +30,7 @@ const RamadanImageSlider = () => {
                     src={src}
                     alt={`Ramadan Background ${index + 1}`}
                     loading={index === 0 ? "eager" : "lazy"}
-                    className={`absolute inset-0 w-full h-full object-cover transition-opacity durationSingular-[1500ms] ease-in-out ${
+                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1500ms] ease-in-out ${
                         index === currentIndex ? 'opacity-100 scale-105' : 'opacity-0 scale-100'
                     }`}
                     style={{ transition: 'opacity 1.5s ease-in-out, transform 8s linear' }}

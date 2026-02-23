@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Globe2, Save, MapPin, Navigation, Calendar, BookOpen, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Globe2, Save, MapPin, Navigation, Calendar, BookOpen, ChevronRight, Loader2, AlertCircle } from 'lucide-react';
 import clsx from 'clsx';
 import { useRamadan } from '../../context/RamadanContext';
 
@@ -47,71 +47,63 @@ const SettingsRow = ({ icon: Icon, iconBgClass, title, subtitle, right, rightEle
     </div>
 );
 
+// Reverse geocode utility with localStorage caching
+const resolveLocationName = async (lat, lng) => {
+    const cacheKey = `location_${parseFloat(lat).toFixed(4)}_${parseFloat(lng).toFixed(4)}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) return cached;
+
+    const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
+    );
+    const data = await res.json();
+    if (!data?.address) throw new Error('No address returned');
+
+    const addr = data.address;
+    const parts = [
+        addr.suburb || addr.neighbourhood || addr.residential || addr.village || addr.town || addr.city_district,
+        addr.city || addr.town || addr.county,
+        addr.state,
+        addr.country
+    ].filter(Boolean);
+
+    const unique = parts.filter((item, i, arr) => i === 0 || item !== arr[i - 1]);
+    const name = unique.join(', ');
+    if (name) localStorage.setItem(cacheKey, name);
+    return name || 'Location resolved';
+};
+
 const RamadanSettings = () => {
     const navigate = useNavigate();
     const { settings, updateSettings, location, requestLocation, updateManualLocation } = useRamadan();
     
-    // Local state for the form
     const [localSettings, setLocalSettings] = useState(settings);
     const [manualLat, setManualLat] = useState(location?.lat || '');
     const [manualLng, setManualLng] = useState(location?.lng || '');
-    const [locationName, setLocationName] = useState('Resolving location...');
+    const [locationName, setLocationName] = useState('Resolving...');
     const [showManualLocation, setShowManualLocation] = useState(false);
+    const [gpsLoading, setGpsLoading] = useState(false);
+    const [gpsError, setGpsError] = useState('');
 
-    // Initial load
     useEffect(() => {
         setLocalSettings(settings);
+    }, [settings]);
+
+    useEffect(() => {
         setManualLat(location?.lat || '');
         setManualLng(location?.lng || '');
-        setShowManualLocation(false);
-    }, [settings, location]);
+    }, [location]);
 
-    // Reverse geocode location robustly using Nominatim
+    // Reverse geocode whenever the location changes
     useEffect(() => {
         if (!location?.lat || !location?.lng) {
             setLocationName('Location not set');
             return;
         }
-
-        const cacheKey = `location_${location.lat}_${location.lng}`;
-        const cached = localStorage.getItem(cacheKey);
-        if (cached) {
-            setLocationName(cached);
-            return;
-        }
-
-        setLocationName('Resolving location...');
-        
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.lat}&lon=${location.lng}&zoom=18&addressdetails=1`)
-            .then(res => res.json())
-            .then(data => {
-                if (data && data.address) {
-                    const addr = data.address;
-                    const locality = addr.suburb || addr.neighbourhood || addr.residential || addr.village || addr.town || addr.city_district || '';
-                    const city = addr.city || addr.town || addr.county || '';
-                    const state = addr.state || '';
-                    const country = addr.country || '';
-                    
-                    const parts = [locality, city, state, country].filter(p => p && p.trim() !== '');
-                    const uniqueParts = parts.filter((item, pos, arr) => {
-                        return pos === 0 || item !== arr[pos - 1];
-                    });
-                    
-                    const resolvedName = uniqueParts.join(', ');
-                    if (resolvedName) {
-                        setLocationName(resolvedName);
-                        localStorage.setItem(cacheKey, resolvedName);
-                    } else {
-                        throw new Error('No valid address parts');
-                    }
-                } else {
-                    throw new Error('Invalid response');
-                }
-            })
-            .catch((err) => {
-                console.error("Geocoding failed", err);
-                setLocationName('Tap Auto-Detect to retry');
-            });
+        setLocationName('Resolving...');
+        resolveLocationName(location.lat, location.lng)
+            .then(name => setLocationName(name))
+            .catch(() => setLocationName('Tap to update location'));
     }, [location?.lat, location?.lng]);
 
     const ALADHAN_METHODS = [
@@ -131,22 +123,38 @@ const RamadanSettings = () => {
         { id: 1, name: 'Hanafi' },
     ];
 
-    const handleChange = (key, value) => {
-        setLocalSettings(prev => ({ ...prev, [key]: value }));
+    const handleChange = (key, value) => setLocalSettings(prev => ({ ...prev, [key]: value }));
+
+    const handleSave = async () => {
+        updateSettings(localSettings);
+        const lat = parseFloat(manualLat);
+        const lng = parseFloat(manualLng);
+        if (lat && lng && (lat !== location?.lat || lng !== location?.lng)) {
+            updateManualLocation(lat, lng);
+        }
+        navigate(-1);
     };
 
-    const handleSave = () => {
-        updateSettings(localSettings);
-        
-        // Check if map coordinates changed manually
-        if (
-            parseFloat(manualLat) !== location?.lat ||
-            parseFloat(manualLng) !== location?.lng
-        ) {
-            updateManualLocation(parseFloat(manualLat), parseFloat(manualLng));
-            navigate(-1);
-        } else {
-            navigate(-1);
+    const handleGPSDetect = async () => {
+        setGpsLoading(true);
+        setGpsError('');
+        try {
+            const newLoc = await requestLocation();
+            if (newLoc) {
+                setManualLat(newLoc.lat);
+                setManualLng(newLoc.lng);
+                const name = await resolveLocationName(newLoc.lat, newLoc.lng);
+                setLocationName(name);
+            }
+        } catch (err) {
+            const msg = err?.code === 1
+                ? 'Location permission denied. Enable it in your browser settings.'
+                : err?.code === 3
+                ? 'GPS timed out. Please try again.'
+                : 'Could not detect location. Please try again.';
+            setGpsError(msg);
+        } finally {
+            setGpsLoading(false);
         }
     };
 
@@ -154,23 +162,20 @@ const RamadanSettings = () => {
         <div className="pb-12 pt-2 sm:pt-4 bg-[#F2F2F7] dark:bg-black min-h-screen text-black dark:text-white font-sans">
             <div className="max-w-screen-md mx-auto sm:px-4">
                 
-                {/* Header Title */}
-                <div className="px-4 flex items-center justify-between mb-4 sm:mb-6 mt-2 relative">
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => navigate(-1)}
-                            className="p-2 bg-transparent hover:bg-black/5 dark:bg-transparent dark:hover:bg-white/10 rounded-full transition-colors active:scale-95 text-black dark:text-white -ml-2 focus:outline-none"
-                        >
-                            <ArrowLeft className="w-6 h-6" />
-                        </button>
-                        <div>
-                            <h1 className="text-3xl font-bold tracking-tight text-black dark:text-white">Ramadan Settings</h1>
-                        </div>
-                    </div>
+                {/* Header */}
+                <div className="px-4 flex items-center gap-3 mb-4 sm:mb-6 mt-2">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="p-2 bg-transparent hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors active:scale-95 text-black dark:text-white -ml-2 focus:outline-none"
+                    >
+                        <ArrowLeft className="w-6 h-6" />
+                    </button>
+                    <h1 className="text-3xl font-bold tracking-tight text-black dark:text-white">Ramadan Settings</h1>
                 </div>
 
-                <div className="px-0 sm:px-0 mt-4 sm:mt-6">
+                <div className="mt-4 sm:mt-6">
                     
+                    {/* Prayer Calculation Group */}
                     <SettingsGroup>
                         <div className="relative">
                             <SettingsRow 
@@ -179,10 +184,10 @@ const RamadanSettings = () => {
                                 title="Calculation Method" 
                                 right={
                                     <div className="flex items-center">
-                                        <span className="text-[16px] text-slate-500 dark:text-[#8E8E93] mr-1 truncate max-w-[140px] md:max-w-none">
+                                        <span className="text-[15px] text-slate-500 dark:text-[#8E8E93] mr-1 truncate max-w-[140px]">
                                             {ALADHAN_METHODS.find(m => m.id === localSettings.calcMethod)?.name || 'Select'}
                                         </span>
-                                        <ChevronRight className="w-5 h-5 text-slate-300 dark:text-[#5C5C5E]" />
+                                        <ChevronRight className="w-4 h-4 text-slate-300 dark:text-[#5C5C5E] shrink-0" />
                                     </div>
                                 }
                             />
@@ -191,8 +196,8 @@ const RamadanSettings = () => {
                                 onChange={(e) => handleChange('calcMethod', Number(e.target.value))}
                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                             >
-                                {ALADHAN_METHODS.map(method => (
-                                    <option key={method.id} value={method.id}>{method.name}</option>
+                                {ALADHAN_METHODS.map(m => (
+                                    <option key={m.id} value={m.id}>{m.name}</option>
                                 ))}
                             </select>
                         </div>
@@ -205,10 +210,10 @@ const RamadanSettings = () => {
                                 isLast={true}
                                 right={
                                     <div className="flex items-center">
-                                        <span className="text-[16px] text-slate-500 dark:text-[#8E8E93] mr-1 truncate max-w-[140px] md:max-w-none">
+                                        <span className="text-[15px] text-slate-500 dark:text-[#8E8E93] mr-1 truncate max-w-[140px]">
                                             {MADHABS.find(m => m.id === localSettings.madhab)?.name || 'Select'}
                                         </span>
-                                        <ChevronRight className="w-5 h-5 text-slate-300 dark:text-[#5C5C5E]" />
+                                        <ChevronRight className="w-4 h-4 text-slate-300 dark:text-[#5C5C5E] shrink-0" />
                                     </div>
                                 }
                             />
@@ -217,62 +222,84 @@ const RamadanSettings = () => {
                                 onChange={(e) => handleChange('madhab', Number(e.target.value))}
                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                             >
-                                {MADHABS.map(madhab => (
-                                    <option key={madhab.id} value={madhab.id}>{madhab.name}</option>
+                                {MADHABS.map(m => (
+                                    <option key={m.id} value={m.id}>{m.name}</option>
                                 ))}
                             </select>
                         </div>
                     </SettingsGroup>
 
+                    {/* Hijri Date Adjustment */}
                     <SettingsGroup>
-                        <div className="px-4 py-3 bg-white dark:bg-[#1C1C1E]">
-                            <div className="flex items-center gap-3.5 px-0 mb-3">
+                        <div className="px-4 py-4 bg-white dark:bg-[#1C1C1E]">
+                            <div className="flex items-center gap-3.5 mb-4">
                                 <div className="w-[30px] h-[30px] rounded-lg shrink-0 flex items-center justify-center bg-emerald-500 text-white">
                                     <Calendar strokeWidth={2} className="w-[18px] h-[18px]" />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <h3 className="text-[16px] xl:text-[17px] text-black dark:text-white leading-tight">Hijri Date Adjustment</h3>
-                                    <p className="text-[13px] text-slate-500 dark:text-[#8E8E93] mt-0.5 truncate">
-                                        Offset: <span className="font-medium text-emerald-600 dark:text-emerald-400">{localSettings.hijriOffset > 0 ? `+${localSettings.hijriOffset}` : localSettings.hijriOffset} Days</span>
+                                    <p className="text-[16px] text-black dark:text-white leading-tight">Hijri Date Adjustment</p>
+                                    <p className="text-[13px] text-slate-500 dark:text-[#8E8E93] mt-0.5">
+                                        Offset: <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                                            {localSettings.hijriOffset > 0 ? `+${localSettings.hijriOffset}` : localSettings.hijriOffset} days
+                                        </span>
                                     </p>
                                 </div>
                             </div>
-                            <div className="px-12 mt-4 pb-2">
-                                 <input 
+                            <div className="px-10 pb-1">
+                                <input 
                                     type="range" 
-                                    min="-2" 
-                                    max="2" 
-                                    step="1"
+                                    min="-2" max="2" step="1"
                                     value={localSettings.hijriOffset}
                                     onChange={(e) => handleChange('hijriOffset', Number(e.target.value))}
                                     className="w-full accent-emerald-500"
-                                 />
-                                 <div className="flex justify-between text-[11px] font-bold text-slate-400 dark:text-[#8E8E93] mt-2 px-1">
-                                    <span>-2</span>
-                                    <span>-1</span>
-                                    <span>0</span>
-                                    <span>+1</span>
-                                    <span>+2</span>
-                                 </div>
+                                />
+                                <div className="flex justify-between text-[11px] font-bold text-slate-400 dark:text-[#8E8E93] mt-1.5">
+                                    {['-2', '-1', '0', '+1', '+2'].map(v => <span key={v}>{v}</span>)}
+                                </div>
                             </div>
                         </div>
                     </SettingsGroup>
 
+                    {/* Location Group */}
                     <SettingsGroup>
                         <SettingsRow 
                             icon={MapPin} 
                             iconBgClass="bg-red-500"
-                            title="Your Location" 
-                            subtitle={locationName} 
-                            onClick={() => setShowManualLocation(!showManualLocation)}
-                            rightElement={<ChevronRight className={clsx("w-5 h-5 text-slate-300 dark:text-[#5C5C5E] transition-transform", showManualLocation && "rotate-90")} />}
+                            title="Prayer Location" 
+                            subtitle={locationName}
+                            onClick={() => setShowManualLocation(s => !s)}
+                            rightElement={<ChevronRight className={clsx("w-5 h-5 text-slate-300 dark:text-[#5C5C5E] transition-transform duration-200", showManualLocation && "rotate-90")} />}
                             isLast={!showManualLocation}
                         />
                         {showManualLocation && (
-                            <div className="p-4 bg-white dark:bg-[#1C1C1E] animate-in fade-in slide-in-from-top-2 border-t border-slate-200 dark:border-[#38383A]">
-                                <div className="flex gap-3 mb-4">
+                            <div className="px-4 pb-4 pt-3 bg-white dark:bg-[#1C1C1E] border-t border-slate-200 dark:border-[#38383A]">
+                                
+                                {/* Auto-detect GPS button */}
+                                <button 
+                                    onClick={handleGPSDetect}
+                                    disabled={gpsLoading}
+                                    className="w-full mb-4 py-3 rounded-xl text-[15px] font-semibold flex items-center justify-center gap-2 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-colors disabled:opacity-60"
+                                >
+                                    {gpsLoading ? (
+                                        <><Loader2 className="w-4 h-4 animate-spin" /> Detecting location…</>
+                                    ) : (
+                                        <><Navigation className="w-4 h-4" /> Auto-Detect using GPS</>
+                                    )}
+                                </button>
+
+                                {/* GPS Error */}
+                                {gpsError && (
+                                    <div className="mb-4 flex items-start gap-2 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl p-3">
+                                        <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
+                                        <p className="text-[13px] text-red-600 dark:text-red-400">{gpsError}</p>
+                                    </div>
+                                )}
+
+                                {/* Manual coordinates */}
+                                <p className="text-[11px] font-semibold text-slate-400 dark:text-[#8E8E93] uppercase tracking-wide mb-2">Or enter manually</p>
+                                <div className="flex gap-3">
                                     <div className="flex-1 space-y-1">
-                                        <span className="text-[11px] font-semibold text-slate-500 uppercase ml-1">Latitude</span>
+                                        <span className="text-[11px] font-medium text-slate-500 ml-1">Latitude</span>
                                         <input 
                                             type="number" 
                                             value={manualLat}
@@ -282,7 +309,7 @@ const RamadanSettings = () => {
                                         />
                                     </div>
                                     <div className="flex-1 space-y-1">
-                                        <span className="text-[11px] font-semibold text-slate-500 uppercase ml-1">Longitude</span>
+                                        <span className="text-[11px] font-medium text-slate-500 ml-1">Longitude</span>
                                         <input 
                                             type="number" 
                                             value={manualLng}
@@ -292,28 +319,22 @@ const RamadanSettings = () => {
                                         />
                                     </div>
                                 </div>
-                                <button 
-                                    onClick={requestLocation}
-                                    className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 border border-slate-200 dark:border-[#38383A] bg-white text-slate-700 hover:bg-slate-50 dark:bg-[#2C2C2E] dark:text-slate-200 dark:hover:bg-[#38383A] transition-colors"
-                                >
-                                    <Navigation className="w-4 h-4 text-indigo-500" />
-                                    Auto-Detect using GPS
-                                </button>
                             </div>
                         )}
                     </SettingsGroup>
 
                 </div>
 
-                <div className="px-4 sm:px-0 mt-8 mb-12">
-                     <button
+                {/* Save Button */}
+                <div className="px-4 sm:px-0 mt-6 mb-12">
+                    <button
                         onClick={handleSave}
                         className="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-[0.98]"
                     >
                         <Save className="w-5 h-5" />
                         Save Settings
                     </button>
-                    <p className="text-center text-[12px] text-slate-400 dark:text-[#8E8E93] mt-4 font-medium">
+                    <p className="text-center text-[12px] text-slate-400 dark:text-[#8E8E93] mt-4">
                         Changes recalculate prayer times immediately.
                     </p>
                 </div>

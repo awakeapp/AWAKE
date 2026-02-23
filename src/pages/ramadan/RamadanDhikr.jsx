@@ -44,7 +44,7 @@ const CounterCard = ({ title, count, target, onSave, accentClass }) => {
             )}
 
             {/* Manual input row */}
-            <div className="flex items-center gap-2 mt-2">
+            <div className="flex flex-wrap items-center gap-2 mt-2">
                 <input
                     type="number"
                     min="0"
@@ -52,12 +52,13 @@ const CounterCard = ({ title, count, target, onSave, accentClass }) => {
                     onChange={e => setInputVal(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && handleSave()}
                     placeholder="Enter count"
-                    className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-3 py-2 text-sm font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    className="flex-1 min-w-0 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    style={{ touchAction: 'manipulation' }}
                 />
                 <button
                     onClick={handleSave}
                     className={clsx(
-                        "px-4 py-2 rounded text-sm font-bold text-white transition-all active:scale-95 flex items-center gap-1",
+                        "shrink-0 px-4 py-2.5 rounded-lg text-sm font-bold text-white transition-colors duration-75 active:opacity-80 flex items-center gap-1",
                         saved ? "bg-emerald-500" : accentClass
                     )}
                 >
@@ -242,7 +243,7 @@ const RamadanDhikr = () => {
 
                 <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-[#2C2C2E]">
                     <h2 className="text-[17px] font-semibold text-black dark:text-white">Daily Quran Log</h2>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <CounterCard 
                             title="Pages Read" 
                             count={todayData.quranPages || 0} 

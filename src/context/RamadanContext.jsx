@@ -14,6 +14,7 @@ export const RamadanProvider = ({ children }) => {
     const [ramadanData, setRamadanData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [refreshSignal, setRefreshSignal] = useState(0);
 
     const [settings, setSettings] = useState(() => {
         const saved = localStorage.getItem('awake_ramadan_prefs');
@@ -125,7 +126,7 @@ export const RamadanProvider = ({ children }) => {
         } else {
             setLoading(false);
         }
-    }, [user, settings]);
+    }, [user, settings, refreshSignal]);
 
     // Firestore Integration for tracking days
     useEffect(() => {
@@ -205,25 +206,21 @@ export const RamadanProvider = ({ children }) => {
     };
 
     const requestLocation = async () => {
-        try {
-            const position = await new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
-            });
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            const newLoc = { lat, lng };
-            localStorage.setItem('awake_ramadan_location', JSON.stringify(newLoc));
-            window.location.reload(); // Quick clean refresh to re-init everything with new coords
-        } catch (err) {
-            console.error("Manual location request failed:", err);
-            alert("Location permission denied. Please enable it in your browser settings and try again.");
-        }
+        const position = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
+        });
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const newLoc = { lat, lng };
+        localStorage.setItem('awake_ramadan_location', JSON.stringify(newLoc));
+        setRefreshSignal(prev => prev + 1);
+        return newLoc;
     };
 
     const updateManualLocation = (lat, lng) => {
         const newLoc = { lat, lng };
         localStorage.setItem('awake_ramadan_location', JSON.stringify(newLoc));
-        window.location.reload();
+        setRefreshSignal(prev => prev + 1);
     };
 
     const value = {
