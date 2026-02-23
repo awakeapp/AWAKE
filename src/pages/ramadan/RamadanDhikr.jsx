@@ -24,7 +24,7 @@ const CounterCard = ({ title, count, target, onSave, accentClass }) => {
     const progress = target > 0 ? Math.min((count / target) * 100, 100) : 0;
 
     return (
-        <div className="bg-white dark:bg-[#1C1C1E] border border-slate-200 dark:border-[#2C2C2E] rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-sm dark:shadow-none">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-sm">
             <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3">{title}</h3>
 
             {/* Count display */}
@@ -136,8 +136,7 @@ const QuranGoalWidget = ({ ramadanData, updateQuranGoal, currentDay }) => {
     }
 
     return (
-        <div className="bg-[#1C1C1E] border border-[#2C2C2E] rounded-xl sm:rounded-2xl p-5 sm:p-6 shadow-sm dark:shadow-none text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-2xl -mr-10 -mt-10"></div>
+        <div className="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl p-5 sm:p-6 shadow-sm text-white relative overflow-hidden">
             
             <div className="flex justify-between items-start mb-6 relative z-10">
                 <div>
@@ -162,7 +161,7 @@ const QuranGoalWidget = ({ ramadanData, updateQuranGoal, currentDay }) => {
                 <div className="w-full bg-slate-800 rounded-full h-3 overflow-hidden mb-3">
                     <div className="h-full bg-emerald-500 rounded-full transition-all duration-1000" style={{ width: `${Math.min(completionPercent, 100)}%` }} />
                 </div>
-                <div className="flex justify-between items-center text-xs font-semibold bg-slate-800/50 py-2 px-3 rounded">
+                <div className="flex justify-between items-center text-xs font-semibold bg-slate-800 py-2 px-3 rounded">
                     <span className="text-slate-400">Pace target: {expectedProgress}</span>
                     <span className={statusColor}>{statusText}</span>
                 </div>

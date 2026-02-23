@@ -6,7 +6,7 @@ import clsx from 'clsx';
 const StatCard = ({ title, icon: Icon, value, target, percent, colorClass = "bg-emerald-500", textClass = "text-emerald-500" }) => {
     const displayPercent = percent > 100 ? 100 : percent;
     return (
-        <div className="bg-white dark:bg-[#1C1C1E] border border-slate-200 dark:border-[#2C2C2E] rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-sm dark:shadow-none">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-sm">
             <div className="flex items-center gap-3 mb-4">
                 <div className={clsx("p-2 rounded-xl bg-opacity-10", textClass, colorClass.replace('bg-', 'bg-').replace('500', '500/10'))}>
                     <Icon className={clsx("w-5 h-5", textClass)} />
@@ -96,15 +96,14 @@ const RamadanStats = () => {
 
             <div className="px-4 sm:px-0 space-y-6">
                 {/* Top Level Summary Card */}
-                <div className="bg-indigo-600 dark:bg-indigo-900/50 rounded-xl sm:rounded-2xl p-6 shadow-md text-white relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                <div className="bg-indigo-600 dark:bg-indigo-900 rounded-xl sm:rounded-2xl p-6 shadow-md text-white relative overflow-hidden">
                     <div className="relative z-10 flex items-center justify-between">
                         <div>
                             <p className="text-indigo-100 uppercase tracking-wider text-[11px] font-bold mb-1">Total Dhikr</p>
                             <p className="text-[40px] font-black tabular-nums tracking-tight leading-none">{grandTotalDhikr}</p>
                         </div>
-                        <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/20">
-                            <Heart className="w-8 h-8 text-white fill-white/20" />
+                        <div className="w-16 h-16 bg-white/10 rounded-xl flex items-center justify-center border border-white/10">
+                            <Heart className="w-8 h-8 text-white fill-white/10" />
                         </div>
                     </div>
                 </div>

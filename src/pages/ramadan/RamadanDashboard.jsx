@@ -39,7 +39,7 @@ const FastingTracker = ({ todayKey, ramadanData, updateDay }) => {
     };
 
     return (
-        <div className="bg-white dark:bg-[#1C1C1E] border border-slate-200 dark:border-[#2C2C2E] rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm dark:shadow-none">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
             <h2 className="text-[17px] font-semibold text-black dark:text-white mb-4">Today's Fast</h2>
             
             <div className="flex gap-3 mb-4">
@@ -111,28 +111,26 @@ const PrayerRow = ({ title, completed, mode, onToggle, onChangeMode }) => {
                 </span>
             </div>
             
-            {completed && (
-                <div className="flex bg-slate-100 dark:bg-slate-800 rounded p-1 animate-in fade-in slide-in-from-right-2">
-                    <button 
-                        onClick={() => onChangeMode('jamaah')}
-                        className={clsx(
-                            "px-3 py-1 text-xs font-semibold rounded-md transition-all",
-                            mode === 'jamaah' ? "bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-                        )}
-                    >
-                        Jama'ah
-                    </button>
-                    <button 
-                        onClick={() => onChangeMode('alone')}
-                        className={clsx(
-                            "px-3 py-1 text-xs font-semibold rounded-md transition-all",
-                            mode === 'alone' ? "bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-                        )}
-                    >
-                        Alone
-                    </button>
-                </div>
-            )}
+            <div className="flex bg-slate-100 dark:bg-slate-800 rounded p-1">
+                <button 
+                    onClick={() => onChangeMode('jamaah')}
+                    className={clsx(
+                        "px-3 py-1 text-xs font-semibold rounded-md transition-all",
+                        mode === 'jamaah' ? "bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                    )}
+                >
+                    Jama'ah
+                </button>
+                <button 
+                    onClick={() => onChangeMode('alone')}
+                    className={clsx(
+                        "px-3 py-1 text-xs font-semibold rounded-md transition-all",
+                        mode === 'alone' ? "bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                    )}
+                >
+                    Alone
+                </button>
+            </div>
         </div>
     );
 };
@@ -145,7 +143,7 @@ const NightPrayersTracker = ({ todayKey, ramadanData, updateDay }) => {
     };
 
     return (
-        <div className="bg-white dark:bg-[#1C1C1E] border border-slate-200 dark:border-[#2C2C2E] rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm dark:shadow-none">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
             <h2 className="text-[17px] font-semibold text-black dark:text-white mb-4">Night Prayers</h2>
             <div className="flex flex-col">
                 <PrayerRow 
@@ -268,7 +266,7 @@ const RamadanDashboard = () => {
                 </div>
             )}
             
-            <div className="bg-white dark:bg-[#1C1C1E] border border-slate-200 dark:border-[#2C2C2E] rounded-xl sm:rounded-2xl p-6 shadow-sm dark:shadow-none overflow-hidden relative">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl p-6 shadow-sm overflow-hidden relative">
                  <div className="relative z-10">
                      <div className="flex justify-between items-center mb-6">
                         <div>
@@ -294,11 +292,11 @@ const RamadanDashboard = () => {
             {/* Suhoor and Iftar Highlights */}
             {todayPrayers && (
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white dark:bg-[#1C1C1E] border border-slate-200 dark:border-[#2C2C2E] rounded-xl p-4 flex flex-col items-center justify-center shadow-sm dark:shadow-none">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center shadow-sm">
                         <span className="text-slate-500 text-[11px] font-semibold uppercase tracking-wider mb-1.5">Suhoor Ends</span>
                         <span className="text-black dark:text-white text-[24px] font-bold tracking-tight">{suhoorTimeStr}</span>
                     </div>
-                    <div className="bg-white dark:bg-[#1C1C1E] border border-slate-200 dark:border-[#2C2C2E] rounded-xl p-4 flex flex-col items-center justify-center shadow-sm dark:shadow-none">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center shadow-sm">
                         <span className="text-slate-500 text-[11px] font-semibold uppercase tracking-wider mb-1.5">Iftar Time</span>
                         <span className="text-black dark:text-white text-[24px] font-bold tracking-tight">{iftarTimeStr}</span>
                     </div>
@@ -316,7 +314,7 @@ const RamadanDashboard = () => {
             )}
 
             {!isRamadanActive && (
-                <div className="bg-[#1C1C1E] border border-[#2C2C2E] rounded-xl p-4 text-center text-slate-400 text-[14px]">
+                <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center text-slate-400 text-[14px]">
                     Ramadan has not officially started yet according to the calculated Hijri date.
                 </div>
             )}

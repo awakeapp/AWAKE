@@ -19,7 +19,7 @@ const EXTRA_PRAYERS = [
 ];
 
 const ModeSelector = ({ value, onChange }) => (
-    <div className="flex bg-slate-100 dark:bg-[#2C2C2E] rounded-lg p-0.5 gap-0.5">
+    <div className="flex bg-slate-100 dark:bg-slate-800/50 rounded-lg p-0.5 gap-0.5">
         {['jamaah', 'alone'].map(m => (
             <button
                 key={m}
@@ -27,7 +27,7 @@ const ModeSelector = ({ value, onChange }) => (
                 className={clsx(
                     "px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all capitalize",
                     value === m
-                        ? "bg-white dark:bg-[#3A3A3C] shadow-sm text-indigo-600 dark:text-indigo-400"
+                        ? "bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400"
                         : "text-slate-500 dark:text-slate-400"
                 )}
             >
@@ -72,16 +72,16 @@ const PrayerRow = ({ prayerKey, label, data, onUpdate, allowMode, allowCount, is
                     <div className="flex items-center gap-1">
                         <button
                             onClick={() => onUpdate(`${prayerKey}Count`, Math.max(0, count - 1))}
-                            className="w-6 h-6 rounded-full bg-slate-100 dark:bg-[#2C2C2E] text-slate-600 dark:text-slate-300 text-sm font-bold flex items-center justify-center"
+                            className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-bold flex items-center justify-center"
                         >−</button>
                         <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 w-5 text-center">{count}</span>
                         <button
                             onClick={() => onUpdate(`${prayerKey}Count`, count + 1)}
-                            className="w-6 h-6 rounded-full bg-slate-100 dark:bg-[#2C2C2E] text-slate-600 dark:text-slate-300 text-sm font-bold flex items-center justify-center"
+                            className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-bold flex items-center justify-center"
                         >+</button>
                     </div>
                 )}
-                {allowMode && completed && (
+                {allowMode && (
                     <ModeSelector value={mode} onChange={(m) => onUpdate(`${prayerKey}Mode`, m)} />
                 )}
             </div>
@@ -132,7 +132,7 @@ const PrayerTracker = () => {
             </div>
 
             {/* Night & Additional Prayers */}
-            <div className="bg-white dark:bg-[#1C1C1E] rounded-xl sm:rounded-2xl border border-slate-200 dark:border-[#2C2C2E] shadow-sm dark:shadow-none overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <div className="px-5 pt-4 pb-2">
                     <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                         Night &amp; Additional Prayers
