@@ -144,7 +144,7 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
                     initial={{ opacity: 0, scale: 0.95, y: 10 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                    transition={{ type: "spring", duration: 0.3, bounce: 0 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
                     className="w-full max-w-lg bg-white dark:bg-slate-950 rounded-[2rem] shadow-2xl shadow-slate-200/50 dark:shadow-black/50 overflow-hidden flex flex-col max-h-[75vh] ring-1 ring-slate-100 dark:ring-slate-800"
                 >
                     {/* Header */}
@@ -307,7 +307,7 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
                     <div className="p-4 sm:p-6 bg-white dark:bg-slate-950 shrink-0 border-t border-slate-100 dark:border-slate-800">
                         <Button
                             onClick={handleSave}
-                            className="w-full py-3.5 text-base font-semibold shadow-lg shadow-indigo-200/50 dark:shadow-indigo-900/50 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl hover:scale-[1.01] active:scale-[0.99] transition-all"
+                            className="w-full py-3.5 text-base font-semibold shadow-lg shadow-indigo-200/50 dark:shadow-indigo-900/50 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-xl transition-all"
                         >
                             Save Routine
                         </Button>

@@ -38,7 +38,7 @@ const History = () => {
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Report History</h2>
                 <button
                     onClick={() => setShowJumpModal(true)}
-                    className="p-2 bg-slate-100 hover:bg-slate-200 text-indigo-600 rounded-full transition-colors dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-indigo-400"
+                    className="p-2 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-indigo-600 rounded-full transition-colors dark:bg-slate-800 dark:hover:bg-slate-700 dark:active:bg-slate-600 dark:text-indigo-400"
                 >
                     <CalendarIcon className="w-5 h-5" />
                 </button>
@@ -53,8 +53,8 @@ const History = () => {
                 className="space-y-4"
             >
                 <div className="text-center mb-6">
-                    <h3 className="text-lg font-medium text-slate-500 dark:text-slate-400">
-                        Overview for <span className="text-slate-900 dark:text-white font-bold">{new Date(formattedDate + 'T00:00:00').toLocaleDateString(undefined, { dateStyle: 'long' })}</span>
+                    <h3 className="text-base font-medium text-slate-500 dark:text-slate-400">
+                        Overview for <span className="text-slate-900 dark:text-white font-semibold">{new Date(formattedDate + 'T00:00:00').toLocaleDateString(undefined, { dateStyle: 'long' })}</span>
                     </h3>
                 </div>
 
@@ -66,9 +66,9 @@ const History = () => {
                     <CardContent className="p-6 relative z-10 flex items-center justify-between">
                         <div>
                             <p className="text-indigo-200 font-medium mb-1">Daily Score</p>
-                            <div className="text-5xl font-black tracking-tight flex items-baseline gap-1">
+                            <div className="text-4xl font-bold tracking-tight flex items-baseline gap-1">
                                 {completionRate}
-                                <span className="text-2xl opacity-60">%</span>
+                                <span className="text-xl opacity-60">%</span>
                             </div>
                             <p className="text-sm text-indigo-100 mt-2 opacity-80">
                                 {completedTasks.length} / {totalTasks} tasks completed
@@ -85,16 +85,16 @@ const History = () => {
                     <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-2xl border border-emerald-100 dark:border-emerald-800/30">
                         <div className="flex items-center gap-2 mb-2">
                             <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                            <span className="font-bold text-emerald-900 dark:text-emerald-100">Completed</span>
+                            <span className="font-semibold text-emerald-900 dark:text-emerald-100">Completed</span>
                         </div>
-                        <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">{completedTasks.length}</p>
+                        <p className="text-xl font-semibold text-emerald-700 dark:text-emerald-300">{completedTasks.length}</p>
                     </div>
                     <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl border border-red-100 dark:border-red-800/30">
                         <div className="flex items-center gap-2 mb-2">
                             <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
-                            <span className="font-bold text-red-900 dark:text-red-100">Missed</span>
+                            <span className="font-semibold text-red-900 dark:text-red-100">Missed</span>
                         </div>
-                        <p className="text-2xl font-bold text-red-700 dark:text-red-300">{missedTasks.length}</p>
+                        <p className="text-xl font-semibold text-red-700 dark:text-red-300">{missedTasks.length}</p>
                     </div>
                 </div>
 
@@ -102,7 +102,7 @@ const History = () => {
                 {violations.length > 0 && (
                     <Card className="border-red-100 bg-red-50/50 dark:bg-red-900/10 dark:border-red-900/30">
                         <CardContent className="p-5">
-                            <h4 className="font-bold text-red-800 dark:text-red-200 flex items-center gap-2 mb-3">
+                            <h4 className="font-semibold text-red-800 dark:text-red-200 flex items-center gap-2 mb-3">
                                 <AlertCircle className="w-5 h-5" />
                                 Violations Detected
                             </h4>
@@ -121,7 +121,7 @@ const History = () => {
                 {/* Improvements */}
                 {improvements.length > 0 ? (
                     <div className="bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800">
-                        <h4 className="font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase text-xs tracking-wider">
+                        <h4 className="font-semibold text-slate-700 dark:text-slate-300 mb-3 uppercase text-xs tracking-wider">
                             Areas to Improve
                         </h4>
                         <ul className="space-y-3">

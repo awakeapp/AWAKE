@@ -5,6 +5,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { useState, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next'; // Added i18n support
+import { useSwipeNavigation } from '../../hooks/useSwipeNavigation';
 
 const WorkspaceLayout = ({ children }) => {
     const navigate = useNavigate();
@@ -12,6 +13,7 @@ const WorkspaceLayout = ({ children }) => {
     const { isDark } = useTheme();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const { t } = useTranslation();
+    const swipeHandlers = useSwipeNavigation();
 
     const isActive = (path) => location.pathname === path;
 
@@ -29,7 +31,10 @@ const WorkspaceLayout = ({ children }) => {
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-sans transition-colors duration-300 pb-24">
+        <div 
+            className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-sans transition-colors duration-300 pb-24"
+            {...swipeHandlers}
+        >
             {/* Background Decoration */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
                 <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl opacity-50 mix-blend-multiply animate-float" />

@@ -46,11 +46,11 @@ const SideMenu = ({ isOpen, onClose }) => {
                         initial={{ x: '100%' }}
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
-                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                        transition={{ duration: 0.25, ease: 'easeOut' }}
                         className="fixed inset-y-0 right-0 z-50 w-3/4 max-w-sm bg-white shadow-2xl flex flex-col dark:bg-slate-900 dark:border-l dark:border-slate-800"
                     >
                         <div className="p-5 border-b flex items-center justify-between dark:border-slate-800">
-                            <h2 className="text-lg font-bold text-slate-800 dark:text-white">{t('common.menu', 'Menu')}</h2>
+                            <h2 className="text-base font-semibold text-slate-800 dark:text-white">{t('common.menu', 'Menu')}</h2>
                             <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full">
                                 <X className="w-5 h-5 text-slate-500" />
                             </button>
@@ -65,7 +65,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                                         key={item.path}
                                         to={item.path}
                                         onClick={onClose}
-                                        className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-50 text-slate-700 font-medium transition-colors dark:text-slate-300 dark:hover:bg-slate-800"
+                                        className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-medium transition-colors dark:text-slate-300 dark:hover:bg-slate-800/80 dark:active:bg-slate-800"
                                     >
                                         <item.icon className="w-5 h-5 text-slate-400" />
                                         {item.label}
@@ -80,7 +80,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                                         // Let's keep side menu open, or close it when Jump is clicked?
                                         // The JumpModal is z-[60], SideMenu is z-50. So JumpModal will be on top.
                                     }}
-                                    className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-50 text-slate-700 font-medium transition-colors w-full text-left dark:text-slate-300 dark:hover:bg-slate-800"
+                                    className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-medium transition-colors w-full text-left dark:text-slate-300 dark:hover:bg-slate-800/80 dark:active:bg-slate-800"
                                 >
                                     <Calendar className="w-5 h-5 text-slate-400" />
                                     {t('date.jump_to_date', 'Jump to Date')}
@@ -99,7 +99,7 @@ const SideMenu = ({ isOpen, onClose }) => {
 
                             {/* Advanced Tools */}
                             <div>
-                                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-3">
+                                <h3 className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2 px-3">
                                     {t('nav.tools', 'Tools')}
                                 </h3>
                                 <div className="space-y-2">
@@ -108,7 +108,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                                             key={feat.path}
                                             to={feat.path}
                                             onClick={onClose}
-                                            className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all group"
+                                            className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:border-slate-200 active:bg-slate-50 dark:active:bg-slate-800/50 transition-colors group"
                                         >
                                             <div className="flex items-center gap-3">
                                                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${feat.bg} ${feat.color}`}>

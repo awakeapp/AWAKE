@@ -52,14 +52,10 @@ export function AppModal({
 
           {/* Modal Panel - iOS Spring Feel */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            initial={{ opacity: 0, scale: 0.98, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ 
-              type: "spring", 
-              damping: 25, 
-              stiffness: 300 
-            }}
+            exit={{ opacity: 0, scale: 0.98, y: 10 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
             className={cn(
               "relative w-full overflow-hidden flex flex-col max-h-[90vh]",
               "bg-surface dark:bg-surface-dark border border-slate-100 dark:border-slate-800",

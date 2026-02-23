@@ -85,14 +85,14 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
             <div className="flex items-center gap-2.5 sm:gap-4 flex-1 min-w-0">
                 {/* 2. ICON - Styled with depth */}
                 <div className={clsx(
-                    "flex-shrink-0 w-9 h-9 sm:w-11 sm:h-11 rounded-[1.1rem] flex items-center justify-center transition-all duration-200",
+                    "flex-shrink-0 w-9 h-9 sm:w-11 sm:h-11 rounded-[1.1rem] flex items-center justify-center transition-colors duration-200",
                     isCarryOver
                         ? "bg-orange-100 dark:bg-orange-900/30 text-orange-500 shadow-sm"
                         : isCompleted
                             ? "bg-slate-100 dark:bg-slate-800 text-slate-400"
-                            : "bg-indigo-50/80 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 shadow-sm group-hover:scale-110"
+                            : "bg-indigo-50/80 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 shadow-sm"
                 )}>
-                    <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:rotate-12 duration-200" />
+                    <IconComponent className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
 
                 <div className="flex flex-col min-w-0 flex-1">
@@ -149,7 +149,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                         <button
                             onClick={handleToggleDatePicker}
                             className={clsx(
-                                "p-1.5 rounded-lg transition-colors duration-150 z-20 relative active:scale-95",
+                                "p-1.5 rounded-lg transition-colors duration-150 z-20 relative active:bg-slate-100 dark:active:bg-slate-800",
                                 isDatePickerOpen ? "text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20" : "text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
                             )}
                             title="Reschedule Task"
@@ -191,21 +191,21 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                     <div className="flex items-center gap-1.5">
                         <button
                             onClick={() => onReschedule && onReschedule(task.id, 'today')}
-                            className="p-2 text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 rounded-xl transition-all active:scale-90 duration-150"
+                            className="p-2 text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 rounded-xl transition-colors active:bg-indigo-200 dark:active:bg-indigo-900/60 duration-150"
                             title="Assign to Today"
                         >
                             <ArrowUp className="w-4 h-4" />
                         </button>
                         <button
                             onClick={() => onDelete && onDelete(task.id)}
-                            className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all active:scale-90 duration-150"
+                            className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors active:bg-red-100 dark:active:bg-red-900/40 duration-150"
                             title="Remove"
                         >
                             <Trash2 className="w-4 h-4" />
                         </button>
                     </div>
                 ) : (
-                    <div className="scale-110 sm:scale-125 transition-transform hover:scale-[1.2] active:scale-95 px-1 duration-150">
+                    <div className="px-1 py-1 transition-opacity active:opacity-70 duration-150">
                         <ThreeStateCheckbox
                             status={isCompleted ? 'checked' : task.status || 'unchecked'}
                             onClick={() => onUpdateStatus(task.id)}

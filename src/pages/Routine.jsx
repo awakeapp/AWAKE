@@ -139,8 +139,8 @@ const Routine = () => {
                         <List className="w-5 h-5 stroke-[1.5]" />
                     </div>
                     <div>
-                        <h2 className="text-[15px] font-semibold text-slate-700 dark:text-slate-200 tracking-tight">Daily Routine</h2>
-                        <p className="text-[11px] text-slate-400 font-medium mt-0.5">
+                        <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-100 tracking-tight">Daily Routine</h2>
+                        <p className="text-xs text-slate-500 font-normal mt-0.5">
                             {dailyData.tasks.filter(t => t.status === 'checked').length}/{dailyData.tasks.length} Completed
                         </p>
                     </div>
@@ -184,8 +184,8 @@ const Routine = () => {
                                 <Lock className="w-8 h-8 text-slate-400" />
                             </div>
                             <div>
-                                <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300">Day Locked</h3>
-                                <p className="text-sm text-slate-500 font-medium">This day is completed and read-only.</p>
+                                <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200">Day Locked</h3>
+                                <p className="text-sm text-slate-500 font-normal">This day is completed and read-only.</p>
                             </div>
                         </div>
                         {dailyData.locked && !isPast && (
@@ -201,7 +201,7 @@ const Routine = () => {
                     </div>
                 ) : (
                     <Button
-                        className="w-full py-4 text-base font-semibold transition-all duration-150 active:scale-[0.98]"
+                        className="w-full py-4 text-sm font-semibold transition-opacity duration-150 active:opacity-80"
                         onClick={handleInitialSubmit}
                     >
                         Complete Day

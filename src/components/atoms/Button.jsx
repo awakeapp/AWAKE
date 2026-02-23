@@ -1,12 +1,18 @@
-import { memo } from 'react';
+import React from 'react';
 import { cn } from '../../lib/utils';
-import { motion } from 'framer-motion';
 import awakeLogo from '../../assets/awake_logo_new.png';
 
-const Button = memo(({ children, variant = 'primary', className, isLoading, disabled, forceScale, ...props }) => {
-    // forceScale allows overriding the scale effect if needed
-    
-    const baseStyles = "inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-white active:scale-95";
+const Button = React.forwardRef(({ 
+    children, 
+    variant = 'primary', 
+    size = 'md', 
+    isLoading = false, 
+    className = '', 
+    disabled, 
+    ...props 
+}, ref) => {
+    // Base styles: WhatsApp style flat UI, no scale bouncing
+    const baseStyles = "inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-white active:bg-slate-100/10";
 
     const variants = {
         primary: "bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-600 shadow-sm",
@@ -16,7 +22,7 @@ const Button = memo(({ children, variant = 'primary', className, isLoading, disa
     };
 
     const sizes = {
-        default: "h-10 py-2 px-4",
+        md: "h-10 py-2 px-4",
         sm: "h-9 px-3 rounded-md",
         lg: "h-11 px-8 rounded-md"
     }
@@ -27,12 +33,11 @@ const Button = memo(({ children, variant = 'primary', className, isLoading, disa
     // Framer motion 'whileTap' is JS based and might be slightly delayed.
     // Let's keep framer motion for smooth spring release but CSS for instant press.
 
+    // Note: Removed framer-motion whileTap since we're using CSS active states for colors only
     return (
-        <motion.button
-            whileHover={{ scale: disabled || isLoading ? 1 : 1.02 }}
-            whileTap={{ scale: disabled || isLoading ? 1 : 0.98 }} // Reduced from 0.95 to avoid conflict with CSS active:scale-95
-            transition={{ duration: 0.1 }}
-            className={cn(baseStyles, variants[variant], sizes.default, className)}
+        <button
+            ref={ref}
+            className={cn(baseStyles, variants[variant], sizes[size], className)}
             disabled={disabled || isLoading}
             {...props}
         >
@@ -51,7 +56,7 @@ const Button = memo(({ children, variant = 'primary', className, isLoading, disa
             ) : (
                 children
             )}
-        </motion.button>
+        </button>
     );
 });
 

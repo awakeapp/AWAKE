@@ -110,7 +110,7 @@ const TaskDashboard = () => {
                     {/* ‹ Prev */}
                     <button
                         onClick={() => navigateDate('prev')}
-                        className="w-[44px] h-[44px] rounded-[12px] border border-slate-200 dark:border-white/[0.07] bg-slate-50 dark:bg-white/[0.04] text-slate-500 dark:text-white/40 flex items-center justify-center shrink-0 hover:bg-slate-100 dark:hover:bg-white/[0.09] hover:text-slate-700 dark:hover:text-white/80 active:scale-90 transition-all"
+                        className="w-[44px] h-[44px] rounded-[12px] border border-slate-200 dark:border-white/[0.07] bg-slate-50 dark:bg-white/[0.04] text-slate-500 dark:text-white/40 flex items-center justify-center shrink-0 hover:bg-slate-100 dark:hover:bg-white/[0.09] hover:text-slate-700 dark:hover:text-white/80 active:bg-slate-200 dark:active:bg-white/[0.15] transition-colors"
                     >
                         <ChevronLeft className="w-5 h-5" />
                     </button>
@@ -154,7 +154,7 @@ const TaskDashboard = () => {
                     {/* › Next */}
                     <button
                         onClick={() => navigateDate('next')}
-                        className="w-[44px] h-[44px] rounded-[12px] border border-slate-200 dark:border-white/[0.07] bg-slate-50 dark:bg-white/[0.04] text-slate-500 dark:text-white/40 flex items-center justify-center shrink-0 hover:bg-slate-100 dark:hover:bg-white/[0.09] hover:text-slate-700 dark:hover:text-white/80 active:scale-90 transition-all"
+                        className="w-[44px] h-[44px] rounded-[12px] border border-slate-200 dark:border-white/[0.07] bg-slate-50 dark:bg-white/[0.04] text-slate-500 dark:text-white/40 flex items-center justify-center shrink-0 hover:bg-slate-100 dark:hover:bg-white/[0.09] hover:text-slate-700 dark:hover:text-white/80 active:bg-slate-200 dark:active:bg-white/[0.15] transition-colors"
                     >
                         <ChevronRight className="w-5 h-5" />
                     </button>
@@ -167,7 +167,7 @@ const TaskDashboard = () => {
                         {canAddTask ? (
                             <button
                                 onClick={() => setIsModalOpen(true)}
-                                className="flex flex-col items-center justify-center h-[44px] w-[60px] rounded-[12px] border border-dashed border-indigo-200 dark:border-sky-400/25 bg-indigo-50/50 dark:bg-sky-400/[0.05] text-indigo-600 dark:text-sky-400/80 hover:bg-indigo-50 dark:hover:bg-sky-400/[0.12] hover:border-indigo-300 dark:hover:border-sky-400/50 hover:text-indigo-700 dark:focus:border-solid hover:border-solid active:scale-95 transition-all"
+                                className="flex flex-col items-center justify-center h-[44px] w-[60px] rounded-[12px] border border-dashed border-indigo-200 dark:border-sky-400/25 bg-indigo-50/50 dark:bg-sky-400/[0.05] text-indigo-600 dark:text-sky-400/80 hover:bg-indigo-50 dark:hover:bg-sky-400/[0.12] hover:border-indigo-300 dark:hover:border-sky-400/50 hover:text-indigo-700 dark:focus:border-solid hover:border-solid active:bg-indigo-100 dark:active:bg-sky-400/20 transition-colors"
                             >
                                 <Plus className="w-4 h-4 mb-0.5" />
                                 <span className="font-mono text-[9px] font-bold tracking-[0.05em] uppercase">Task</span>
@@ -181,7 +181,7 @@ const TaskDashboard = () => {
                             <button
                                 onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
                                 className={clsx(
-                                    "flex flex-col items-center justify-center h-[44px] w-[60px] rounded-[12px] border border-slate-200 dark:border-white/[0.07] bg-slate-50 dark:bg-white/[0.04] text-slate-500 dark:text-white/60 hover:bg-slate-100 dark:hover:bg-white/[0.09] hover:text-slate-700 dark:hover:text-white/90 transition-all",
+                                    "flex flex-col items-center justify-center h-[44px] w-[60px] rounded-[12px] border border-slate-200 dark:border-white/[0.07] bg-slate-50 dark:bg-white/[0.04] text-slate-500 dark:text-white/60 hover:bg-slate-100 dark:hover:bg-white/[0.09] hover:text-slate-700 dark:hover:text-white/90 active:bg-slate-200 dark:active:bg-white/[0.15] transition-colors",
                                     menuOpen && "bg-slate-200 dark:bg-white/[0.09] text-slate-800 dark:text-white/90 border-slate-300 dark:border-white/[0.15]"
                                 )}
                             >

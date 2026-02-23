@@ -10,6 +10,7 @@ import { useDate } from '../../context/DateContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useState } from 'react';
+import { useSwipeNavigation } from '../../hooks/useSwipeNavigation';
 
 const MainLayout = ({ children }) => {
     const { user } = useAuthContext();
@@ -27,9 +28,13 @@ const MainLayout = ({ children }) => {
     const showHeader = !hiddenHeaderRoutes.some(route => location.pathname.startsWith(route));
 
     const { isDark } = useTheme();
+    const swipeHandlers = useSwipeNavigation();
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-24 dark:bg-slate-950 dark:text-slate-50 transition-colors">
+        <div 
+            className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-24 dark:bg-slate-950 dark:text-slate-50 transition-colors"
+            {...swipeHandlers}
+        >
             {/* Top Navigation using unified AppHeader */}
             {showHeader && (
                 <AppHeader 

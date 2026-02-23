@@ -28,7 +28,7 @@ const DayOverviewModal = ({ isOpen, onClose, data, onConfirm }) => {
                     initial={{ y: "100%", opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: "100%", opacity: 0 }}
-                    transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
                     className="w-full sm:max-w-md bg-white/95 dark:bg-slate-950/95 backdrop-blur-3xl rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl overflow-hidden ring-1 ring-black/5 dark:ring-white/10"
                 >
                     <div className="p-8">
@@ -40,7 +40,7 @@ const DayOverviewModal = ({ isOpen, onClose, data, onConfirm }) => {
                             </div>
                             <button
                                 onClick={onClose}
-                                className="p-2 bg-slate-50 dark:bg-slate-900 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-full transition-all active:scale-95"
+                                className="p-2 bg-slate-50 dark:bg-slate-900 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-full transition-all active:bg-slate-200 dark:active:bg-slate-800"
                             >
                                 <X className="w-5 h-5" />
                             </button>
@@ -174,7 +174,7 @@ const DayOverviewModal = ({ isOpen, onClose, data, onConfirm }) => {
                         <div className="space-y-4">
                             <Button
                                 onClick={onConfirm}
-                                className="w-full py-4 text-base font-medium rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                                className="w-full py-4 text-base font-medium rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2 transition-all active:bg-indigo-800"
                             >
                                 <Lock className="w-4 h-4" />
                                 Lock & Save Day

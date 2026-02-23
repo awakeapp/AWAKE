@@ -8,6 +8,7 @@ import { DataContextProvider } from './context/DataContext';
 import { TaskContextProvider } from './context/TaskContext';
 import { FinanceContextProvider } from './context/FinanceContext';
 import { VehicleContextProvider } from './context/VehicleContext';
+import { RamadanProvider } from './context/RamadanContext';
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -127,7 +128,7 @@ function App() {
         <ThemeContextProvider>
           <DateContextProvider>
             <DataContextProvider>
-
+              <RamadanProvider>
                 <TaskContextProvider>
                   <FinanceContextProvider>
                     <VehicleContextProvider>
@@ -186,7 +187,7 @@ function App() {
                     </VehicleContextProvider>
                   </FinanceContextProvider>
                 </TaskContextProvider>
-
+              </RamadanProvider>
             </DataContextProvider>
           </DateContextProvider>
         </ThemeContextProvider>

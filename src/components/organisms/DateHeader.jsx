@@ -35,7 +35,7 @@ const DateHeader = ({ className, showControls = true }) => {
                     <div className="flex-1 min-w-0">
                         <h2
                             onClick={() => setIsJumpModalOpen(true)}
-                            className="text-lg sm:text-xl font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 leading-none cursor-pointer hover:text-indigo-700 transition-all active:scale-95 truncate"
+                            className="text-lg sm:text-xl font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 leading-none cursor-pointer hover:text-indigo-700 transition-all active:opacity-80 truncate"
                         >
                             {isToday ? 'TODAY' : dayName}
                         </h2>
@@ -55,7 +55,7 @@ const DateHeader = ({ className, showControls = true }) => {
                     <div className="flex items-center gap-1 p-1 bg-slate-100/50 dark:bg-slate-800/50 rounded-2xl border border-slate-200/50">
                         <button
                             onClick={prevDay}
-                            className="p-2 hover:bg-white dark:hover:bg-slate-700 text-slate-400 hover:text-indigo-600 rounded-xl transition-all active:scale-90"
+                            className="p-2 hover:bg-white dark:hover:bg-slate-700 text-slate-400 hover:text-indigo-600 rounded-xl transition-all active:bg-slate-200 dark:active:bg-slate-600"
                         >
                             <ChevronLeft className="w-5 h-5" />
                         </button>
@@ -69,7 +69,7 @@ const DateHeader = ({ className, showControls = true }) => {
                                 }
                             }}
                             className={cn(
-                                "px-3 py-1.5 text-[10px] font-normal uppercase tracking-widest rounded-xl transition-all active:scale-95 shadow-sm",
+                                "px-3 py-1.5 text-[10px] font-normal uppercase tracking-widest rounded-xl transition-all active:opacity-80 shadow-sm",
                                 isToday
                                     ? "text-slate-500 bg-white/80 dark:bg-slate-700/80 border border-slate-200/50"
                                     : "text-white bg-indigo-600 hover:bg-indigo-700 shadow-indigo-200 dark:shadow-none"
@@ -81,7 +81,7 @@ const DateHeader = ({ className, showControls = true }) => {
                         <button
                             onClick={nextDay}
                             disabled={isToday}
-                            className="p-2 hover:bg-white dark:hover:bg-slate-700 text-slate-400 hover:text-indigo-600 rounded-xl transition-all active:scale-90 disabled:opacity-20 disabled:hover:bg-transparent"
+                            className="p-2 hover:bg-white dark:hover:bg-slate-700 text-slate-400 hover:text-indigo-600 rounded-xl transition-all active:bg-slate-200 dark:active:bg-slate-600 disabled:opacity-20 disabled:hover:bg-transparent"
                         >
                             <ChevronRight className="w-5 h-5" />
                         </button>

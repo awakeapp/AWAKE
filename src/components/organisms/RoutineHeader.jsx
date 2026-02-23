@@ -42,10 +42,10 @@ const RoutineHeader = ({ onEditClick, isLocked }) => {
                                 : "bg-slate-300 dark:bg-slate-600"
                         )} />
                         <div className="min-w-0">
-                            <div className="text-base font-black tracking-wider text-indigo-600 dark:text-indigo-400 leading-none">
+                            <div className="text-sm font-bold tracking-wide text-indigo-600 dark:text-indigo-400 leading-none">
                                 {isToday ? t('date.today_caps') : dayName}
                             </div>
-                            <div className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-widest mt-2 leading-none uppercase">
+                            <div className="text-xs font-medium text-slate-500 dark:text-slate-400 tracking-wider mt-2 leading-none uppercase">
                                 {displayDate}
                             </div>
                         </div>
@@ -55,7 +55,7 @@ const RoutineHeader = ({ onEditClick, isLocked }) => {
                     <div className="flex items-center gap-1.5 shrink-0">
                         <button
                             onClick={prevDay}
-                            className="w-9 h-9 flex items-center justify-center rounded text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-90"
+                            className="w-9 h-9 flex items-center justify-center rounded text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors active:bg-slate-200 dark:active:bg-slate-700"
                         >
                             <ChevronLeft className="w-5 h-5" />
                         </button>
@@ -66,7 +66,7 @@ const RoutineHeader = ({ onEditClick, isLocked }) => {
                                 else jumpToToday();
                             }}
                             className={cn(
-                                "px-3 py-2 text-[10px] font-bold uppercase tracking-[0.15em] rounded transition-all active:scale-95",
+                                "px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] rounded transition-opacity active:opacity-80",
                                 isToday
                                     ? "text-slate-500 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
                                     : "text-white bg-indigo-600 hover:bg-indigo-500 shadow-sm shadow-indigo-500/20"
@@ -78,7 +78,7 @@ const RoutineHeader = ({ onEditClick, isLocked }) => {
                         <button
                             onClick={nextDay}
                             disabled={isToday}
-                            className="w-9 h-9 flex items-center justify-center rounded text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-90 disabled:opacity-20 disabled:cursor-default"
+                            className="w-9 h-9 flex items-center justify-center rounded text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors active:bg-slate-200 dark:active:bg-slate-700 disabled:opacity-20 disabled:cursor-default"
                         >
                             <ChevronRight className="w-5 h-5" />
                         </button>
@@ -120,13 +120,13 @@ const RoutineHeader = ({ onEditClick, isLocked }) => {
                 {!isToday && (
                     <div className="flex items-center justify-between px-5 py-3 bg-amber-50 dark:bg-amber-950/30 border-t border-amber-100/50 dark:border-amber-900/50 text-[11px]">
                         <div className="flex items-center gap-2 text-amber-600 dark:text-amber-500">
-                             <span className="font-extrabold tracking-wider uppercase">
+                             <span className="font-bold tracking-wide uppercase">
                                 VIEWING PAST DATE: {displayDate}
                              </span>
                         </div>
                         <button
                             onClick={jumpToToday}
-                            className="bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-800 transition-colors font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg active:scale-95"
+                            className="bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-800 transition-opacity font-semibold uppercase tracking-wide px-3 py-1.5 rounded-lg active:opacity-80"
                         >
                             RETURN TO TODAY
                         </button>

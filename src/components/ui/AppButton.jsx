@@ -22,27 +22,32 @@ export const AppButton = React.forwardRef(({
   disabled = false,
   icon: Icon,
   className,
+  onClick,
   ...props 
 }, ref) => {
+  const baseClasses = cn(
+    // Base constraints: height >= 44px tap target, typography token, motion token
+    // Strict: transition-all duration-180 ease-in-out (configured globally, we just say transition-all)
+    "relative flex items-center justify-center gap-2 min-h-[44px]",
+    "rounded font-medium transition-all outline-none",
+    "focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900",
+    // Variants
+    !variantClasses[variant] ? variantClasses.primary : variantClasses[variant],
+    // Sizes
+    sizeClasses[size],
+    // Full width
+    fullWidth ? "w-full" : "",
+    // Disabled/Loading state: 50% opacity, no pointer events to prevent fast double clicking.
+    (disabled || isLoading) ? "opacity-50 cursor-not-allowed" : "active:opacity-80",
+    className
+  );
+
   return (
     <button
       ref={ref}
+      onClick={onClick}
       disabled={disabled || isLoading}
-      className={cn(
-        // Base constraints: height >= 44px tap target, typography token, motion token
-        // Strict: transition-all duration-180 ease-in-out (configured globally, we just say transition-all)
-        "relative flex items-center justify-center gap-2 px-4 py-3 min-h-[44px]",
-        "rounded text-base font-medium transition-all outline-none",
-        "focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900",
-        // Variants
-        variants[variant],
-        // Full width
-        fullWidth ? "w-full" : "",
-        // Disabled/Loading state: 50% opacity, no pointer events to prevent fast double clicking. NO scale(0.98) on click if disabled.
-        // Active state: subtle scale down (0.98) without layout shift
-        (disabled || isLoading) ? "opacity-50 cursor-not-allowed" : "active:scale-[0.98]",
-        className
-      )}
+      className={baseClasses}
       {...props}
     >
       {/* 

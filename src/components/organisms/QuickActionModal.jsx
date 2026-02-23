@@ -61,7 +61,7 @@ const QuickActionModal = ({ isOpen, onClose }) => {
                     initial={{ y: '100%', opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: '100%', opacity: 0 }}
-                    transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                    transition={{ duration: 0.25, ease: 'easeOut' }}
                     className="relative w-full max-w-sm bg-white dark:bg-slate-900 rounded-3xl shadow-2xl p-6 z-10"
                 >
                     <div className="flex justify-between items-center mb-6">

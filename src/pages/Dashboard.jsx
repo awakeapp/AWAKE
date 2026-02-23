@@ -167,12 +167,12 @@ const Dashboard = () => {
             <div className="space-y-4">
                 <div className="flex items-end justify-between px-1">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">{greeting}, User</h1>
+                        <h1 className="text-xl font-semibold text-slate-800 dark:text-white tracking-tight">{greeting}, User</h1>
                         {motivation && <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">{motivation}</p>}
                     </div>
                     <div className="text-right hidden sm:block">
-                        <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Workspace</div>
-                        <div className="text-lg font-semibold text-slate-700 dark:text-slate-200">{remainingTasksCount} tasks left</div>
+                        <div className="text-xs font-medium text-slate-400 uppercase tracking-widest">Workspace</div>
+                        <div className="text-sm font-semibold text-slate-700 dark:text-slate-200">{remainingTasksCount} tasks left</div>
                     </div>
                 </div>
 
@@ -192,9 +192,9 @@ const Dashboard = () => {
                                 {routineProgress === 100 ? <Trophy className="w-6 h-6" /> : <Target className="w-6 h-6" />}
                             </div>
                             <div>
-                                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Routine</div>
-                                <div className="text-xl font-bold text-slate-900 dark:text-white leading-none">
-                                    {routineProgress}% <span className="text-sm font-medium text-slate-400 ml-1">Complete</span>
+                                <div className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-0.5">Routine</div>
+                                <div className="text-lg font-semibold text-slate-900 dark:text-white leading-none">
+                                    {routineProgress}% <span className="text-xs font-medium text-slate-400 ml-1">Complete</span>
                                 </div>
                             </div>
                         </div>
@@ -254,7 +254,7 @@ const Dashboard = () => {
                             onClick={() => setShowUnlockModal(true)}
                             className="w-full py-12 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center text-slate-400 hover:text-amber-500 hover:border-amber-200 dark:hover:border-amber-900/50 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all group"
                         >
-                            <div className="w-12 h-12 rounded-full bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <div className="w-12 h-12 rounded-full bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center mb-3 transition-colors">
                                 <Lock className="w-6 h-6 text-amber-500" />
                             </div>
                             <span className="font-semibold text-sm text-slate-600 dark:text-slate-300">Day Locked</span>
@@ -265,7 +265,7 @@ const Dashboard = () => {
                             onClick={() => setShowManagerModal(true)}
                             className="w-full py-12 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center text-slate-400 hover:text-indigo-500 hover:border-indigo-200 dark:hover:border-indigo-900/50 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all group"
                         >
-                            <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3 transition-colors">
                                 <Edit2 className="w-6 h-6" />
                             </div>
                             <span className="font-semibold text-sm">Design Your Day</span>
@@ -320,7 +320,7 @@ const Dashboard = () => {
                     </div>
                 ) : (
                     <Button
-                        className="w-full py-4 text-base font-semibold shadow-xl shadow-indigo-500/20"
+                        className="w-full py-4 text-sm font-semibold shadow-xl shadow-indigo-500/20"
                         onClick={handleInitialSubmit}
                     >
                         Complete Day

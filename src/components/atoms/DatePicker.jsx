@@ -51,13 +51,13 @@ const DatePicker = ({ selectedDate, onChange, minDate, onClose, className }) => 
                 <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800/50 rounded-lg p-0.5 border border-slate-100 dark:border-slate-800">
                     <button
                         onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-                        className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-white dark:hover:bg-slate-700 rounded-md transition-all active:scale-90"
+                        className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-white dark:hover:bg-slate-700 rounded-md transition-all active:bg-slate-100 dark:active:bg-slate-600"
                     >
                         <ChevronUp className="w-3.5 h-3.5 stroke-[2.5]" />
                     </button>
                     <button
                         onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                        className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-white dark:hover:bg-slate-700 rounded-md transition-all active:scale-90"
+                        className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-white dark:hover:bg-slate-700 rounded-md transition-all active:bg-slate-100 dark:active:bg-slate-600"
                     >
                         <ChevronDown className="w-3.5 h-3.5 stroke-[2.5]" />
                     </button>
@@ -88,7 +88,7 @@ const DatePicker = ({ selectedDate, onChange, minDate, onClose, className }) => 
                             className={clsx(
                                 "h-8 w-8 rounded-lg flex items-center justify-center text-xs transition-all relative font-semibold",
                                 isDisabled && "opacity-20 cursor-not-allowed",
-                                !isDisabled && isSelected && "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 scale-105 z-10",
+                                !isDisabled && isSelected && "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 z-10",
                                 !isDisabled && !isSelected && isCurrentMonth && "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:rounded-lg",
                                 !isDisabled && !isSelected && !isCurrentMonth && "text-slate-300 dark:text-slate-600",
                                 isTodayDate && !isSelected && "text-indigo-600 font-bold bg-indigo-50 dark:bg-indigo-900/20",

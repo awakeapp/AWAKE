@@ -14,8 +14,8 @@ const BottomNav = () => {
                     className={({ isActive }) => clsx(
                         "p-3 rounded-full transition-all duration-300 relative flex items-center justify-center",
                         isActive
-                            ? "text-blue-400 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.3)] scale-110"
-                            : "text-slate-400 hover:text-blue-400 hover:scale-110 hover:bg-white/5"
+                            ? "text-blue-400 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                            : "text-slate-400 hover:text-blue-400 hover:bg-white/5 active:bg-white/10"
                     )}
                 >
                     <Home className="w-6 h-6" />
@@ -27,8 +27,8 @@ const BottomNav = () => {
                     className={({ isActive }) => clsx(
                         "p-3 rounded-full transition-all duration-300 relative flex items-center justify-center",
                         isActive
-                            ? "text-blue-400 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.3)] scale-110"
-                            : "text-slate-400 hover:text-blue-400 hover:scale-110 hover:bg-white/5"
+                            ? "text-blue-400 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                            : "text-slate-400 hover:text-blue-400 hover:bg-white/5 active:bg-white/10"
                     )}
                 >
                     <ListTodo className="w-6 h-6" />
@@ -40,8 +40,8 @@ const BottomNav = () => {
                     className={({ isActive }) => clsx(
                         "p-3 rounded-full transition-all duration-300 relative flex items-center justify-center",
                         isActive
-                            ? "text-blue-400 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.3)] scale-110"
-                            : "text-slate-400 hover:text-blue-400 hover:scale-110 hover:bg-white/5"
+                            ? "text-blue-400 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                            : "text-slate-400 hover:text-blue-400 hover:bg-white/5 active:bg-white/10"
                     )}
                 >
                     <Wallet className="w-6 h-6" />
@@ -53,8 +53,8 @@ const BottomNav = () => {
                     className={({ isActive }) => clsx(
                         "p-3 rounded-full transition-all duration-300 relative flex items-center justify-center",
                         isActive
-                            ? "text-blue-400 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.3)] scale-110"
-                            : "text-slate-400 hover:text-blue-400 hover:scale-110 hover:bg-white/5"
+                            ? "text-blue-400 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                            : "text-slate-400 hover:text-blue-400 hover:bg-white/5 active:bg-white/10"
                     )}
                 >
                     <Car className="w-6 h-6" />
