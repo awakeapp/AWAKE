@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { AuthContextProvider } from './context/AuthContext';
 import { ThemeContextProvider } from './context/ThemeContext';
@@ -16,6 +16,7 @@ import MainLayout from './components/templates/MainLayout';
 import WorkspaceLayout from './components/templates/WorkspaceLayout';
 import GlobalErrorBanner from './components/system/GlobalErrorBanner';
 import OnboardingModal from './components/system/OnboardingModal';
+import WelcomeSequence from './components/molecules/WelcomeSequence';
 
 // Firebase services
 import { trackScreenView } from './lib/analytics';
@@ -30,6 +31,7 @@ const Home = lazy(() => import('./pages/Home'));
 const Routine = lazy(() => import('./pages/Routine'));
 const History = lazy(() => import('./pages/History'));
 const Settings = lazy(() => import('./pages/Settings'));
+const Profile = lazy(() => import('./pages/Profile'));
 // const UserManagement = lazy(() => import('./pages/UserManagement')); // Removed
 
 
@@ -61,10 +63,25 @@ function AnalyticsTracker() {
 }
 
 function App() {
+  const [showWelcome, setShowWelcome] = useState(() => !sessionStorage.getItem('hasSeenWelcome'));
+
   useEffect(() => {
     // Initialize remote config on app load
     initRemoteConfig().catch(console.error);
   }, []);
+
+  if (showWelcome) {
+    return (
+        <AuthContextProvider>
+            <ThemeContextProvider>
+                <WelcomeSequence onComplete={() => {
+                    sessionStorage.setItem('hasSeenWelcome', 'true');
+                    setShowWelcome(false);
+                }} />
+            </ThemeContextProvider>
+        </AuthContextProvider>
+    );
+  }
 
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
@@ -96,6 +113,7 @@ function App() {
                             <Route path="/routine" element={<Routine />} />
                             <Route path="/history" element={<History />} />
                             <Route path="/settings" element={<Settings />} />
+                            <Route path="/profile" element={<Profile />} />
 
                             {/* <Route path="/users" element={<UserManagement />} /> */}
                             <Route path="/analytics" element={<Analytics />} />

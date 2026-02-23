@@ -1,8 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Home, CheckSquare, Calendar, Settings, LogOut, Utensils, PieChart, ChevronRight, Heart, Wallet, Activity } from 'lucide-react';
+import { X, Home, CheckSquare, Calendar, Settings, Utensils, PieChart, ChevronRight, Heart, Wallet, Activity } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../hooks/useAuthContext';
-import { useLogout } from '../../hooks/useLogout';
 
 import { useRef, useState } from 'react';
 import { useDate } from '../../context/DateContext';
@@ -12,25 +11,9 @@ import { useTranslation } from 'react-i18next';
 
 const SideMenu = ({ isOpen, onClose }) => {
     const { user } = useAuthContext();
-    const { logout } = useLogout();
-    const { setDate, formattedDate, maxDate } = useDate();
     const navigate = useNavigate();
     const [isJumpModalOpen, setIsJumpModalOpen] = useState(false);
     const { t } = useTranslation();
-
-    const handleLogout = async () => {
-        try {
-            await logout();
-            // App.jsx ProtectedRoute should handle redirect, 
-            // but we'll try to navigate too for good measure.
-            navigate('/login', { replace: true });
-        } catch (err) {
-            console.error("Logout error:", err);
-            // Hard reset fallback
-            localStorage.clear();
-            window.location.hash = '/login';
-        }
-    };
 
     const menuItems = [
         { icon: Home, label: t('nav.dashboard', 'Dashboard'), path: '/' },
@@ -66,43 +49,11 @@ const SideMenu = ({ isOpen, onClose }) => {
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                         className="fixed inset-y-0 right-0 z-50 w-3/4 max-w-sm bg-white shadow-2xl flex flex-col dark:bg-slate-900 dark:border-l dark:border-slate-800"
                     >
-                        {/* Header */}
                         <div className="p-5 border-b flex items-center justify-between dark:border-slate-800">
                             <h2 className="text-lg font-bold text-slate-800 dark:text-white">{t('common.menu', 'Menu')}</h2>
                             <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full">
                                 <X className="w-5 h-5 text-slate-500" />
                             </button>
-                        </div>
-
-                        {/* User Profile Summary */}
-                        <div
-                            onClick={() => {
-                                navigate('/settings');
-                                onClose();
-                            }}
-                            className="p-5 bg-slate-50 border-b dark:bg-slate-900 dark:border-slate-800 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                        >
-                            <div className="flex items-center gap-3">
-                                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold shadow-sm ring-2 ring-white dark:ring-slate-700 overflow-hidden ${user?.profileColor ? `${user.profileColor} text-white` : 'bg-indigo-100 text-indigo-600'}`}>
-                                    {user?.photoURL ? (
-                                        <img
-                                            src={user.photoURL}
-                                            alt={user?.name}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    ) : (
-                                        <span className="text-sm font-black uppercase tracking-wider !text-white">{user?.initials || user?.name?.charAt(0)}</span>
-                                    )}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex items-center justify-between">
-                                        <p className="font-bold text-slate-900 truncate dark:text-white">{user?.name}</p>
-                                        <ChevronRight className="w-4 h-4 text-slate-400" />
-                                    </div>
-                                    <p className="text-[10px] text-slate-500 font-medium">{t('settings.member_id', 'Member ID')}: AWK-{user?.uid?.slice(-4).toUpperCase() || 'GUEST'}</p>
-                                    <p className="text-[10px] text-indigo-500 font-semibold">{user?.email}</p>
-                                </div>
-                            </div>
                         </div>
 
                         {/* Navigation */}
@@ -173,15 +124,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Footer */}
-                        <div className="p-4 border-t">
-                            <button
-                                type="button"
-                                onClick={handleLogout}
-                                className="flex items-center gap-3 w-full px-3 py-3 rounded-xl text-red-600 hover:bg-red-50 font-medium transition-colors active:scale-95 z-[60]"
-                            >
-                                <LogOut className="w-5 h-5" />
-                                {t('settings.sign_out', 'Sign Out')}
-                            </button>
+                        <div className="p-4 border-t border-slate-100 dark:border-slate-800">
                             <p className="text-center text-xs text-slate-300 mt-4">
                                 Version 1.0.0
                             </p>

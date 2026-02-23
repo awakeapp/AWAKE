@@ -149,7 +149,7 @@ const Login = () => {
                     <CardHeader className="space-y-2 text-center pb-6 pt-8">
                         <div className="mx-auto flex justify-center mb-6 relative">
                             <div className="relative">
-                                <img src={awakeLogo} alt="Awake Logo" className="h-10 w-auto relative z-10 drop-shadow-sm object-contain dark:brightness-0 dark:invert" />
+                                <img src={awakeLogo} alt="Awake Logo" className="h-8 w-auto relative z-10 drop-shadow-sm object-contain dark:brightness-0 dark:invert" />
                             </div>
                         </div>
                         <CardTitle className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">

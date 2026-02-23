@@ -7,7 +7,7 @@ const FullPageLoader = () => {
                 <img
                     src={awakeLogo}
                     alt="Loading..."
-                    className="h-16 w-auto animate-pulse object-contain drop-shadow-xl dark:brightness-0 dark:invert"
+                    className="h-10 w-auto animate-pulse object-contain drop-shadow-xl dark:brightness-0 dark:invert"
                 />
             </div>
         </div>

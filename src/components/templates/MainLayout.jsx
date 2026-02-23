@@ -4,14 +4,15 @@ import { Suspense } from 'react';
 import SideMenu from '../organisms/SideMenu';
 import BottomNavigation from '../organisms/BottomNavigation';
 import { AppHeader } from '../ui/AppHeader';
-import { LayoutGrid, ArrowLeft, Droplet, Moon, Sun } from 'lucide-react';
+import { Menu, ArrowLeft, Droplet, Moon, Sun } from 'lucide-react';
 
 import { useDate } from '../../context/DateContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuthContext } from '../../hooks/useAuthContext';
 import { useState } from 'react';
-import awakeLogo from '../../assets/awake_logo_new.png';
 
 const MainLayout = ({ children }) => {
+    const { user } = useAuthContext();
     const { formattedDate } = useDate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
@@ -37,14 +38,20 @@ const MainLayout = ({ children }) => {
                 onBack={() => navigate(-1)}
                 leftNode={
                     <button
-                        onClick={() => navigate('/')}
-                        className="focus:outline-none hover:opacity-80 transition-opacity"
+                        onClick={() => navigate('/profile')}
+                        className="focus:outline-none hover:opacity-80 transition-opacity flex items-center justify-center"
                     >
-                        <img
-                            src={awakeLogo}
-                            alt="HUMI AWAKE"
-                            className="h-8 w-auto object-cover dark:brightness-0 dark:invert"
-                        />
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shadow-sm ring-1 ring-white dark:ring-slate-700 overflow-hidden ${user?.profileColor ? `${user.profileColor} text-white` : 'bg-indigo-100 text-indigo-600'}`}>
+                            {user?.photoURL ? (
+                                <img
+                                    src={user.photoURL}
+                                    alt={user?.name}
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <span className="uppercase">{user?.initials || user?.name?.charAt(0) || 'U'}</span>
+                            )}
+                        </div>
                     </button>
                 }
                 rightNode={
@@ -53,7 +60,7 @@ const MainLayout = ({ children }) => {
                             onClick={() => setIsMenuOpen(true)}
                             className="p-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors dark:text-slate-300 dark:hover:bg-slate-800"
                         >
-                            <LayoutGrid className="w-6 h-6" />
+                            <Menu className="w-6 h-6" />
                         </button>
                     </>
                 }
