@@ -18,6 +18,17 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     console.error("Render Crash Caught:", error, errorInfo);
+    
+    const msg = error?.message || "";
+    const isChunkLoadFailed = msg.includes("Failed to fetch dynamically") || msg.includes("Importing a module script failed");
+    
+    if (isChunkLoadFailed) {
+      const reloadCount = parseInt(sessionStorage.getItem('chunk_reload_count') || '0', 10);
+      if (reloadCount < 2) {
+        sessionStorage.setItem('chunk_reload_count', (reloadCount + 1).toString());
+        window.location.reload();
+      }
+    }
   }
 
   handleReload = () => {
