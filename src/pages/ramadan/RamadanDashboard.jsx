@@ -39,8 +39,8 @@ const FastingTracker = ({ todayKey, ramadanData, updateDay }) => {
     };
 
     return (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Today's Fast</h2>
+        <div className="bg-white dark:bg-[#1C1C1E] border border-slate-200 dark:border-[#2C2C2E] rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm dark:shadow-none">
+            <h2 className="text-[17px] font-semibold text-black dark:text-white mb-4">Today's Fast</h2>
             
             <div className="flex gap-3 mb-4">
                 <button 
@@ -145,8 +145,8 @@ const NightPrayersTracker = ({ todayKey, ramadanData, updateDay }) => {
     };
 
     return (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Night Prayers</h2>
+        <div className="bg-white dark:bg-[#1C1C1E] border border-slate-200 dark:border-[#2C2C2E] rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm dark:shadow-none">
+            <h2 className="text-[17px] font-semibold text-black dark:text-white mb-4">Night Prayers</h2>
             <div className="flex flex-col">
                 <PrayerRow 
                     title="Taraweeh" 
@@ -240,21 +240,18 @@ const RamadanDashboard = () => {
     const isRamadanActive = hijriDate?.isRamadan;
 
     return (
-        <div className="space-y-6 pb-24">
-            <header className="mb-6 px-2">
-                <div className="flex justify-between items-end">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Ramadan Hub</h1>
-                        <p className="text-slate-500 text-sm mt-1">Track your fasting and worship.</p>
-                    </div>
-                    <button 
-                        onClick={() => setIsSettingsOpen(true)}
-                        className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-full transition-colors dark:hover:bg-slate-800 dark:hover:text-slate-300"
-                    >
-                        <Settings className="w-6 h-6" />
-                    </button>
-                </div>
+        <div className="pb-24 pt-2 sm:pt-4">
+            <header className="px-4 sm:px-0 flex items-center justify-between mb-6">
+                <h1 className="text-[28px] font-bold tracking-tight text-black dark:text-white">Ramadan</h1>
+                <button 
+                    onClick={() => setIsSettingsOpen(true)}
+                    className="p-2 -mr-2 text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors"
+                >
+                    <Settings className="w-6 h-6" />
+                </button>
             </header>
+
+            <div className="px-4 sm:px-0 space-y-6">
 
             {/* Location Warning Banner */}
             {location?.isDefault && (
@@ -271,17 +268,17 @@ const RamadanDashboard = () => {
                 </div>
             )}
             
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm overflow-hidden relative">
+            <div className="bg-white dark:bg-[#1C1C1E] border border-slate-200 dark:border-[#2C2C2E] rounded-xl sm:rounded-2xl p-6 shadow-sm dark:shadow-none overflow-hidden relative">
                  <div className="relative z-10">
                      <div className="flex justify-between items-center mb-6">
                         <div>
-                            <span className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase">
+                            <span className="bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full text-[11px] font-semibold tracking-wider uppercase">
                                 {isRamadanActive ? `Day ${hijriDate.day}` : 'Pre-Ramadan'}
                             </span>
                         </div>
                         <div className="text-right">
-                             <p className="font-bold text-slate-900 dark:text-white text-sm">{hijriDate?.day} Ramadan {hijriDate?.year}</p>
-                             <p className="text-slate-500 text-xs mt-px">{now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
+                             <p className="font-semibold text-black dark:text-white text-[15px]">{hijriDate?.day} Ramadan {hijriDate?.year}</p>
+                             <p className="text-slate-500 text-[13px] mt-0.5">{now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
                         </div>
                      </div>
 
@@ -297,13 +294,13 @@ const RamadanDashboard = () => {
             {/* Suhoor and Iftar Highlights */}
             {todayPrayers && (
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col items-center justify-center shadow-sm">
-                        <span className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Suhoor Ends</span>
-                        <span className="text-slate-900 dark:text-white text-2xl font-bold">{suhoorTimeStr}</span>
+                    <div className="bg-white dark:bg-[#1C1C1E] border border-slate-200 dark:border-[#2C2C2E] rounded-xl p-4 flex flex-col items-center justify-center shadow-sm dark:shadow-none">
+                        <span className="text-slate-500 text-[11px] font-semibold uppercase tracking-wider mb-1.5">Suhoor Ends</span>
+                        <span className="text-black dark:text-white text-[24px] font-bold tracking-tight">{suhoorTimeStr}</span>
                     </div>
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col items-center justify-center shadow-sm">
-                        <span className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Iftar Time</span>
-                        <span className="text-slate-900 dark:text-white text-2xl font-bold">{iftarTimeStr}</span>
+                    <div className="bg-white dark:bg-[#1C1C1E] border border-slate-200 dark:border-[#2C2C2E] rounded-xl p-4 flex flex-col items-center justify-center shadow-sm dark:shadow-none">
+                        <span className="text-slate-500 text-[11px] font-semibold uppercase tracking-wider mb-1.5">Iftar Time</span>
+                        <span className="text-black dark:text-white text-[24px] font-bold tracking-tight">{iftarTimeStr}</span>
                     </div>
                 </div>
             )}
@@ -319,10 +316,12 @@ const RamadanDashboard = () => {
             )}
 
             {!isRamadanActive && (
-                <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-500/20 rounded p-4 text-center text-amber-800 dark:text-amber-200 text-sm">
+                <div className="bg-[#1C1C1E] border border-[#2C2C2E] rounded-xl p-4 text-center text-slate-400 text-[14px]">
                     Ramadan has not officially started yet according to the calculated Hijri date.
                 </div>
             )}
+            
+            </div>
 
             <RamadanSettingsModal 
                 isOpen={isSettingsOpen} 

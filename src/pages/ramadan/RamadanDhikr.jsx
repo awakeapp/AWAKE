@@ -24,12 +24,12 @@ const CounterCard = ({ title, count, target, onSave, accentClass }) => {
     const progress = target > 0 ? Math.min((count / target) * 100, 100) : 0;
 
     return (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded p-4 shadow-sm">
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">{title}</h3>
+        <div className="bg-white dark:bg-[#1C1C1E] border border-slate-200 dark:border-[#2C2C2E] rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-sm dark:shadow-none">
+            <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3">{title}</h3>
 
             {/* Count display */}
             <div className="flex items-end gap-2 mb-3">
-                <span className="text-4xl font-black text-slate-800 dark:text-white tabular-nums leading-none">{count}</span>
+                <span className="text-4xl font-black text-black dark:text-white tabular-nums leading-none tracking-tight">{count}</span>
                 {target > 0 && <span className="text-sm font-medium text-slate-400 mb-1">/ {target}</span>}
             </div>
 
@@ -136,7 +136,7 @@ const QuranGoalWidget = ({ ramadanData, updateQuranGoal, currentDay }) => {
     }
 
     return (
-        <div className="bg-slate-900 border border-slate-800 rounded p-4 shadow-sm text-white relative overflow-hidden">
+        <div className="bg-[#1C1C1E] border border-[#2C2C2E] rounded-xl sm:rounded-2xl p-5 sm:p-6 shadow-sm dark:shadow-none text-white relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-2xl -mr-10 -mt-10"></div>
             
             <div className="flex justify-between items-start mb-6 relative z-10">
@@ -203,59 +203,62 @@ const RamadanDhikr = () => {
     };
 
     return (
-        <div className="space-y-6 pb-24">
-            <header className="mb-2 px-2">
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Worship & Dhikr</h1>
-                <p className="text-slate-500 text-sm mt-1">Enter your daily recitation counts below.</p>
+        <div className="pb-24 pt-2 sm:pt-4">
+            <header className="px-4 sm:px-0 flex items-center justify-between mb-6">
+                <div>
+                    <h1 className="text-[28px] font-bold tracking-tight text-black dark:text-white">Dhikr</h1>
+                </div>
             </header>
 
-            <QuranGoalWidget 
-                ramadanData={ramadanData} 
-                updateQuranGoal={updateQuranGoal} 
-                currentDay={hijriDate.day} 
-            />
+            <div className="px-4 sm:px-0 space-y-6">
+                <QuranGoalWidget 
+                    ramadanData={ramadanData} 
+                    updateQuranGoal={updateQuranGoal} 
+                    currentDay={hijriDate.day} 
+                />
 
-            <div className="space-y-4">
-                <CounterCard 
-                    title="Tahlil (La ilaha illAllah)" 
-                    count={todayData.tahlil || 0} 
-                    target={100}
-                    onSave={(val) => handleSave('tahlil', val)}
-                    accentClass="bg-blue-500"
-                />
-                <CounterCard 
-                    title="Salawat" 
-                    count={todayData.salawat || 0} 
-                    target={100}
-                    onSave={(val) => handleSave('salawat', val)}
-                    accentClass="bg-indigo-500"
-                />
-                <CounterCard 
-                    title="Istighfar" 
-                    count={todayData.istighfar || 0} 
-                    target={100}
-                    onSave={(val) => handleSave('istighfar', val)}
-                    accentClass="bg-violet-500"
-                />
-            </div>
-
-            <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-800">
-                <h2 className="px-2 text-lg font-bold text-slate-900 dark:text-white">Daily Quran Log</h2>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-4">
                     <CounterCard 
-                        title="Pages Read" 
-                        count={todayData.quranPages || 0} 
-                        target={0}
-                        onSave={(val) => handleSave('quranPages', val)}
-                        accentClass="bg-emerald-500"
+                        title="Tahlil (La ilaha illAllah)" 
+                        count={todayData.tahlil || 0} 
+                        target={100}
+                        onSave={(val) => handleSave('tahlil', val)}
+                        accentClass="bg-blue-500"
                     />
                     <CounterCard 
-                        title="Juz Read" 
-                        count={todayData.quranJuz || 0} 
-                        target={0}
-                        onSave={(val) => handleSave('quranJuz', val)}
-                        accentClass="bg-emerald-600"
+                        title="Salawat" 
+                        count={todayData.salawat || 0} 
+                        target={100}
+                        onSave={(val) => handleSave('salawat', val)}
+                        accentClass="bg-indigo-500"
                     />
+                    <CounterCard 
+                        title="Istighfar" 
+                        count={todayData.istighfar || 0} 
+                        target={100}
+                        onSave={(val) => handleSave('istighfar', val)}
+                        accentClass="bg-violet-500"
+                    />
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-[#2C2C2E]">
+                    <h2 className="text-[17px] font-semibold text-black dark:text-white">Daily Quran Log</h2>
+                    <div className="grid grid-cols-2 gap-4">
+                        <CounterCard 
+                            title="Pages Read" 
+                            count={todayData.quranPages || 0} 
+                            target={0}
+                            onSave={(val) => handleSave('quranPages', val)}
+                            accentClass="bg-emerald-500"
+                        />
+                        <CounterCard 
+                            title="Juz Read" 
+                            count={todayData.quranJuz || 0} 
+                            target={0}
+                            onSave={(val) => handleSave('quranJuz', val)}
+                            accentClass="bg-emerald-600"
+                        />
+                    </div>
                 </div>
             </div>
         </div>

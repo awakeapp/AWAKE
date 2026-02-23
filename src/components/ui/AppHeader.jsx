@@ -1,8 +1,5 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
-import { clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+
+
 
 function cn(...inputs) {
   return twMerge(clsx(inputs));
@@ -16,16 +13,6 @@ export function AppHeader({
   onBack,
   className 
 }) {
-  const navigate = useNavigate();
-
-  const handleBack = () => {
-    if (onBack) {
-      onBack();
-    } else {
-      navigate(-1);
-    }
-  };
-
   return (
     <header
       className={cn(
@@ -41,13 +28,9 @@ export function AppHeader({
       {/* Left Action Area */}
       <div className="flex-1 flex justify-start items-center">
         {showBack ? (
-          <button
-            onClick={handleBack}
-            className="flex items-center text-primary-600 dark:text-primary-400 p-2 -ml-2 rounded-full active:bg-slate-100 dark:active:bg-slate-800 transition-colors"
-          >
-            <ChevronLeft className="w-6 h-6" /> {/* Standard 24px icon */}
-            <span className="text-base font-medium ml-1">Back</span>
-          </button>
+          <div className="-ml-2">
+            <BackButton onClick={onBack} className="bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 text-primary-600 dark:text-primary-400" />
+          </div>
         ) : (
           leftNode
         )}

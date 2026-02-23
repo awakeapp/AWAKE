@@ -6,23 +6,23 @@ import clsx from 'clsx';
 const StatCard = ({ title, icon: Icon, value, target, percent, colorClass = "bg-emerald-500", textClass = "text-emerald-500" }) => {
     const displayPercent = percent > 100 ? 100 : percent;
     return (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded p-4 shadow-sm">
+        <div className="bg-white dark:bg-[#1C1C1E] border border-slate-200 dark:border-[#2C2C2E] rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-sm dark:shadow-none">
             <div className="flex items-center gap-3 mb-4">
                 <div className={clsx("p-2 rounded-xl bg-opacity-10", textClass, colorClass.replace('bg-', 'bg-').replace('500', '500/10'))}>
                     <Icon className={clsx("w-5 h-5", textClass)} />
                 </div>
-                <h3 className="font-bold text-slate-700 dark:text-slate-300">{title}</h3>
+                <h3 className="font-semibold text-black dark:text-white text-[15px]">{title}</h3>
             </div>
             
             <div className="flex items-end justify-between mb-2">
                 <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-black text-slate-900 dark:text-white tabular-nums">{value}</span>
-                    {target && <span className="text-sm text-slate-400 font-medium">/ {target}</span>}
+                    <span className="text-[28px] font-black tracking-tight text-black dark:text-white tabular-nums leading-none">{value}</span>
+                    {target && <span className="text-[13px] text-slate-500 font-medium">/ {target}</span>}
                 </div>
-                <span className={clsx("text-sm font-bold", textClass)}>{Math.round(percent)}%</span>
+                <span className={clsx("text-[13px] font-bold", textClass)}>{Math.round(percent)}%</span>
             </div>
             
-            <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-slate-100 dark:bg-[#2C2C2E] rounded-full h-2 overflow-hidden">
                 <div 
                     className={clsx("h-full rounded-full transition-all duration-1000", colorClass)} 
                     style={{ width: `${displayPercent}%` }}
@@ -87,31 +87,29 @@ const RamadanStats = () => {
     const grandTotalDhikr = totalTahlil + totalSalawat + totalIstighfar;
 
     return (
-        <div className="space-y-6 pb-24">
-            <header className="mb-6 px-2">
-                <div className="flex justify-between items-end">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Ramadan Stats</h1>
-                        <p className="text-slate-500 text-sm mt-1">Your overall progress this month.</p>
-                    </div>
+        <div className="pb-24 pt-2 sm:pt-4">
+            <header className="px-4 sm:px-0 flex items-center justify-between mb-6">
+                <div>
+                    <h1 className="text-[28px] font-bold tracking-tight text-black dark:text-white">Stats</h1>
                 </div>
             </header>
 
-            {/* Top Level Summary Card */}
-            <div className="bg-indigo-600 dark:bg-indigo-900/50 rounded p-6 shadow-md text-white relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
-                <div className="relative z-10 flex items-center justify-between">
-                    <div>
-                        <p className="text-indigo-100 uppercase tracking-wider text-xs font-bold mb-1">Total Dhikr</p>
-                        <p className="text-5xl font-black tabular-nums tracking-tight">{grandTotalDhikr}</p>
-                    </div>
-                    <div className="w-16 h-16 bg-white/20 rounded flex items-center justify-center backdrop-blur-sm border border-white/20">
-                        <Heart className="w-8 h-8 text-white fill-white/20" />
+            <div className="px-4 sm:px-0 space-y-6">
+                {/* Top Level Summary Card */}
+                <div className="bg-indigo-600 dark:bg-indigo-900/50 rounded-xl sm:rounded-2xl p-6 shadow-md text-white relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                    <div className="relative z-10 flex items-center justify-between">
+                        <div>
+                            <p className="text-indigo-100 uppercase tracking-wider text-[11px] font-bold mb-1">Total Dhikr</p>
+                            <p className="text-[40px] font-black tabular-nums tracking-tight leading-none">{grandTotalDhikr}</p>
+                        </div>
+                        <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/20">
+                            <Heart className="w-8 h-8 text-white fill-white/20" />
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="space-y-4">
+                <div className="space-y-4">
                 <StatCard 
                     title="Fasting Days" 
                     icon={Sun} 
@@ -166,6 +164,7 @@ const RamadanStats = () => {
                     colorClass="bg-blue-500" 
                     textClass="text-blue-500"
                 />
+            </div>
             </div>
         </div>
     );

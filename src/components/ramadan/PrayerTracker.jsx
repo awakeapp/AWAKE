@@ -109,13 +109,13 @@ const PrayerTracker = () => {
     return (
         <div className="space-y-6">
             {/* 5 Daily Prayers */}
-            <div className="bg-white dark:bg-[#1C1C1E] rounded-2xl border border-slate-200 dark:border-[#2C2C2E] shadow-sm dark:shadow-none overflow-hidden">
-                <div className="px-4 pt-4 pb-2">
-                    <h2 className="text-[13px] font-semibold text-slate-500 dark:text-[#8E8E93] uppercase tracking-wider">
+            <div className="bg-white dark:bg-[#1C1C1E] rounded-xl sm:rounded-2xl border border-slate-200 dark:border-[#2C2C2E] shadow-sm dark:shadow-none overflow-hidden">
+                <div className="px-5 pt-4 pb-2">
+                    <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                         Daily Prayers
                     </h2>
                 </div>
-                <div className="px-4 pb-2">
+                <div className="px-5 pb-2">
                     {PRAYERS.map((p, idx) => (
                         <PrayerRow
                             key={p.key}
@@ -132,13 +132,13 @@ const PrayerTracker = () => {
             </div>
 
             {/* Night & Additional Prayers */}
-            <div className="bg-white dark:bg-[#1C1C1E] rounded-2xl border border-slate-200 dark:border-[#2C2C2E] shadow-sm dark:shadow-none overflow-hidden">
-                <div className="px-4 pt-4 pb-2">
-                    <h2 className="text-[13px] font-semibold text-slate-500 dark:text-[#8E8E93] uppercase tracking-wider">
+            <div className="bg-white dark:bg-[#1C1C1E] rounded-xl sm:rounded-2xl border border-slate-200 dark:border-[#2C2C2E] shadow-sm dark:shadow-none overflow-hidden">
+                <div className="px-5 pt-4 pb-2">
+                    <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                         Night &amp; Additional Prayers
                     </h2>
                 </div>
-                <div className="px-4 pb-2">
+                <div className="px-5 pb-2">
                     {EXTRA_PRAYERS.map((p, idx) => (
                         <PrayerRow
                             key={p.key}

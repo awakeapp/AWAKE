@@ -134,32 +134,13 @@ const Routine = () => {
 
     return (
         <div className="pb-24">
-            <div className="sticky top-[60px] z-20 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md pt-3 pb-3 mb-4 border-b border-slate-200 dark:border-slate-800 -mx-4 px-4">
-                <DateHeader className="mb-0" />
-            </div>
-
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-4 mb-6 flex items-center justify-between transition-all duration-150">
-                <div className="flex items-center gap-4">
-                    <div className="bg-slate-100 dark:bg-slate-800 p-2.5 rounded-xl text-slate-500">
-                        <List className="w-5 h-5 stroke-[1.5]" />
-                    </div>
-                    <div>
-                        <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-100 tracking-tight">Daily Routine</h2>
-                        <p className="text-xs text-slate-500 font-normal mt-0.5">
-                            {dailyData.tasks.filter(t => t.status === 'checked').length}/{dailyData.tasks.length} Completed
-                        </p>
-                    </div>
-                </div>
-                <button
-                    onClick={() => setShowManagerModal(true)}
-                    className={clsx(
-                        "text-slate-400 hover:text-indigo-600 transition-colors p-2",
-                        isLocked && "hidden"
-                    )}
-                    aria-label="Edit Routine"
-                >
-                    <Edit2 className="w-4 h-4 stroke-[1.5]" />
-                </button>
+            <div className="sticky top-[60px] z-20 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md py-2 mb-6 border-b border-slate-200 dark:border-slate-800 -mx-4 px-4 transition-all duration-150">
+                <DateHeader 
+                    className="mb-0 w-full" 
+                    overviewText={`${dailyData.tasks.filter(t => t.status === 'checked').length}/${dailyData.tasks.length} Completed`}
+                    onEditClick={() => setShowManagerModal(true)}
+                    isLocked={isLocked}
+                />
             </div>
 
             <div className="space-y-6">

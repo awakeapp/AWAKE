@@ -3,10 +3,8 @@ import { Suspense } from 'react';
 
 import SideMenu from '../organisms/SideMenu';
 import BottomNavigation from '../organisms/BottomNavigation';
-import RamadanBottomNav from '../ramadan/RamadanBottomNav';
 import { AppHeader } from '../ui/AppHeader';
 import { Menu } from 'lucide-react';
-import { RAMADAN_MODE } from '../../lib/featureFlags';
 
 import { useDate } from '../../context/DateContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -35,7 +33,6 @@ const MainLayout = ({ children }) => {
 
     const { isDark } = useTheme();
     const swipeHandlers = useSwipeNavigation();
-    const isRamadanPath = RAMADAN_MODE && location.pathname.startsWith('/ramadan');
 
     const Loader = (
         <div className="flex items-center justify-center p-12">
@@ -54,7 +51,6 @@ const MainLayout = ({ children }) => {
                 <AppHeader
                     title=""
                     showBack={!isTopLevel}
-                    onBack={() => navigate(-1)}
                     leftNode={
                         <button
                             onClick={() => navigate('/profile')}
@@ -97,8 +93,8 @@ const MainLayout = ({ children }) => {
                 </main>
             )}
 
-            {/* Bottom Navigation — swap to Ramadan nav on /ramadan/* paths */}
-            {isRamadanPath ? <RamadanBottomNav /> : <BottomNavigation />}
+            {/* Bottom Navigation */}
+            <BottomNavigation />
 
             {/* Side Menu Drawer */}
             <SideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />

@@ -13,7 +13,11 @@ import { RAMADAN_MODE } from './lib/featureFlags';
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
-
+import FullPageLoader from './components/molecules/FullPageLoader';
+import MainLayout from './components/templates/MainLayout';
+import RamadanLayout from './components/templates/RamadanLayout';
+import WorkspaceLayout from './components/templates/WorkspaceLayout';
+import GlobalErrorBanner from './components/system/GlobalErrorBanner';
 import OnboardingModal from './components/system/OnboardingModal';
 import WelcomeSequence from './components/molecules/WelcomeSequence';
 
@@ -133,6 +137,7 @@ function App() {
                             <Route path="/analytics" element={<Analytics />} />
                             <Route path="/diet" element={<DietPlan />} />
 
+
                             {/* Finance */}
                             <Route path="/finance" element={<FinanceDashboard />} />
                             <Route path="/finance/debts" element={<DebtManager />} />
@@ -141,16 +146,16 @@ function App() {
 
                             {/* Vehicle */}
                             <Route path="/vehicle" element={<VehicleDashboard />} />
-
-                            {/* Ramadan — only included when RAMADAN_MODE=true */}
-                            {RAMADAN_MODE && RamadanDashboard && (
-                              <>
-                                <Route path="/ramadan" element={<RamadanDashboard />} />
-                                <Route path="/ramadan/stats" element={<RamadanStats />} />
-                                <Route path="/ramadan/dhikr" element={<RamadanDhikr />} />
-                              </>
-                            )}
                           </Route>
+
+                          {/* Ramadan — only included when RAMADAN_MODE=true, using RamadanLayout */}
+                          {RAMADAN_MODE && RamadanDashboard && (
+                            <Route element={<ProtectedRoute><RamadanLayout /></ProtectedRoute>}>
+                              <Route path="/ramadan" element={<RamadanDashboard />} />
+                              <Route path="/ramadan/stats" element={<RamadanStats />} />
+                              <Route path="/ramadan/dhikr" element={<RamadanDhikr />} />
+                            </Route>
+                          )}
 
                           {/* Workspace Routes */}
                           <Route path="/workspace" element={<ProtectedRoute><WorkspaceLayout /></ProtectedRoute>}>

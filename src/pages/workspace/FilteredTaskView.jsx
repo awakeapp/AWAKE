@@ -3,10 +3,10 @@ import TaskItem from '../../components/molecules/workspace/TaskItem';
 import { useMemo } from 'react';
 import { Calendar, Star, Clock } from 'lucide-react';
 import { format } from 'date-fns';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import BackButton from '../../components/atoms/BackButton';
 
 const FilteredTaskView = () => {
-    const navigate = useNavigate();
     const { filterType } = useParams();
     const { tasks, toggleTask, deleteTask, updateTask, rescheduleTask } = useTasks();
 
@@ -43,11 +43,7 @@ const FilteredTaskView = () => {
         <div className="space-y-6 pb-24">
             {/* Header */}
             <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
-                <button onClick={() => navigate(-1)} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex-shrink-0">
-                    <svg className="w-6 h-6 text-slate-700 dark:text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                </button>
+                <BackButton className="bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 -ml-2" />
                 <div className={`p-2 rounded-lg bg-slate-50 dark:bg-slate-800 ${header.color}`}>
                     <HeaderIcon className="w-6 h-6" />
                 </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronLeft, Lock, Trash2, Sliders, Bell, Layout } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import BackButton from '../../components/atoms/BackButton';
 import ThreeStateCheckbox from '../../components/atoms/ThreeStateCheckbox';
 import { motion } from 'framer-motion';
 import { useTasks } from '../../context/TaskContext';
@@ -23,12 +24,7 @@ const Settings = () => {
         <div className="space-y-6 pb-24">
             {/* Header */}
             <div className="flex items-center gap-3 mb-6">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
-                >
-                    <ChevronLeft className="w-5 h-5 text-slate-600" />
-                </button>
+                <BackButton className="bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 -ml-2" />
                 <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">
                     Settings
                 </h1>

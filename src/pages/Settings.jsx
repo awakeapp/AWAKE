@@ -6,6 +6,7 @@ import { User, Moon, Sun, Clock, ChevronRight, Download, ShieldCheck, HelpCircle
 import { FirestoreService } from '../services/firestore-service';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import BackButton from '../components/atoms/BackButton';
 
 // Shared Row Component matching iOS style
 const SettingsRow = ({ icon: Icon, title, subtitle, right, onClick, className, isLast, iconBgClass }) => (
@@ -98,9 +99,7 @@ const Settings = () => {
                 
                 {/* Header Title */}
                 <div className="px-4 flex items-center gap-3 sm:px-0 mb-4 sm:mb-6 mt-2">
-                    <button onClick={() => navigate(-1)} className="p-2 -ml-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors flex-shrink-0 lg:hidden">
-                        <ChevronRight className="w-6 h-6 rotate-180 text-black dark:text-white" />
-                    </button>
+                    <BackButton className="bg-transparent hover:bg-black/5 dark:bg-transparent dark:hover:bg-white/10 text-black dark:text-white lg:hidden -ml-2" />
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight text-black dark:text-white">{t('nav.settings', 'Settings')}</h1>
                     </div>

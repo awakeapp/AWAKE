@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { ArrowLeft, Archive, RefreshCw, Save, History, TrendingUp, TrendingDown, ArrowRightLeft } from 'lucide-react';
+import { Archive, RefreshCw, Save, History, TrendingUp, TrendingDown, ArrowRightLeft } from 'lucide-react';
+import BackButton from '../../components/atoms/BackButton';
 import { useState, useMemo } from 'react';
 import { format } from 'date-fns';
 
@@ -51,9 +52,7 @@ const AccountDetail = () => {
             {/* Header */}
             <div className="bg-slate-900 text-white p-6 pb-12 rounded-b-[2rem] shadow-xl">
                 <div className="flex items-center justify-between mb-6">
-                    <button onClick={() => navigate(-1)} className="p-2 bg-white/10 rounded-xl hover:bg-white/20 transition-colors">
-                        <ArrowLeft className="w-5 h-5 text-white" />
-                    </button>
+                    <BackButton className="bg-transparent hover:bg-white/20 text-white -ml-2" />
                     <h1 className="text-lg font-bold leading-tight">Account Details</h1>
                     <button
                         onClick={handleArchiveClick}

@@ -8,6 +8,7 @@ import { Calendar as CalendarIcon, PieChart, AlertCircle, CheckCircle2, XCircle,
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import BackButton from '../components/atoms/BackButton';
 
 const History = () => {
     const navigate = useNavigate();
@@ -38,12 +39,7 @@ const History = () => {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <button onClick={() => navigate(-1)} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex-shrink-0">
-                        <CalendarIcon className="w-6 h-6 rotate-180 hidden" />
-                        <svg className="w-6 h-6 text-slate-700 dark:text-slate-300 transform rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
+                    <BackButton className="bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 -ml-2" />
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">Report History</h2>
                 </div>
                 <button

@@ -13,8 +13,7 @@ const About = () => {
             {/* Header */}
             <AppHeader
                 title={t('nav.about_awake')}
-                leftAction={() => navigate(-1)}
-                leftIcon={ArrowLeft}
+                showBack={true}
             />
 
             <div className="p-6 max-w-lg mx-auto space-y-8 mt-4">

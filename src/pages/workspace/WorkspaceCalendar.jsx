@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, parseISO } from 'date-fns';
 import { ChevronLeft, ChevronRight, Circle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import BackButton from '../../components/atoms/BackButton';
 import { useTasks } from '../../context/TaskContext';
 
 const WorkspaceCalendar = () => {
@@ -48,9 +49,7 @@ const WorkspaceCalendar = () => {
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                    <button onClick={() => navigate(-1)} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex-shrink-0">
-                        <ChevronLeft className="w-6 h-6 text-slate-700 dark:text-slate-300" />
-                    </button>
+                    <BackButton className="bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 -ml-2" />
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white capitalize leading-tight">
                         {format(currentMonth, 'MMMM yyyy')}
                     </h2>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, TrendingUp, TrendingDown } from 'lucide-react';
+import BackButton from '../components/atoms/BackButton';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useData } from '../context/DataContext';
@@ -35,9 +36,7 @@ const Analytics = () => {
         <div className="space-y-6">
             {/* Header */}
             <div className="flex items-center gap-3 mb-6 px-4">
-                <button onClick={() => navigate(-1)} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex-shrink-0">
-                    <ArrowLeft className="w-6 h-6 text-slate-700 dark:text-slate-300" />
-                </button>
+                <BackButton className="bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 -ml-2" />
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white leading-tight">Analytics</h1>
                     <p className="text-slate-500 text-sm mt-0.5">Your financial breakdown</p>
