@@ -89,7 +89,10 @@ const FinanceDashboard = () => {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24">
             {/* Header / Month Context */}
-            <header className="bg-slate-900 text-white p-6 pb-8 rounded-b-[2.5rem] shadow-2xl shadow-slate-900/20 relative overflow-hidden">
+            <header
+                className="bg-slate-900 text-white px-6 pb-8 rounded-b-[2.5rem] shadow-2xl shadow-slate-900/20 relative overflow-hidden"
+                style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 1.5rem)' }}
+            >
                 {/* Background Decor */}
                 {/* Background Decor - Simplified */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>

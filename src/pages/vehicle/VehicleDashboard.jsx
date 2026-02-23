@@ -124,8 +124,11 @@ const VehicleDashboard = () => {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24">
             {/* Header */}
-            <header className="bg-white dark:bg-slate-900 sticky top-0 z-20 shadow-sm animate-in slide-in-from-top-4 duration-300">
-                <div className="px-6 pt-6 pb-4 flex items-center justify-between">
+            <header
+                className="bg-white dark:bg-slate-900 sticky top-0 z-20 shadow-sm animate-in slide-in-from-top-4 duration-300"
+                style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+            >
+                <div className="px-6 pt-4 pb-4 flex items-center justify-between">
                     <h1 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">
                         {showArchived ? 'Archived Vehicles' : 'Vehicle Dashboard'}
                     </h1>
