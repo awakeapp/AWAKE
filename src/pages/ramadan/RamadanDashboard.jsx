@@ -276,7 +276,7 @@ const RamadanDashboard = () => {
     return (
         <div className="pb-24 pt-2 sm:pt-4">
             <header className="px-4 sm:px-0 flex items-center justify-between mb-6">
-                <h1 className="text-[28px] font-bold tracking-tight text-black dark:text-white">Ramadan</h1>
+                <h1 className="text-[28px] font-bold tracking-tight text-black dark:text-white">Ramadan Track</h1>
                 <button 
                     onClick={() => navigate('/ramadan/settings')}
                     className="p-2 -mr-2 text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors"
@@ -326,9 +326,9 @@ const RamadanDashboard = () => {
                      </div>
 
                      <div className="mt-auto text-center pb-2">
-                         <p className="text-slate-300 uppercase tracking-widest text-[11px] sm:text-xs font-bold mb-2 drop-shadow-md">{nextEvent}</p>
+                         <p className="text-white/80 uppercase tracking-widest text-xs sm:text-sm font-bold mb-3 drop-shadow-md">{nextEvent}</p>
                          {/* Massive tabular countdown timer */}
-                         <div className="text-5xl sm:text-7xl font-bold tabular-nums tracking-tighter text-white drop-shadow-lg">
+                         <div className="text-6xl sm:text-8xl font-black tabular-nums tracking-tighter text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]">
                              {countdownStr}
                          </div>
                      </div>

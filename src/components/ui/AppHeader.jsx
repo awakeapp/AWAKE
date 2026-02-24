@@ -38,12 +38,16 @@ export function AppHeader({
       className={cn(
         // Strict Height Token: 56px (h-14) or 64px (h-16). WhatsApp uses 56px roughly on Android, 44px + safe area on iOS. We'll use 56px.
         // Needs proper padding: px-4 (16px)
-        "fixed top-0 left-0 right-0 z-50 w-full h-[56px] px-4",
+        "fixed top-0 left-0 right-0 z-50 w-full px-4",
         "flex items-center justify-between",
         "bg-white dark:bg-slate-950",
         "border-b border-slate-200 dark:border-slate-800",
         className
       )}
+      style={{
+          paddingTop: 'env(safe-area-inset-top)',
+          height: 'calc(56px + env(safe-area-inset-top))'
+      }}
     >
       {/* Left Action Area */}
       <div className="flex-1 flex justify-start items-center">

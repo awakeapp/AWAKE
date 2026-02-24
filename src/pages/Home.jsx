@@ -12,6 +12,7 @@ import FuelLogModal from '../components/organisms/FuelLogModal';
 import FinanceLogModal from '../components/organisms/FinanceLogModal';
 import AddTaskModal from '../components/molecules/workspace/AddTaskModal';
 import MotivationBanner from '../components/organisms/MotivationBanner';
+import RamadanImageSlider from '../components/ramadan/RamadanImageSlider';
 import { useTranslation } from 'react-i18next';
 import { RAMADAN_MODE } from '../lib/featureFlags';
 
@@ -119,33 +120,37 @@ const Home = () => {
             {RAMADAN_MODE && (
                 <div
                     onClick={() => navigate('/ramadan')}
-                    className="w-full bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800 rounded-3xl p-5 shadow-lg shadow-indigo-500/25 active:from-indigo-700 active:to-violet-900 transition-colors duration-75 cursor-pointer relative overflow-hidden"
+                    className="w-full bg-slate-900 rounded-3xl p-5 shadow-lg shadow-black/20 active:scale-[0.98] transition-all duration-75 cursor-pointer relative overflow-hidden flex flex-col justify-between min-h-[160px]"
                 >
-                    {/* Glow background orbs */}
-                    <div className="absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full blur-2xl" />
-                    <div className="absolute -left-4 -bottom-6 w-20 h-20 bg-violet-400/20 rounded-full blur-xl" />
+                    <RamadanImageSlider />
 
-                    <div className="flex items-center justify-between relative z-10">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-inner">
-                                <Moon className="w-6 h-6 text-white fill-white/30" />
+                    <div className="flex justify-between items-start relative z-10 w-full mb-4">
+                        <div className="flex gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-sm shrink-0">
+                                <Moon className="w-6 h-6 text-white drop-shadow" />
                             </div>
-                            <div>
-                                <p className="text-[11px] font-semibold text-indigo-200 uppercase tracking-widest mb-0.5">Ramadan Hub</p>
+                            <div className="pt-0.5">
+                                <p className="text-[12px] font-bold text-white/80 uppercase tracking-widest mb-1 drop-shadow-md">Ramadan Tracker</p>
                                 {isRamadanActive ? (
-                                    <>
-                                        <p className="text-[13px] font-medium text-indigo-100">Day {hijriDate?.day} · {nextEvent}</p>
-                                        <p className="text-[22px] font-bold text-white tabular-nums leading-tight">{countdownStr}</p>
-                                    </>
+                                    <p className="text-[17px] font-bold text-white drop-shadow-md leading-tight">
+                                        Day {hijriDate?.day} · {nextEvent}
+                                    </p>
                                 ) : (
-                                    <>
-                                        <p className="text-[15px] font-semibold text-white leading-tight">Track Fasting &amp; Worship</p>
-                                        <p className="text-[12px] text-indigo-200">Prayers · Dhikr · Stats</p>
-                                    </>
+                                    <p className="text-[16px] font-bold text-white leading-tight drop-shadow-md">Track Fasting & Worship</p>
                                 )}
                             </div>
                         </div>
-                        <ChevronRight className="w-5 h-5 text-white/60 shrink-0" />
+                        <ChevronRight className="w-6 h-6 text-white/80 shrink-0 mt-1" />
+                    </div>
+
+                    <div className="relative z-10 w-full text-right mt-auto">
+                        {isRamadanActive ? (
+                            <p className="text-4xl sm:text-5xl font-black text-white tabular-nums tracking-tight leading-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+                                {countdownStr}
+                            </p>
+                        ) : (
+                            <p className="text-[14px] text-white/80 font-medium pb-1 drop-shadow-md">Prayers · Dhikr · Stats</p>
+                        )}
                     </div>
                 </div>
             )}
