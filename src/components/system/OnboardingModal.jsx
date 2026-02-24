@@ -5,12 +5,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Check, Sparkles, Activity, Zap } from 'lucide-react';
 import clsx from 'clsx';
 import Button from '../atoms/Button';
+import { useScrollLock } from '../../hooks/useScrollLock';
 
 const OnboardingModal = () => {
     const { user } = useAuthContext();
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [currentSlide, setCurrentSlide] = useState(0);
+
+    useScrollLock(isOpen);
 
     const slides = [
         {

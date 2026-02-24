@@ -1,7 +1,10 @@
 import { useFinance } from '../../context/FinanceContext';
 import { X } from 'lucide-react';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 const BudgetSummary = ({ isOpen, onClose }) => {
+    useScrollLock(isOpen);
     const { categories, getBudgetStats } = useFinance();
 
     if (!isOpen) return null;

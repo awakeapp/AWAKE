@@ -4,7 +4,10 @@ import Button from '../atoms/Button';
 import confetti from 'canvas-confetti';
 import { useEffect } from 'react';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 const CategoryCompletionModal = ({ isOpen, onClose, categoryName }) => {
+    useScrollLock(isOpen);
     useEffect(() => {
         if (isOpen) {
             confetti({

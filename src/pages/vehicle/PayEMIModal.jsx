@@ -4,7 +4,10 @@ import { useFinance } from '../../context/FinanceContext';
 import { format } from 'date-fns';
 import JumpDateModal from '../../components/organisms/JumpDateModal';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 const PayEMIModal = ({ isOpen, onClose, onSave, loan, vehicle, loanDetail }) => {
+    useScrollLock(isOpen);
     const { accounts } = useFinance();
 
     const [formData, setFormData] = useState({

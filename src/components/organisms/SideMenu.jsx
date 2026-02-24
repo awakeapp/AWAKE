@@ -8,6 +8,8 @@ import JumpDateModal from './JumpDateModal';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 // Pure button row — no Link wrapper that could race with navigation
 const MenuRow = ({ item, isLast, onTap }) => (
     <button
@@ -31,6 +33,7 @@ const MenuRow = ({ item, isLast, onTap }) => (
 );
 
 const SideMenu = ({ isOpen, onClose }) => {
+    useScrollLock(isOpen);
     const { user } = useAuthContext();
     const navigate = useNavigate();
     const [isJumpModalOpen, setIsJumpModalOpen] = useState(false);

@@ -4,6 +4,8 @@ import Button from '../atoms/Button';
 import confetti from 'canvas-confetti';
 import { useEffect } from 'react';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 const TROLL_MESSAGES = {
     'EARLY MORNING': [
         "Love your bed too much?",
@@ -46,6 +48,7 @@ const TROLL_MESSAGES = {
 };
 
 const UnifiedFeedbackModal = ({ isOpen, onClose, type = 'success', category }) => {
+    useScrollLock(isOpen);
     // type: 'success' | 'troll'
 
     useEffect(() => {

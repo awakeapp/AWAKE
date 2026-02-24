@@ -3,6 +3,8 @@ import { X, Save, Calendar, Gauge, Repeat, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import JumpDateModal from '../JumpDateModal';
 
+import { useScrollLock } from '../../../hooks/useScrollLock';
+
 const FOLLOW_UP_TYPES = [
     'Refuel', 'Servicing', 'Oil Change', 'Tyre Change',
     'Insurance Renewal', 'Pollution Check', 'Registration Renewal',
@@ -10,6 +12,7 @@ const FOLLOW_UP_TYPES = [
 ];
 
 const AddFollowUpModal = ({ isOpen, onClose, onSave, vehicle }) => {
+    useScrollLock(isOpen);
     const [formData, setFormData] = useState({
         type: 'Servicing',
         customType: '',

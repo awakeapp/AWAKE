@@ -5,7 +5,10 @@ import { X, CheckCircle, Clock, ToggleLeft } from 'lucide-react';
 import clsx from 'clsx';
 import { inferIcon, getIconComponent } from '../../utils/iconInference';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 const HabitManagerDialog = ({ isOpen, onClose, onAdd }) => {
+    useScrollLock(isOpen);
     const [name, setName] = useState('');
     const [type, setType] = useState('toggle'); // 'toggle' | 'number'
     const [unit, setUnit] = useState('hrs'); // 'hrs' | 'mins'

@@ -3,7 +3,10 @@ import { usePrayer } from '../../context/PrayerContext';
 import { MapPin, Navigation, Save, X, Loader2 } from 'lucide-react';
 import clsx from 'clsx';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 const LocationModal = ({ isOpen, onClose }) => {
+    useScrollLock(isOpen);
     const { requestLocation, updateManualLocation, loading, location } = usePrayer();
     const [manualLat, setManualLat] = useState(location?.lat || '');
     const [manualLng, setManualLng] = useState(location?.lng || '');

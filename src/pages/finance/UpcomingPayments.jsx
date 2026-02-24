@@ -3,6 +3,7 @@ import { useFinance } from '../../context/FinanceContext';
 import { Plus, Trash2, Calendar, Zap, CreditCard, Music, Monitor, Smartphone, Briefcase, ShoppingBag, Pause, Play, RefreshCw } from 'lucide-react';
 import { format, differenceInDays, isBefore, addMonths } from 'date-fns';
 import { useTranslation } from 'react-i18next'; // Added i18n support
+import { useScrollLock } from '../../hooks/useScrollLock';
 
 const ICONS = [
     { icon: Zap, label: 'Utility' },
@@ -27,6 +28,8 @@ const UpcomingPayments = () => {
     const { subscriptions, addSubscription, deleteSubscription, toggleSubscriptionStatus } = useFinance();
     const [isAdding, setIsAdding] = useState(false);
     const { t } = useTranslation(); // Enable translations
+
+    useScrollLock(isAdding);
 
     // Form State
     const [name, setName] = useState('');

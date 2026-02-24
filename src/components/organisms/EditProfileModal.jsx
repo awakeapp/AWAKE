@@ -6,7 +6,10 @@ import Button from '../atoms/Button';
 import Input from '../atoms/Input';
 import { useAuthContext } from '../../hooks/useAuthContext';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 const EditProfileModal = ({ isOpen, onClose }) => {
+    useScrollLock(isOpen);
     const { user, dispatch } = useAuthContext();
     const [name, setName] = useState(user?.name || '');
     const [isSaving, setIsSaving] = useState(false);

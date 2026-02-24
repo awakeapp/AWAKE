@@ -6,8 +6,11 @@ import { useData } from '../../context/DataContext';
 import { inferIcon, getIconComponent } from '../../utils/iconInference';
 import { useSettings } from '../../context/SettingsContext';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 
 const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
+    useScrollLock(isOpen);
     // Local state for editing
     const [localTasks, setLocalTasks] = useState([]);
     const { updateAllTasks } = useData();

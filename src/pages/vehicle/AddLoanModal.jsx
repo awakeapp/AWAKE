@@ -3,7 +3,10 @@ import { X, Save, Landmark, Calculator, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import JumpDateModal from '../../components/organisms/JumpDateModal';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 const AddLoanModal = ({ isOpen, onClose, onSave, vehicle }) => {
+    useScrollLock(isOpen);
     const [formData, setFormData] = useState({
         vehicleId: vehicle?.id || '',
         lender: '',

@@ -6,7 +6,10 @@ import { useTasks } from '../../context/TaskContext';
 import { useFinance } from '../../context/FinanceContext';
 import Button from '../atoms/Button';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 const QuickActionModal = ({ isOpen, onClose }) => {
+    useScrollLock(isOpen);
     const [actionType, setActionType] = useState('task'); // 'task' or 'expense'
     const [inputValue, setInputValue] = useState('');
     const [amountValue, setAmountValue] = useState('');

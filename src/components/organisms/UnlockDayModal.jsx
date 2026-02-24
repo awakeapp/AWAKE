@@ -4,7 +4,10 @@ import Button from '../atoms/Button';
 import Input from '../atoms/Input';
 import { LockOpen, X } from 'lucide-react';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 const UnlockDayModal = ({ isOpen, onClose, onConfirm }) => {
+    useScrollLock(isOpen);
     const [reason, setReason] = useState('');
     const [error, setError] = useState('');
 

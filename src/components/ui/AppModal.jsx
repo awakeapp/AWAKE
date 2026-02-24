@@ -5,6 +5,8 @@ import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { TRANSITION_FAST } from '../../styles/tokens';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
@@ -17,17 +19,7 @@ export function AppModal({
   className,
   maxWidth = 'sm' // 'xs' | 'sm' | 'md' | 'lg' | 'full'
 }) {
-  // Prevent body scroll when open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
+  useScrollLock(isOpen);
 
   const maxWidthMap = {
     xs: 'max-w-xs',

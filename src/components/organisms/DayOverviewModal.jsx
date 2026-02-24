@@ -4,11 +4,14 @@ import { CheckCircle2, AlertCircle, X, Lock, Pizza, Candy, Salad, CheckCircle, W
 import { useFinance } from '../../context/FinanceContext';
 import clsx from 'clsx';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 const HABIT_COMPONENTS = {
     Pizza, Candy, Salad, CheckCircle, Wallet, Smartphone, GlassWater, Activity
 };
 
 const DayOverviewModal = ({ isOpen, onClose, data, onConfirm }) => {
+    useScrollLock(isOpen);
     if (!isOpen) return null;
 
     const totalTasks = data.tasks.length;

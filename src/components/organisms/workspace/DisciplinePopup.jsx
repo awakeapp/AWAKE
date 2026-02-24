@@ -1,6 +1,8 @@
 import { X, Trophy, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import { useScrollLock } from '../../../hooks/useScrollLock';
+
 const SUCCESS_QUOTES = [
     "Discipline is the bridge between goals and accomplishment.",
     "Don't stop when you're tired. Stop when you're done.",
@@ -18,6 +20,7 @@ const TROLL_QUOTES = [
 ];
 
 const DisciplinePopup = ({ isOpen, onClose, score }) => {
+    useScrollLock(isOpen);
     if (!isOpen) return null;
 
     const isSuccess = score === 100;

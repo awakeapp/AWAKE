@@ -3,10 +3,13 @@ import { MessageCircle, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ChatWindow from './ChatWindow';
 import { useHealthAssistant } from '../../../hooks/useHealthAssistant';
+import { useScrollLock } from '../../../hooks/useScrollLock';
 
 const ChatWidget = () => {
     const [isOpen, setIsOpen] = useState(false);
     const assistant = useHealthAssistant();
+
+    useScrollLock(isOpen);
 
     return (
         <>

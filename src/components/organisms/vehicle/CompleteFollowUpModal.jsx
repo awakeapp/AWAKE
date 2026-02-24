@@ -4,7 +4,10 @@ import { useFinance } from '../../../context/FinanceContext';
 import { format } from 'date-fns';
 import JumpDateModal from '../JumpDateModal';
 
+import { useScrollLock } from '../../../hooks/useScrollLock';
+
 const CompleteFollowUpModal = ({ isOpen, onClose, onComplete, followUp, vehicle }) => {
+    useScrollLock(isOpen);
     const { accounts } = useFinance();
 
     // Default form data

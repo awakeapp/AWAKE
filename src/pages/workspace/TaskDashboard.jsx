@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Clock, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, AlertCircle, X, MoreHorizontal, ArrowUpDown, ListTodo, Layout, Settings, Edit2 } from 'lucide-react';
 import { useTasks } from '../../context/TaskContext';
 import TaskList from '../../components/organisms/workspace/TaskList';
@@ -67,7 +67,7 @@ const TaskDashboard = () => {
     };
 
     // Filter & Sort Tasks
-    const currentTasks = React.useMemo(() => {
+    const currentTasks = useMemo(() => {
         const filtered = tasks.filter(taskItem => taskItem.date === selectedDateStr);
         let sorted = [...filtered];
 

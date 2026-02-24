@@ -2,6 +2,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import Button from '../atoms/Button';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 const TROLL_MESSAGES = {
     'EARLY MORNING': [
         "Love your bed too much?",
@@ -44,6 +46,7 @@ const TROLL_MESSAGES = {
 };
 
 const TrollModal = ({ isOpen, onClose, category }) => {
+    useScrollLock(isOpen);
     // Pick keys based on category or default
     const categoryMessages = TROLL_MESSAGES[category] || TROLL_MESSAGES['DEFAULT'];
 

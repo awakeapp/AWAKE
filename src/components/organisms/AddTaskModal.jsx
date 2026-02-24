@@ -2,7 +2,10 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Clock, Type } from 'lucide-react';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 const AddTaskModal = ({ isOpen, onClose, onSave }) => {
+    useScrollLock(isOpen);
     const [name, setName] = useState('');
     const [time, setTime] = useState('');
 

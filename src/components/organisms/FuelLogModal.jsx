@@ -6,7 +6,10 @@ import { useVehicle } from '../../context/VehicleContext';
 import { useFinance } from '../../context/FinanceContext';
 import Button from '../atoms/Button';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 const FuelLogModal = ({ isOpen, onClose }) => {
+    useScrollLock(isOpen);
     const { vehicles, getActiveVehicle, addServiceRecord } = useVehicle();
     const { accounts } = useFinance();
 

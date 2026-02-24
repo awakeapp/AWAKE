@@ -5,6 +5,7 @@ import { User, Plus, Check, RotateCcw, ArrowLeft, Calendar } from 'lucide-react'
 import { format } from 'date-fns';
 import { useState } from 'react';
 import JumpDateModal from '../../components/organisms/JumpDateModal';
+import { useScrollLock } from '../../hooks/useScrollLock';
 
 const DebtManager = () => {
     const navigate = useNavigate();
@@ -23,6 +24,8 @@ const DebtManager = () => {
     const [repayModalOpen, setRepayModalOpen] = useState(false);
     const [selectedDebt, setSelectedDebt] = useState(null);
     const [repayAmount, setRepayAmount] = useState('');
+
+    useScrollLock(repayModalOpen);
 
     const activeDebts = debts.filter(d => !d.isSettled);
 

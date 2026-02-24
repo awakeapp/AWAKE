@@ -3,6 +3,8 @@ import { X, Save, Car, Bike, Truck, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import JumpDateModal from '../../components/organisms/JumpDateModal';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 const VEHICLE_TYPES = [
     { id: 'car', label: 'Car', icon: Car },
     { id: 'bike', label: 'Bike', icon: Bike },
@@ -13,6 +15,7 @@ const VEHICLE_TYPES = [
 const FUEL_TYPES = ['Petrol', 'Diesel', 'Electric', 'Hybrid', 'CNG'];
 
 const AddVehicleModal = ({ isOpen, onClose, onSave, editVehicle = null }) => {
+    useScrollLock(isOpen);
     const [formData, setFormData] = useState({
         name: '',
         type: 'car',

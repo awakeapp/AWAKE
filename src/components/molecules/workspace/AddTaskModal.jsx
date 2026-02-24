@@ -5,7 +5,10 @@ import clsx from 'clsx';
 import { format } from 'date-fns';
 import JumpDateModal from '../../organisms/JumpDateModal';
 
+import { useScrollLock } from '../../../hooks/useScrollLock';
+
 const AddTaskModal = ({ isOpen, onClose, onAdd, initialDate }) => {
+    useScrollLock(isOpen);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState('Work');

@@ -79,9 +79,10 @@
   }
 
   /* Keep text selection enabled for inputs and textareas */
-  input, textarea {
-    -webkit-user-select: auto;
-    user-select: auto;
+  input, textarea, [contenteditable="true"] {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
   }
 
   /* Restore pointer for interactive elements */

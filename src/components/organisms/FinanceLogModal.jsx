@@ -5,7 +5,10 @@ import { X, Check, IndianRupee } from 'lucide-react';
 import { useFinance } from '../../context/FinanceContext';
 import Button from '../atoms/Button';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 const FinanceLogModal = ({ isOpen, onClose }) => {
+    useScrollLock(isOpen);
     const { addTransaction, categories, accounts } = useFinance();
 
     const [amount, setAmount] = useState('');

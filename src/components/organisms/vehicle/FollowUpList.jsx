@@ -4,6 +4,7 @@ import { differenceInDays, isBefore, addDays, format, parseISO } from 'date-fns'
 import { Calendar, Gauge, CheckCircle, AlertTriangle, Plus, Clock, Settings } from 'lucide-react';
 import CompleteFollowUpModal from './CompleteFollowUpModal';
 import AddFollowUpModal from './AddFollowUpModal';
+import { useScrollLock } from '../../../hooks/useScrollLock';
 
 const FollowUpList = ({ vehicle }) => {
     const { followUps, completeFollowUp, deleteFollowUp, addFollowUp, getLatestRecord, toggleMaintenanceItem } = useVehicle();
@@ -11,6 +12,8 @@ const FollowUpList = ({ vehicle }) => {
     const [addModalOpen, setAddModalOpen] = useState(false);
     const [configModalOpen, setConfigModalOpen] = useState(false);
     const [selectedFollowUp, setSelectedFollowUp] = useState(null);
+
+    useScrollLock(configModalOpen);
 
     // Filter for current vehicle
     const vehicleFollowUps = followUps.filter(f => f.vehicleId === vehicle.id && f.status !== 'completed');

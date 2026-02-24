@@ -5,7 +5,10 @@ import { X, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { useDate } from '../../context/DateContext';
 import Button from '../atoms/Button';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 const JumpDateModal = ({ isOpen, onClose, initialDate, onSelect, minDate }) => {
+    useScrollLock(isOpen);
     const { currentDate, setDate } = useDate();
 
     // Use provided initialDate or fallback to global currentDate

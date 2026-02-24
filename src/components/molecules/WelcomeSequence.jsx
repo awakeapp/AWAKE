@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { useScrollLock } from '../../hooks/useScrollLock';
 
 const MESSAGES = [
     "Welcome",
@@ -15,6 +16,8 @@ const TOTAL_DURATION = MESSAGES.length * MESSAGE_DURATION + 500;
 
 export default function WelcomeSequence({ onComplete }) {
     const [currentIndex, setCurrentIndex] = useState(0);
+
+    useScrollLock(true);
 
     useEffect(() => {
         if (currentIndex < MESSAGES.length - 1) {

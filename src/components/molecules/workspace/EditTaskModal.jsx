@@ -6,7 +6,10 @@ import { format } from 'date-fns';
 import JumpDateModal from '../../organisms/JumpDateModal';
 import { useTasks } from '../../../context/TaskContext';
 
+import { useScrollLock } from '../../../hooks/useScrollLock';
+
 const EditTaskModal = ({ isOpen, onClose, task }) => {
+    useScrollLock(isOpen);
     const { updateTask } = useTasks();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');

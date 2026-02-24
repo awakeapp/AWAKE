@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next'; // Added i18n support
 import { useSwipeNavigation } from '../../hooks/useSwipeNavigation';
 import { TRANSITION_FAST } from '../../styles/tokens';
+import { useScrollLock } from '../../hooks/useScrollLock';
 
 const WorkspaceLayout = ({ children }) => {
     const navigate = useNavigate();
@@ -15,6 +16,8 @@ const WorkspaceLayout = ({ children }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const { t } = useTranslation();
     const swipeHandlers = useSwipeNavigation();
+
+    useScrollLock(isSidebarOpen);
 
     const isActive = (path) => location.pathname === path;
 

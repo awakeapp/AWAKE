@@ -4,7 +4,10 @@ import { AppButton } from '@/components/ui/AppButton';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { useScrollLock } from '../../../hooks/useScrollLock';
+
 const TaskSettingsModal = ({ isOpen, onClose }) => {
+    useScrollLock(isOpen);
     const { settings, updateSettings, clearAllTasks } = useTasks();
     const [view, setView] = useState('main'); // 'main' | 'settings'
     const navigate = useNavigate();

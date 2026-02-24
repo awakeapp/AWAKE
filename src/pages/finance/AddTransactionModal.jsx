@@ -7,7 +7,10 @@ import { format } from 'date-fns';
 import { FirestoreService } from '../../services/firestore-service';
 import JumpDateModal from '../../components/organisms/JumpDateModal';
 
+import { useScrollLock } from '../../hooks/useScrollLock';
+
 const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDelete }) => {
+    useScrollLock(isOpen);
     const { addTransaction, addTransfer, editTransaction, deleteTransaction, checkDuplicate, categories, accounts, transactions, addRecurringRule, getBudgetStats } = useFinance();
     const { user } = useAuthContext();
     const [amount, setAmount] = useState('');
