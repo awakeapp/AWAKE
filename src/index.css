@@ -41,7 +41,6 @@
   }
   body {
     @apply bg-white text-slate-900 antialiased dark:bg-[#020617] dark:text-slate-50 transition-colors duration-0;
-    padding-top: env(safe-area-inset-top);
   }
 
   /* ═══ Cross-Platform Normalization ═══════════════════════ */

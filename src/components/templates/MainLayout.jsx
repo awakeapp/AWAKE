@@ -10,6 +10,7 @@ import { useDate } from '../../context/DateContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useState } from 'react';
+import { cn } from '../../lib/utils';
 
 const MainLayout = ({ children }) => {
     const { user } = useAuthContext();
@@ -41,8 +42,11 @@ const MainLayout = ({ children }) => {
 
     return (
         <div
-            className={`min-h-screen bg-slate-50 font-sans text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors ${showHeader && !isFullBleed ? 'pt-[56px]' : ''}`}
-            style={isFullBleed ? undefined : { paddingBottom: '5rem' }}
+            className={`min-h-screen bg-slate-50 font-sans text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors`}
+            style={{ 
+                paddingTop: showHeader ? 'calc(56px + env(safe-area-inset-top))' : 'env(safe-area-inset-top)',
+                paddingBottom: isFullBleed ? '0' : 'calc(5rem + env(safe-area-inset-bottom))'
+            }}
         >
             {/* Global AppHeader — hidden on pages with their own header */}
             {showHeader && (
@@ -77,11 +81,16 @@ const MainLayout = ({ children }) => {
             {/* Page Content */}
             {isFullBleed ? (
                 /* Full-bleed: zero wrapper — the page controls its own paddings, width, and header */
-                <Suspense fallback={Loader}>
-                    {children || <Outlet />}
-                </Suspense>
+                <main className="min-h-screen">
+                    <Suspense fallback={Loader}>
+                        {children || <Outlet />}
+                    </Suspense>
+                </main>
             ) : (
-                <main className="px-4 py-6 max-w-md mx-auto w-full">
+                <main className={cn(
+                    "px-4 max-w-md mx-auto w-full",
+                    showHeader ? "pt-[calc(56px+env(safe-area-inset-top))]" : "pt-0"
+                )}>
                     <Suspense fallback={Loader}>
                         {children || <Outlet />}
                     </Suspense>

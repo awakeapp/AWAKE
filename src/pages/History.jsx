@@ -34,26 +34,37 @@ const History = () => {
  ...violations.map(v => `Avoid: ${v}`)
  ];
 
- return (
- <div className="pb-24 space-y-6">
- {/* Header */}
- <div className="flex items-center justify-between">
- <div className="flex items-center gap-3">
- <button
- onClick={() => navigate(-1)}
- className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors text-slate-700 dark:text-slate-300 -ml-2 focus:outline-none"
- >
- <ArrowLeft className="w-6 h-6" />
- </button>
- <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">Report History</h2>
- </div>
- <button
- onClick={() => setShowJumpModal(true)}
- className="p-2 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-indigo-600 rounded-full transition-colors dark:bg-slate-800 dark:hover:bg-slate-700 dark:active:bg-slate-600 dark:text-indigo-400"
- >
- <CalendarIcon className="w-5 h-5" />
- </button>
- </div>
+  return (
+    <div className="pb-24">
+      {/* Fixed Sticky Header */}
+      <div 
+        className="fixed top-0 left-0 right-0 z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-all duration-300"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
+        <div className="max-w-md mx-auto w-full px-4 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate(-1)}
+              className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors text-slate-700 dark:text-slate-300 -ml-2 focus:outline-none"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Report History</h2>
+          </div>
+          <button
+            onClick={() => setShowJumpModal(true)}
+            className="p-2 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-indigo-600 rounded-full transition-colors dark:bg-slate-800 dark:hover:bg-slate-700 dark:active:bg-slate-600 dark:text-indigo-400"
+          >
+            <CalendarIcon className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div 
+        className="max-w-md mx-auto w-full px-4 space-y-6"
+        style={{ paddingTop: 'calc(56px + env(safe-area-inset-top) + 24px)' }}
+      >
 
  {/* Selected Date Report */}
  <motion.div
@@ -158,8 +169,9 @@ const History = () => {
  isOpen={showJumpModal}
  onClose={() => setShowJumpModal(false)}
  />
- </div>
- );
+      </div>
+    </div>
+  );
 };
 
 export default History;

@@ -65,7 +65,10 @@ const WorkspaceLayout = ({ children }) => {
                             className="fixed inset-y-0 right-0 z-50 w-80 bg-white dark:bg-slate-900 shadow-2xl flex flex-col h-full border-l border-slate-100 dark:border-slate-800"
                         >
                             {/* Drawer Header */}
-                            <div className="p-5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
+                            <div 
+                                className="p-5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800"
+                                style={{ paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' }}
+                            >
                                 <h2 className="font-bold text-lg">{t('common.menu', 'Menu')}</h2>
                                 <button onClick={() => setIsSidebarOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
                                     <X className="w-5 h-5 text-slate-500" />
@@ -123,10 +126,15 @@ const WorkspaceLayout = ({ children }) => {
             </AnimatePresence>
 
             {/* Main Content Area */}
-            <main className="relative z-10 px-4 py-6 max-w-lg mx-auto w-full">
-                <Suspense fallback={<div className="flex items-center justify-center p-12"><div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div></div>}>
-                    {children || <Outlet />}
-                </Suspense>
+            <main 
+                className="relative z-10 px-4 max-w-lg mx-auto w-full"
+                style={{ paddingTop: 'env(safe-area-inset-top)' }}
+            >
+                <div className="pt-6">
+                    <Suspense fallback={<div className="flex items-center justify-center p-12"><div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div></div>}>
+                        {children || <Outlet />}
+                    </Suspense>
+                </div>
             </main>
 
             <BottomNavigation />

@@ -40,7 +40,7 @@ export function AppHeader({
  // Needs proper padding: px-4 (16px)
  "fixed top-0 left-0 right-0 z-50 w-full px-4",
  "flex items-center justify-between",
- "bg-white dark:bg-slate-950",
+ "bg-white/80 dark:bg-slate-950/80 backdrop-blur-md",
  "border-b border-slate-200 dark:border-slate-800",
  className
  )}

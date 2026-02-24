@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ChevronLeft, Lock, Trash2, Sliders, Bell, Layout } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-import ThreeStateCheckbox from '../../components/atoms/ThreeStateCheckbox';
+import ToggleSwitch from '../../components/atoms/ToggleSwitch';
 import { motion } from 'framer-motion';
 import { useTasks } from '../../context/TaskContext';
 
@@ -53,16 +53,10 @@ const Settings = () => {
  <p className="text-xs text-slate-500 mt-0.5">Remove completed tasks after 24h</p>
  </div>
  </div>
- <div
- onClick={() => toggleSetting('autoDeleteCompleted')}
- className={`w-11 h-6 rounded-full flex items-center px-0.5 cursor-pointer transition-colors ${settings.autoDeleteCompleted ? 'bg-indigo-500' : 'bg-slate-200 dark:bg-slate-700'}`}
- >
- <motion.div
- layout
- className="w-5 h-5 bg-white rounded-full shadow-sm"
- animate={{ x: settings.autoDeleteCompleted ? 20 : 0 }}
- />
- </div>
+                    <ToggleSwitch
+                        status={settings.autoDeleteCompleted ? 'checked' : 'unchecked'}
+                        onClick={() => toggleSetting('autoDeleteCompleted')}
+                    />
  </div>
 
  {/* Setting Item */}
@@ -76,16 +70,10 @@ const Settings = () => {
  <p className="text-xs text-slate-500 mt-0.5">Show confirmation before deleting</p>
  </div>
  </div>
- <div
- onClick={() => toggleSetting('confirmDelete')}
- className={`w-11 h-6 rounded-full flex items-center px-0.5 cursor-pointer transition-colors ${settings.confirmDelete ? 'bg-indigo-500' : 'bg-slate-200 dark:bg-slate-700'}`}
- >
- <motion.div
- layout
- className="w-5 h-5 bg-white rounded-full shadow-sm"
- animate={{ x: settings.confirmDelete ? 20 : 0 }}
- />
- </div>
+                    <ToggleSwitch
+                        status={settings.confirmDelete ? 'checked' : 'unchecked'}
+                        onClick={() => toggleSetting('confirmDelete')}
+                    />
  </div>
 
  {/* Setting Item */}
@@ -99,16 +87,10 @@ const Settings = () => {
  <p className="text-xs text-slate-500 mt-0.5">Keep completed tasks visible in list</p>
  </div>
  </div>
- <div
- onClick={() => toggleSetting('showCompletedInList')}
- className={`w-11 h-6 rounded-full flex items-center px-0.5 cursor-pointer transition-colors ${settings.showCompletedInList ? 'bg-indigo-500' : 'bg-slate-200 dark:bg-slate-700'}`}
- >
- <motion.div
- layout
- className="w-5 h-5 bg-white rounded-full shadow-sm"
- animate={{ x: settings.showCompletedInList ? 20 : 0 }}
- />
- </div>
+                    <ToggleSwitch
+                        status={settings.showCompletedInList ? 'checked' : 'unchecked'}
+                        onClick={() => toggleSetting('showCompletedInList')}
+                    />
  </div>
 
  </div>

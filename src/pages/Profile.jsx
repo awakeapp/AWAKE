@@ -257,7 +257,23 @@ const Profile = () => {
     const memberId = `AWK-${user?.uid?.slice(-4).toUpperCase() || 'GUEST'}`;
 
     return (
-        <div className="pb-24 pt-4 bg-[#F2F2F7] dark:bg-black min-h-screen text-slate-900 dark:text-white font-sans selection:bg-indigo-500/30">
+        <div className="pb-24 bg-[#F2F2F7] dark:bg-black min-h-screen text-slate-900 dark:text-white font-sans selection:bg-indigo-500/30">
+            {/* Fixed Sticky Header */}
+            <div 
+                className="fixed top-0 left-0 right-0 z-40 bg-[#F2F2F7]/80 dark:bg-black/80 backdrop-blur-md border-b border-slate-200 dark:border-white/10 transition-all duration-300"
+                style={{ paddingTop: 'env(safe-area-inset-top)' }}
+            >
+                <div className="max-w-screen-md mx-auto px-4 h-14 flex items-center gap-4">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="p-1 -ml-1 text-slate-900 dark:text-white hover:opacity-70 transition-opacity"
+                    >
+                        <ArrowLeft className="w-7 h-7" />
+                    </button>
+                    <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Account</h1>
+                </div>
+            </div>
+
             {/* Modals */}
             <EditProfileModal isOpen={isEditProfileOpen} onClose={() => setIsEditProfileOpen(false)} />
             <ExportModal
@@ -288,18 +304,10 @@ const Profile = () => {
             />
             <Toast message={toast.message} isError={toast.isError} isVisible={toast.visible} />
 
-            <div className="max-w-screen-md mx-auto px-4">
-
-                {/* Header */}
-                <div className="flex items-center gap-4 mb-4 mt-8">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="p-1 -ml-1 text-slate-900 dark:text-white hover:opacity-70 transition-opacity lg:hidden"
-                    >
-                        <ArrowLeft className="w-7 h-7" />
-                    </button>
-                    <h1 className="text-[32px] font-bold tracking-tight text-slate-900 dark:text-white">Account</h1>
-                </div>
+            <div 
+                className="max-w-screen-md mx-auto px-4"
+                style={{ paddingTop: 'calc(56px + env(safe-area-inset-top) + 20px)' }}
+            >
 
                 <div className="mt-8">
 

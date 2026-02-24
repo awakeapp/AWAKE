@@ -206,10 +206,10 @@ const RamadanDashboard = () => {
     const isRamadanActive = hijriDate?.isRamadan;
 
     return (
-        <div className="pb-24 pt-2 sm:pt-4">
+        <div className="pb-12">
             <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
             
-            <header className="px-4 sm:px-0 flex flex-col mb-6">
+            <header className="flex flex-col mb-6 pt-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-[28px] font-bold tracking-tight text-black dark:text-white">Ramadan Track</h1>
                     <button 
@@ -245,7 +245,7 @@ const RamadanDashboard = () => {
                 )}
             </header>
 
-            <div className="px-4 sm:px-0 space-y-6">
+            <div className="space-y-6">
 
             {error && !dailyTimings && (
                 <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/20 rounded-xl p-4 flex items-center justify-between shadow-sm">

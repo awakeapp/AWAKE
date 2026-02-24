@@ -138,10 +138,10 @@ const Routine = () => {
     };
 
     return (
-        <div className="pb-24" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 90px)' }}>
+        <div className="pb-24">
             <div 
-                className="fixed top-0 left-0 right-0 z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md pt-3 pb-3 border-b border-slate-200 dark:border-slate-800 transition-all duration-300"
-                style={{ paddingTop: 'calc(env(safe-area-inset-top) + 4px)' }}
+                className="fixed top-0 left-0 right-0 z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-all duration-300"
+                style={{ paddingTop: 'env(safe-area-inset-top)' }}
             >
                 <div className="max-w-md mx-auto w-full px-4">
                     <DateHeader 
@@ -153,7 +153,10 @@ const Routine = () => {
                 </div>
             </div>
 
-            <div className="max-w-md mx-auto w-full pl-[2%] pr-[2%]">
+            <div 
+                className="max-w-md mx-auto w-full px-4"
+                style={{ paddingTop: 'calc(72px + env(safe-area-inset-top) + 20px)' }}
+            >
                 <div className="space-y-6">
                 
                     {/* Categories */}

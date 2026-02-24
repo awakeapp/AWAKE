@@ -57,21 +57,27 @@ const Settings = () => {
  const navigate = useNavigate();
 
  return (
- <div className="pb-12 pt-2 sm:pt-4 bg-[#F2F2F7] dark:bg-black min-h-screen text-black dark:text-white font-sans">
- <div className="max-w-screen-md mx-auto sm:px-4">
- 
- {/* Header Title */}
- <div className="px-4 flex items-center gap-3 sm:px-0 mb-4 sm:mb-6 mt-2">
+ <div className="pb-12 bg-[#F2F2F7] dark:bg-black min-h-screen text-black dark:text-white font-sans">
+ {/* Fixed Sticky Header */}
+ <div 
+ className="fixed top-0 left-0 right-0 z-40 bg-[#F2F2F7]/80 dark:bg-black/80 backdrop-blur-md border-b border-slate-200 dark:border-white/10 transition-all duration-300"
+ style={{ paddingTop: 'env(safe-area-inset-top)' }}
+ >
+ <div className="max-w-screen-md mx-auto px-4 h-14 flex items-center gap-3">
  <button
  onClick={() => navigate(-1)}
  className="p-2 bg-transparent hover:bg-black/5 dark:bg-transparent dark:hover:bg-white/10 rounded-full transition-colors text-black dark:text-white lg:hidden -ml-2 focus:outline-none"
  >
  <ArrowLeft className="w-6 h-6" />
  </button>
- <div>
- <h1 className="text-3xl font-bold tracking-tight text-black dark:text-white">{t('nav.settings', 'Settings')}</h1>
+ <h1 className="text-xl font-bold tracking-tight text-black dark:text-white">{t('nav.settings', 'Settings')}</h1>
  </div>
  </div>
+
+ <div 
+ className="max-w-screen-md mx-auto px-4 sm:px-4"
+ style={{ paddingTop: 'calc(56px + env(safe-area-inset-top) + 20px)' }}
+ >
 
  <div className="px-0 sm:px-0">
  

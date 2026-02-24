@@ -1,7 +1,7 @@
 import { useState, useEffect, memo } from 'react';
 import { useTasks } from '../../../context/TaskContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import ThreeStateCheckbox from '../../atoms/ThreeStateCheckbox';
+import ToggleSwitch from '../../atoms/ToggleSwitch';
 import { inferIcon, getIconComponent } from '../../../utils/iconInference';
 import clsx from 'clsx';
 import { Clock, ArrowUp, Trash2, Calendar as CalendarIcon, Tag, Info } from 'lucide-react';
@@ -255,7 +255,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                     </div>
                 ) : (
                     <div className="px-1 py-1 transition-opacity active:opacity-70 duration-150">
-                        <ThreeStateCheckbox
+                        <ToggleSwitch
                             status={isCompleted ? 'checked' : task.status || 'unchecked'}
                             onClick={() => onUpdateStatus(task.id)}
                             disabled={isLocked}
