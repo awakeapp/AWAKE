@@ -17,7 +17,7 @@ import { RAMADAN_MODE } from '../lib/featureFlags';
 const Home = () => {
     const { user } = useAuthContext();
     const { dailyData } = useData();
-    const { tasks: workspaceTasks } = useTasks();
+    const { tasks: workspaceTasks, addTask } = useTasks();
     const { getDailySpend } = useFinance();
     const { hijriDate, prayerTimes, loading: ramadanLoading } = useRamadan();
     const navigate = useNavigate();
@@ -26,6 +26,8 @@ const Home = () => {
     const [isFuelModalOpen, setIsFuelModalOpen] = useState(false);
     const [isFinanceModalOpen, setIsFinanceModalOpen] = useState(false);
     const [now, setNow] = useState(new Date());
+    const [newTaskTitle, setNewTaskTitle] = useState('');
+    const [isAddingTask, setIsAddingTask] = useState(false);
 
     useEffect(() => {
         const timer = setInterval(() => setNow(new Date()), 1000);
@@ -42,12 +44,28 @@ const Home = () => {
     const completedRoutine = outputTasks.filter(t => t.status === 'checked').length;
     const totalRoutine = outputTasks.length;
     const routineProgress = totalRoutine > 0 ? Math.round((completedRoutine / totalRoutine) * 100) : 0;
-    const remainingTasksCount = workspaceTasks.filter(t => t.status !== 'done').length;
+    const totalWorkspaceTasks = workspaceTasks.length;
+    const completedWorkspaceTasks = workspaceTasks.filter(t => t.status === 'done' || t.status === 'completed' || t.isCompleted).length;
+    const remainingTasksCount = workspaceTasks.filter(t => t.status !== 'done' && t.status !== 'completed' && !t.isCompleted).length;
     const dailySpend = getDailySpend();
 
     let motivation = "";
     if (routineProgress >= 80) motivation = t('home.motivation_finishing', "Finishing strong.");
     if (routineProgress === 100) motivation = t('home.motivation_mastered', "Discipline mastered.");
+
+    const handleAddTask = async (e) => {
+        e.preventDefault();
+        if (!newTaskTitle.trim() || isAddingTask) return;
+        setIsAddingTask(true);
+        try {
+            await addTask(newTaskTitle.trim(), {});
+            setNewTaskTitle('');
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsAddingTask(false);
+        }
+    };
 
     // --- Ramadan Mini Widget Logic ---
     const todayDateNumber = now.getDate();
@@ -166,48 +184,66 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* Combined Tasks Overview & Today's Spent Grid */}
-            <div className="grid grid-cols-2 gap-3">
-                {/* Tasks */}
-                <div 
-                    onClick={() => navigate('/workspace')} 
-                    className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-2xl p-4 flex flex-col justify-between h-32 active:bg-blue-100/50 dark:active:bg-blue-900/30 transition-colors duration-75 cursor-pointer"
-                >
-                    <div className="flex items-start justify-between">
-                         <div className="p-2 bg-white dark:bg-slate-900/50 rounded-xl text-blue-500 shadow-sm">
-                            <List className="w-5 h-5" />
+            {/* Workspace Tasks Overview Card */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm">
+                <div onClick={() => navigate('/workspace')} className="flex items-start justify-between mb-4 cursor-pointer group">
+                    <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-500 dark:text-blue-400 group-active:scale-95 transition-transform">
+                            <List className="w-6 h-6" />
                         </div>
-                        <span className="text-xs font-medium text-blue-500 uppercase tracking-wider">{t('home.tasks', 'Tasks')}</span>
+                        <div>
+                            <h3 className="text-[16px] xl:text-[17px] font-semibold text-slate-800 dark:text-white leading-tight">{t('home.workspace', 'Workspace')}</h3>
+                            <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+                                {completedWorkspaceTasks} / {totalWorkspaceTasks} {t('home.completed', 'Completed')}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="text-right">
+                        <div className="text-2xl font-bold text-slate-800 dark:text-white leading-none">
+                            {remainingTasksCount}
+                        </div>
+                        <span className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">{t('home.left', 'Left')}</span>
+                    </div>
+                </div>
+                
+                <form onSubmit={handleAddTask} className="flex items-center gap-2 relative">
+                    <input 
+                        type="text" 
+                        value={newTaskTitle}
+                        onChange={(e) => setNewTaskTitle(e.target.value)}
+                        placeholder="Quick add task..." 
+                        className="flex-1 min-w-0 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-[15px] font-medium text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all placeholder:text-slate-400"
+                    />
+                    <button 
+                        type="submit"
+                        disabled={!newTaskTitle.trim() || isAddingTask}
+                        className="w-12 h-12 shrink-0 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-xl flex items-center justify-center transition-colors disabled:opacity-50 duration-75"
+                    >
+                        <span className="text-2xl font-light leading-none mb-0.5">+</span>
+                    </button>
+                </form>
+            </div>
+
+            {/* Finance Summary - Full Width */}
+            <div 
+                onClick={() => navigate('/finance')}
+                className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 rounded-3xl p-5 flex items-center justify-between active:bg-emerald-100/50 dark:active:bg-emerald-900/30 transition-colors duration-75 cursor-pointer"
+            >
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900/50 flex items-center justify-center text-emerald-500 shadow-sm">
+                        <IndianRupee className="w-6 h-6" />
                     </div>
                     <div>
-                        <div className="text-xl font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1">
-                            {remainingTasksCount} <span className="text-xs text-slate-400 font-medium">{t('home.left', 'Left')}</span>
+                        <div className="text-xs font-medium text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1">
+                            {t('home.todays_spend', "Today's Spent")}
                         </div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate">
-                            {t('home.workspace', 'Workspace')}
+                        <div className="text-2xl font-semibold text-slate-800 dark:text-slate-100 leading-none">
+                             <span dir="ltr">₹{dailySpend.toLocaleString()}</span>
                         </div>
                     </div>
                 </div>
-
-                {/* Finance Summary */}
-                <div 
-                    onClick={() => navigate('/finance')}
-                    className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl p-4 flex flex-col justify-between h-32 active:bg-emerald-100/50 dark:active:bg-emerald-900/30 transition-colors duration-75 cursor-pointer"
-                >
-                    <div className="flex items-start justify-between">
-                        <div className="p-2 bg-white dark:bg-slate-900/50 rounded-xl text-emerald-500 shadow-sm">
-                            <IndianRupee className="w-5 h-5" />
-                        </div>
-                        <span className="text-xs font-medium text-emerald-500 uppercase tracking-wider">Spend</span>
-                    </div>
-                    <div>
-                        <div className="text-xl font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1">
-                             <span dir="ltr">₹{dailySpend.toLocaleString()}</span>
-                        </div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate">
-                            {t('home.todays_spend', "Today's Spent")}
-                        </div>
-                    </div>
+                <div className="bg-emerald-100 dark:bg-emerald-800/50 p-2 rounded-full text-emerald-600 dark:text-emerald-400">
+                    <ArrowRight className="w-5 h-5" />
                 </div>
             </div>
 
