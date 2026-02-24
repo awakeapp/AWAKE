@@ -25,14 +25,12 @@ export const reverseGeocode = async (lat, lng) => {
         const addr = data.address || {};
 
         // Extract structured components
-        const city = addr.city || addr.town || addr.village || addr.municipality || addr.county || '';
+        const city = addr.city || addr.town || addr.village || addr.municipality || addr.city_district || addr.suburb || addr.neighbourhood || addr.county || '';
         const state = addr.state || '';
         const country = addr.country || '';
-        const suburb = addr.suburb || addr.neighbourhood || '';
 
-        // Format display name: "City, State, Country"
-        // If city is missing, use suburb. If both missing, use state.
-        const mainPart = city || suburb || state || 'Unknown';
+        // Prioritize city name for mainPart
+        const mainPart = city || state || 'Unknown';
         const displayName = [mainPart, state, country]
             .filter(Boolean)
             .filter((item, i, arr) => i === 0 || item !== arr[i - 1]) // Deduplicate adjacent

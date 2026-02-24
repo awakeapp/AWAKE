@@ -136,6 +136,7 @@ export const PrayerProvider = ({ children }) => {
             try {
                 // A. Reverse Geocoding via Service
                 try {
+                    // Only fetch if we don't have details or location changed significantly
                     const details = await locationService.reverseGeocode(location.lat, location.lng);
                     setLocationDetails(details);
                 } catch (geoErr) {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
 import { useRamadan } from '../../context/RamadanContext';
+import { usePrayer } from '../../context/PrayerContext';
 import { Plus } from 'lucide-react';
 
 const PRAYERS = [
@@ -37,7 +38,7 @@ const ModeSelector = ({ value, onChange }) => (
     </div>
 );
 
-const PrayerRow = ({ prayerKey, label, data, onUpdate, allowMode, allowCount, isLast }) => {
+const PrayerRow = ({ prayerKey, label, time, data, onUpdate, allowMode, allowCount, isLast }) => {
     const completed = data[prayerKey] || false;
     const mode = data[`${prayerKey}Mode`] || 'jamaah';
     const count = data[`${prayerKey}Count`] || 0;
@@ -47,13 +48,18 @@ const PrayerRow = ({ prayerKey, label, data, onUpdate, allowMode, allowCount, is
             "flex items-center justify-between py-3 px-0 transition-colors",
             !isLast && "border-b border-slate-100 dark:border-[#38383A]"
         )}>
-            <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
                 <span className={clsx(
                     "text-[15px] font-medium leading-tight",
                     completed ? "text-slate-900 dark:text-white" : "text-slate-500 dark:text-slate-400"
                 )}>
                     {label}
                 </span>
+                {time && (
+                    <span className="text-[12px] text-slate-400 dark:text-slate-500 font-medium tabular-nums ml-1">
+                        • {time}
+                    </span>
+                )}
             </div>
 
             <div className="flex items-center gap-3 shrink-0">
@@ -96,6 +102,7 @@ const PrayerRow = ({ prayerKey, label, data, onUpdate, allowMode, allowCount, is
 
 const PrayerTracker = () => {
     const { ramadanData, updateRamadanDay, updateCustomPrayers, hijriDate } = useRamadan();
+    const { dailyTimings } = usePrayer();
     const todayKey = new Date().toLocaleDateString('en-CA');
     const todayData = ramadanData?.days?.[todayKey] || {};
     const customPrayers = ramadanData?.customPrayers || [];
@@ -105,6 +112,19 @@ const PrayerTracker = () => {
 
     const handleUpdate = (field, value) => {
         updateRamadanDay(todayKey, { [field]: value });
+    };
+
+    const formatPrayerTime = (timeStr) => {
+        if (!timeStr) return null;
+        try {
+            const timePart = timeStr.split(' ')[0];
+            const [hours, mins] = timePart.split(':');
+            const d = new Date();
+            d.setHours(parseInt(hours, 10), parseInt(mins, 10), 0, 0);
+            return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        } catch (e) {
+            return timeStr;
+        }
     };
 
     const handleAddPrayer = () => {
@@ -137,18 +157,23 @@ const PrayerTracker = () => {
                     </h2>
                 </div>
                 <div className="px-5 pb-2">
-                    {PRAYERS.map((p, idx) => (
-                        <PrayerRow
-                            key={p.key}
-                            prayerKey={p.key}
-                            label={p.label}
-                            data={todayData}
-                            onUpdate={handleUpdate}
-                            allowMode={p.allowMode}
-                            allowCount={false}
-                            isLast={idx === PRAYERS.length - 1}
-                        />
-                    ))}
+                    {PRAYERS.map((p, idx) => {
+                        const rawTime = dailyTimings?.[p.label]; 
+                        const formattedTime = formatPrayerTime(rawTime);
+                        return (
+                            <PrayerRow
+                                key={p.key}
+                                prayerKey={p.key}
+                                label={p.label}
+                                time={formattedTime}
+                                data={todayData}
+                                onUpdate={handleUpdate}
+                                allowMode={p.allowMode}
+                                allowCount={false}
+                                isLast={idx === PRAYERS.length - 1}
+                            />
+                        );
+                    })}
                 </div>
             </div>
 

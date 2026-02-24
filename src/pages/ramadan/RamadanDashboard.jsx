@@ -220,14 +220,24 @@ const RamadanDashboard = () => {
                     </button>
                 </div>
                 {displayName && (
-                    <div className="flex items-center gap-2 mt-1 px-0.5">
-                        <MapPin className="w-3.5 h-3.5 text-emerald-500" />
-                        <span className="text-[13px] font-medium text-slate-500 dark:text-slate-400 truncate max-w-[200px]">
-                            {displayName}
-                        </span>
+                    <div className="mt-1 flex items-center justify-between">
+                        <div 
+                            onClick={() => setIsLocationModalOpen(true)}
+                            className="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"
+                        >
+                            <MapPin className="w-4 h-4 text-emerald-500 shrink-0" />
+                            <div className="flex flex-col min-w-0">
+                                <span className="text-[14px] font-bold text-slate-900 dark:text-white leading-none">
+                                    {displayName.split(',')[0]}
+                                </span>
+                                <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-[150px]">
+                                    {displayName.split(',').slice(1).join(',').trim()}
+                                </span>
+                            </div>
+                        </div>
                         <button 
                             onClick={() => setIsLocationModalOpen(true)}
-                            className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider ml-1 hover:underline underline-offset-2"
+                            className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest ml-4 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 px-2 py-1 rounded-md"
                         >
                             Change
                         </button>
