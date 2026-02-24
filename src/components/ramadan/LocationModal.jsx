@@ -5,7 +5,7 @@ import { useScrollLock } from '../../hooks/useScrollLock';
 
 const LocationModal = ({ isOpen, onClose }) => {
     useScrollLock(isOpen);
-    const { requestLocation, updateManualLocation, displayName, latitude, longitude } = usePrayer();
+    const { requestLocation, updateManualLocation, displayName, searchLocation } = usePrayer();
     
     const [detecting, setDetecting] = useState(false);
     const [error, setError] = useState(null);
@@ -75,37 +75,8 @@ const LocationModal = ({ isOpen, onClose }) => {
     const performSearch = async (query) => {
         setIsSearching(true);
         try {
-            const res = await fetch(
-                `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=6`,
-                { headers: { 'Accept-Language': 'en' } }
-            );
-            if (!res.ok) throw new Error('Search failed');
-            const data = await res.json();
-            
-            // Parse results into structured format
-            const parsed = data.map(item => {
-                const addr = item.address || {};
-                const area = addr.suburb || addr.neighbourhood || addr.village || addr.town || addr.city_district || '';
-                const city = addr.city || addr.town || addr.county || addr.state_district || '';
-                const state = addr.state || '';
-                const country = addr.country || '';
-                
-                // Build display parts, deduplicate adjacent
-                const parts = [area, city, state, country].filter(Boolean);
-                const uniqueParts = parts.filter((p, i, a) => i === 0 || p !== a[i - 1]);
-
-                return {
-                    lat: parseFloat(item.lat),
-                    lng: parseFloat(item.lon),
-                    displayName: uniqueParts.join(', ') || item.display_name,
-                    area,
-                    city,
-                    state,
-                    country
-                };
-            });
-
-            setSearchResults(parsed);
+            const data = await searchLocation(query);
+            setSearchResults(data);
         } catch (err) {
             console.error('Location search error:', err);
             setError('Search failed. Please check your connection.');
@@ -125,7 +96,7 @@ const LocationModal = ({ isOpen, onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center p-0 sm:p-4">
             {/* Backdrop */}
             <div 
                 className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 

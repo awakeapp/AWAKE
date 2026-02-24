@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import * as locationService from '../services/locationService';
 
 const PrayerContext = createContext();
 
@@ -30,7 +31,8 @@ export const PrayerProvider = ({ children }) => {
 
     const [settings, setSettings] = useState(() => {
         const saved = localStorage.getItem(STORAGE_KEY_SETTINGS);
-        return saved ? JSON.parse(saved) : { method: null, madhab: null, hijriOffset: 0, manualOverride: false };
+        // Default to India settings: Method 2 (ISNA), Madhab 0 (Standard), Hijri Offset 0
+        return saved ? JSON.parse(saved) : { method: 2, madhab: 0, hijriOffset: 0, manualOverride: false };
     });
 
     const [locationDetails, setLocationDetails] = useState({
@@ -40,7 +42,7 @@ export const PrayerProvider = ({ children }) => {
     const [prayerData, setPrayerData] = useState({
         dailyTimings: null,
         hijriDate: null,
-        timezone: ''
+        timezone: 'Asia/Kolkata' // Default to India timezone
     });
 
     const [loading, setLoading] = useState(true);
@@ -77,12 +79,12 @@ export const PrayerProvider = ({ children }) => {
                 if (!prev || prev.isFallback) {
                     // Clear stale fallback from localStorage
                     localStorage.removeItem(STORAGE_KEY_LOC);
-                    return { lat: latitude, lng: longitude };
+                    return { lat: latitude, lng: longitude, isManual: false };
                 }
                 const dist = calculateDistance(prev.lat, prev.lng, latitude, longitude);
                 // Update only if distance is more than 5km
                 if (dist > 5) {
-                    return { lat: latitude, lng: longitude };
+                    return { lat: latitude, lng: longitude, isManual: false };
                 }
                 return prev; // keep old to avoid refetch
             });
@@ -125,49 +127,19 @@ export const PrayerProvider = ({ children }) => {
             setLoading(true);
 
             try {
-                // A. Reverse Geocoding (with addressdetails=1 for full breakdown)
-                let country = '';
+                // A. Reverse Geocoding via Service
                 try {
-                    const resGeocode = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?lat=${location.lat}&lon=${location.lng}&format=json&addressdetails=1&zoom=18`
-                    );
-                    if (resGeocode.ok) {
-                        const dataGeocode = await resGeocode.json();
-                        const addr = dataGeocode.address || {};
-                        
-                        // Locality: prefer granular locality first, then broader
-                        const locality = addr.suburb || addr.neighbourhood || addr.village || addr.town || addr.city_district || addr.city || addr.county || '';
-                        // City: broader city/town name
-                        const city = addr.city || addr.town || addr.county || '';
-                        const state = addr.state || '';
-                        country = addr.country || '';
-
-                        // Build display: "Locality, City" or "Locality, State" 
-                        const parts = [locality, city, state].filter(Boolean);
-                        // Deduplicate adjacent duplicates (e.g. if locality == city)
-                        const uniqueParts = parts.filter((item, i, arr) => i === 0 || item !== arr[i - 1]);
-                        const locDisplayName = uniqueParts.slice(0, 2).join(', ') || 'Unknown Location';
-                        
-                        setLocationDetails({ city: locality || city, state, country, displayName: locDisplayName });
-                    }
+                    const details = await locationService.reverseGeocode(location.lat, location.lng);
+                    setLocationDetails(details);
                 } catch (geoErr) {
                     console.warn("Geocoding failed, using fallback display:", geoErr);
                 }
 
-                // B. Auto-detect India Settings if not manually overridden
-                let currentMethod = settings.method || 2; // Default 2 (ISNA)
-                let currentMadhab = settings.madhab || 0; // Default 0 (Shafi)
+                // B. Determine Settings (defaults already set in state)
+                let currentMethod = settings.method || 2; 
+                let currentMadhab = settings.madhab || 0; 
                 let currentHijriOffset = settings.hijriOffset ?? 0;
-
-                if (country === 'India' && !settings.manualOverride) {
-                    currentMethod = 1;    // Karachi
-                    currentMadhab = 1;    // Hanafi
-                    currentHijriOffset = 1; // +1 for India moon sighting
-                    
-                    if (settings.method !== 1 || settings.madhab !== 1 || settings.hijriOffset !== 1) {
-                         setSettings({ method: 1, madhab: 1, hijriOffset: 1, manualOverride: false });
-                    }
-                }
+                let currentTimezone = 'Asia/Kolkata'; // Always default to India for this refactor
 
                 // C. Fetch AlAdhan API
                 const dateStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
@@ -184,8 +156,9 @@ export const PrayerProvider = ({ children }) => {
 
                 try {
                     const timestamp = Math.floor(Date.now() / 1000);
+                    // Explicitly pass timezone parameter as requested
                     const resPrayer = await fetch(
-                        `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${location.lat}&longitude=${location.lng}&method=${currentMethod}&school=${currentMadhab}&adjustment=${currentHijriOffset}`
+                        `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${location.lat}&longitude=${location.lng}&method=${currentMethod}&school=${currentMadhab}&adjustment=${currentHijriOffset}&timezone=${currentTimezone}`
                     );
                     
                     if (!resPrayer.ok) throw new Error("Failed to fetch timings");
@@ -204,7 +177,7 @@ export const PrayerProvider = ({ children }) => {
                                 year: parseInt(hijri.year, 10),
                                 isRamadan: hijri.month.number === 9
                             },
-                            timezone: dataPrayer.data.meta.timezone
+                            timezone: dataPrayer.data.meta.timezone || currentTimezone
                         };
                         
                         // Cleanup old caches
@@ -296,7 +269,8 @@ export const PrayerProvider = ({ children }) => {
         error,
         requestLocation,
         updateManualLocation,
-        updateSettings
+        updateSettings,
+        searchLocation: locationService.searchLocation
     };
 
     return (

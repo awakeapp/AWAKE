@@ -64,12 +64,12 @@ const RamadanSettings = () => {
     }, [calculationMethod, madhab, hijriOffset]);
 
     const ALADHAN_METHODS = [
-        { id: 2, name: 'ISNA (North America)' },
+        { id: 2, name: 'ISNA (India / North America)' },
+        { id: 1, name: 'Karachi (South Asia / India)' },
         { id: 3, name: 'Muslim World League (MWL)' },
         { id: 4, name: 'Umm Al-Qura, Makkah' },
         { id: 5, name: 'Egyptian General Authority' },
         { id: 8, name: 'Gulf Region' },
-        { id: 1, name: 'Karachi (South Asia / India)' },
         { id: 11, name: 'Majlis Ugama Islam Singapura' },
         { id: 17, name: 'JAKIM (Malaysia)' },
         { id: 20, name: 'Kemenag (Indonesia)' },
