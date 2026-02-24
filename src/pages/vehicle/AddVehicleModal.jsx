@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { X, Save, Car, Bike, Truck } from 'lucide-react';
+import { X, Save, Car, Bike, Truck, Calendar } from 'lucide-react';
+import { format } from 'date-fns';
+import JumpDateModal from '../../components/organisms/JumpDateModal';
 
 const VEHICLE_TYPES = [
     { id: 'car', label: 'Car', icon: Car },
@@ -52,6 +54,8 @@ const AddVehicleModal = ({ isOpen, onClose, onSave, editVehicle = null }) => {
     };
 
     if (!isOpen) return null;
+
+    const [purchaseDatePickerOpen, setPurchaseDatePickerOpen] = useState(false);
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -140,12 +144,19 @@ const AddVehicleModal = ({ isOpen, onClose, onSave, editVehicle = null }) => {
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Purchase Date</label>
-                            <input
-                                type="date"
-                                required
-                                value={formData.purchaseDate}
-                                onChange={(e) => setFormData({ ...formData, purchaseDate: e.target.value })}
-                                className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
+                            <button
+                                type="button"
+                                onClick={() => setPurchaseDatePickerOpen(true)}
+                                className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 text-left flex items-center gap-2"
+                            >
+                                <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
+                                {formData.purchaseDate ? format(new Date(formData.purchaseDate + 'T00:00:00'), 'MMM d, yyyy') : 'Select date'}
+                            </button>
+                            <JumpDateModal
+                                isOpen={purchaseDatePickerOpen}
+                                onClose={() => setPurchaseDatePickerOpen(false)}
+                                initialDate={formData.purchaseDate ? new Date(formData.purchaseDate + 'T00:00:00') : new Date()}
+                                onSelect={(d) => { setFormData({ ...formData, purchaseDate: format(d, 'yyyy-MM-dd') }); setPurchaseDatePickerOpen(false); }}
                             />
                         </div>
                         <div>

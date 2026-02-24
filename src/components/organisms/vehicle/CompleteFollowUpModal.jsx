@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { X, CheckCircle, Wallet, Gauge, FileText } from 'lucide-react';
+import { X, CheckCircle, Wallet, Gauge, FileText, Calendar } from 'lucide-react';
 import { useFinance } from '../../../context/FinanceContext';
+import { format } from 'date-fns';
+import JumpDateModal from '../JumpDateModal';
 
 const CompleteFollowUpModal = ({ isOpen, onClose, onComplete, followUp, vehicle }) => {
     const { accounts } = useFinance();
@@ -15,6 +17,8 @@ const CompleteFollowUpModal = ({ isOpen, onClose, onComplete, followUp, vehicle 
     });
 
     if (!isOpen || !followUp) return null;
+
+    const [completeDatePickerOpen, setCompleteDatePickerOpen] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -48,12 +52,19 @@ const CompleteFollowUpModal = ({ isOpen, onClose, onComplete, followUp, vehicle 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Date Completed</label>
-                            <input
-                                type="date"
-                                required
-                                value={formData.date}
-                                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl px-4 py-3 text-slate-900 dark:text-white"
+                            <button
+                                type="button"
+                                onClick={() => setCompleteDatePickerOpen(true)}
+                                className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl px-4 py-3 text-slate-900 dark:text-white text-left flex items-center gap-2"
+                            >
+                                <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
+                                {formData.date ? format(new Date(formData.date + 'T00:00:00'), 'MMM d, yyyy') : 'Select date'}
+                            </button>
+                            <JumpDateModal
+                                isOpen={completeDatePickerOpen}
+                                onClose={() => setCompleteDatePickerOpen(false)}
+                                initialDate={formData.date ? new Date(formData.date + 'T00:00:00') : new Date()}
+                                onSelect={(d) => { setFormData({ ...formData, date: format(d, 'yyyy-MM-dd') }); setCompleteDatePickerOpen(false); }}
                             />
                         </div>
                         <div>

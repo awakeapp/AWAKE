@@ -1,9 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { User, Plus, Check, RotateCcw, ArrowLeft } from 'lucide-react';
-
+import { User, Plus, Check, RotateCcw, ArrowLeft, Calendar } from 'lucide-react';
+import { format } from 'date-fns';
 import { useState } from 'react';
+import JumpDateModal from '../../components/organisms/JumpDateModal';
 
 const DebtManager = () => {
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ const DebtManager = () => {
     const [amount, setAmount] = useState('');
     const [dueDate, setDueDate] = useState('');
     const [note, setNote] = useState('');
+    const [dueDatePickerOpen, setDueDatePickerOpen] = useState(false);
 
     // Repayment State
     const [repayModalOpen, setRepayModalOpen] = useState(false);
@@ -121,11 +123,19 @@ const DebtManager = () => {
                             </div>
                             <div>
                                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Due Date (Optional)</label>
-                                <input
-                                    type="date"
-                                    value={dueDate}
-                                    onChange={e => setDueDate(e.target.value)}
-                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500"
+                                <button
+                                    type="button"
+                                    onClick={() => setDueDatePickerOpen(true)}
+                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 text-left flex items-center gap-2"
+                                >
+                                    <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
+                                    {dueDate ? format(new Date(dueDate + 'T00:00:00'), 'MMM d, yyyy') : 'Select date'}
+                                </button>
+                                <JumpDateModal
+                                    isOpen={dueDatePickerOpen}
+                                    onClose={() => setDueDatePickerOpen(false)}
+                                    initialDate={dueDate ? new Date(dueDate + 'T00:00:00') : new Date()}
+                                    onSelect={(d) => { if (d) { setDueDate(format(d, 'yyyy-MM-dd')); } else { setDueDate(''); } setDueDatePickerOpen(false); }}
                                 />
                             </div>
                             <div>

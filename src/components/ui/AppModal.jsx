@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { TRANSITION_FAST } from '../../styles/tokens';
 
 function cn(...inputs) {
   return twMerge(clsx(inputs));
@@ -45,7 +46,7 @@ export function AppModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            transition={TRANSITION_FAST}
             onClick={onClose}
             className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
           />
@@ -55,7 +56,7 @@ export function AppModal({
             initial={{ opacity: 0, scale: 0.99, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.99, y: 10 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
+            transition={TRANSITION_FAST}
             className={cn(
               "relative w-full overflow-hidden flex flex-col max-h-[90vh]",
               "bg-surface dark:bg-surface-dark border border-slate-100 dark:border-slate-800",

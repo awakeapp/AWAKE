@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { X, Save, Calendar, Gauge, Repeat, AlertCircle } from 'lucide-react';
+import { format } from 'date-fns';
+import JumpDateModal from '../JumpDateModal';
 
 const FOLLOW_UP_TYPES = [
     'Refuel', 'Servicing', 'Oil Change', 'Tyre Change',
@@ -21,6 +23,8 @@ const AddFollowUpModal = ({ isOpen, onClose, onSave, vehicle }) => {
     });
 
     if (!isOpen) return null;
+
+    const [followUpDatePickerOpen, setFollowUpDatePickerOpen] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -111,12 +115,20 @@ const AddFollowUpModal = ({ isOpen, onClose, onSave, vehicle }) => {
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Due Date</label>
-                                <input
-                                    type="date"
-                                    required
-                                    value={formData.date}
-                                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                    className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl px-4 py-3 text-slate-900 dark:text-white"
+                                <button
+                                    type="button"
+                                    onClick={() => setFollowUpDatePickerOpen(true)}
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl px-4 py-3 text-slate-900 dark:text-white text-left flex items-center gap-2"
+                                >
+                                    <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
+                                    {formData.date ? format(new Date(formData.date + 'T00:00:00'), 'MMM d, yyyy') : 'Select date'}
+                                </button>
+                                <JumpDateModal
+                                    isOpen={followUpDatePickerOpen}
+                                    onClose={() => setFollowUpDatePickerOpen(false)}
+                                    initialDate={formData.date ? new Date(formData.date + 'T00:00:00') : new Date()}
+                                    onSelect={(d) => { setFormData({ ...formData, date: format(d, 'yyyy-MM-dd') }); setFollowUpDatePickerOpen(false); }}
+                                    minDate={new Date()}
                                 />
                             </div>
 

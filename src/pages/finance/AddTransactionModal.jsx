@@ -5,6 +5,7 @@ import { X, ArrowRight, Wallet, ArrowRightLeft, Calendar, FileText, AlertTriangl
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { FirestoreService } from '../../services/firestore-service';
+import JumpDateModal from '../../components/organisms/JumpDateModal';
 
 const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDelete }) => {
     const { addTransaction, addTransfer, editTransaction, deleteTransaction, checkDuplicate, categories, accounts, transactions, addRecurringRule, getBudgetStats } = useFinance();
@@ -26,6 +27,10 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
 
     const [isSplit, setIsSplit] = useState(false);
     const [splits, setSplits] = useState([{ categoryId: '', amount: '' }]);
+
+    // Date picker modal states (replaces native OS date pickers)
+    const [datePickerOpen, setDatePickerOpen] = useState(false);
+    const [recurDatePickerOpen, setRecurDatePickerOpen] = useState(false);
 
     // Warning State
     const [duplicateWarning, setDuplicateWarning] = useState(null);
@@ -312,14 +317,20 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                                 </div>
                                 <div className="w-1/3">
                                     <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Date</label>
-                                    <div className="relative">
-                                        <input
-                                            type="date"
-                                            value={date}
-                                            onChange={e => setDate(e.target.value)}
-                                            className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl py-3 px-3 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
-                                        />
-                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setDatePickerOpen(true)}
+                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl py-3 px-3 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none text-left flex items-center gap-2"
+                                    >
+                                        <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
+                                        {date ? format(new Date(date + 'T00:00:00'), 'MMM d, yyyy') : 'Select'}
+                                    </button>
+                                    <JumpDateModal
+                                        isOpen={datePickerOpen}
+                                        onClose={() => setDatePickerOpen(false)}
+                                        initialDate={date ? new Date(date + 'T00:00:00') : new Date()}
+                                        onSelect={(d) => { setDate(format(d, 'yyyy-MM-dd')); setDatePickerOpen(false); }}
+                                    />
                                 </div>
                             </div>
 
@@ -342,11 +353,19 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                                         </div>
                                         <div className="flex-1">
                                             <label className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2 block">End Date (Optional)</label>
-                                            <input
-                                                type="date"
-                                                value={recurEndDate}
-                                                onChange={e => setRecurEndDate(e.target.value)}
-                                                className="w-full bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-800 rounded-xl p-2 text-sm font-medium focus:ring-2 focus:ring-indigo-500"
+                                            <button
+                                                type="button"
+                                                onClick={() => setRecurDatePickerOpen(true)}
+                                                className="w-full bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-800 rounded-xl p-2 text-sm font-medium focus:ring-2 focus:ring-indigo-500 text-left flex items-center gap-2"
+                                            >
+                                                <Calendar className="w-4 h-4 text-indigo-400 shrink-0" />
+                                                {recurEndDate ? format(new Date(recurEndDate + 'T00:00:00'), 'MMM d, yyyy') : 'Select'}
+                                            </button>
+                                            <JumpDateModal
+                                                isOpen={recurDatePickerOpen}
+                                                onClose={() => setRecurDatePickerOpen(false)}
+                                                initialDate={recurEndDate ? new Date(recurEndDate + 'T00:00:00') : new Date()}
+                                                onSelect={(d) => { if (d) { setRecurEndDate(format(d, 'yyyy-MM-dd')); } else { setRecurEndDate(''); } setRecurDatePickerOpen(false); }}
                                             />
                                         </div>
                                     </div>

@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, History, PieChart, Settings, Info, Utensils, ChevronRight, CalendarDays } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../hooks/useAuthContext';
-
+import { TRANSITION_FAST } from '../../styles/tokens';
 import { useState } from 'react';
 import JumpDateModal from './JumpDateModal';
 import { useTranslation } from 'react-i18next';
@@ -71,7 +71,7 @@ const SideMenu = ({ isOpen, onClose }) => {
                         initial={{ x: '100%' }}
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
-                        transition={{ duration: 0.15, ease: 'easeOut', type: 'tween' }}
+                        transition={TRANSITION_FAST}
                         className="fixed inset-y-0 right-0 z-[60] w-[85%] max-w-sm bg-[#F2F2F7] dark:bg-black shadow-2xl flex flex-col font-sans"
                     >
                         {/* Header */}

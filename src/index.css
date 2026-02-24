@@ -43,10 +43,70 @@
     padding-top: env(safe-area-inset-top);
   }
 
+  /* ═══ Cross-Platform Normalization ═══════════════════════
+     One app, one design, zero platform variance.
+     Strips ALL OS-native styling so Android matches iOS exactly. */
+
+  *,
+  *::before,
+  *::after {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Force remove ALL platform-native form control styling.
+     Every component already applies its own explicit Tailwind classes,
+     so this reset is safe and intentional. */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  textarea,
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 0;
+    font: inherit;
+    color: inherit;
+  }
+
+  /* Restore pointer for interactive elements */
+  button, select, [role="button"] {
+    cursor: pointer;
+  }
+
+  /* Prevent iOS auto-zoom on focused inputs (font-size < 16px triggers it) */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="search"],
+  textarea,
+  select {
+    font-size: 16px;
+  }
+
+  /* Remove Android Chrome autofill blue/yellow background */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px transparent inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
   /* Global fix: eliminate 300ms tap delay on all interactive elements */
   button,
   a,
-  [role="button"] {
+  [role="button"],
+  label,
+  [tabindex] {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }

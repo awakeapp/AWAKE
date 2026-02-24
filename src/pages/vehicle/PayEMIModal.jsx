@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { X, Check, Banknote, AlertCircle, TrendingDown, Percent, MinusCircle } from 'lucide-react';
+import { X, Check, Banknote, AlertCircle, TrendingDown, Percent, MinusCircle, Calendar } from 'lucide-react';
 import { useFinance } from '../../context/FinanceContext';
+import { format } from 'date-fns';
+import JumpDateModal from '../../components/organisms/JumpDateModal';
 
 const PayEMIModal = ({ isOpen, onClose, onSave, loan, vehicle, loanDetail }) => {
     const { accounts } = useFinance();
@@ -47,6 +49,8 @@ const PayEMIModal = ({ isOpen, onClose, onSave, loan, vehicle, loanDetail }) => 
 
     const remaining = Number(loan.remainingPrincipal);
 
+    const [paymentDatePickerOpen, setPaymentDatePickerOpen] = useState(false);
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden animate-in fade-in zoom-in duration-200">
@@ -80,12 +84,19 @@ const PayEMIModal = ({ isOpen, onClose, onSave, loan, vehicle, loanDetail }) => 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Date</label>
-                            <input
-                                type="date"
-                                required
-                                value={formData.date}
-                                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl px-4 py-3 text-slate-900 dark:text-white"
+                            <button
+                                type="button"
+                                onClick={() => setPaymentDatePickerOpen(true)}
+                                className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl px-4 py-3 text-slate-900 dark:text-white text-left flex items-center gap-2"
+                            >
+                                <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
+                                {formData.date ? format(new Date(formData.date + 'T00:00:00'), 'MMM d, yyyy') : 'Select date'}
+                            </button>
+                            <JumpDateModal
+                                isOpen={paymentDatePickerOpen}
+                                onClose={() => setPaymentDatePickerOpen(false)}
+                                initialDate={formData.date ? new Date(formData.date + 'T00:00:00') : new Date()}
+                                onSelect={(d) => { setFormData({ ...formData, date: format(d, 'yyyy-MM-dd') }); setPaymentDatePickerOpen(false); }}
                             />
                         </div>
                         <div>

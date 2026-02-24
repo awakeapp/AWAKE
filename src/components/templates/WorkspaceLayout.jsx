@@ -6,6 +6,7 @@ import { useState, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next'; // Added i18n support
 import { useSwipeNavigation } from '../../hooks/useSwipeNavigation';
+import { TRANSITION_FAST } from '../../styles/tokens';
 
 const WorkspaceLayout = ({ children }) => {
     const navigate = useNavigate();
@@ -59,7 +60,7 @@ const WorkspaceLayout = ({ children }) => {
                             initial={{ x: '100%' }}
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
-                            transition={{ duration: 0.15, ease: "easeOut" }}
+                            transition={TRANSITION_FAST}
                             className="fixed inset-y-0 right-0 z-50 w-80 bg-white dark:bg-slate-900 shadow-2xl flex flex-col h-full border-l border-slate-100 dark:border-slate-800"
                         >
                             {/* Drawer Header */}
