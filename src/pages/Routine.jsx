@@ -153,57 +153,59 @@ const Routine = () => {
                 </div>
             </div>
 
-            <div className="space-y-6">
-                {/* Categories */}
-                {Object.entries(categories).map(([category, tasks]) => (
-                    <RoutineCategory
-                        key={category}
-                        title={category}
-                        tasks={tasks}
-                        onUpdateStatus={updateTaskStatus}
+            <div className="max-w-md mx-auto w-full px-4">
+                <div className="space-y-6">
+                    {/* Categories */}
+                    {Object.entries(categories).map(([category, tasks]) => (
+                        <RoutineCategory
+                            key={category}
+                            title={category}
+                            tasks={tasks}
+                            onUpdateStatus={updateTaskStatus}
+                            isLocked={isLocked}
+                        />
+                    ))}
+
+                    {/* Habits */}
+                    <DailyHabits
+                        habits={dailyData.habits}
+                        onUpdateHabit={updateHabit}
                         isLocked={isLocked}
                     />
-                ))}
 
-                {/* Habits */}
-                <DailyHabits
-                    habits={dailyData.habits}
-                    onUpdateHabit={updateHabit}
-                    isLocked={isLocked}
-                />
-
-                {/* Submit / Unlock */}
-                {isLocked ? (
-                    <div className="text-center p-6 bg-slate-100 rounded-2xl dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                        <div className="flex flex-col items-center gap-2 mb-4">
-                            <div className="bg-slate-200 p-4 rounded-full dark:bg-slate-800">
-                                <Lock className="w-8 h-8 text-slate-400" />
+                    {/* Submit / Unlock */}
+                    {isLocked ? (
+                        <div className="text-center p-6 bg-slate-100 rounded-2xl dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                            <div className="flex flex-col items-center gap-2 mb-4">
+                                <div className="bg-slate-200 p-4 rounded-full dark:bg-slate-800">
+                                    <Lock className="w-8 h-8 text-slate-400" />
+                                </div>
+                                <div>
+                                    <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200">Day Locked</h3>
+                                    <p className="text-sm text-slate-500 font-normal">This day is completed and read-only.</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200">Day Locked</h3>
-                                <p className="text-sm text-slate-500 font-normal">This day is completed and read-only.</p>
-                            </div>
+                            {dailyData.locked && !isPast && (
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setShowUnlockModal(true)}
+                                    className="w-full sm:w-auto"
+                                >
+                                    <Edit2 className="w-4 h-4 mr-2" />
+                                    Edit Day
+                                </Button>
+                            )}
                         </div>
-                        {dailyData.locked && !isPast && (
-                            <Button
-                                variant="outline"
-                                onClick={() => setShowUnlockModal(true)}
-                                className="w-full sm:w-auto"
-                            >
-                                <Edit2 className="w-4 h-4 mr-2" />
-                                Edit Day
-                            </Button>
-                        )}
-                    </div>
-                ) : (
-                    <button
-                        className="w-full py-3.5 text-sm font-semibold rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 shadow-sm ring-1 ring-slate-900/5 flex items-center justify-center gap-2 active:opacity-70 transition-opacity"
-                        onClick={() => setShowSubmitModal(true)}
-                    >
-                        <List className="w-4 h-4 stroke-[1.5]" />
-                        Today's Overview
-                    </button>
-                )}
+                    ) : (
+                        <button
+                            className="w-full py-3.5 text-sm font-semibold rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 shadow-sm ring-1 ring-slate-900/5 flex items-center justify-center gap-2 active:opacity-70 transition-opacity"
+                            onClick={() => setShowSubmitModal(true)}
+                        >
+                            <List className="w-4 h-4 stroke-[1.5]" />
+                            Today's Overview
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Submit Modal */}
