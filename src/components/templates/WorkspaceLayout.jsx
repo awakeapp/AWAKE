@@ -5,7 +5,6 @@ import { useTheme } from '../../context/ThemeContext';
 import { useState, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next'; // Added i18n support
-import { useSwipeNavigation } from '../../hooks/useSwipeNavigation';
 import { TRANSITION_FAST } from '../../styles/tokens';
 import { useScrollLock } from '../../hooks/useScrollLock';
 
@@ -15,7 +14,7 @@ const WorkspaceLayout = ({ children }) => {
     const { isDark } = useTheme();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const { t } = useTranslation();
-    const swipeHandlers = useSwipeNavigation();
+
 
     useScrollLock(isSidebarOpen);
 
@@ -37,7 +36,6 @@ const WorkspaceLayout = ({ children }) => {
     return (
         <div 
             className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-sans transition-colors duration-300 pb-24"
-            {...swipeHandlers}
         >
             {/* Background Decoration */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">

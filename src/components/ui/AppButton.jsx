@@ -27,18 +27,16 @@ export const AppButton = React.forwardRef(({
 }, ref) => {
   const baseClasses = cn(
     // Base constraints: height >= 44px tap target, typography token, motion token
-    // Strict: transition-all duration-180 ease-in-out (configured globally, we just say transition-all)
+    // Strict: transition-all focus-visible:ring-2
     "relative flex items-center justify-center gap-2 min-h-[44px]",
     "rounded font-medium transition-all outline-none",
     "focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900",
     // Variants
-    !variantClasses[variant] ? variantClasses.primary : variantClasses[variant],
-    // Sizes
-    sizeClasses[size],
+    variants[variant] || variants.primary,
     // Full width
     fullWidth ? "w-full" : "",
     // Disabled/Loading state: 50% opacity, no pointer events to prevent fast double clicking.
-    (disabled || isLoading) ? "opacity-50 cursor-not-allowed" : "active:opacity-80",
+    (disabled || isLoading) ? "opacity-50 cursor-not-allowed" : "",
     className
   );
 

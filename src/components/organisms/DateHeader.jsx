@@ -36,7 +36,7 @@ const DateHeader = ({ className, showControls = true, overviewText, onEditClick,
                 {showControls && (
                     <button
                         onClick={prevDay}
-                        className="p-1.5 sm:p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all active:scale-95 flex-shrink-0"
+                        className="p-1.5 sm:p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all flex-shrink-0"
                     >
                         <ChevronLeft className="w-6 h-6 sm:w-7 sm:h-7" />
                     </button>
@@ -70,7 +70,7 @@ const DateHeader = ({ className, showControls = true, overviewText, onEditClick,
                     <button
                         onClick={nextDay}
                         disabled={!allowFuture && isToday}
-                        className="p-1.5 sm:p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all active:scale-95 disabled:opacity-20 disabled:hover:bg-transparent flex-shrink-0"
+                        className="p-1.5 sm:p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all disabled:opacity-20 disabled:hover:bg-transparent flex-shrink-0"
                     >
                         <ChevronRight className="w-6 h-6 sm:w-7 sm:h-7" />
                     </button>
@@ -79,7 +79,7 @@ const DateHeader = ({ className, showControls = true, overviewText, onEditClick,
                 {!isToday && (
                     <button
                         onClick={jumpToToday}
-                        className="flex items-center justify-center bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-xs sm:text-sm font-bold uppercase tracking-wider px-3 sm:px-4 py-2 rounded-xl transition-colors active:scale-95 flex-shrink-0 ml-0.5 sm:ml-1"
+                        className="flex items-center justify-center bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-xs sm:text-sm font-bold uppercase tracking-wider px-3 sm:px-4 py-2 rounded-xl transition-colors flex-shrink-0 ml-0.5 sm:ml-1"
                     >
                         Today
                     </button>
@@ -102,7 +102,7 @@ const DateHeader = ({ className, showControls = true, overviewText, onEditClick,
                     {onEditClick && !isLocked && (
                         <button
                             onClick={onEditClick}
-                            className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-800 transition-all active:scale-95 flex-shrink-0"
+                            className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-800 transition-all flex-shrink-0"
                             aria-label="Edit Routine"
                         >
                             <Edit2 className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />

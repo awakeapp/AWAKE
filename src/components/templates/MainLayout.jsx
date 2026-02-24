@@ -10,7 +10,6 @@ import { useDate } from '../../context/DateContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useState } from 'react';
-import { useSwipeNavigation } from '../../hooks/useSwipeNavigation';
 
 const MainLayout = ({ children }) => {
     const { user } = useAuthContext();
@@ -32,7 +31,7 @@ const MainLayout = ({ children }) => {
     const isFullBleed = fullBleedRoutes.some(route => location.pathname.startsWith(route));
 
     const { isDark } = useTheme();
-    const swipeHandlers = useSwipeNavigation();
+
 
     const Loader = (
         <div className="flex items-center justify-center p-12">
@@ -44,7 +43,6 @@ const MainLayout = ({ children }) => {
         <div
             className={`min-h-screen bg-slate-50 font-sans text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors ${showHeader && !isFullBleed ? 'pt-[56px]' : ''}`}
             style={isFullBleed ? undefined : { paddingBottom: '5rem' }}
-            {...swipeHandlers}
         >
             {/* Global AppHeader — hidden on pages with their own header */}
             {showHeader && (

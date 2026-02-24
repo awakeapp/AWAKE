@@ -11,155 +11,155 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
 const History = () => {
-    const navigate = useNavigate();
-    const { dailyData } = useData();
-    const { formattedDate, setDate, isToday } = useDate();
-    const { user } = useAuthContext();
-    const [showJumpModal, setShowJumpModal] = useState(false);
+ const navigate = useNavigate();
+ const { dailyData } = useData();
+ const { formattedDate, setDate, isToday } = useDate();
+ const { user } = useAuthContext();
+ const [showJumpModal, setShowJumpModal] = useState(false);
 
-    // --- Report Calculations ---
-    const totalTasks = dailyData.tasks?.length || 0;
-    const completedTasks = dailyData.tasks?.filter(t => t.status === 'checked') || [];
-    const missedTasks = dailyData.tasks?.filter(t => t.status === 'missed') || [];
-    const completionRate = totalTasks > 0 ? Math.round((completedTasks.length / totalTasks) * 100) : 0;
+ // --- Report Calculations ---
+ const totalTasks = dailyData.tasks?.length || 0;
+ const completedTasks = dailyData.tasks?.filter(t => t.status === 'checked') || [];
+ const missedTasks = dailyData.tasks?.filter(t => t.status === 'missed') || [];
+ const completionRate = totalTasks > 0 ? Math.round((completedTasks.length / totalTasks) * 100) : 0;
 
-    const violations = [];
-    if (dailyData.habits?.junkFood) violations.push("Ate Junk Food");
-    if (dailyData.habits?.sugar) violations.push("Consumed Sugar");
-    if (dailyData.habits?.coldDrinks) violations.push("Drank Cold Drinks");
-    if (dailyData.habits?.screenTime > 2) violations.push(`High Screen Time (${dailyData.habits.screenTime}h)`);
+ const violations = [];
+ if (dailyData.habits?.junkFood) violations.push("Ate Junk Food");
+ if (dailyData.habits?.sugar) violations.push("Consumed Sugar");
+ if (dailyData.habits?.coldDrinks) violations.push("Drank Cold Drinks");
+ if (dailyData.habits?.screenTime > 2) violations.push(`High Screen Time (${dailyData.habits.screenTime}h)`);
 
-    const improvements = [
-        ...missedTasks.map(t => `Missed task: ${t.name}`),
-        ...violations.map(v => `Avoid: ${v}`)
-    ];
+ const improvements = [
+ ...missedTasks.map(t => `Missed task: ${t.name}`),
+ ...violations.map(v => `Avoid: ${v}`)
+ ];
 
-    return (
-        <div className="pb-24 space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors active:scale-95 text-slate-700 dark:text-slate-300 -ml-2 focus:outline-none"
-                    >
-                        <ArrowLeft className="w-6 h-6" />
-                    </button>
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">Report History</h2>
-                </div>
-                <button
-                    onClick={() => setShowJumpModal(true)}
-                    className="p-2 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-indigo-600 rounded-full transition-colors dark:bg-slate-800 dark:hover:bg-slate-700 dark:active:bg-slate-600 dark:text-indigo-400"
-                >
-                    <CalendarIcon className="w-5 h-5" />
-                </button>
-            </div>
+ return (
+ <div className="pb-24 space-y-6">
+ {/* Header */}
+ <div className="flex items-center justify-between">
+ <div className="flex items-center gap-3">
+ <button
+ onClick={() => navigate(-1)}
+ className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors text-slate-700 dark:text-slate-300 -ml-2 focus:outline-none"
+ >
+ <ArrowLeft className="w-6 h-6" />
+ </button>
+ <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">Report History</h2>
+ </div>
+ <button
+ onClick={() => setShowJumpModal(true)}
+ className="p-2 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-indigo-600 rounded-full transition-colors dark:bg-slate-800 dark:hover:bg-slate-700 dark:active:bg-slate-600 dark:text-indigo-400"
+ >
+ <CalendarIcon className="w-5 h-5" />
+ </button>
+ </div>
 
-            {/* Selected Date Report */}
-            <motion.div
-                key={formattedDate}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-4"
-            >
-                <div className="text-center mb-6">
-                    <h3 className="text-base font-medium text-slate-500 dark:text-slate-400">
-                        Overview for <span className="text-slate-900 dark:text-white font-semibold">{new Date(formattedDate + 'T00:00:00').toLocaleDateString(undefined, { dateStyle: 'long' })}</span>
-                    </h3>
-                </div>
+ {/* Selected Date Report */}
+ <motion.div
+ key={formattedDate}
+ initial={{ opacity: 0, y: 20 }}
+ animate={{ opacity: 1, y: 0 }}
+ transition={{ duration: 0.3 }}
+ className="space-y-4"
+ >
+ <div className="text-center mb-6">
+ <h3 className="text-base font-medium text-slate-500 dark:text-slate-400">
+ Overview for <span className="text-slate-900 dark:text-white font-semibold">{new Date(formattedDate + 'T00:00:00').toLocaleDateString(undefined, { dateStyle: 'long' })}</span>
+ </h3>
+ </div>
 
-                {/* Score Card */}
-                <Card className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white border-none shadow-xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-8 opacity-10">
-                        <PieChart size={120} />
-                    </div>
-                    <CardContent className="p-6 relative z-10 flex items-center justify-between">
-                        <div>
-                            <p className="text-indigo-200 font-medium mb-1">Daily Score</p>
-                            <div className="text-4xl font-bold tracking-tight flex items-baseline gap-1">
-                                {completionRate}
-                                <span className="text-xl opacity-60">%</span>
-                            </div>
-                            <p className="text-sm text-indigo-100 mt-2 opacity-80">
-                                {completedTasks.length} / {totalTasks} tasks completed
-                            </p>
-                        </div>
-                        <div className="w-24 h-24 rounded-full border-8 border-white/20 flex items-center justify-center relative">
-                            <TrendingUp className="w-10 h-10 text-white" />
-                        </div>
-                    </CardContent>
-                </Card>
+ {/* Score Card */}
+ <Card className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white border-none shadow-xl relative overflow-hidden">
+ <div className="absolute top-0 right-0 p-8 opacity-10">
+ <PieChart size={120} />
+ </div>
+ <CardContent className="p-6 relative z-10 flex items-center justify-between">
+ <div>
+ <p className="text-indigo-200 font-medium mb-1">Daily Score</p>
+ <div className="text-4xl font-bold tracking-tight flex items-baseline gap-1">
+ {completionRate}
+ <span className="text-xl opacity-60">%</span>
+ </div>
+ <p className="text-sm text-indigo-100 mt-2 opacity-80">
+ {completedTasks.length} / {totalTasks} tasks completed
+ </p>
+ </div>
+ <div className="w-24 h-24 rounded-full border-8 border-white/20 flex items-center justify-center relative">
+ <TrendingUp className="w-10 h-10 text-white" />
+ </div>
+ </CardContent>
+ </Card>
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-2xl border border-emerald-100 dark:border-emerald-800/30">
-                        <div className="flex items-center gap-2 mb-2">
-                            <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                            <span className="font-semibold text-emerald-900 dark:text-emerald-100">Completed</span>
-                        </div>
-                        <p className="text-xl font-semibold text-emerald-700 dark:text-emerald-300">{completedTasks.length}</p>
-                    </div>
-                    <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl border border-red-100 dark:border-red-800/30">
-                        <div className="flex items-center gap-2 mb-2">
-                            <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
-                            <span className="font-semibold text-red-900 dark:text-red-100">Missed</span>
-                        </div>
-                        <p className="text-xl font-semibold text-red-700 dark:text-red-300">{missedTasks.length}</p>
-                    </div>
-                </div>
+ {/* Stats Grid */}
+ <div className="grid grid-cols-2 gap-3">
+ <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-2xl border border-emerald-100 dark:border-emerald-800/30">
+ <div className="flex items-center gap-2 mb-2">
+ <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+ <span className="font-semibold text-emerald-900 dark:text-emerald-100">Completed</span>
+ </div>
+ <p className="text-xl font-semibold text-emerald-700 dark:text-emerald-300">{completedTasks.length}</p>
+ </div>
+ <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl border border-red-100 dark:border-red-800/30">
+ <div className="flex items-center gap-2 mb-2">
+ <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+ <span className="font-semibold text-red-900 dark:text-red-100">Missed</span>
+ </div>
+ <p className="text-xl font-semibold text-red-700 dark:text-red-300">{missedTasks.length}</p>
+ </div>
+ </div>
 
-                {/* Violations */}
-                {violations.length > 0 && (
-                    <Card className="border-red-100 bg-red-50/50 dark:bg-red-900/10 dark:border-red-900/30">
-                        <CardContent className="p-5">
-                            <h4 className="font-semibold text-red-800 dark:text-red-200 flex items-center gap-2 mb-3">
-                                <AlertCircle className="w-5 h-5" />
-                                Violations Detected
-                            </h4>
-                            <ul className="space-y-2">
-                                {violations.map((v, i) => (
-                                    <li key={i} className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
-                                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
-                                        {v}
-                                    </li>
-                                ))}
-                            </ul>
-                        </CardContent>
-                    </Card>
-                )}
+ {/* Violations */}
+ {violations.length > 0 && (
+ <Card className="border-red-100 bg-red-50/50 dark:bg-red-900/10 dark:border-red-900/30">
+ <CardContent className="p-5">
+ <h4 className="font-semibold text-red-800 dark:text-red-200 flex items-center gap-2 mb-3">
+ <AlertCircle className="w-5 h-5" />
+ Violations Detected
+ </h4>
+ <ul className="space-y-2">
+ {violations.map((v, i) => (
+ <li key={i} className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
+ <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
+ {v}
+ </li>
+ ))}
+ </ul>
+ </CardContent>
+ </Card>
+ )}
 
-                {/* Improvements */}
-                {improvements.length > 0 ? (
-                    <div className="bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800">
-                        <h4 className="font-semibold text-slate-700 dark:text-slate-300 mb-3 uppercase text-xs tracking-wider">
-                            Areas to Improve
-                        </h4>
-                        <ul className="space-y-3">
-                            {improvements.map((item, i) => (
-                                <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
-                                    <div className="w-6 h-6 rounded-full bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center shrink-0 text-slate-400 text-xs font-bold border border-slate-100 dark:border-slate-700">
-                                        {i + 1}
-                                    </div>
-                                    <span className="py-0.5">{item}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                ) : (
-                    <div className="bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl p-6 text-center border-dashed border-2 border-emerald-100 dark:border-emerald-800/30">
-                        <p className="text-emerald-700 dark:text-emerald-300 font-medium">No improvements needed! Perfect day!</p>
-                    </div>
-                )}
-            </motion.div>
+ {/* Improvements */}
+ {improvements.length > 0 ? (
+ <div className="bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800">
+ <h4 className="font-semibold text-slate-700 dark:text-slate-300 mb-3 uppercase text-xs tracking-wider">
+ Areas to Improve
+ </h4>
+ <ul className="space-y-3">
+ {improvements.map((item, i) => (
+ <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
+ <div className="w-6 h-6 rounded-full bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center shrink-0 text-slate-400 text-xs font-bold border border-slate-100 dark:border-slate-700">
+ {i + 1}
+ </div>
+ <span className="py-0.5">{item}</span>
+ </li>
+ ))}
+ </ul>
+ </div>
+ ) : (
+ <div className="bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl p-6 text-center border-dashed border-2 border-emerald-100 dark:border-emerald-800/30">
+ <p className="text-emerald-700 dark:text-emerald-300 font-medium">No improvements needed! Perfect day!</p>
+ </div>
+ )}
+ </motion.div>
 
-            {/* Jump Date Modal */}
-            <JumpDateModal
-                isOpen={showJumpModal}
-                onClose={() => setShowJumpModal(false)}
-            />
-        </div>
-    );
+ {/* Jump Date Modal */}
+ <JumpDateModal
+ isOpen={showJumpModal}
+ onClose={() => setShowJumpModal(false)}
+ />
+ </div>
+ );
 };
 
 export default History;

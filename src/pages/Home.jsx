@@ -200,7 +200,7 @@ const Home = () => {
                             </div>
                             <button
                                 onClick={(e) => { e.stopPropagation(); navigate('/routine'); }}
-                                className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:bg-slate-300 dark:active:bg-slate-600 text-slate-600 dark:text-slate-300 rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm active:scale-95"
+                                className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:bg-slate-300 dark:active:bg-slate-600 text-slate-600 dark:text-slate-300 rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
                             >
                                 View
                             </button>
@@ -226,7 +226,7 @@ const Home = () => {
                             </div>
                             <button
                                 onClick={(e) => { e.stopPropagation(); setIsTaskModalOpen(true); }}
-                                className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors active:scale-95 shadow-sm"
+                                className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
                             >
                                 + Task
                             </button>
@@ -252,7 +252,7 @@ const Home = () => {
                             </div>
                             <button
                                 onClick={(e) => { e.stopPropagation(); setIsFinanceModalOpen(true); }}
-                                className="bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors active:scale-95 shadow-sm"
+                                className="bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
                             >
                                 + Log
                             </button>
@@ -278,7 +278,7 @@ const Home = () => {
                             </div>
                             <button
                                 onClick={(e) => { e.stopPropagation(); setIsFuelModalOpen(true); }}
-                                className="bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors active:scale-95 shadow-sm"
+                                className="bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
                             >
                                 + Fuel
                             </button>
