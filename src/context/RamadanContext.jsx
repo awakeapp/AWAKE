@@ -217,6 +217,28 @@ export const RamadanProvider = ({ children }) => {
         return newLoc;
     };
 
+    const updateCustomPrayers = async (prayers) => {
+        if (!user || !hijriDate?.year) return;
+        const yearId = String(hijriDate.year);
+        const path = `users/${user.uid}/ramadan`;
+        try {
+            await FirestoreService.setItem(path, yearId, { customPrayers: prayers }, true);
+        } catch (err) {
+            console.error("Failed to update custom prayers:", err);
+        }
+    };
+
+    const updateCustomDhikr = async (dhikr) => {
+        if (!user || !hijriDate?.year) return;
+        const yearId = String(hijriDate.year);
+        const path = `users/${user.uid}/ramadan`;
+        try {
+            await FirestoreService.setItem(path, yearId, { customDhikr: dhikr }, true);
+        } catch (err) {
+            console.error("Failed to update custom dhikr:", err);
+        }
+    };
+
     const updateManualLocation = (lat, lng) => {
         const newLoc = { lat, lng };
         localStorage.setItem('awake_ramadan_location', JSON.stringify(newLoc));
@@ -232,6 +254,8 @@ export const RamadanProvider = ({ children }) => {
         error,
         updateRamadanDay,
         updateQuranGoal,
+        updateCustomPrayers,
+        updateCustomDhikr,
         requestLocation,
         updateManualLocation,
         settings,

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRamadan } from '../../context/RamadanContext';
-import { BookOpen, Target, Settings2, Activity, Check } from 'lucide-react';
+import { BookOpen, Target, Settings2, Activity, Check, Plus } from 'lucide-react';
 import clsx from 'clsx';
 
 const CounterCard = ({ title, count, target, onSave, accentClass }) => {
@@ -172,8 +172,13 @@ const QuranGoalWidget = ({ ramadanData, updateQuranGoal, currentDay }) => {
 };
 
 const RamadanDhikr = () => {
-    const { loading, error, ramadanData, updateRamadanDay, updateQuranGoal, hijriDate } = useRamadan();
+    const { loading, error, ramadanData, updateRamadanDay, updateQuranGoal, updateCustomDhikr, hijriDate } = useRamadan();
     const [now, setNow] = useState(new Date());
+    const [isAddingDhikr, setIsAddingDhikr] = useState(false);
+    const [newDhikrName, setNewDhikrName] = useState('');
+    const [newDhikrTarget, setNewDhikrTarget] = useState(100);
+
+    const customDhikrItems = ramadanData?.customDhikr || [];
 
     useEffect(() => {
         const timer = setInterval(() => setNow(new Date()), 60000);
@@ -200,6 +205,22 @@ const RamadanDhikr = () => {
 
     const handleSave = (field, newVal) => {
         updateRamadanDay(todayKey, { [field]: newVal });
+    };
+
+    const handleAddCustomDhikr = () => {
+        const trimmed = newDhikrName.trim();
+        if (!trimmed) return;
+        
+        const newDhikr = {
+            id: 'dhikr_' + Date.now(),
+            title: trimmed,
+            target: parseInt(newDhikrTarget, 10) || 0
+        };
+        
+        updateCustomDhikr([...customDhikrItems, newDhikr]);
+        setNewDhikrName('');
+        setNewDhikrTarget(100);
+        setIsAddingDhikr(false);
     };
 
     return (
@@ -239,6 +260,61 @@ const RamadanDhikr = () => {
                         onSave={(val) => handleSave('istighfar', val)}
                         accentClass="bg-violet-500"
                     />
+                    
+                    {customDhikrItems.map((cd, index) => (
+                        <CounterCard 
+                            key={cd.id}
+                            title={cd.title} 
+                            count={todayData[cd.id] || 0} 
+                            target={cd.target}
+                            onSave={(val) => handleSave(cd.id, val)}
+                            accentClass={["bg-blue-500", "bg-indigo-500", "bg-violet-500", "bg-emerald-500"][index % 4]}
+                        />
+                    ))}
+
+                    {isAddingDhikr ? (
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-sm animate-in fade-in slide-in-from-top-2">
+                            <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3">Add Custom Dhikr</h3>
+                            <div className="flex flex-col sm:flex-row gap-3">
+                                <input 
+                                    type="text" 
+                                    value={newDhikrName}
+                                    onChange={e => setNewDhikrName(e.target.value)}
+                                    placeholder="Dhikr Name (e.g. SubhanAllah)"
+                                    autoFocus
+                                    className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-colors rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                />
+                                <div className="flex items-center gap-2">
+                                    <input 
+                                        type="number" 
+                                        value={newDhikrTarget}
+                                        onChange={e => setNewDhikrTarget(e.target.value)}
+                                        placeholder="Target"
+                                        className="w-24 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-colors rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    />
+                                    <button 
+                                        onClick={handleAddCustomDhikr} 
+                                        className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold rounded-lg transition-colors"
+                                    >
+                                        Save
+                                    </button>
+                                    <button 
+                                        onClick={() => { setIsAddingDhikr(false); setNewDhikrName(''); setNewDhikrTarget(100); }} 
+                                        className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-sm font-semibold rounded-lg transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <button 
+                            onClick={() => setIsAddingDhikr(true)} 
+                            className="w-full py-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl text-slate-500 dark:text-slate-400 font-semibold hover:border-indigo-400 hover:text-indigo-500 dark:hover:border-indigo-500 dark:hover:text-indigo-400 transition-colors flex justify-center items-center gap-2"
+                        >
+                            <Plus className="w-5 h-5" /> Add Custom Dhikr
+                        </button>
+                    )}
                 </div>
 
                 <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-[#2C2C2E]">
