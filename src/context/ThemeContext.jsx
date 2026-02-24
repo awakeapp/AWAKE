@@ -32,6 +32,9 @@ export const ThemeContextProvider = ({ children }) => {
     useEffect(() => {
         const root = window.document.documentElement;
         
+        // Prevent partial rendering/flickering with temporary lock
+        root.classList.add('theme-switching');
+        
         // Define theme colors matching index.css
         const lightColor = '#ffffff';
         const darkColor = '#020617';
@@ -46,14 +49,16 @@ export const ThemeContextProvider = ({ children }) => {
 
         // Dynamic Meta Tag Update for Instant Status Bar Switch
         const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-        // Legacy status bar style is static 'default' in index.html to avoid conflicts
-        // iOS 15+ handles contrast automatically via theme-color
-
         const newColor = theme === 'dark' ? darkColor : lightColor;
 
         if (metaThemeColor) metaThemeColor.setAttribute('content', newColor);
 
         localStorage.setItem('theme', theme);
+
+        // Remove lock after browser naturally repaints
+        setTimeout(() => {
+            root.classList.remove('theme-switching');
+        }, 50);
     }, [theme]);
 
     // Listen for system theme changes if no explicit user preference

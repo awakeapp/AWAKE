@@ -39,7 +39,7 @@
     background-color: #020617; /* match dark:bg-primary-950 */
   }
   body {
-    @apply bg-white text-slate-900 antialiased dark:bg-primary-950 dark:text-slate-50;
+    @apply bg-white text-slate-900 antialiased dark:bg-[#020617] dark:text-slate-50 transition-colors duration-0;
     padding-top: env(safe-area-inset-top);
   }
 
@@ -59,6 +59,11 @@
   
   *::-webkit-scrollbar {
     display: none; /* Chrome, Safari and Opera */
+  }
+
+  /* Instant theme switch lock */
+  .theme-switching, .theme-switching * {
+    transition: none !important;
   }
 }
 
