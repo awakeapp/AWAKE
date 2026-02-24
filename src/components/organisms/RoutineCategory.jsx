@@ -23,7 +23,7 @@ const RoutineCategory = ({ title, tasks, onUpdateStatus, isLocked }) => {
     const total = tasks.length;
 
     return (
-        <section className={`mb-3 transition-all duration-300 ${isLocked ? 'opacity-70 grayscale-[0.5] pointer-events-none' : ''}`}>
+        <section className={`mb-2 transition-all duration-300 ${isLocked ? 'opacity-70 grayscale-[0.5] pointer-events-none' : ''}`}>
             {/* Compact Category Header */}
             <div className="w-full flex items-center justify-between px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200">
                 <div className="flex items-center gap-2.5">
@@ -38,8 +38,8 @@ const RoutineCategory = ({ title, tasks, onUpdateStatus, isLocked }) => {
             </div>
 
             {/* Content (Always Visible) */}
-            <div className="overflow-hidden mt-2">
-                <div className="grid gap-3 px-1 pb-4">
+            <div className="overflow-hidden mt-1.5">
+                <div className="grid gap-2 px-0 pb-2">
                     {tasks.map((task) => (
                         <TaskItem
                             key={task.id}

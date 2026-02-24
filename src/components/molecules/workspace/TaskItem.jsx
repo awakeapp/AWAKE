@@ -2,6 +2,7 @@ import { useState, useEffect, memo } from 'react';
 import { useTasks } from '../../../context/TaskContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import ToggleSwitch from '../../atoms/ToggleSwitch';
+import ThreeStateCheckbox from '../../atoms/ThreeStateCheckbox';
 import { inferIcon, getIconComponent } from '../../../utils/iconInference';
 import clsx from 'clsx';
 import { Clock, ArrowUp, Trash2, Calendar as CalendarIcon, Tag, Info } from 'lucide-react';
@@ -56,7 +57,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
             transition={{ duration: 0.2 }} // Faster enter/layout
             whileHover={{ y: -2 }}
             className={clsx(
-                "group relative flex items-start gap-3 sm:gap-5 p-3 sm:p-4 rounded-[1.5rem] border transition-all duration-200", // Changed to items-start
+                "group relative flex items-center gap-2.5 sm:gap-3 p-2.5 rounded-2xl border transition-all duration-200", 
                 isCarryOver
                     ? "bg-orange-50/40 dark:bg-orange-950/20 border-orange-100/50 dark:border-orange-900/30"
                     : isCompleted
@@ -73,8 +74,8 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
 
             {/* 1. TIME Section - Redesigned for Premium Feel */}
             {!isCarryOver && task.time && (
-                <div className="shrink-0 flex flex-col items-center justify-center min-w-[62px] sm:min-w-[70px] py-1.5 px-2 bg-slate-50/50 dark:bg-slate-800/50 rounded-2xl border border-slate-100/50 dark:border-slate-700/50">
-                    <span className="text-[17px] sm:text-[19px] font-thin text-slate-800 dark:text-slate-100 tabular-nums leading-none tracking-tight">
+                <div className="shrink-0 flex flex-col items-center justify-center min-w-[50px] py-1 px-1.5 bg-slate-50/50 dark:bg-slate-800/50 rounded-xl border border-slate-100/50 dark:border-slate-700/50">
+                    <span className="text-[14px] font-medium text-slate-800 dark:text-slate-100 tabular-nums leading-none tracking-tight">
                         {(() => {
                             const [h, m] = task.time.split(':').map(Number);
                             if (timeFormat === '24h') {
@@ -88,10 +89,10 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
             )}
 
             {/* Main Content Area */}
-            <div className="flex items-start gap-2.5 sm:gap-4 flex-1 min-w-0 pt-0.5">
+            <div className="flex items-center gap-2.5 sm:gap-3 flex-1 min-w-0">
                 {/* 2. ICON - Styled with depth */}
                 <div className={clsx(
-                    "flex-shrink-0 w-9 h-9 sm:w-11 sm:h-11 rounded-[1.1rem] flex items-center justify-center transition-colors duration-200",
+                    "flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center transition-colors duration-200",
                     isCarryOver
                         ? "bg-orange-100 dark:bg-orange-900/30 text-orange-500 shadow-sm"
                         : isCompleted
@@ -142,7 +143,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                             </div>
                         )}
                         <span className={clsx(
-                            "text-[14px] sm:text-[16px] font-normal tracking-tight transition-colors duration-200 leading-tight whitespace-pre-wrap break-words [overflow-wrap:anywhere] block w-full",
+                            "text-[14px] sm:text-[15px] font-medium tracking-tight transition-colors duration-200 leading-tight whitespace-pre-wrap break-words [overflow-wrap:anywhere] block w-full",
                             isCarryOver
                                 ? "text-slate-600 dark:text-slate-400"
                                 : isCompleted
@@ -255,11 +256,21 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                     </div>
                 ) : (
                     <div className="px-1 py-1 transition-opacity active:opacity-70 duration-150">
-                        <ToggleSwitch
-                            status={isCompleted ? 'checked' : task.status || 'unchecked'}
-                            onClick={() => onUpdateStatus(task.id)}
-                            disabled={isLocked}
-                        />
+                        {isRoutine ? (
+                            <ToggleSwitch
+                                status={isCompleted ? 'checked' : task.status || 'unchecked'}
+                                onClick={() => onUpdateStatus(task.id)}
+                                disabled={isLocked}
+                            />
+                        ) : (
+                            <div className="scale-90 opacity-90 transition-all hover:scale-100 hover:opacity-100">
+                                <ThreeStateCheckbox
+                                    status={isCompleted ? 'checked' : task.status || 'unchecked'}
+                                    onClick={() => onUpdateStatus(task.id)}
+                                    disabled={isLocked}
+                                />
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
