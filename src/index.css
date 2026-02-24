@@ -6,10 +6,11 @@
   html,
   body {
     background-color: #ffffff;
-    overscroll-behavior: none;
+    /* contain = prevents scroll-bleed to parent/browser-chrome
+       but ALLOWS the native iOS elastic bounce within each scroll container.
+       This is the WhatsApp / native-app behavior. */
+    overscroll-behavior-y: contain;
     -webkit-overflow-scrolling: touch;
-    /* Removed automatic transition here to prevent load flash. 
-           We now rely on .theme-transition class added by JS for smooth toggles. */
   }
 
   /* Regional Typography Overrides */
@@ -36,16 +37,14 @@
 
   html.dark,
   html.dark body {
-    background-color: #020617; /* match dark:bg-primary-950 */
+    background-color: #020617;
   }
   body {
     @apply bg-white text-slate-900 antialiased dark:bg-[#020617] dark:text-slate-50 transition-colors duration-0;
     padding-top: env(safe-area-inset-top);
   }
 
-  /* ═══ Cross-Platform Normalization ═══════════════════════
-     One app, one design, zero platform variance.
-     Strips ALL OS-native styling so Android matches iOS exactly. */
+  /* ═══ Cross-Platform Normalization ═══════════════════════ */
 
   *,
   *::before,
@@ -64,9 +63,7 @@
     -webkit-touch-callout: none;
   }
 
-  /* Force remove ALL platform-native form control styling.
-     Every component already applies its own explicit Tailwind classes,
-     so this reset is safe and intentional. */
+  /* Force remove ALL platform-native form control styling. */
   input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
   textarea,
   select {
@@ -90,7 +87,7 @@
     cursor: pointer;
   }
 
-  /* Prevent iOS auto-zoom on focused inputs (font-size < 16px triggers it) */
+  /* Prevent iOS auto-zoom on focused inputs */
   input[type="text"],
   input[type="email"],
   input[type="password"],
@@ -111,7 +108,7 @@
     transition: background-color 5000s ease-in-out 0s;
   }
 
-  /* Global fix: eliminate 300ms tap delay on all interactive elements */
+  /* Global: eliminate 300ms tap delay */
   button,
   a,
   [role="button"],
@@ -123,17 +120,70 @@
 
   /* Global scrollbar removal for app-like clean UI */
   * {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
-  
   *::-webkit-scrollbar {
-    display: none; /* Chrome, Safari and Opera */
+    display: none;
   }
 
   /* Instant theme switch lock */
   .theme-switching, .theme-switching * {
     transition: none !important;
+  }
+
+  /* ═══ Micro-Interaction Layer ════════════════════════════
+     WhatsApp-style smooth press feedback:
+     – Immediate response (no delay)
+     – Subtle ease-out scale on press
+     – Smooth color/opacity transitions
+     – No heavy animations, no layout shift */
+
+  /* All interactive elements get a smooth base transition */
+  button,
+  a,
+  [role="button"],
+  .cursor-pointer {
+    transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 150ms ease-out,
+                background-color 150ms ease-out,
+                color 150ms ease-out,
+                box-shadow 200ms ease-out;
+    will-change: transform;
+  }
+
+  /* Subtle press-down effect — barely visible but tactile */
+  button:active:not(:disabled),
+  a:active,
+  [role="button"]:active {
+    transform: scale(0.97);
+  }
+
+  /* Cards and list items — very light press */
+  .rounded-2xl:active,
+  .rounded-xl:active,
+  .rounded-3xl:active,
+  [class*="rounded-"]:active {
+    transform: scale(0.985);
+    transition: transform 120ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Fixed headers: prevent any transform/bounce inheritance */
+  [class*="fixed"][class*="top-0"],
+  [class*="fixed"][class*="bottom-0"] {
+    transform: none !important;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* Scrollable containers get elastic bounce behavior */
+  .overflow-y-auto,
+  .overflow-y-scroll,
+  .overflow-auto,
+  [class*="overflow-y-auto"],
+  [class*="overflow-auto"] {
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
   }
 }
 

@@ -193,30 +193,20 @@ const TaskDashboard = () => {
                             {/* Dropdown */}
                             <div
                                 className={clsx(
-                                    "absolute top-[calc(100%+8px)] right-0 bg-white dark:bg-[#16202f] border border-slate-200 dark:border-white/[0.09] rounded-[14px] p-1.5 flex flex-col gap-0.5 min-w-[180px] shadow-xl dark:shadow-[0_20px_48px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.03)] z-[200] origin-top-right transition-all duration-200",
+                                    "absolute top-[calc(100%+8px)] right-0 bg-white dark:bg-[#16202f] border border-slate-200 dark:border-white/[0.09] rounded-[16px] p-2 flex flex-col gap-0.5 min-w-[220px] shadow-xl dark:shadow-[0_20px_48px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.03)] z-[200] origin-top-right transition-all duration-200",
                                     menuOpen
                                         ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
                                         : "opacity-0 scale-[0.96] -translate-y-1.5 pointer-events-none"
                                 )}
                             >
-                                {/* Tasks Section */}
-                                <div className="font-mono text-[9px] text-slate-400 dark:text-white/20 tracking-[0.1em] uppercase px-2.5 pt-1.5 pb-1">{translate('home.tasks', 'Tasks')}</div>
-                                <button
-                                    onClick={() => { setMenuOpen(false); /* future edit */ }}
-                                    className="flex items-center gap-2.5 px-2.5 py-2 rounded-[9px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[12px] font-semibold"
-                                >
-                                    <div className="w-[22px] h-[22px] rounded-[7px] flex items-center justify-center shrink-0 bg-amber-400/10">
-                                        <Edit2 className="w-3 h-3 text-amber-500 dark:text-amber-400" />
-                                    </div>
-                                    Edit Tasks
-                                </button>
+                                <div className="font-mono text-[10px] text-slate-400 dark:text-white/20 tracking-[0.1em] uppercase px-3 pt-2 pb-1">Actions</div>
                                 <button
                                     onClick={() => {
                                         const modes = ['default', 'category', 'priority', 'time'];
                                         const nextMode = modes[(modes.indexOf(sortMode) + 1) % modes.length];
                                         handleSortChange(nextMode);
                                     }}
-                                    className="flex items-center gap-2.5 px-2.5 py-2 rounded-[9px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[12px] font-semibold"
+                                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-[10px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[13px] font-semibold"
                                 >
                                     <div className="w-[22px] h-[22px] rounded-[7px] flex items-center justify-center shrink-0 bg-indigo-500/10 dark:bg-indigo-400/10">
                                         <ArrowUpDown className="w-3 h-3 text-indigo-500 dark:text-indigo-400" />
@@ -226,14 +216,13 @@ const TaskDashboard = () => {
                                         <span className="text-[9px] font-bold text-indigo-500 uppercase tracking-wider">{sortMode}</span>
                                     </div>
                                 </button>
-                                
-                                <div className="h-px bg-slate-100 dark:bg-white/[0.06] mx-1.5 my-1" />
+                                <div className="h-px bg-slate-100 dark:bg-white/[0.06] mx-2 my-1" />
                                 
                                 {/* View Section */}
-                                <div className="font-mono text-[9px] text-slate-400 dark:text-white/20 tracking-[0.1em] uppercase px-2.5 pt-1.5 pb-1">View</div>
+                                <div className="font-mono text-[10px] text-slate-400 dark:text-white/20 tracking-[0.1em] uppercase px-3 pt-2 pb-1">View</div>
                                 <button
                                     onClick={() => { navigate('/workspace/filter/all'); setMenuOpen(false); }}
-                                    className="flex items-center gap-2.5 px-2.5 py-2 rounded-[9px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[12px] font-semibold"
+                                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-[10px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[13px] font-semibold"
                                 >
                                     <div className="w-[22px] h-[22px] rounded-[7px] flex items-center justify-center shrink-0 bg-sky-500/10 dark:bg-sky-400/10">
                                         <ListTodo className="w-3 h-3 text-sky-500 dark:text-sky-400" />
@@ -242,7 +231,7 @@ const TaskDashboard = () => {
                                 </button>
                                 <button
                                     onClick={() => { navigate('/workspace/calendar'); setMenuOpen(false); }}
-                                    className="flex items-center gap-2.5 px-2.5 py-2 rounded-[9px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[12px] font-semibold"
+                                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-[10px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[13px] font-semibold"
                                 >
                                     <div className="w-[22px] h-[22px] rounded-[7px] flex items-center justify-center shrink-0 bg-blue-500/10 dark:bg-blue-400/10">
                                         <CalendarIcon className="w-3 h-3 text-blue-500 dark:text-blue-400" />
@@ -251,7 +240,7 @@ const TaskDashboard = () => {
                                 </button>
                                 <button
                                     onClick={() => { navigate('/workspace/overview'); setMenuOpen(false); }}
-                                    className="flex items-center gap-2.5 px-2.5 py-2 rounded-[9px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[12px] font-semibold"
+                                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-[10px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[13px] font-semibold"
                                 >
                                     <div className="w-[22px] h-[22px] rounded-[7px] flex items-center justify-center shrink-0 bg-purple-500/10 dark:bg-purple-400/10">
                                         <Layout className="w-3 h-3 text-purple-500 dark:text-purple-400" />
@@ -259,8 +248,8 @@ const TaskDashboard = () => {
                                     Weekly Overview
                                 </button>
                                 <button
-                                    onClick={() => { navigate('/workspace/recent'); setMenuOpen(false); }}
-                                    className="flex items-center gap-2.5 px-2.5 py-2 rounded-[9px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[12px] font-semibold"
+                                    onClick={() => { navigate('/workspace/filter/recent'); setMenuOpen(false); }}
+                                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-[10px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[13px] font-semibold"
                                 >
                                     <div className="w-[22px] h-[22px] rounded-[7px] flex items-center justify-center shrink-0 bg-emerald-500/10 dark:bg-emerald-400/10">
                                         <Clock className="w-3 h-3 text-emerald-500 dark:text-emerald-400" />
@@ -268,13 +257,13 @@ const TaskDashboard = () => {
                                     Recent Tasks
                                 </button>
                                 
-                                <div className="h-px bg-slate-100 dark:bg-white/[0.06] mx-1.5 my-1" />
+                                <div className="h-px bg-slate-100 dark:bg-white/[0.06] mx-2 my-1" />
                                 
                                 {/* Options Section */}
-                                <div className="font-mono text-[9px] text-slate-400 dark:text-white/20 tracking-[0.1em] uppercase px-2.5 pt-1.5 pb-1">Options</div>
+                                <div className="font-mono text-[10px] text-slate-400 dark:text-white/20 tracking-[0.1em] uppercase px-3 pt-2 pb-1">Options</div>
                                 <button
                                     onClick={() => { setIsSettingsOpen(true); setMenuOpen(false); }}
-                                    className="flex items-center gap-2.5 px-2.5 py-2 rounded-[9px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[12px] font-semibold"
+                                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-[10px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[13px] font-semibold"
                                 >
                                     <div className="w-[22px] h-[22px] rounded-[7px] flex items-center justify-center shrink-0 bg-slate-500/10 dark:bg-slate-400/10">
                                         <Settings className="w-3 h-3 text-slate-500 dark:text-slate-400" />
