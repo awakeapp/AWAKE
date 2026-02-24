@@ -17,10 +17,6 @@
     />
     <meta name="theme-color" content="#ffffff" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="default"
-    />
     <meta name="apple-mobile-web-app-title" content="AWAKE" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="color-scheme" id="color-scheme-meta" content="light dark" />
@@ -51,9 +47,6 @@
 
           const root = document.documentElement;
           const metaTheme = document.querySelector('meta[name="theme-color"]');
-          const metaStatus = document.querySelector(
-            'meta[name="apple-mobile-web-app-status-bar-style"]',
-          );
 
           if (isDark) {
             root.classList.add("dark");
