@@ -30,7 +30,7 @@ export const PrayerProvider = ({ children }) => {
 
     const [settings, setSettings] = useState(() => {
         const saved = localStorage.getItem(STORAGE_KEY_SETTINGS);
-        return saved ? JSON.parse(saved) : { method: null, madhab: null, manualOverride: false };
+        return saved ? JSON.parse(saved) : { method: null, madhab: null, hijriOffset: 0, manualOverride: false };
     });
 
     const [locationDetails, setLocationDetails] = useState({
@@ -55,7 +55,7 @@ export const PrayerProvider = ({ children }) => {
         localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(settings));
     }, [settings]);
 
-    // Save location to local storage
+    // Save location to local storage (only real GPS / manual locations)
     useEffect(() => {
         if (location && !location.isFallback) {
             localStorage.setItem(STORAGE_KEY_LOC, JSON.stringify(location));
@@ -73,7 +73,12 @@ export const PrayerProvider = ({ children }) => {
             const { latitude, longitude } = position.coords;
             
             setLocation((prev) => {
-                if (!prev) return { lat: latitude, lng: longitude };
+                // If previous was fallback or null, always accept GPS coordinates
+                if (!prev || prev.isFallback) {
+                    // Clear stale fallback from localStorage
+                    localStorage.removeItem(STORAGE_KEY_LOC);
+                    return { lat: latitude, lng: longitude };
+                }
                 const dist = calculateDistance(prev.lat, prev.lng, latitude, longitude);
                 // Update only if distance is more than 5km
                 if (dist > 5) {
@@ -120,19 +125,30 @@ export const PrayerProvider = ({ children }) => {
             setLoading(true);
 
             try {
-                // A. Reverse Geocoding
+                // A. Reverse Geocoding (with addressdetails=1 for full breakdown)
                 let country = '';
                 try {
                     const resGeocode = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?lat=${location.lat}&lon=${location.lng}&format=json`
+                        `https://nominatim.openstreetmap.org/reverse?lat=${location.lat}&lon=${location.lng}&format=json&addressdetails=1&zoom=18`
                     );
                     if (resGeocode.ok) {
                         const dataGeocode = await resGeocode.json();
-                        let city = dataGeocode.address?.city || dataGeocode.address?.town || dataGeocode.address?.village || dataGeocode.address?.county || '';
-                        let state = dataGeocode.address?.state || '';
-                        country = dataGeocode.address?.country || '';
-                        const locDisplayName = [city, state].filter(Boolean).join(', ') || 'Unknown Location';
-                        setLocationDetails({ city, state, country, displayName: locDisplayName });
+                        const addr = dataGeocode.address || {};
+                        
+                        // Locality: prefer granular locality first, then broader
+                        const locality = addr.suburb || addr.neighbourhood || addr.village || addr.town || addr.city_district || addr.city || addr.county || '';
+                        // City: broader city/town name
+                        const city = addr.city || addr.town || addr.county || '';
+                        const state = addr.state || '';
+                        country = addr.country || '';
+
+                        // Build display: "Locality, City" or "Locality, State" 
+                        const parts = [locality, city, state].filter(Boolean);
+                        // Deduplicate adjacent duplicates (e.g. if locality == city)
+                        const uniqueParts = parts.filter((item, i, arr) => i === 0 || item !== arr[i - 1]);
+                        const locDisplayName = uniqueParts.slice(0, 2).join(', ') || 'Unknown Location';
+                        
+                        setLocationDetails({ city: locality || city, state, country, displayName: locDisplayName });
                     }
                 } catch (geoErr) {
                     console.warn("Geocoding failed, using fallback display:", geoErr);
@@ -141,19 +157,21 @@ export const PrayerProvider = ({ children }) => {
                 // B. Auto-detect India Settings if not manually overridden
                 let currentMethod = settings.method || 2; // Default 2 (ISNA)
                 let currentMadhab = settings.madhab || 0; // Default 0 (Shafi)
+                let currentHijriOffset = settings.hijriOffset ?? 0;
 
                 if (country === 'India' && !settings.manualOverride) {
-                    currentMethod = 1; // Karachi
-                    currentMadhab = 1; // Hanafi
+                    currentMethod = 1;    // Karachi
+                    currentMadhab = 1;    // Hanafi
+                    currentHijriOffset = 1; // +1 for India moon sighting
                     
-                    if (settings.method !== 1 || settings.madhab !== 1) {
-                         setSettings({ method: 1, madhab: 1, manualOverride: false });
+                    if (settings.method !== 1 || settings.madhab !== 1 || settings.hijriOffset !== 1) {
+                         setSettings({ method: 1, madhab: 1, hijriOffset: 1, manualOverride: false });
                     }
                 }
 
                 // C. Fetch AlAdhan API
                 const dateStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
-                const cacheKey = `${STORAGE_KEY_PRAYER}_${dateStr}_${location.lat.toFixed(2)}_${location.lng.toFixed(2)}_${currentMethod}_${currentMadhab}`;
+                const cacheKey = `${STORAGE_KEY_PRAYER}_${dateStr}_${location.lat.toFixed(2)}_${location.lng.toFixed(2)}_${currentMethod}_${currentMadhab}_${currentHijriOffset}`;
                 
                 const cachedData = localStorage.getItem(cacheKey);
                 if (cachedData) {
@@ -167,7 +185,7 @@ export const PrayerProvider = ({ children }) => {
                 try {
                     const timestamp = Math.floor(Date.now() / 1000);
                     const resPrayer = await fetch(
-                        `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${location.lat}&longitude=${location.lng}&method=${currentMethod}&school=${currentMadhab}`
+                        `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${location.lat}&longitude=${location.lng}&method=${currentMethod}&school=${currentMadhab}&adjustment=${currentHijriOffset}`
                     );
                     
                     if (!resPrayer.ok) throw new Error("Failed to fetch timings");
@@ -175,7 +193,7 @@ export const PrayerProvider = ({ children }) => {
 
                     if (dataPrayer.code === 200) {
                         const hijri = dataPrayer.data.date.hijri;
-                        const cleanHijriMonth = hijri.month.en.replace(' ', '');
+                        const cleanHijriMonth = hijri.month.en.replace(/\s/g, '');
                         
                         const pData = {
                             dailyTimings: dataPrayer.data.timings,
@@ -184,7 +202,7 @@ export const PrayerProvider = ({ children }) => {
                                 month: hijri.month.number,
                                 monthName: cleanHijriMonth,
                                 year: parseInt(hijri.year, 10),
-                                isRamadan: cleanHijriMonth.includes('Ramadan') || Array.from({length: 30}, (_, i) => i + 1).includes(parseInt(hijri.day, 10)) && cleanHijriMonth === 'Ramadan'
+                                isRamadan: hijri.month.number === 9
                             },
                             timezone: dataPrayer.data.meta.timezone
                         };
@@ -200,7 +218,6 @@ export const PrayerProvider = ({ children }) => {
                     }
                 } catch (prayerErr) {
                     console.error("Prayer API fetch failed:", prayerErr);
-                    // Provide a nice fallback error string instead of crashing
                     setError("Timings unavailable. Please check your connection.");
                 }
             } catch (err) {
@@ -221,7 +238,7 @@ export const PrayerProvider = ({ children }) => {
             isFetchingRef.current = false;
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [location?.lat, location?.lng, settings.method, settings.madhab]);
+    }, [location?.lat, location?.lng, settings.method, settings.madhab, settings.hijriOffset]);
 
     const requestLocation = () => {
         return new Promise((resolve, reject) => {
@@ -229,11 +246,11 @@ export const PrayerProvider = ({ children }) => {
                 reject(new Error("Geolocation not supported"));
                 return;
             }
-            // Temporarily use getCurrentPosition just for immediate manual request, 
-            // watchPosition handles the background sync.
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
                     const { latitude, longitude } = pos.coords;
+                    // Clear fallback cache
+                    localStorage.removeItem(STORAGE_KEY_LOC);
                     setLocation({ lat: latitude, lng: longitude });
                     resolve({ lat: latitude, lng: longitude });
                 },
@@ -244,10 +261,15 @@ export const PrayerProvider = ({ children }) => {
     };
 
     const updateManualLocation = (lat, lng) => {
+        localStorage.removeItem(STORAGE_KEY_LOC);
         setLocation({ lat: parseFloat(lat), lng: parseFloat(lng), isManual: true });
     };
 
     const updateSettings = (updates) => {
+        // Clear prayer cache so new settings trigger a fresh fetch
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith(STORAGE_KEY_PRAYER)) localStorage.removeItem(key);
+        });
         setSettings(prev => ({ ...prev, ...updates, manualOverride: true }));
     };
 
@@ -258,6 +280,7 @@ export const PrayerProvider = ({ children }) => {
         timezone: prayerData.timezone,
         calculationMethod: settings.method,
         madhab: settings.madhab,
+        hijriOffset: settings.hijriOffset ?? 0,
         dailyTimings: prayerData.dailyTimings,
         hijriDate: prayerData.hijriDate,
         loading,

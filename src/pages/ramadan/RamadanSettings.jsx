@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Globe2, Save, MapPin, Navigation, BookOpen, ChevronRight, Loader2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Globe2, Save, MapPin, BookOpen, Calendar, ChevronRight } from 'lucide-react';
 import clsx from 'clsx';
 import { usePrayer } from '../../context/PrayerContext';
 import LocationModal from '../../components/ramadan/LocationModal';
@@ -50,14 +50,18 @@ const SettingsRow = ({ icon: Icon, iconBgClass, title, subtitle, right, rightEle
 
 const RamadanSettings = () => {
     const navigate = useNavigate();
-    const { calculationMethod, madhab, updateSettings, displayName } = usePrayer();
+    const { calculationMethod, madhab, hijriOffset, updateSettings, displayName } = usePrayer();
     
-    const [localSettings, setLocalSettings] = useState({ method: calculationMethod, madhab: madhab });
+    const [localSettings, setLocalSettings] = useState({ 
+        method: calculationMethod, 
+        madhab: madhab,
+        hijriOffset: hijriOffset ?? 0
+    });
     const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
     useEffect(() => {
-        setLocalSettings({ method: calculationMethod, madhab: madhab });
-    }, [calculationMethod, madhab]);
+        setLocalSettings({ method: calculationMethod, madhab: madhab, hijriOffset: hijriOffset ?? 0 });
+    }, [calculationMethod, madhab, hijriOffset]);
 
     const ALADHAN_METHODS = [
         { id: 2, name: 'ISNA (North America)' },
@@ -153,6 +157,40 @@ const RamadanSettings = () => {
                                     <option key={m.id} value={m.id}>{m.name}</option>
                                 ))}
                             </select>
+                        </div>
+                    </SettingsGroup>
+
+                    {/* Hijri Date Adjustment */}
+                    <SettingsGroup>
+                        <div className="px-4 py-4 bg-white dark:bg-[#1C1C1E]">
+                            <div className="flex items-center gap-3.5 mb-4">
+                                <div className="w-[30px] h-[30px] rounded-lg shrink-0 flex items-center justify-center bg-emerald-500 text-white">
+                                    <Calendar strokeWidth={2} className="w-[18px] h-[18px]" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-[16px] text-black dark:text-white leading-tight">Hijri Date Adjustment</p>
+                                    <p className="text-[13px] text-slate-500 dark:text-[#8E8E93] mt-0.5">
+                                        Offset: <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                                            {localSettings.hijriOffset > 0 ? `+${localSettings.hijriOffset}` : localSettings.hijriOffset} days
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="px-10 pb-1">
+                                <input 
+                                    type="range" 
+                                    min="-2" max="2" step="1"
+                                    value={localSettings.hijriOffset}
+                                    onChange={(e) => handleChange('hijriOffset', Number(e.target.value))}
+                                    className="w-full accent-emerald-500"
+                                />
+                                <div className="flex justify-between text-[11px] font-bold text-slate-400 dark:text-[#8E8E93] mt-1.5">
+                                    {['-2', '-1', '0', '+1', '+2'].map(v => <span key={v}>{v}</span>)}
+                                </div>
+                            </div>
+                            <p className="text-[11px] text-slate-400 dark:text-[#8E8E93] mt-3 px-2 leading-relaxed">
+                                India follows moon sighting. If Ramadan dates appear incorrect, adjust by +1 or -1 day.
+                            </p>
                         </div>
                     </SettingsGroup>
 
