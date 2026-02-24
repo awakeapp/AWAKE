@@ -93,11 +93,31 @@ export const ThemeContextProvider = ({ children }) => {
 
         // Dynamic Meta Tag Update for Instant Status Bar Switch
         const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        const colorSchemeMeta = document.getElementById('color-scheme-meta');
         
         // Use override if present, else default
         const targetColor = themeOverride || (resolvedTheme === 'dark' ? darkColor : lightColor);
 
-        if (metaThemeColor) metaThemeColor.setAttribute('content', targetColor);
+        // Force recreation of theme-color meta tag to bypass iOS PWA caching bug
+        if (metaThemeColor) {
+            metaThemeColor.remove();
+        }
+        const newMetaThemeColor = document.createElement('meta');
+        newMetaThemeColor.name = 'theme-color';
+        newMetaThemeColor.content = targetColor;
+        document.head.appendChild(newMetaThemeColor);
+
+        // Force recreation of color-scheme meta tag to enforce text color (black vs white)
+        if (colorSchemeMeta) {
+            colorSchemeMeta.remove();
+        }
+        const newColorSchemeMeta = document.createElement('meta');
+        newColorSchemeMeta.id = 'color-scheme-meta';
+        newColorSchemeMeta.name = 'color-scheme';
+        // Only force the specific scheme so the PWA matches the manual app override
+        newColorSchemeMeta.content = resolvedTheme === 'dark' ? 'dark' : 'light';
+        document.head.appendChild(newColorSchemeMeta);
+
         document.documentElement.style.backgroundColor = targetColor; // Hard apply iOS Top Bounce
         document.body.style.backgroundColor = targetColor;           // Hard apply iOS Bottom Bounce
 
