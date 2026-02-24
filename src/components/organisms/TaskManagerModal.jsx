@@ -4,6 +4,7 @@ import { X, Plus, Trash2, Edit2, Check } from 'lucide-react';
 import Button from '../atoms/Button';
 import { useData } from '../../context/DataContext';
 import { inferIcon, getIconComponent } from '../../utils/iconInference';
+import { useSettings } from '../../context/SettingsContext';
 
 
 const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
@@ -320,9 +321,21 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
 
 // Simplified Single-Line Time Input
 const TimeInput = ({ value, onChange }) => {
-    const parseTime = (timeStr) => {
-        if (!timeStr || typeof timeStr !== 'string') return { h: '12', m: '00', p: 'AM' };
+    const { timeFormat } = useSettings();
+    const is24h = timeFormat === '24h';
+
+    const parseTime = (timeStr, is24hFormat) => {
+        if (!timeStr || typeof timeStr !== 'string') {
+            return is24hFormat ? { h: '12', m: '00', p: '' } : { h: '12', m: '00', p: 'AM' };
+        }
         const [h, m] = timeStr.split(':').map(Number);
+        if (is24hFormat) {
+            return {
+                h: String(h).padStart(2, '0'),
+                m: String(m).padStart(2, '0'),
+                p: ''
+            };
+        }
         const p = h >= 12 ? 'PM' : 'AM';
         const h12 = h % 12 || 12;
         return {
@@ -332,37 +345,41 @@ const TimeInput = ({ value, onChange }) => {
         };
     };
 
-    const parsed = parseTime(value);
+    const parsed = parseTime(value, is24h);
     const [hourInput, setHourInput] = useState(parsed.h);
     const [minuteInput, setMinuteInput] = useState(parsed.m);
 
     // Sync local state when parent value changes
     useEffect(() => {
-        const newParsed = parseTime(value);
+        const newParsed = parseTime(value, is24h);
         setHourInput(newParsed.h);
         setMinuteInput(newParsed.m);
-    }, [value]);
+    }, [value, is24h]);
 
     const commitTime = () => {
-        let h = parseInt(hourInput) || 12;
-        h = Math.max(1, Math.min(12, h));
+        let h = parseInt(hourInput) || (is24h ? 0 : 12);
+        h = Math.max(is24h ? 0 : 1, Math.min(is24h ? 23 : 12, h));
 
         let m = parseInt(minuteInput) || 0;
         m = Math.max(0, Math.min(59, m));
 
-        // Convert to 24h
-        if (parsed.p === 'PM' && h !== 12) h += 12;
-        if (parsed.p === 'AM' && h === 12) h = 0;
+        // Convert to 24h for saving if needed
+        let finalH = h;
+        if (!is24h) {
+            if (parsed.p === 'PM' && h !== 12) finalH += 12;
+            if (parsed.p === 'AM' && h === 12) finalH = 0;
+        }
 
-        const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        const timeStr = `${String(finalH).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
         onChange(timeStr);
 
-        // Update display to formatted values
-        setHourInput(String(Math.max(1, Math.min(12, parseInt(hourInput) || 12))).padStart(2, '0'));
+        // Update display
+        setHourInput(String(Math.max(is24h ? 0 : 1, Math.min(is24h ? 23 : 12, h))).padStart(2, '0'));
         setMinuteInput(String(Math.max(0, Math.min(59, parseInt(minuteInput) || 0))).padStart(2, '0'));
     };
 
     const toggleAmPm = () => {
+        if (is24h) return;
         let h = parseInt(hourInput) || 12;
         h = Math.max(1, Math.min(12, h));
         let m = parseInt(minuteInput) || 0;
@@ -405,12 +422,14 @@ const TimeInput = ({ value, onChange }) => {
                 placeholder="00"
             />
 
-            <button
-                onClick={toggleAmPm}
-                className="ml-0.5 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
-            >
-                {parsed.p}
-            </button>
+            {!is24h && (
+                <button
+                    onClick={toggleAmPm}
+                    className="ml-0.5 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+                >
+                    {parsed.p}
+                </button>
+            )}
         </div>
     );
 };

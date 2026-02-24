@@ -5,6 +5,7 @@ import ThreeStateCheckbox from '../../atoms/ThreeStateCheckbox';
 import { inferIcon, getIconComponent } from '../../../utils/iconInference';
 import clsx from 'clsx';
 import { Clock, ArrowUp, Trash2, Calendar as CalendarIcon, Tag } from 'lucide-react';
+import { useSettings } from '../../../context/SettingsContext';
 import JumpDateModal from '../../organisms/JumpDateModal';
 import { format } from 'date-fns';
 
@@ -23,6 +24,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
 
     // Import TaskContext for global popover management
     const { activePopoverId, setActivePopoverId } = useTasks();
+    const { timeFormat } = useSettings();
 
     // Simplified styling
     const isCompleted = task.status === 'completed' || task.status === 'checked';
@@ -74,6 +76,9 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                     <span className="text-[17px] sm:text-[19px] font-thin text-slate-800 dark:text-slate-100 tabular-nums leading-none tracking-tight">
                         {(() => {
                             const [h, m] = task.time.split(':').map(Number);
+                            if (timeFormat === '24h') {
+                                return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+                            }
                             const h12 = h % 12 || 12;
                             return `${String(h12).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
                         })()}

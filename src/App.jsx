@@ -4,6 +4,7 @@ import { AuthContextProvider } from './context/AuthContext';
 import { ThemeContextProvider } from './context/ThemeContext';
 import { DateContextProvider } from './context/DateContext';
 import { DataContextProvider } from './context/DataContext';
+import { SettingsProvider } from './context/SettingsContext';
 
 import { TaskContextProvider } from './context/TaskContext';
 import { FinanceContextProvider } from './context/FinanceContext';
@@ -110,6 +111,7 @@ function App() {
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <AuthContextProvider>
         <ThemeContextProvider>
+          <SettingsProvider>
           <DateContextProvider>
             <DataContextProvider>
               {/* RamadanProvider is always mounted — routes are conditionally included below */}
@@ -178,6 +180,7 @@ function App() {
               </RamadanProvider>
             </DataContextProvider>
           </DateContextProvider>
+          </SettingsProvider>
         </ThemeContextProvider>
       </AuthContextProvider>
     </BrowserRouter>

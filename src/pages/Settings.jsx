@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useSettings } from '../context/SettingsContext';
 import { User, Moon, Sun, Clock, ChevronRight, Download, ShieldCheck, HelpCircle, UserPlus, FileText, ArrowLeft, Monitor } from 'lucide-react';
-import { FirestoreService } from '../services/firestore-service';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -51,47 +51,10 @@ const SettingsGroup = ({ children, className }) => (
 
 const Settings = () => {
     const { user } = useAuthContext();
-    const { theme, themePreference, setThemePreference } = useTheme();
+    const { themePreference, setThemePreference } = useTheme();
+    const { appSettings, updateSetting } = useSettings();
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
-
-    const [appSettings, setAppSettings] = useState({
-        language: i18n.language || 'en',
-        timeFormat: '12h'
-    });
-
-    useEffect(() => {
-        if (!user) return;
-        const unsub = FirestoreService.subscribeToDocument(
-            `users/${user.uid}/config`,
-            'settings',
-            (data) => {
-                if (data) {
-                    setAppSettings(prev => ({ ...prev, ...data }));
-                    if (data.language && data.language !== i18n.language) {
-                        i18n.changeLanguage(data.language);
-                    }
-                }
-            }
-        );
-        return () => unsub();
-    }, [user, i18n]);
-
-    const updateSetting = async (key, value) => {
-        if (key === 'language') {
-            i18n.changeLanguage(value);
-        }
-        const newSettings = { ...appSettings, [key]: value };
-        setAppSettings(newSettings);
-
-        if (user) {
-            try {
-                await FirestoreService.setItem(`users/${user.uid}/config`, 'settings', { [key]: value }, true);
-            } catch (e) {
-                console.error("Failed to save setting", e);
-            }
-        }
-    };
 
     return (
         <div className="pb-12 pt-2 sm:pt-4 bg-[#F2F2F7] dark:bg-black min-h-screen text-black dark:text-white font-sans">
@@ -121,16 +84,19 @@ const Settings = () => {
                             iconBgClass="bg-red-500"
                             title={t('settings.language', 'Language')} 
                             right={
-                                <select
-                                    value={i18n.language.split('-')[0]}
-                                    onChange={(e) => updateSetting('language', e.target.value)}
-                                    className="bg-transparent text-[16px] text-slate-500 dark:text-[#8E8E93] outline-none cursor-pointer pr-1 text-right max-w-[120px]"
-                                >
-                                    <option value="en">English</option>
-                                    <option value="ar">العربية</option>
-                                    <option value="kn">ಕನ್ನಡ</option>
-                                    <option value="ml">മലയാളം</option>
-                                </select>
+                                <div className="relative">
+                                    <select
+                                        value={appSettings.language?.split('-')[0] || 'en'}
+                                        onChange={(e) => updateSetting('language', e.target.value)}
+                                        className="appearance-none bg-slate-100 dark:bg-[#2C2C2E] text-slate-700 dark:text-[#E5E5EA] text-[14px] font-medium rounded-lg px-3 py-1.5 focus:outline-none pr-8 cursor-pointer"
+                                    >
+                                        <option value="en">English</option>
+                                        <option value="ar">العربية</option>
+                                        <option value="kn">ಕನ್ನಡ</option>
+                                        <option value="ml">മലയാളം</option>
+                                    </select>
+                                    <ChevronRight className="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none rotate-90" />
+                                </div>
                             }
                         />
                         <SettingsRow 
@@ -139,21 +105,16 @@ const Settings = () => {
                             title="Time Format" 
                             isLast
                             right={
-                                <div className="flex bg-slate-100 dark:bg-[#2C2C2E] rounded p-[2px]">
-                                    <button
-                                        onClick={() => updateSetting('timeFormat', '12h')}
-                                        className={clsx(
-                                            "px-3 py-1 text-[13px] font-medium rounded transition-colors duration-200",
-                                            appSettings.timeFormat === '12h' ? "bg-white dark:bg-[#636366] text-black dark:text-white shadow-sm" : "text-slate-500 dark:text-[#8E8E93]"
-                                        )}
-                                    >12H</button>
-                                    <button
-                                        onClick={() => updateSetting('timeFormat', '24h')}
-                                        className={clsx(
-                                            "px-3 py-1 text-[13px] font-medium rounded transition-colors duration-200",
-                                            appSettings.timeFormat === '24h' ? "bg-white dark:bg-[#636366] text-black dark:text-white shadow-sm" : "text-slate-500 dark:text-[#8E8E93]"
-                                        )}
-                                    >24H</button>
+                                <div className="relative">
+                                    <select
+                                        value={appSettings.timeFormat || '12h'}
+                                        onChange={(e) => updateSetting('timeFormat', e.target.value)}
+                                        className="appearance-none bg-slate-100 dark:bg-[#2C2C2E] text-slate-700 dark:text-[#E5E5EA] text-[14px] font-medium rounded-lg px-3 py-1.5 focus:outline-none pr-8 cursor-pointer"
+                                    >
+                                        <option value="12h">12-hour</option>
+                                        <option value="24h">24-hour</option>
+                                    </select>
+                                    <ChevronRight className="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none rotate-90" />
                                 </div>
                             }
                         />
@@ -167,28 +128,17 @@ const Settings = () => {
                             title="Theme" 
                             isLast
                             right={
-                                <div className="flex bg-slate-100 dark:bg-[#1C1C1E] p-0.5 rounded-md border border-slate-200 dark:border-[#2C2C2E] overflow-hidden">
-                                    <button
-                                        onClick={() => setThemePreference('light')}
-                                        className={clsx(
-                                            "px-3 py-1 text-[13px] font-medium rounded transition-all duration-200",
-                                            themePreference === 'light' ? "bg-white dark:bg-[#636366] text-black dark:text-white shadow-sm" : "text-slate-500 dark:text-[#8E8E93]"
-                                        )}
-                                    >Light</button>
-                                    <button
-                                        onClick={() => setThemePreference('system')}
-                                        className={clsx(
-                                            "px-3 py-1 text-[13px] font-medium rounded transition-all duration-200",
-                                            themePreference === 'system' ? "bg-white dark:bg-[#636366] text-black dark:text-white shadow-sm" : "text-slate-500 dark:text-[#8E8E93]"
-                                        )}
-                                    >Auto</button>
-                                    <button
-                                        onClick={() => setThemePreference('dark')}
-                                        className={clsx(
-                                            "px-3 py-1 text-[13px] font-medium rounded transition-all duration-200",
-                                            themePreference === 'dark' ? "bg-white dark:bg-[#636366] text-black dark:text-white shadow-sm" : "text-slate-500 dark:text-[#8E8E93]"
-                                        )}
-                                    >Dark</button>
+                                <div className="relative">
+                                    <select
+                                        value={themePreference || 'system'}
+                                        onChange={(e) => setThemePreference(e.target.value)}
+                                        className="appearance-none bg-slate-100 dark:bg-[#2C2C2E] text-slate-700 dark:text-[#E5E5EA] text-[14px] font-medium rounded-lg px-3 py-1.5 focus:outline-none pr-8 cursor-pointer"
+                                    >
+                                        <option value="light">Light</option>
+                                        <option value="dark">Dark</option>
+                                        <option value="system">System</option>
+                                    </select>
+                                    <ChevronRight className="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none rotate-90" />
                                 </div>
                             }
                         />

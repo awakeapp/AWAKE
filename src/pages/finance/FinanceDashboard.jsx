@@ -10,10 +10,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useThemeColor } from '../../hooks/useThemeColor';
 import { useTheme } from '../../context/ThemeContext';
+import { useSettings } from '../../context/SettingsContext';
 
 const FinanceDashboard = () => {
     const navigate = useNavigate();
     const { isDark } = useTheme();
+    const { timeFormat } = useSettings();
     // Lock status bar to Finance header colour while this page is mounted
     useThemeColor(isDark ? '#0f172a' : '#0f172a'); // slate-900 in both modes
     const { t } = useTranslation(); // Enable translations
@@ -269,7 +271,7 @@ const FinanceDashboard = () => {
                                             </div>
                                             <div>
                                                 <p className="font-bold text-slate-900 dark:text-white text-sm">{tx.note || cat?.name}</p>
-                                                <p className="text-xs text-slate-400">{format(new Date(tx.date || tx.createdAt), 'MMM d, h:mm a')}</p>
+                                                <p className="text-xs text-slate-400">{format(new Date(tx.date || tx.createdAt), timeFormat === '24h' ? 'MMM d, HH:mm' : 'MMM d, h:mm a')}</p>
                                             </div>
                                         </div>
                                         <div className="text-right relative z-10">
