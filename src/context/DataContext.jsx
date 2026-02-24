@@ -358,7 +358,7 @@ export const DataContextProvider = ({ children }) => {
             type,
             icon: iconName || (type === 'number' ? 'Activity' : 'CheckCircle'),
             value: type === 'number' ? 0 : false,
-            unit: type === 'number' ? unit : undefined
+            unit: type === 'number' ? unit : null
         };
 
         await saveData({
