@@ -39,7 +39,10 @@ const Routine = () => {
     if (!dailyData || !dailyData.tasks) {
         return (
             <div className="pb-24 pt-20">
-                <div className="fixed top-0 left-0 right-0 z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md pt-3 pb-3 border-b border-slate-200 dark:border-slate-800">
+                <div 
+                    className="fixed top-0 left-0 right-0 z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md pt-3 pb-3 border-b border-slate-200 dark:border-slate-800"
+                    style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
+                >
                     <div className="max-w-md mx-auto w-full px-4">
                         <DateHeader className="mb-0" />
                     </div>
@@ -136,7 +139,10 @@ const Routine = () => {
 
     return (
         <div className="pb-24 pt-[4rem]">
-            <div className="fixed top-0 left-0 right-0 z-40 bg-slate-50/90 dark:bg-[#020617]/90 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 pt-1 pb-2 transition-all duration-300">
+            <div 
+                className="fixed top-0 left-0 right-0 z-40 bg-slate-50/90 dark:bg-[#020617]/90 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 pt-1 pb-2 transition-all duration-300"
+                style={{ paddingTop: 'calc(env(safe-area-inset-top) + 4px)' }}
+            >
                 <div className="max-w-md mx-auto w-full px-4">
                     <DateHeader 
                         className="w-full" 

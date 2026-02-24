@@ -52,7 +52,10 @@ const Overview = () => {
     return (
         <div className="space-y-8 pb-24 pt-20">
             {/* Fixed Header */}
-            <div className="fixed top-0 left-0 right-0 z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-transparent">
+            <div 
+                className="fixed top-0 left-0 right-0 z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-transparent"
+                style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0px)' }}
+            >
                 <div className="max-w-lg mx-auto w-full px-4 h-16 flex items-center gap-3">
                     <button
                         onClick={() => navigate(-1)}
