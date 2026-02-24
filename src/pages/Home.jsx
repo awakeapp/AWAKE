@@ -67,6 +67,8 @@ const Home = () => {
     // --- Ramadan Mini Widget Logic ---
     let nextEvent = '';
     let countdownStr = '--:--:--';
+    let suhoorTimeStr = '--:--';
+    let iftarTimeStr = '--:--';
     const isRamadanActive = hijriDate?.isRamadan;
 
     if (dailyTimings) {
@@ -79,6 +81,9 @@ const Home = () => {
         };
         const fajrTime = parseTime(Fajr);
         const maghribTime = parseTime(Maghrib);
+        
+        suhoorTimeStr = fajrTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        iftarTimeStr = maghribTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
         
         if (now < fajrTime) {
             nextEvent = 'Suhoor ends in';
@@ -118,38 +123,57 @@ const Home = () => {
             {RAMADAN_MODE && (
                 <div
                     onClick={() => navigate('/ramadan')}
-                    className="w-full bg-slate-900 rounded-3xl p-5 shadow-lg shadow-black/20 active:scale-[0.98] transition-all duration-75 cursor-pointer relative overflow-hidden flex flex-col justify-between min-h-[160px]"
+                    className="w-full bg-slate-900 rounded-3xl p-6 shadow-lg shadow-black/20 active:scale-[0.98] transition-all duration-75 cursor-pointer relative overflow-hidden flex flex-col justify-between min-h-[220px]"
                 >
                     <RamadanImageSlider />
-
-                    <div className="flex justify-between items-start relative z-10 w-full mb-4">
-                        <div className="flex gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-sm shrink-0">
-                                <Moon className="w-6 h-6 text-white drop-shadow" />
+                    
+                    {/* Top Header */}
+                    <div className="flex items-start justify-between relative z-10 w-full mb-6">
+                        <div className="flex gap-4 items-center">
+                            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-sm shrink-0">
+                                <Moon className="w-5 h-5 text-white drop-shadow-md" />
                             </div>
-                            <div className="pt-0.5">
-                                <p className="text-[12px] font-bold text-white/80 uppercase tracking-widest mb-1 drop-shadow-md">Ramadan Tracker</p>
+                            <div>
+                                <h3 className="text-[13px] font-bold text-white uppercase tracking-widest drop-shadow-md">Ramadan Tracker</h3>
                                 {isRamadanActive ? (
-                                    <p className="text-[17px] font-bold text-white drop-shadow-md leading-tight">
-                                        Day {hijriDate?.day} · {nextEvent}
+                                    <p className="text-[12px] font-medium text-white/90 drop-shadow-md mt-0.5">
+                                        Day {hijriDate?.day}
                                     </p>
                                 ) : (
-                                    <p className="text-[16px] font-bold text-white leading-tight drop-shadow-md">Track Fasting & Worship</p>
+                                    <p className="text-[12px] font-medium text-white/90 drop-shadow-md mt-0.5">Pre-Ramadan</p>
                                 )}
                             </div>
                         </div>
-                        <ChevronRight className="w-6 h-6 text-white/80 shrink-0 mt-1" />
+                        <ChevronRight className="w-6 h-6 text-white/80 shrink-0" />
                     </div>
 
-                    <div className="relative z-10 w-full text-right mt-auto">
-                        {isRamadanActive ? (
-                            <p className="text-4xl sm:text-5xl font-black text-white tabular-nums tracking-tight leading-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
-                                {countdownStr}
-                            </p>
+                    {/* Central Countdown */}
+                    <div className="relative z-10 w-full text-center flex-1 flex flex-col justify-center items-center py-2">
+                        {dailyTimings ? (
+                            <>
+                                <p className="text-white/90 uppercase tracking-widest text-xs font-bold mb-2 drop-shadow-md">{nextEvent}</p>
+                                <p className="text-5xl sm:text-6xl font-black text-white tabular-nums tracking-tighter leading-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]">
+                                    {countdownStr}
+                                </p>
+                            </>
                         ) : (
-                            <p className="text-[14px] text-white/80 font-medium pb-1 drop-shadow-md">Prayers · Dhikr · Stats</p>
+                            <p className="text-white font-semibold text-lg drop-shadow-md">Loading timings...</p>
                         )}
                     </div>
+
+                    {/* Bottom Suhoor / Iftar Row */}
+                    {dailyTimings && (
+                        <div className="relative z-10 flex justify-between w-full mt-4 pt-4 border-t border-white/20">
+                            <div className="text-left">
+                                <p className="text-white/70 text-[10px] uppercase font-bold tracking-wider mb-0.5">Suhoor Ends</p>
+                                <p className="text-white font-bold text-lg drop-shadow-md">{suhoorTimeStr}</p>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-white/70 text-[10px] uppercase font-bold tracking-wider mb-0.5">Iftar Time</p>
+                                <p className="text-white font-bold text-lg drop-shadow-md">{iftarTimeStr}</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 

@@ -121,18 +121,22 @@ export const PrayerProvider = ({ children }) => {
 
             try {
                 // A. Reverse Geocoding
-                const resGeocode = await fetch(
-                    `https://nominatim.openstreetmap.org/reverse?lat=${location.lat}&lon=${location.lng}&format=json`
-                );
-                const dataGeocode = await resGeocode.json();
-                
-                let city = dataGeocode.address?.city || dataGeocode.address?.town || dataGeocode.address?.village || dataGeocode.address?.county || '';
-                let state = dataGeocode.address?.state || '';
-                let country = dataGeocode.address?.country || '';
-                
-                const locDisplayName = [city, state].filter(Boolean).join(', ') || 'Unknown Location';
-                
-                setLocationDetails({ city, state, country, displayName: locDisplayName });
+                let country = '';
+                try {
+                    const resGeocode = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?lat=${location.lat}&lon=${location.lng}&format=json`
+                    );
+                    if (resGeocode.ok) {
+                        const dataGeocode = await resGeocode.json();
+                        let city = dataGeocode.address?.city || dataGeocode.address?.town || dataGeocode.address?.village || dataGeocode.address?.county || '';
+                        let state = dataGeocode.address?.state || '';
+                        country = dataGeocode.address?.country || '';
+                        const locDisplayName = [city, state].filter(Boolean).join(', ') || 'Unknown Location';
+                        setLocationDetails({ city, state, country, displayName: locDisplayName });
+                    }
+                } catch (geoErr) {
+                    console.warn("Geocoding failed, using fallback display:", geoErr);
+                }
 
                 // B. Auto-detect India Settings if not manually overridden
                 let currentMethod = settings.method || 2; // Default 2 (ISNA)
@@ -149,7 +153,6 @@ export const PrayerProvider = ({ children }) => {
 
                 // C. Fetch AlAdhan API
                 const dateStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
-                // Round lat/lng to 2 decimals for cache key to avoid tiny jitter redownloads
                 const cacheKey = `${STORAGE_KEY_PRAYER}_${dateStr}_${location.lat.toFixed(2)}_${location.lng.toFixed(2)}_${currentMethod}_${currentMadhab}`;
                 
                 const cachedData = localStorage.getItem(cacheKey);
@@ -157,44 +160,52 @@ export const PrayerProvider = ({ children }) => {
                     setPrayerData(JSON.parse(cachedData));
                     setLoading(false);
                     isFetchingRef.current = false;
+                    setError(null);
                     return;
                 }
 
-                const timestamp = Math.floor(Date.now() / 1000);
-                const resPrayer = await fetch(
-                    `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${location.lat}&longitude=${location.lng}&method=${currentMethod}&school=${currentMadhab}`
-                );
-                
-                if (!resPrayer.ok) throw new Error("Failed to fetch timings");
-                const dataPrayer = await resPrayer.json();
+                try {
+                    const timestamp = Math.floor(Date.now() / 1000);
+                    const resPrayer = await fetch(
+                        `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${location.lat}&longitude=${location.lng}&method=${currentMethod}&school=${currentMadhab}`
+                    );
+                    
+                    if (!resPrayer.ok) throw new Error("Failed to fetch timings");
+                    const dataPrayer = await resPrayer.json();
 
-                if (dataPrayer.code === 200) {
-                    const hijri = dataPrayer.data.date.hijri;
-                    const cleanHijriMonth = hijri.month.en.replace(' ', '');
-                    
-                    const pData = {
-                        dailyTimings: dataPrayer.data.timings,
-                        hijriDate: {
-                            day: parseInt(hijri.day, 10),
-                            month: hijri.month.number,
-                            monthName: cleanHijriMonth,
-                            year: parseInt(hijri.year, 10),
-                            isRamadan: cleanHijriMonth.includes('Ramadan') || Array.from({length: 30}, (_, i) => i + 1).includes(parseInt(hijri.day, 10)) && cleanHijriMonth === 'Ramadan'
-                        },
-                        timezone: dataPrayer.data.meta.timezone
-                    };
-                    
-                    // Cleanup old caches (optional simple cleanup)
-                    Object.keys(localStorage).forEach(key => {
-                        if (key.startsWith(STORAGE_KEY_PRAYER)) localStorage.removeItem(key);
-                    });
-                    
-                    localStorage.setItem(cacheKey, JSON.stringify(pData));
-                    setPrayerData(pData);
+                    if (dataPrayer.code === 200) {
+                        const hijri = dataPrayer.data.date.hijri;
+                        const cleanHijriMonth = hijri.month.en.replace(' ', '');
+                        
+                        const pData = {
+                            dailyTimings: dataPrayer.data.timings,
+                            hijriDate: {
+                                day: parseInt(hijri.day, 10),
+                                month: hijri.month.number,
+                                monthName: cleanHijriMonth,
+                                year: parseInt(hijri.year, 10),
+                                isRamadan: cleanHijriMonth.includes('Ramadan') || Array.from({length: 30}, (_, i) => i + 1).includes(parseInt(hijri.day, 10)) && cleanHijriMonth === 'Ramadan'
+                            },
+                            timezone: dataPrayer.data.meta.timezone
+                        };
+                        
+                        // Cleanup old caches
+                        Object.keys(localStorage).forEach(key => {
+                            if (key.startsWith(STORAGE_KEY_PRAYER)) localStorage.removeItem(key);
+                        });
+                        
+                        localStorage.setItem(cacheKey, JSON.stringify(pData));
+                        setPrayerData(pData);
+                        setError(null);
+                    }
+                } catch (prayerErr) {
+                    console.error("Prayer API fetch failed:", prayerErr);
+                    // Provide a nice fallback error string instead of crashing
+                    setError("Timings unavailable. Please check your connection.");
                 }
             } catch (err) {
                 console.error("Prayer/Location Engine Error:", err);
-                setError(err.message);
+                setError("An error occurred loading settings.");
             } finally {
                 setLoading(false);
                 isFetchingRef.current = false;

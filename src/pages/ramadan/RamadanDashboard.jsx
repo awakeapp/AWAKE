@@ -157,12 +157,8 @@ const RamadanDashboard = () => {
         return () => clearInterval(timer);
     }, []);
 
-    if (loading) {
+    if (loading && !dailyTimings) {
         return <div className="p-4 text-center mt-16 text-slate-500 animate-pulse">Initializing Ramadan Engine...</div>;
-    }
-
-    if (error) {
-        return <div className="p-4 text-center mt-16 text-red-500 bg-red-50 dark:bg-red-900/20 rounded mx-4">Error: {error}</div>;
     }
 
     let nextEvent = '';
@@ -224,6 +220,13 @@ const RamadanDashboard = () => {
             </header>
 
             <div className="px-4 sm:px-0 space-y-6">
+
+            {error && !dailyTimings && (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/20 rounded-xl p-4 flex items-center justify-between shadow-sm">
+                    <p className="text-red-600 dark:text-red-400 text-sm font-medium">{error}</p>
+                    <button onClick={() => window.location.reload()} className="px-3 py-1.5 bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-300 rounded text-xs font-bold hover:bg-red-200 dark:hover:bg-red-500/40">Retry</button>
+                </div>
+            )}
 
             <div className="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl shadow-xl overflow-hidden relative min-h-[220px] sm:min-h-[260px] flex flex-col justify-between">
                  {/* Cinematic Image Slider Background */}

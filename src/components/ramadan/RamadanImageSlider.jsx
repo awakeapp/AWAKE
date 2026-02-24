@@ -45,9 +45,8 @@ const RamadanImageSlider = () => {
                 />
             ))}
 
-            {/* Premium cinematic strong dark gradient overlays */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/80 to-slate-950 dark:to-black z-10" />
-            <div className="absolute inset-0 bg-slate-900/50 mix-blend-multiply z-10" />
+            {/* Controlled Gradient Overlay for readability while maintaining image visibility */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/80 z-10" />
         </div>
     );
 };
