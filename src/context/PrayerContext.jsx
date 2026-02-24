@@ -266,7 +266,11 @@ export const PrayerProvider = ({ children }) => {
     };
 
     const updateManualLocation = (lat, lng) => {
+        // Clear old prayer and location caches to force fresh fetch
         localStorage.removeItem(STORAGE_KEY_LOC);
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith(STORAGE_KEY_PRAYER)) localStorage.removeItem(key);
+        });
         setLocation({ lat: parseFloat(lat), lng: parseFloat(lng), isManual: true });
     };
 
