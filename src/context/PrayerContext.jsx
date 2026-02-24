@@ -38,7 +38,7 @@ export const PrayerProvider = ({ children }) => {
 
     const [locationDetails, setLocationDetails] = useState(() => {
         const saved = localStorage.getItem(STORAGE_KEY_LOC_DETAILS);
-        return saved ? JSON.parse(saved) : { city: '', state: '', country: '', displayName: 'Location...' };
+        return saved ? JSON.parse(saved) : { city: '', state: '', country: '', displayName: 'Detecting...' };
     });
 
     const [prayerData, setPrayerData] = useState({
@@ -89,8 +89,8 @@ export const PrayerProvider = ({ children }) => {
                     return { lat: latitude, lng: longitude, isManual: false };
                 }
                 const dist = calculateDistance(prev.lat, prev.lng, latitude, longitude);
-                // Update only if distance is more than 5km
-                if (dist > 5) {
+                // Update only if distance is more than 2km
+                if (dist > 2) {
                     return { lat: latitude, lng: longitude, isManual: false };
                 }
                 return prev; // keep old to avoid refetch
