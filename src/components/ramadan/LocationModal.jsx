@@ -90,7 +90,7 @@ const LocationModal = ({ isOpen, onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center p-0 transition-all duration-300">
+        <div className="fixed inset-0 z-[1000] flex items-start sm:items-center justify-center p-0 pt-[15vh] sm:pt-0 transition-all duration-300">
             {/* Backdrop */}
             <div 
                 className="absolute inset-0 bg-black/80 backdrop-blur-md" 
@@ -98,7 +98,7 @@ const LocationModal = ({ isOpen, onClose }) => {
             />
             
             {/* Modal */}
-            <div className="relative w-full sm:w-[440px] max-h-[90vh] bg-black sm:bg-[#1C1C1E] rounded-t-[32px] sm:rounded-3xl border-t border-white/10 sm:border border-white/5 shadow-2xl flex flex-col overflow-hidden" style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+            <div className="relative w-[92%] sm:w-[440px] max-h-[75vh] bg-black sm:bg-[#1C1C1E] rounded-[32px] sm:rounded-3xl border border-white/10 sm:border border-white/5 shadow-2xl flex flex-col overflow-hidden">
                 
                 {/* Grab Handle for Mobile */}
                 <div className="sm:hidden flex justify-center py-2.5">
