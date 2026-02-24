@@ -4,12 +4,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ThreeStateCheckbox from '../../atoms/ThreeStateCheckbox';
 import { inferIcon, getIconComponent } from '../../../utils/iconInference';
 import clsx from 'clsx';
-import { Clock, ArrowUp, Trash2, Calendar as CalendarIcon, Tag } from 'lucide-react';
+import { Clock, ArrowUp, Trash2, Calendar as CalendarIcon, Tag, Info } from 'lucide-react';
 import { useSettings } from '../../../context/SettingsContext';
 import JumpDateModal from '../../organisms/JumpDateModal';
 import { format } from 'date-fns';
 
-const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', onReschedule, onDelete, isRoutine = false }) => {
+const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', onReschedule, onDelete, isRoutine = false, onEdit }) => {
     // Safely handle missing name/title
     const displayTitle = task.name || task.title || 'Untitled';
 
@@ -31,6 +31,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
     const isCarryOver = variant === 'carry_over';
 
     const isDatePickerOpen = activePopoverId === task.id;
+    const [showInfo, setShowInfo] = useState(false);
 
     // Handle closing when clicking outside
     useEffect(() => {
@@ -100,17 +101,57 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                     <IconComponent className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
 
-                <div className="flex flex-col min-w-0 flex-1">
-                    <span className={clsx(
-                        "text-[14px] sm:text-[16px] font-normal tracking-tight transition-colors duration-200",
-                        isCarryOver
-                            ? "text-slate-600 dark:text-slate-400"
-                            : isCompleted
-                                ? "text-slate-400 line-through decoration-slate-300/60"
-                                : "text-slate-900 dark:text-slate-50 group-hover:text-indigo-700 dark:group-hover:text-indigo-300"
-                    )}>
-                        {displayTitle}
-                    </span>
+                <div 
+                    className="flex flex-col min-w-0 flex-1 cursor-pointer active:opacity-60 transition-opacity"
+                    onClick={(e) => {
+                        // Prevent edit if clicking on the description info icon (handled by its own button)
+                        if (onEdit && !isCarryOver) onEdit(task);
+                    }}
+                >
+                    <div className="flex items-center gap-2">
+                        {task.description && (
+                            <div className="relative">
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setShowInfo(!showInfo);
+                                    }}
+                                    className="flex items-center justify-center p-0.5 mt-0.5 rounded-full text-slate-400 hover:text-indigo-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                >
+                                    <Info className="w-3.5 h-3.5" />
+                                </button>
+                                <AnimatePresence>
+                                    {showInfo && (
+                                        <>
+                                            <div 
+                                                className="fixed inset-0 z-[80]" 
+                                                onClick={(e) => { e.stopPropagation(); setShowInfo(false); }} 
+                                            />
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 5, scale: 0.95 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.95 }}
+                                                className="absolute top-full left-0 mt-2 p-3 bg-white dark:bg-slate-800 rounded-[14px] shadow-xl border border-slate-100 dark:border-slate-700 w-56 sm:w-64 z-[90] text-[13px] leading-relaxed text-slate-600 dark:text-slate-300 pointer-events-auto shadow-[0_20px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_48px_rgba(0,0,0,0.55)]"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                {task.description}
+                                            </motion.div>
+                                        </>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        )}
+                        <span className={clsx(
+                            "text-[14px] sm:text-[16px] font-normal tracking-tight transition-colors duration-200 truncate",
+                            isCarryOver
+                                ? "text-slate-600 dark:text-slate-400"
+                                : isCompleted
+                                    ? "text-slate-400 line-through decoration-slate-300/60"
+                                    : "text-slate-900 dark:text-slate-50 group-hover:text-indigo-700 dark:group-hover:text-indigo-300"
+                        )}>
+                            {displayTitle}
+                        </span>
+                    </div>
 
                     {/* PRIORITY & CATEGORY DISPLAY */}
                     {!isCarryOver && (

@@ -3,6 +3,8 @@ import { Clock, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Alert
 import { useTasks } from '../../context/TaskContext';
 import TaskList from '../../components/organisms/workspace/TaskList';
 import AddTaskModal from '../../components/molecules/workspace/AddTaskModal';
+import EditTaskModal from '../../components/molecules/workspace/EditTaskModal';
+import TaskSettingsModal from '../../components/molecules/workspace/TaskSettingsModal';
 import { format, addDays, subDays, isBefore, isSameDay, startOfDay } from 'date-fns';
 import { useLocation, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
@@ -50,8 +52,51 @@ const TaskDashboard = () => {
     const isPastDate = isBefore(startOfDay(selectedDate), startOfDay(new Date()));
     const isLocked = isDayLocked(selectedDateStr);
 
-    // Filter Tasks
-    const currentTasks = tasks.filter(taskItem => taskItem.date === selectedDateStr);
+    // Edit Task State
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editingTask, setEditingTask] = useState(null);
+
+    // Sorting State
+    const [sortMode, setSortMode] = useState(() => {
+        return localStorage.getItem('awake_task_sort') || 'default';
+    });
+
+    const handleSortChange = (mode) => {
+        setSortMode(mode);
+        localStorage.setItem('awake_task_sort', mode);
+    };
+
+    // Filter & Sort Tasks
+    const currentTasks = React.useMemo(() => {
+        const filtered = tasks.filter(taskItem => taskItem.date === selectedDateStr);
+        let sorted = [...filtered];
+
+        switch (sortMode) {
+            case 'category':
+                sorted.sort((a, b) => (a.category || '').localeCompare(b.category || ''));
+                break;
+            case 'priority':
+                const pOrder = { 'High': 1, 'Medium': 2, 'Low': 3 };
+                sorted.sort((a, b) => (pOrder[a.priority] || 4) - (pOrder[b.priority] || 4));
+                break;
+            case 'date':
+                sorted.sort((a, b) => new Date(a.date) - new Date(b.date));
+                break;
+            case 'time':
+                sorted.sort((a, b) => {
+                    if (!a.time) return 1;
+                    if (!b.time) return -1;
+                    return a.time.localeCompare(b.time);
+                });
+                break;
+            case 'default':
+            default:
+                // Default is handled by backend order or createdAt if we want to ensure it
+                sorted.sort((a, b) => b.createdAt - a.createdAt);
+                break;
+        }
+        return sorted;
+    }, [tasks, selectedDateStr, sortMode]);
 
     // Stats
     const totalCurrent = currentTasks.length;
@@ -101,7 +146,7 @@ const TaskDashboard = () => {
     const [isPickerOpen, setIsPickerOpen] = useState(false);
 
     return (
-        <div className="space-y-6 pb-24 pt-20 h-full relative">
+        <div className="space-y-6 pb-24 pt-14 h-full relative">
             {/* ── FIXED TODO HEADER BAR ── */}
             <div 
                 className="fixed top-0 left-0 right-0 z-40 bg-slate-50/90 dark:bg-[#020617]/90 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 transition-all duration-300"
@@ -166,13 +211,20 @@ const TaskDashboard = () => {
                                     Edit Tasks
                                 </button>
                                 <button
-                                    onClick={() => { setMenuOpen(false); /* future sort */ }}
+                                    onClick={() => {
+                                        const modes = ['default', 'category', 'priority', 'time'];
+                                        const nextMode = modes[(modes.indexOf(sortMode) + 1) % modes.length];
+                                        handleSortChange(nextMode);
+                                    }}
                                     className="flex items-center gap-2.5 px-2.5 py-2 rounded-[9px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[12px] font-semibold"
                                 >
                                     <div className="w-[22px] h-[22px] rounded-[7px] flex items-center justify-center shrink-0 bg-indigo-500/10 dark:bg-indigo-400/10">
                                         <ArrowUpDown className="w-3 h-3 text-indigo-500 dark:text-indigo-400" />
                                     </div>
-                                    Sort
+                                    <div className="flex-1 flex justify-between items-center pr-1">
+                                        <span>Sort</span>
+                                        <span className="text-[9px] font-bold text-indigo-500 uppercase tracking-wider">{sortMode}</span>
+                                    </div>
                                 </button>
                                 
                                 <div className="h-px bg-slate-100 dark:bg-white/[0.06] mx-1.5 my-1" />
@@ -247,6 +299,10 @@ const TaskDashboard = () => {
                             onToggle={toggleTask}
                             onDelete={deleteTask}
                             onUpdate={updateTask}
+                            onEdit={(task) => {
+                                setEditingTask(task);
+                                setIsEditModalOpen(true);
+                            }}
                             isLocked={isLocked}
                             onReschedule={handleReschedule}
                         />
@@ -278,6 +334,10 @@ const TaskDashboard = () => {
                                 onToggle={toggleTask}
                                 onDelete={deleteTask}
                                 onUpdate={updateTask}
+                                onEdit={(task) => {
+                                    setEditingTask(task);
+                                    setIsEditModalOpen(true);
+                                }}
                                 isLocked={false}
                                 onReschedule={handleReschedule}
                                 isVariant="carry_over"
@@ -287,12 +347,26 @@ const TaskDashboard = () => {
                 )}
             </div>
 
-            {/* Modal */}
+            {/* Modals */}
             <AddTaskModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onAdd={handleAddTask}
                 initialDate={selectedDateStr}
+            />
+
+            <EditTaskModal
+                isOpen={isEditModalOpen}
+                onClose={() => {
+                    setIsEditModalOpen(false);
+                    setEditingTask(null);
+                }}
+                task={editingTask}
+            />
+
+            <TaskSettingsModal 
+                isOpen={isSettingsOpen} 
+                onClose={() => setIsSettingsOpen(false)} 
             />
         </div>
     );
