@@ -108,7 +108,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                         if (onEdit && !isCarryOver) onEdit(task);
                     }}
                 >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
                         {task.description && (
                             <div className="relative">
                                 <button

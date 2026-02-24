@@ -13,11 +13,11 @@ const HabitToggle = ({ id, icon, label, value, onChange, onDelete, disabled, isE
 
     return (
         <div className="flex items-center justify-between py-3.5 border-b border-slate-50 dark:border-slate-800/50 last:border-0 group">
-            <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-500 dark:text-slate-400 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/20 group-hover:text-indigo-600 transition-colors">
+            <div className="flex items-center gap-3 min-w-0 flex-1 mr-2">
+                <div className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center shrink-0 text-slate-500 dark:text-slate-400 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/20 group-hover:text-indigo-600 transition-colors">
                     <Icon className="w-4.5 h-4.5" />
                 </div>
-                <span className="font-normal text-[15px] text-slate-700 dark:text-slate-300">{label}</span>
+                <span className="font-normal text-[15px] text-slate-700 dark:text-slate-300 truncate">{label}</span>
             </div>
 
             <div className="flex items-center gap-3">
@@ -89,12 +89,12 @@ const NumericHabitInput = ({ id, icon, label, value, unit, onChange, onDelete, d
 
     return (
         <div className="flex items-center justify-between py-3.5 border-b border-slate-50 dark:border-slate-800/50 last:border-0 group">
-            <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-500 dark:text-slate-400 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/20 group-hover:text-indigo-600 transition-colors">
+            <div className="flex items-center gap-3 min-w-0 flex-1 mr-2">
+                <div className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center shrink-0 text-slate-500 dark:text-slate-400 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/20 group-hover:text-indigo-600 transition-colors">
                     <Icon className="w-4.5 h-4.5" />
                 </div>
-                <div className="flex flex-col">
-                    <span className="font-normal text-[15px] text-slate-700 dark:text-slate-300">{label}</span>
+                <div className="flex flex-col min-w-0">
+                    <span className="font-normal text-[15px] text-slate-700 dark:text-slate-300 truncate">{label}</span>
                     <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{unit === 'hrs' ? 'Hours' : 'Minutes'}</span>
                 </div>
             </div>
