@@ -8,7 +8,7 @@ import LocationModal from '../../components/ramadan/LocationModal';
 // Shared Group Component matching the "premium" grouped layout
 const SettingsGroup = ({ children, className }) => (
     <div className={clsx("mb-5", className)}>
-        <div className="bg-[#1C1C1E] rounded-xl overflow-hidden shadow-sm">
+        <div className="bg-white dark:bg-[#1C1C1E] rounded-xl overflow-hidden shadow-sm border border-slate-200/50 dark:border-none">
             {children}
         </div>
     </div>
@@ -19,21 +19,21 @@ const SettingsRow = ({ icon: Icon, iconBgClass, title, subtitle, right, rightEle
     <div 
         onClick={onClick}
         className={clsx(
-            "flex items-center min-h-[52px] active:bg-[#2C2C2E] transition-colors duration-200 cursor-pointer",
-            !isLast && "ml-12 border-b border-[#2C2C2E]",
+            "flex items-center min-h-[52px] active:bg-slate-50 dark:active:bg-[#2C2C2E] transition-colors duration-200 cursor-pointer",
+            !isLast && "ml-12 border-b border-slate-100 dark:border-[#2C2C2E]",
             className
         )}
     >
         <div className={clsx("flex items-center py-3 flex-1 min-w-0 pr-4", !isLast ? "" : "ml-4")}>
             {Icon && (
-                <div className={clsx("w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-slate-400 bg-slate-800/50", !isLast ? "-ml-8 mr-4" : "mr-4")}>
+                <div className={clsx("w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800/50", !isLast ? "-ml-8 mr-4" : "mr-4")}>
                     <Icon strokeWidth={2.5} className="w-5 h-5" />
                 </div>
             )}
             <div className="flex-1 min-w-0 flex items-center justify-between">
                 <div className="flex flex-col min-w-0">
-                    <p className="text-[16px] xl:text-[17px] font-medium text-white leading-tight truncate">{title}</p>
-                    {subtitle && <p className="text-[13px] text-[#8E8E93] mt-1 truncate">{subtitle}</p>}
+                    <p className="text-[16px] xl:text-[17px] font-medium text-slate-900 dark:text-white leading-tight truncate">{title}</p>
+                    {subtitle && <p className="text-[13px] text-slate-500 dark:text-[#8E8E93] mt-1 truncate">{subtitle}</p>}
                 </div>
                 
                 {rightElement || right ? (
@@ -41,7 +41,7 @@ const SettingsRow = ({ icon: Icon, iconBgClass, title, subtitle, right, rightEle
                         {rightElement || right}
                     </div>
                 ) : (
-                    <ChevronRight className="w-5 h-5 text-[#5C5C5E] ml-2 shrink-0" />
+                    <ChevronRight className="w-5 h-5 text-slate-300 dark:text-[#5C5C5E] ml-2 shrink-0" />
                 )}
             </div>
         </div>
@@ -89,20 +89,19 @@ const RamadanSettings = () => {
     };
 
     return (
-        <div className="pb-12 pt-4 bg-black min-h-screen text-white font-sans selection:bg-indigo-500/30">
+        <div className="pb-12 pt-4 bg-[#F2F2F7] dark:bg-black min-h-screen text-slate-900 dark:text-white font-sans selection:bg-indigo-500/30">
             <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
-            
             <div className="max-w-screen-md mx-auto px-4">
                 
                 {/* Header */}
                 <div className="flex items-center gap-4 mb-4 mt-6">
                     <button
                         onClick={() => navigate(-1)}
-                        className="p-1 -ml-1 text-white hover:opacity-70 transition-opacity"
+                        className="p-1 -ml-1 text-slate-900 dark:text-white hover:opacity-70 transition-opacity"
                     >
                         <ArrowLeft className="w-7 h-7" />
                     </button>
-                    <h1 className="text-[32px] font-bold tracking-tight text-white">Settings</h1>
+                    <h1 className="text-[32px] font-bold tracking-tight text-slate-900 dark:text-white">Settings</h1>
                 </div>
 
                 <div className="mt-8">
@@ -114,11 +113,11 @@ const RamadanSettings = () => {
                                 icon={Globe2} 
                                 title="Calculation Method" 
                                 right={
-                                    <div className="flex items-center bg-[#2C2C2E] px-3 py-1.5 rounded-lg">
-                                        <span className="text-[15px] text-[#8E8E93] mr-1.5 font-medium">
+                                    <div className="flex items-center bg-slate-100 dark:bg-[#2C2C2E] px-3 py-1.5 rounded-lg">
+                                        <span className="text-[15px] text-slate-500 dark:text-[#8E8E93] mr-1.5 font-medium">
                                             {ALADHAN_METHODS.find(m => m.id === localSettings.method)?.name || 'Select'}
                                         </span>
-                                        <ChevronRight className="w-4 h-4 text-[#5C5C5E]" />
+                                        <ChevronRight className="w-4 h-4 text-slate-300 dark:text-[#5C5C5E]" />
                                     </div>
                                 }
                             />
@@ -139,11 +138,11 @@ const RamadanSettings = () => {
                                 title="Asr Madhab" 
                                 isLast={true}
                                 right={
-                                    <div className="flex items-center bg-[#2C2C2E] px-3 py-1.5 rounded-lg">
-                                        <span className="text-[15px] text-[#8E8E93] mr-1.5 font-medium">
+                                    <div className="flex items-center bg-slate-100 dark:bg-[#2C2C2E] px-3 py-1.5 rounded-lg">
+                                        <span className="text-[15px] text-slate-500 dark:text-[#8E8E93] mr-1.5 font-medium">
                                             {MADHABS.find(m => m.id === localSettings.madhab)?.name || 'Select'}
                                         </span>
-                                        <ChevronRight className="w-4 h-4 text-[#5C5C5E]" />
+                                        <ChevronRight className="w-4 h-4 text-slate-300 dark:text-[#5C5C5E]" />
                                     </div>
                                 }
                             />
@@ -172,15 +171,15 @@ const RamadanSettings = () => {
 
                     {/* Hijri Adjustment Group */}
                     <SettingsGroup>
-                        <div className="p-4 bg-[#1C1C1E]">
+                        <div className="p-4 bg-white dark:bg-[#1C1C1E]">
                             <div className="flex items-center gap-4 mb-4">
-                                <div className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-slate-400 bg-slate-800/50">
+                                <div className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800/50">
                                     <Calendar strokeWidth={2.5} className="w-5 h-5" />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-[16px] font-medium text-white">Hijri Date Adjustment</p>
-                                    <p className="text-[13px] text-[#8E8E93] mt-0.5">
-                                        Offset: <span className="font-semibold text-emerald-400">
+                                    <p className="text-[16px] font-medium text-slate-900 dark:text-white">Hijri Date Adjustment</p>
+                                    <p className="text-[13px] text-slate-500 dark:text-[#8E8E93] mt-0.5">
+                                        Offset: <span className="font-semibold text-emerald-500 dark:text-emerald-400">
                                             {localSettings.hijriOffset > 0 ? `+${localSettings.hijriOffset}` : localSettings.hijriOffset} days
                                         </span>
                                     </p>
@@ -192,7 +191,7 @@ const RamadanSettings = () => {
                                     min="-2" max="2" step="1"
                                     value={localSettings.hijriOffset}
                                     onChange={(e) => handleChange('hijriOffset', Number(e.target.value))}
-                                    className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+                                    className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
                                 />
                                 <div className="flex justify-between text-[11px] font-bold text-[#48484A] mt-2">
                                     {['-2', '-1', '0', '+1', '+2'].map(v => <span key={v}>{v}</span>)}
@@ -214,7 +213,7 @@ const RamadanSettings = () => {
                 <div className="mt-8 mb-12 flex flex-col items-center gap-6">
                     <button
                         onClick={handleSave}
-                        className="w-full max-w-xs py-4 px-6 bg-white text-black active:bg-slate-200 rounded-2xl font-bold transition-all shadow-lg active:scale-[0.97]"
+                        className="w-full max-w-xs py-4 px-6 bg-indigo-600 dark:bg-white text-white dark:text-black active:bg-indigo-700 dark:active:bg-slate-200 rounded-2xl font-bold transition-all shadow-lg active:scale-[0.97]"
                     >
                         Apply Changes
                     </button>

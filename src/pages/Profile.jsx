@@ -29,7 +29,7 @@ const SectionLabel = ({ children }) => (
 
 const SettingsGroup = ({ children, className }) => (
     <div className={clsx("mb-5", className)}>
-        <div className="bg-[#1C1C1E] rounded-xl overflow-hidden shadow-sm">
+        <div className="bg-white dark:bg-[#1C1C1E] rounded-xl overflow-hidden shadow-sm border border-slate-200/50 dark:border-none">
             {children}
         </div>
     </div>
@@ -39,17 +39,17 @@ const SettingsRow = ({ icon: Icon, title, subtitle, right, onClick, className, i
     <div 
         onClick={onClick}
         className={clsx(
-            "flex items-center min-h-[52px] active:bg-[#2C2C2E] transition-colors duration-200 cursor-pointer group",
-            !isLast && "ml-12 border-b border-[#2C2C2E]",
+            "flex items-center min-h-[52px] active:bg-slate-50 dark:active:bg-[#2C2C2E] transition-colors duration-200 cursor-pointer group",
+            !isLast && "ml-12 border-b border-slate-100 dark:border-[#2C2C2E]",
             className
         )}
     >
         <div className={clsx("flex items-center py-3 flex-1 min-w-0 pr-4", !isLast ? "" : "ml-4")}>
             {Icon && (
                 <div className={clsx(
-                    "w-8 h-8 rounded-lg shrink-0 flex items-center justify-center bg-slate-800/50",
+                    "w-8 h-8 rounded-lg shrink-0 flex items-center justify-center bg-slate-100 dark:bg-slate-800/50",
                     !isLast ? "-ml-8 mr-4" : "mr-4",
-                    isDanger ? "text-rose-500 bg-rose-500/10" : "text-slate-400"
+                    isDanger ? "text-rose-500 bg-rose-500/10" : "text-slate-400 dark:text-slate-500"
                 )}>
                     <Icon strokeWidth={2.5} className="w-5 h-5" />
                 </div>
@@ -58,15 +58,15 @@ const SettingsRow = ({ icon: Icon, title, subtitle, right, onClick, className, i
                 <div className="flex flex-col min-w-0">
                     <p className={clsx(
                         "text-[16px] xl:text-[17px] font-medium leading-tight truncate",
-                        isDanger ? "text-rose-500" : "text-white"
+                        isDanger ? "text-rose-500" : "text-slate-900 dark:text-white"
                     )}>{title}</p>
-                    {subtitle && <p className="text-[13px] text-[#8E8E93] mt-1 truncate">{subtitle}</p>}
+                    {subtitle && <p className="text-[13px] text-slate-500 dark:text-[#8E8E93] mt-1 truncate">{subtitle}</p>}
                 </div>
                 
                 {right ? (
                     <div className="shrink-0 ml-2 flex items-center">{right}</div>
                 ) : (
-                    <ChevronRight className="w-5 h-5 text-[#5C5C5E] ml-2 shrink-0 group-active:translate-x-0.5 transition-transform" />
+                    <ChevronRight className="w-5 h-5 text-slate-300 dark:text-[#5C5C5E] ml-2 shrink-0 group-active:translate-x-0.5 transition-transform" />
                 )}
             </div>
         </div>
@@ -120,30 +120,30 @@ const ConfirmDialog = ({ isOpen, title, message, confirmLabel, isDanger, onConfi
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.9, opacity: 0 }}
-                    className="relative w-full max-w-[320px] bg-[#1C1C1E] rounded-3xl border border-white/5 shadow-2xl overflow-hidden z-10"
+                    className="relative w-full max-w-[320px] bg-white dark:bg-[#1C1C1E] rounded-3xl border border-slate-200 dark:border-white/5 shadow-2xl overflow-hidden z-10"
                 >
                     <div className="px-6 pt-8 pb-6 text-center">
                         <div className={clsx(
                             "w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center",
-                            isDanger ? "bg-rose-500/10" : "bg-slate-800/50"
+                            isDanger ? "bg-rose-500/10" : "bg-slate-100 dark:bg-slate-800/50"
                         )}>
-                            <AlertTriangle className={clsx("w-7 h-7", isDanger ? "text-rose-500" : "text-slate-400")} />
+                            <AlertTriangle className={clsx("w-7 h-7", isDanger ? "text-rose-500" : "text-slate-400 dark:text-slate-500")} />
                         </div>
-                        <h3 className="text-[19px] font-bold text-white mb-2">{title}</h3>
-                        <p className="text-[14px] text-[#8E8E93] leading-relaxed">{message}</p>
+                        <h3 className="text-[19px] font-bold text-slate-900 dark:text-white mb-2">{title}</h3>
+                        <p className="text-[14px] text-slate-500 dark:text-[#8E8E93] leading-relaxed">{message}</p>
                     </div>
-                    <div className="flex border-t border-white/5">
+                    <div className="flex border-t border-slate-100 dark:border-white/5">
                         <button
                             onClick={onCancel}
-                            className="flex-1 py-4 text-[16px] font-bold text-[#8E8E93] active:bg-white/5 transition-colors border-r border-white/5"
+                            className="flex-1 py-4 text-[16px] font-bold text-slate-500 dark:text-[#8E8E93] active:bg-slate-50 dark:active:bg-white/5 transition-colors border-r border-slate-100 dark:border-white/5"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={onConfirm}
                             className={clsx(
-                                "flex-1 py-4 text-[16px] font-bold active:bg-white/5 transition-colors",
-                                isDanger ? "text-rose-500" : "text-white"
+                                "flex-1 py-4 text-[16px] font-bold active:bg-slate-50 dark:active:bg-white/5 transition-colors",
+                                isDanger ? "text-rose-500" : "text-slate-900 dark:text-white"
                             )}
                         >
                             {confirmLabel || 'Confirm'}
@@ -257,7 +257,7 @@ const Profile = () => {
     const memberId = `AWK-${user?.uid?.slice(-4).toUpperCase() || 'GUEST'}`;
 
     return (
-        <div className="pb-24 pt-4 bg-black min-h-screen text-white font-sans selection:bg-indigo-500/30">
+        <div className="pb-24 pt-4 bg-[#F2F2F7] dark:bg-black min-h-screen text-slate-900 dark:text-white font-sans selection:bg-indigo-500/30">
             {/* Modals */}
             <EditProfileModal isOpen={isEditProfileOpen} onClose={() => setIsEditProfileOpen(false)} />
             <ExportModal
@@ -294,55 +294,55 @@ const Profile = () => {
                 <div className="flex items-center gap-4 mb-4 mt-8">
                     <button
                         onClick={() => navigate(-1)}
-                        className="p-1 -ml-1 text-white hover:opacity-70 transition-opacity lg:hidden"
+                        className="p-1 -ml-1 text-slate-900 dark:text-white hover:opacity-70 transition-opacity lg:hidden"
                     >
                         <ArrowLeft className="w-7 h-7" />
                     </button>
-                    <h1 className="text-[32px] font-bold tracking-tight text-white">Account</h1>
+                    <h1 className="text-[32px] font-bold tracking-tight text-slate-900 dark:text-white">Account</h1>
                 </div>
 
                 <div className="mt-8">
 
                     {/* ────── SECTION 1: IDENTITY ────── */}
                     <div className="mb-8">
-                        <div className="bg-[#1C1C1E] rounded-3xl p-6 border border-white/5 relative overflow-hidden group">
+                        <div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-6 border border-slate-200/50 dark:border-white/5 relative overflow-hidden group shadow-sm">
                            {/* Subtle background glow */}
                            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl rounded-full translate-x-10 -translate-y-10 group-hover:scale-110 transition-transform duration-700" />
                            
                            <div className="flex items-center gap-5 relative z-10">
                                 {/* Avatar */}
-                                <div
-                                    className="w-[84px] h-[84px] rounded-[28px] bg-slate-800 flex items-center justify-center text-3xl font-bold text-slate-400 overflow-hidden shrink-0 border border-white/10 cursor-pointer active:scale-95 transition-all shadow-xl"
+                                 <div
+                                    className="w-[84px] h-[84px] rounded-[28px] bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-3xl font-bold text-slate-400 dark:text-slate-500 overflow-hidden shrink-0 border border-slate-200 dark:border-white/10 cursor-pointer active:scale-95 transition-all shadow-sm"
                                     onClick={() => setIsEditProfileOpen(true)}
                                 >
                                     {user?.photoURL ? (
                                         <img src={user.photoURL} alt={user?.name} className="w-full h-full object-cover" />
                                     ) : (
-                                        <span className="uppercase text-slate-400">
+                                        <span className="uppercase text-slate-400 dark:text-slate-500">
                                             {user?.name?.charAt(0) || 'U'}
                                         </span>
                                     )}
                                 </div>
 
-                                {/* Details */}
+                                 {/* Details */}
                                 <div className="flex-1 min-w-0">
-                                    <h2 className="text-[22px] font-bold text-white leading-tight truncate">
+                                    <h2 className="text-[22px] font-bold text-slate-900 dark:text-white leading-tight truncate">
                                         {user?.name || user?.displayName || 'User'}
                                     </h2>
                                     <div className="mt-1.5 flex flex-col gap-0.5">
-                                        <span className="text-[13px] font-bold text-indigo-400 uppercase tracking-wider">
+                                        <span className="text-[13px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
                                             {memberId}
                                         </span>
-                                        <span className="text-[14px] text-[#8E8E93] truncate">
+                                        <span className="text-[14px] text-slate-500 dark:text-[#8E8E93] truncate">
                                             {user?.email}
                                         </span>
                                     </div>
                                 </div>
 
-                                {/* Edit button */}
+                                 {/* Edit button */}
                                 <button
                                     onClick={() => setIsEditProfileOpen(true)}
-                                    className="w-10 h-10 rounded-full flex items-center justify-center bg-[#2C2C2E] text-[#8E8E93] active:scale-90 transition-all border border-white/5"
+                                    className="w-10 h-10 rounded-full flex items-center justify-center bg-slate-100 dark:bg-[#2C2C2E] text-slate-400 dark:text-[#8E8E93] active:scale-90 transition-all border border-slate-200/50 dark:border-white/5"
                                 >
                                     <Edit2 className="w-5 h-5" />
                                 </button>
@@ -365,21 +365,21 @@ const Profile = () => {
                         
                         {/* Password editing drawer */}
                         {isEditingPassword && (
-                            <div className="px-5 py-5 bg-[#1C1C1E] border-t border-[#2C2C2E] animate-in fade-in slide-in-from-top-2 duration-300">
+                            <div className="px-5 py-5 bg-white dark:bg-[#1C1C1E] border-t border-slate-100 dark:border-[#2C2C2E] animate-in fade-in slide-in-from-top-2 duration-300">
                                 <div className="space-y-4">
                                     <div className="space-y-3">
                                         <input
                                             type="password"
                                             value={currentPassword}
                                             onChange={(e) => setCurrentPassword(e.target.value)}
-                                            className="w-full bg-[#2C2C2E] border border-white/5 rounded-2xl px-5 py-4 text-[16px] font-medium outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder:text-[#48484A] text-white"
+                                            className="w-full bg-slate-100 dark:bg-[#2C2C2E] border border-slate-200 dark:border-white/5 rounded-2xl px-5 py-4 text-[16px] font-medium outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder:text-slate-400 dark:placeholder:text-[#48484A] text-slate-900 dark:text-white"
                                             placeholder="Current password"
                                         />
                                         <input
                                             type="password"
                                             value={newPassword}
                                             onChange={(e) => setNewPassword(e.target.value)}
-                                            className="w-full bg-[#2C2C2E] border border-white/5 rounded-2xl px-5 py-4 text-[16px] font-medium outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder:text-[#48484A] text-white"
+                                            className="w-full bg-slate-100 dark:bg-[#2C2C2E] border border-slate-200 dark:border-white/5 rounded-2xl px-5 py-4 text-[16px] font-medium outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder:text-slate-400 dark:placeholder:text-[#48484A] text-slate-900 dark:text-white"
                                             placeholder="New password (min. 6 chars)"
                                         />
                                     </div>
@@ -404,14 +404,14 @@ const Profile = () => {
                                                 setCurrentPassword('');
                                                 setNewPassword('');
                                             }}
-                                            className="flex-1 py-4 bg-[#2C2C2E] text-white text-[15px] font-bold rounded-2xl transition-all active:scale-[0.97]"
+                                            className="flex-1 py-4 bg-slate-100 dark:bg-[#2C2C2E] text-slate-900 dark:text-white text-[15px] font-bold rounded-2xl transition-all active:scale-[0.97]"
                                         >
                                             Cancel
                                         </button>
                                         <button
                                             onClick={handleSavePassword}
                                             disabled={isPasswordLoading}
-                                            className="flex-1 py-4 bg-white text-black text-[15px] font-bold rounded-2xl transition-all disabled:opacity-50 active:scale-[0.97]"
+                                            className="flex-1 py-4 bg-indigo-600 dark:bg-white text-white dark:text-black text-[15px] font-bold rounded-2xl transition-all disabled:opacity-50 active:scale-[0.97]"
                                         >
                                             {isPasswordLoading ? 'Saving...' : 'Save Changes'}
                                         </button>
