@@ -14,21 +14,65 @@ export const useTheme = () => {
 
 export const ThemeContextProvider = ({ children }) => {
     const { user } = useAuthContext();
-    const [theme, setTheme] = useState(() => {
-        // Init from storage or system preference
+    
+    // Track user's explicit preference: 'system', 'light', or 'dark'
+    const [themePreference, setThemePreferenceState] = useState(() => {
         if (typeof window !== 'undefined') {
-            const stored = localStorage.getItem('theme');
-            if (stored) return stored;
-
-            // System preference
-            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                return 'dark';
-            }
+            const stored = localStorage.getItem('themePreference') || localStorage.getItem('theme'); // fallback legacy
+            if (stored && ['light', 'dark', 'system'].includes(stored)) return stored;
         }
-        return 'light';
+        return 'system';
     });
 
-    // Apply theme to DOM and Status Bar
+    // The actual resolved active theme based on preference and OS
+    const [resolvedTheme, setResolvedTheme] = useState(() => {
+        if (themePreference === 'system') {
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        return themePreference;
+    });
+
+    // Optional override for specific pages (e.g. Finance Dashboard)
+    const [themeOverride, setThemeOverride] = useState(null);
+
+    // Sync preference strictly to Firestore and LocalStorage
+    const setThemePreference = useCallback(async (newPref) => {
+        if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(20);
+        setThemePreferenceState(newPref);
+        localStorage.setItem('themePreference', newPref);
+
+        // Optional: save to firebase
+        if (user) {
+            try {
+                await FirestoreService.setItem(`users/${user.uid}/config`, 'settings', { theme: newPref }, true);
+            } catch (e) {
+                console.error("Failed to save theme setting", e);
+            }
+        }
+    }, [user]);
+
+    // System theme listener
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handleChange = (e) => {
+            if (themePreference === 'system') {
+                setResolvedTheme(e.matches ? 'dark' : 'light');
+            }
+        };
+
+        mediaQuery.addEventListener('change', handleChange);
+        
+        // Ensure resolved theme is always up to date if preference changes
+        if (themePreference === 'system') {
+            setResolvedTheme(mediaQuery.matches ? 'dark' : 'light');
+        } else {
+            setResolvedTheme(themePreference);
+        }
+
+        return () => mediaQuery.removeEventListener('change', handleChange);
+    }, [themePreference]);
+
+    // Apply resolved theme to DOM and Status Bar
     useEffect(() => {
         const root = window.document.documentElement;
         
@@ -39,7 +83,7 @@ export const ThemeContextProvider = ({ children }) => {
         const lightColor = '#ffffff';
         const darkColor = '#020617';
 
-        if (theme === 'dark') {
+        if (resolvedTheme === 'dark') {
             root.classList.add('dark');
             root.style.colorScheme = 'dark';
         } else {
@@ -49,53 +93,31 @@ export const ThemeContextProvider = ({ children }) => {
 
         // Dynamic Meta Tag Update for Instant Status Bar Switch
         const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-        const newColor = theme === 'dark' ? darkColor : lightColor;
+        
+        // Use override if present, else default
+        const targetColor = themeOverride || (resolvedTheme === 'dark' ? darkColor : lightColor);
 
-        if (metaThemeColor) metaThemeColor.setAttribute('content', newColor);
+        if (metaThemeColor) metaThemeColor.setAttribute('content', targetColor);
+        document.documentElement.style.backgroundColor = targetColor; // Hard apply iOS Top Bounce
+        document.body.style.backgroundColor = targetColor;           // Hard apply iOS Bottom Bounce
 
-        localStorage.setItem('theme', theme);
+        // Provide legacy fallback just in case scripts read it
+        localStorage.setItem('theme', resolvedTheme);
 
         // Remove lock after browser naturally repaints
         setTimeout(() => {
             root.classList.remove('theme-switching');
         }, 50);
-    }, [theme]);
-
-    // Listen for system theme changes if no explicit user preference
-    useEffect(() => {
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const handleChange = (e) => {
-            const stored = localStorage.getItem('theme');
-            if (stored) return; // Ignore if user has set a preference
-            setTheme(e.matches ? 'dark' : 'light');
-        };
-
-        mediaQuery.addEventListener('change', handleChange);
-        return () => mediaQuery.removeEventListener('change', handleChange);
-    }, []);
-    
-    // ... Sync from Firestore on load (unchanged) ...
-
-    const toggleTheme = useCallback(async () => {
-        const newTheme = theme === 'dark' ? 'light' : 'dark';
-        setTheme(newTheme);
-
-        if (user) {
-            try {
-                // Merge with existing settings? 
-                // We should probably rely on a SettingsContext for this, but simplistic approach here:
-                await FirestoreService.setItem(`users/${user.uid}/config`, 'settings', { theme: newTheme }, true);
-            } catch (e) {
-                console.error("Failed to save theme", e);
-            }
-        }
-    }, [theme, user]);
+    }, [resolvedTheme, themeOverride]);
 
     const value = useMemo(() => ({
-        theme,
-        toggleTheme,
-        isDark: theme === 'dark'
-    }), [theme, toggleTheme]);
+        theme: resolvedTheme, // Keep 'theme' property for backward compatibility (evaluates to 'dark' | 'light')
+        themePreference,      // New explicit preference property ('dark' | 'light' | 'system')
+        setThemePreference,
+        themeOverride,
+        setThemeOverride,
+        isDark: resolvedTheme === 'dark'
+    }), [resolvedTheme, themePreference, setThemePreference, themeOverride, setThemeOverride]);
 
     return (
         <ThemeContext.Provider value={value}>

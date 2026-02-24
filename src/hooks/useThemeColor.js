@@ -1,19 +1,19 @@
 import { useEffect } from 'react';
+import { useTheme } from '../context/ThemeContext';
 
 /**
  * Dynamically sets the `theme-color` meta tag while a component is mounted.
- * Restores the previous value on unmount so navigation away from the page reverts correctly.
+ * Uses ThemeContext override to ensure proper sync with device themes implicitly.
  *
  * @param {string} color  - CSS color string, e.g. '#0f172a'
  */
 export function useThemeColor(color) {
+    const { setThemeOverride } = useTheme();
+    
     useEffect(() => {
-        const meta = document.querySelector('meta[name="theme-color"]');
-        if (!meta) return;
-        const previous = meta.getAttribute('content');
-        meta.setAttribute('content', color);
+        setThemeOverride(color);
         return () => {
-            meta.setAttribute('content', previous);
+            setThemeOverride(null);
         };
-    }, [color]);
+    }, [color, setThemeOverride]);
 }

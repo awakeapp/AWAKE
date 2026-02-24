@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { User, Moon, Sun, Clock, ChevronRight, Download, ShieldCheck, HelpCircle, UserPlus, FileText, ArrowLeft } from 'lucide-react';
+import { User, Moon, Sun, Clock, ChevronRight, Download, ShieldCheck, HelpCircle, UserPlus, FileText, ArrowLeft, Monitor } from 'lucide-react';
 import { FirestoreService } from '../services/firestore-service';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -51,7 +51,7 @@ const SettingsGroup = ({ children, className }) => (
 
 const Settings = () => {
     const { user } = useAuthContext();
-    const { theme, toggleTheme } = useTheme();
+    const { theme, themePreference, setThemePreference } = useTheme();
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
 
@@ -162,28 +162,34 @@ const Settings = () => {
                     {/* Appearance Group (iOS Toggle style) */}
                     <SettingsGroup>
                         <SettingsRow 
-                            icon={theme === 'dark' ? Moon : Sun} 
-                            iconBgClass="bg-slate-800 dark:bg-slate-700"
-                            title="Dark Mode" 
+                            icon={themePreference === 'dark' ? Moon : (themePreference === 'light' ? Sun : Monitor)} 
+                            iconBgClass={themePreference === 'light' ? "bg-amber-400" : "bg-slate-800 dark:bg-slate-700"}
+                            title="Theme" 
                             isLast
                             right={
-                                <button
-                                    onClick={() => {
-                                        if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50);
-                                        toggleTheme();
-                                    }}
-                                    className={clsx(
-                                        "relative w-[51px] h-[31px] rounded-full transition-colors duration-300 ease-in-out shrink-0",
-                                        theme === 'dark' ? "bg-[#34C759]" : "bg-[#E9E9EA]"
-                                    )}
-                                >
-                                    <span
+                                <div className="flex bg-slate-100 dark:bg-[#1C1C1E] p-0.5 rounded-md border border-slate-200 dark:border-[#2C2C2E] overflow-hidden">
+                                    <button
+                                        onClick={() => setThemePreference('light')}
                                         className={clsx(
-                                            "absolute top-[2px] left-[2px] w-[27px] h-[27px] bg-white rounded-full shadow-[0_3px_8px_rgba(0,0,0,0.15)] transform transition-transform duration-300 ease-in-out",
-                                            theme === 'dark' ? "translate-x-[20px]" : "translate-x-0"
+                                            "px-3 py-1 text-[13px] font-medium rounded transition-all duration-200",
+                                            themePreference === 'light' ? "bg-white dark:bg-[#636366] text-black dark:text-white shadow-sm" : "text-slate-500 dark:text-[#8E8E93]"
                                         )}
-                                    />
-                                </button>
+                                    >Light</button>
+                                    <button
+                                        onClick={() => setThemePreference('system')}
+                                        className={clsx(
+                                            "px-3 py-1 text-[13px] font-medium rounded transition-all duration-200",
+                                            themePreference === 'system' ? "bg-white dark:bg-[#636366] text-black dark:text-white shadow-sm" : "text-slate-500 dark:text-[#8E8E93]"
+                                        )}
+                                    >Auto</button>
+                                    <button
+                                        onClick={() => setThemePreference('dark')}
+                                        className={clsx(
+                                            "px-3 py-1 text-[13px] font-medium rounded transition-all duration-200",
+                                            themePreference === 'dark' ? "bg-white dark:bg-[#636366] text-black dark:text-white shadow-sm" : "text-slate-500 dark:text-[#8E8E93]"
+                                        )}
+                                    >Dark</button>
+                                </div>
                             }
                         />
                     </SettingsGroup>
