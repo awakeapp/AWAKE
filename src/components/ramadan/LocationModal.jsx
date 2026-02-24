@@ -16,8 +16,12 @@ const LocationModal = ({ isOpen, onClose }) => {
         setDetecting(true);
         setError(null);
         try {
-            await requestLocation();
-            onClose();
+            const loc = await requestLocation();
+            if (loc?.isFallback) {
+                setError("Could not detect location. Note: GPS permission may be denied. Please check browser settings or enter manually.");
+            } else {
+                onClose();
+            }
         } catch (err) {
             setError("Failed to auto-detect location. Please ensure location services are enabled or enter manual coordinates.");
         } finally {

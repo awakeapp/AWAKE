@@ -241,9 +241,10 @@ export const PrayerProvider = ({ children }) => {
     }, [location?.lat, location?.lng, settings.method, settings.madhab, settings.hijriOffset]);
 
     const requestLocation = () => {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             if (!navigator.geolocation) {
-                reject(new Error("Geolocation not supported"));
+                console.warn("Geolocation not supported. Falling back.");
+                resolve(location || FALLBACK_LOCATION);
                 return;
             }
             navigator.geolocation.getCurrentPosition(
@@ -251,10 +252,14 @@ export const PrayerProvider = ({ children }) => {
                     const { latitude, longitude } = pos.coords;
                     // Clear fallback cache
                     localStorage.removeItem(STORAGE_KEY_LOC);
-                    setLocation({ lat: latitude, lng: longitude });
-                    resolve({ lat: latitude, lng: longitude });
+                    const newLoc = { lat: latitude, lng: longitude, isManual: false };
+                    setLocation(newLoc);
+                    resolve(newLoc);
                 },
-                (err) => reject(err),
+                (err) => {
+                    console.warn("GPS request failed or denied:", err);
+                    resolve(location || FALLBACK_LOCATION);
+                },
                 { timeout: 10000, enableHighAccuracy: true }
             );
         });
