@@ -50,7 +50,7 @@ const Overview = () => {
     const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ec4899'];
 
     return (
-        <div className="space-y-8 pb-24 pt-20">
+        <div className="space-y-8 pb-24" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 80px)' }}>
             {/* Fixed Header */}
             <div 
                 className="fixed top-0 left-0 right-0 z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-transparent"
