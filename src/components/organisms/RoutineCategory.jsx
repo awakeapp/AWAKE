@@ -50,6 +50,7 @@ const RoutineCategory = ({ title, tasks, onUpdateStatus, isLocked }) => {
                         />
                     ))}
                 </div>
+            
             </div>
         </section>
     );

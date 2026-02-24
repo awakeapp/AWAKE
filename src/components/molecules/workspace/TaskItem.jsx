@@ -56,7 +56,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
             transition={{ duration: 0.2 }} // Faster enter/layout
             whileHover={{ y: -2 }}
             className={clsx(
-                "group relative flex items-center gap-3 sm:gap-5 p-3 sm:p-4 rounded-[1.5rem] border transition-all duration-200", // Faster hover
+                "group relative flex items-start gap-3 sm:gap-5 p-3 sm:p-4 rounded-[1.5rem] border transition-all duration-200", // Changed to items-start
                 isCarryOver
                     ? "bg-orange-50/40 dark:bg-orange-950/20 border-orange-100/50 dark:border-orange-900/30"
                     : isCompleted
@@ -88,7 +88,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
             )}
 
             {/* Main Content Area */}
-            <div className="flex items-center gap-2.5 sm:gap-4 flex-1 min-w-0">
+            <div className="flex items-start gap-2.5 sm:gap-4 flex-1 min-w-0 pt-0.5">
                 {/* 2. ICON - Styled with depth */}
                 <div className={clsx(
                     "flex-shrink-0 w-9 h-9 sm:w-11 sm:h-11 rounded-[1.1rem] flex items-center justify-center transition-colors duration-200",
@@ -102,13 +102,13 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                 </div>
 
                 <div 
-                    className="flex flex-col min-w-0 flex-1 cursor-pointer active:opacity-60 transition-opacity"
+                    className="flex flex-col flex-1 min-w-0 cursor-pointer active:opacity-60 transition-opacity"
                     onClick={(e) => {
                         // Prevent edit if clicking on the description info icon (handled by its own button)
                         if (onEdit && !isCarryOver) onEdit(task);
                     }}
                 >
-                    <div className="flex items-center gap-2 min-w-0">
+                    <div className="flex items-start gap-2 w-full">
                         {task.description && (
                             <div className="relative">
                                 <button
@@ -142,7 +142,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                             </div>
                         )}
                         <span className={clsx(
-                            "text-[14px] sm:text-[16px] font-normal tracking-tight transition-colors duration-200 truncate",
+                            "text-[14px] sm:text-[16px] font-normal tracking-tight transition-colors duration-200 leading-tight whitespace-pre-wrap break-words [overflow-wrap:anywhere] block w-full",
                             isCarryOver
                                 ? "text-slate-600 dark:text-slate-400"
                                 : isCompleted
@@ -188,7 +188,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
             </div>
 
             {/* 4. ACTIONS */}
-            <div className="flex-shrink-0 flex items-center gap-1.5 sm:gap-2 pl-1">
+            <div className="flex-shrink-0 flex items-start mt-1 gap-1.5 sm:gap-2 pl-1">
                 {/* DATE SELECTOR BUTTON */}
                 {!isLocked && !isCompleted && !isRoutine && (
                     <div className="relative">
