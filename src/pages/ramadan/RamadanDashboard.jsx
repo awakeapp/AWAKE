@@ -209,14 +209,30 @@ const RamadanDashboard = () => {
         <div className="pb-24 pt-2 sm:pt-4">
             <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
             
-            <header className="px-4 sm:px-0 flex items-center justify-between mb-6">
-                <h1 className="text-[28px] font-bold tracking-tight text-black dark:text-white">Ramadan Track</h1>
-                <button 
-                    onClick={() => navigate('/ramadan/settings')}
-                    className="p-2 -mr-2 text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors"
-                >
-                    <Settings className="w-6 h-6" />
-                </button>
+            <header className="px-4 sm:px-0 flex flex-col mb-6">
+                <div className="flex items-center justify-between">
+                    <h1 className="text-[28px] font-bold tracking-tight text-black dark:text-white">Ramadan Track</h1>
+                    <button 
+                        onClick={() => navigate('/ramadan/settings')}
+                        className="p-2 -mr-2 text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors"
+                    >
+                        <Settings className="w-6 h-6" />
+                    </button>
+                </div>
+                {displayName && (
+                    <div className="flex items-center gap-2 mt-1 px-0.5">
+                        <MapPin className="w-3.5 h-3.5 text-emerald-500" />
+                        <span className="text-[13px] font-medium text-slate-500 dark:text-slate-400 truncate max-w-[200px]">
+                            {displayName}
+                        </span>
+                        <button 
+                            onClick={() => setIsLocationModalOpen(true)}
+                            className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider ml-1 hover:underline underline-offset-2"
+                        >
+                            Change
+                        </button>
+                    </div>
+                )}
             </header>
 
             <div className="px-4 sm:px-0 space-y-6">
@@ -242,15 +258,6 @@ const RamadanDashboard = () => {
                         <div className="text-right">
                              <p className="font-semibold text-white text-[16px] drop-shadow-md">{hijriDate?.day} Ramadan {hijriDate?.year}</p>
                              <p className="text-slate-300 text-[13px] mt-0.5 drop-shadow-md">{now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
-                             {displayName && (
-                                <button 
-                                    onClick={() => setIsLocationModalOpen(true)}
-                                    className="text-slate-400 text-[11.5px] mt-2 font-semibold flex items-center justify-end gap-1.5 drop-shadow-md hover:text-white transition-colors bg-black/20 backdrop-blur p-1 pr-2 rounded-full border border-white/5 active:bg-black/40"
-                                >
-                                    <MapPin className="w-3.5 h-3.5" />
-                                    {displayName}
-                                </button>
-                             )}
                         </div>
                      </div>
 

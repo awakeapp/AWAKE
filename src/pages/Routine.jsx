@@ -153,7 +153,7 @@ const Routine = () => {
                 </div>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6 max-w-md mx-auto w-full px-4">
                 {/* Categories */}
                 {Object.entries(categories).map(([category, tasks]) => (
                     <RoutineCategory

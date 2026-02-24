@@ -12,9 +12,11 @@ const NOMINATIM_BASE_URL = 'https://nominatim.openstreetmap.org';
  */
 export const reverseGeocode = async (lat, lng) => {
     try {
-        const url = `${NOMINATIM_BASE_URL}/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+        const url = `${NOMINATIM_BASE_URL}/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1&email=support@awakeapp.com`;
         const response = await fetch(url, {
-            headers: { 'Accept-Language': 'en' }
+            headers: { 
+                'Accept-Language': 'en'
+            }
         });
 
         if (!response.ok) throw new Error('Failed to fetch location details');
@@ -58,9 +60,11 @@ export const searchLocation = async (query) => {
     if (!query || query.trim().length < 3) return [];
 
     try {
-        const url = `${NOMINATIM_BASE_URL}/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=5`;
+        const url = `${NOMINATIM_BASE_URL}/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=5&email=support@awakeapp.com`;
         const response = await fetch(url, {
-            headers: { 'Accept-Language': 'en' }
+            headers: { 
+                'Accept-Language': 'en'
+            }
         });
 
         if (!response.ok) throw new Error('Search failed');

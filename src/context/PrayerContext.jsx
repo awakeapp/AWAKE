@@ -7,6 +7,7 @@ export const usePrayer = () => useContext(PrayerContext);
 
 const FALLBACK_LOCATION = { lat: 12.9716, lng: 77.5946, isFallback: true };
 const STORAGE_KEY_LOC = 'awake_prayer_location';
+const STORAGE_KEY_LOC_DETAILS = 'awake_prayer_loc_details';
 const STORAGE_KEY_SETTINGS = 'awake_prayer_settings';
 const STORAGE_KEY_PRAYER = 'awake_prayer_daily';
 
@@ -35,8 +36,9 @@ export const PrayerProvider = ({ children }) => {
         return saved ? JSON.parse(saved) : { method: 2, madhab: 0, hijriOffset: 0, manualOverride: false };
     });
 
-    const [locationDetails, setLocationDetails] = useState({
-        city: '', state: '', country: '', displayName: 'Location...'
+    const [locationDetails, setLocationDetails] = useState(() => {
+        const saved = localStorage.getItem(STORAGE_KEY_LOC_DETAILS);
+        return saved ? JSON.parse(saved) : { city: '', state: '', country: '', displayName: 'Location...' };
     });
 
     const [prayerData, setPrayerData] = useState({
@@ -56,6 +58,11 @@ export const PrayerProvider = ({ children }) => {
     useEffect(() => {
         localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(settings));
     }, [settings]);
+
+    // Persist location details
+    useEffect(() => {
+        localStorage.setItem(STORAGE_KEY_LOC_DETAILS, JSON.stringify(locationDetails));
+    }, [locationDetails]);
 
     // Save location to local storage (only real GPS / manual locations)
     useEffect(() => {
