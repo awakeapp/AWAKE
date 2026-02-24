@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRamadan } from '../../context/RamadanContext';
+import { usePrayer } from '../../context/PrayerContext';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, Circle, Edit3, Settings, MapPin } from 'lucide-react';
 import clsx from 'clsx';
 import NotificationSettings from '../../components/ramadan/NotificationSettings';
 import PrayerTracker from '../../components/ramadan/PrayerTracker';
 import RamadanImageSlider from '../../components/ramadan/RamadanImageSlider';
+import LocationModal from '../../components/ramadan/LocationModal';
 
 const FastingTracker = ({ todayKey, ramadanData, updateDay }) => {
     const todayData = ramadanData?.days?.[todayKey] || {};
@@ -101,23 +103,28 @@ const PrayerRow = ({ title, completed, mode, onToggle, onChangeMode }) => {
                 <button 
                     onClick={onToggle}
                     className={clsx(
-                        "w-6 h-6 rounded-full flex items-center justify-center transition-colors border",
-                        completed ? "bg-indigo-500 border-indigo-500 text-white" : "border-slate-300 dark:border-slate-600 text-transparent hover:border-indigo-400"
+                        "w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-colors",
+                        completed 
+                            ? "bg-indigo-500 text-white" 
+                            : "border-2 border-slate-300 dark:border-slate-600"
                     )}
                 >
-                    <CheckCircle2 className="w-4 h-4" />
+                    {completed && <CheckCircle2 className="w-4 h-4" />}
                 </button>
-                <span className={clsx("font-medium", completed ? "text-slate-900 dark:text-white" : "text-slate-600 dark:text-slate-400")}>
-                    {title}
-                </span>
+                <span className={clsx(
+                    "text-[15px] font-medium transition-colors",
+                    completed ? "text-slate-900 dark:text-white" : "text-slate-500 dark:text-slate-400"
+                )}>{title}</span>
             </div>
             
-            <div className="flex bg-slate-100 dark:bg-slate-800 rounded p-1">
+            <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
                 <button 
                     onClick={() => onChangeMode('jamaah')}
                     className={clsx(
-                        "px-3 py-1 text-xs font-semibold rounded-md transition-all",
-                        mode === 'jamaah' ? "bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                        "px-3 py-1 rounded text-xs font-semibold transition-colors",
+                        mode === 'jamaah' 
+                            ? "bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-400" 
+                            : "text-slate-500 dark:text-slate-400"
                     )}
                 >
                     Jama'ah
@@ -125,8 +132,10 @@ const PrayerRow = ({ title, completed, mode, onToggle, onChangeMode }) => {
                 <button 
                     onClick={() => onChangeMode('alone')}
                     className={clsx(
-                        "px-3 py-1 text-xs font-semibold rounded-md transition-all",
-                        mode === 'alone' ? "bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                        "px-3 py-1 rounded text-xs font-semibold transition-colors",
+                        mode === 'alone' 
+                            ? "bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-400" 
+                            : "text-slate-500 dark:text-slate-400"
                     )}
                 >
                     Alone
@@ -136,106 +145,33 @@ const PrayerRow = ({ title, completed, mode, onToggle, onChangeMode }) => {
     );
 };
 
-const NightPrayersTracker = ({ todayKey, ramadanData, updateDay }) => {
-    const todayData = ramadanData?.days?.[todayKey] || {};
-
-    const handleUpdate = (field, val) => {
-        updateDay(todayKey, { [field]: val });
-    };
-
-    return (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
-            <h2 className="text-[17px] font-semibold text-black dark:text-white mb-4">Night Prayers</h2>
-            <div className="flex flex-col">
-                <PrayerRow 
-                    title="Taraweeh" 
-                    completed={todayData.taraweeh || false}
-                    mode={todayData.taraweehMode || 'jamaah'}
-                    onToggle={() => handleUpdate('taraweeh', !todayData.taraweeh)}
-                    onChangeMode={(m) => handleUpdate('taraweehMode', m)}
-                />
-                <PrayerRow 
-                    title="Tahajjud" 
-                    completed={todayData.tahajjud || false}
-                    mode={todayData.tahajjudMode || 'alone'}
-                    onToggle={() => handleUpdate('tahajjud', !todayData.tahajjud)}
-                    onChangeMode={(m) => handleUpdate('tahajjudMode', m)}
-                />
-                <PrayerRow 
-                    title="Witr" 
-                    completed={todayData.witr || false}
-                    mode={todayData.witrMode || 'alone'}
-                    onToggle={() => handleUpdate('witr', !todayData.witr)}
-                    onChangeMode={(m) => handleUpdate('witrMode', m)}
-                />
-            </div>
-        </div>
-    );
-};
-
 const RamadanDashboard = () => {
     const navigate = useNavigate();
-    const { loading, error, prayerTimes, hijriDate, location, requestLocation, ramadanData, updateRamadanDay } = useRamadan();
+    const { ramadanData, updateRamadanDay } = useRamadan();
+    const { dailyTimings, hijriDate, displayName, loading, error, requestLocation } = usePrayer();
     const [now, setNow] = useState(new Date());
-    const [resolvedLocation, setResolvedLocation] = useState('');
+    const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
     useEffect(() => {
         const timer = setInterval(() => setNow(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
 
-    // Fetch formatted location for the top widget
-    useEffect(() => {
-        if (!location?.lat || !location?.lng) return;
-        
-        const cacheKey = `location_${location.lat}_${location.lng}`;
-        const cached = localStorage.getItem(cacheKey);
-        if (cached) {
-            setResolvedLocation(cached);
-            return;
-        }
-
-        // Silent reverse geocode if not cached
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.lat}&lon=${location.lng}&zoom=18&addressdetails=1`)
-            .then(res => res.json())
-            .then(data => {
-                if (data && data.address) {
-                    const addr = data.address;
-                    const locality = addr.suburb || addr.neighbourhood || addr.residential || addr.village || addr.town || addr.city_district || '';
-                    const city = addr.city || addr.town || addr.county || '';
-                    const state = addr.state || '';
-                    
-                    const parts = [locality, city, state].filter(p => p && p.trim() !== '');
-                    const uniqueParts = parts.filter((item, pos, arr) => pos === 0 || item !== arr[pos - 1]);
-                    
-                    const resolvedName = uniqueParts.join(', ');
-                    if (resolvedName) {
-                        setResolvedLocation(resolvedName);
-                        localStorage.setItem(cacheKey, resolvedName);
-                    }
-                }
-            })
-            .catch(() => {}); // silent fail, keep blank
-    }, [location?.lat, location?.lng]);
-
     if (loading) {
-        return <div className="p-4 text-center mt-16 text-slate-500 animate-pulse">Initializing Ramadan Hub...</div>;
+        return <div className="p-4 text-center mt-16 text-slate-500 animate-pulse">Initializing Ramadan Engine...</div>;
     }
 
     if (error) {
         return <div className="p-4 text-center mt-16 text-red-500 bg-red-50 dark:bg-red-900/20 rounded mx-4">Error: {error}</div>;
     }
 
-    const todayDateNumber = now.getDate();
-    const todayPrayers = prayerTimes?.find(p => parseInt(p.date.gregorian.day, 10) === todayDateNumber);
-
     let nextEvent = '';
     let countdownStr = '';
     let suhoorTimeStr = '--:--';
     let iftarTimeStr = '--:--';
 
-    if (todayPrayers) {
-        const { Fajr, Maghrib } = todayPrayers.timings;
+    if (dailyTimings) {
+        const { Fajr, Maghrib } = dailyTimings;
         // Parse "05:12 (+0530)" to local date object
         const parseTime = (timeStr) => {
             const timePart = timeStr.split(' ')[0];
@@ -275,6 +211,8 @@ const RamadanDashboard = () => {
 
     return (
         <div className="pb-24 pt-2 sm:pt-4">
+            <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
+            
             <header className="px-4 sm:px-0 flex items-center justify-between mb-6">
                 <h1 className="text-[28px] font-bold tracking-tight text-black dark:text-white">Ramadan Track</h1>
                 <button 
@@ -287,21 +225,6 @@ const RamadanDashboard = () => {
 
             <div className="px-4 sm:px-0 space-y-6">
 
-            {/* Location Warning Banner */}
-            {location?.isDefault && (
-                <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-500/20 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <p className="text-amber-800 dark:text-amber-200 text-sm font-medium">
-                        Using default South India timing. Please set your location for accurate prayer times.
-                    </p>
-                    <button 
-                        onClick={requestLocation}
-                        className="whitespace-nowrap px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded text-sm font-bold shadow-sm transition-colors"
-                    >
-                        Set Location
-                    </button>
-                </div>
-            )}
-            
             <div className="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl shadow-xl overflow-hidden relative min-h-[220px] sm:min-h-[260px] flex flex-col justify-between">
                  {/* Cinematic Image Slider Background */}
                  <RamadanImageSlider />
@@ -316,11 +239,14 @@ const RamadanDashboard = () => {
                         <div className="text-right">
                              <p className="font-semibold text-white text-[16px] drop-shadow-md">{hijriDate?.day} Ramadan {hijriDate?.year}</p>
                              <p className="text-slate-300 text-[13px] mt-0.5 drop-shadow-md">{now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
-                             {resolvedLocation && (
-                                <p className="text-slate-400 text-[11px] mt-1.5 font-medium flex items-center justify-end gap-1 drop-shadow-md">
-                                    <MapPin className="w-3 h-3" />
-                                    {resolvedLocation}
-                                </p>
+                             {displayName && (
+                                <button 
+                                    onClick={() => setIsLocationModalOpen(true)}
+                                    className="text-slate-400 text-[11.5px] mt-2 font-semibold flex items-center justify-end gap-1.5 drop-shadow-md hover:text-white transition-colors bg-black/20 backdrop-blur p-1 pr-2 rounded-full border border-white/5 active:bg-black/40"
+                                >
+                                    <MapPin className="w-3.5 h-3.5" />
+                                    {displayName}
+                                </button>
                              )}
                         </div>
                      </div>
@@ -336,7 +262,7 @@ const RamadanDashboard = () => {
             </div>
 
             {/* Suhoor and Iftar Highlights */}
-            {todayPrayers && (
+            {dailyTimings && (
                 <div className="grid grid-cols-2 gap-4">
                     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center shadow-sm">
                         <span className="text-slate-500 text-[11px] font-semibold uppercase tracking-wider mb-1.5">Suhoor Ends</span>

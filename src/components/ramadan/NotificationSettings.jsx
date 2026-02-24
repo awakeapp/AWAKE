@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useRamadan } from '../../context/RamadanContext';
+import { usePrayer } from '../../context/PrayerContext';
 import { Bell, BellOff } from 'lucide-react';
 import clsx from 'clsx';
 
 const NotificationSettings = () => {
-    const { prayerTimes, hijriDate } = useRamadan();
+    const { dailyTimings, hijriDate } = usePrayer();
     const [prefs, setPrefs] = useState(() => {
         const saved = localStorage.getItem('awake_ramadan_notifications');
         return saved ? JSON.parse(saved) : { suhoor: false, iftar: false, tahajjud: false };
@@ -46,10 +46,8 @@ const NotificationSettings = () => {
 
         const checkReminders = () => {
             const now = new Date();
-            const todayDateNumber = now.getDate();
-            const todayPrayers = prayerTimes?.find(p => parseInt(p.date.gregorian.day, 10) === todayDateNumber);
             
-            if (!todayPrayers) return;
+            if (!dailyTimings) return;
 
             const parseTime = (timeStr) => {
                 const timePart = timeStr.split(' ')[0];
@@ -59,8 +57,8 @@ const NotificationSettings = () => {
                 return d;
             };
 
-            const fajrTime = parseTime(todayPrayers.timings.Fajr);
-            const maghribTime = parseTime(todayPrayers.timings.Maghrib);
+            const fajrTime = parseTime(dailyTimings.Fajr);
+            const maghribTime = parseTime(dailyTimings.Maghrib);
             
             // Suhoor: 30 mins before Fajr
             const suhoorReminderTime = new Date(fajrTime.getTime() - 30 * 60000);
@@ -93,7 +91,7 @@ const NotificationSettings = () => {
         checkReminders();
 
         return () => clearInterval(intervalId);
-    }, [prefs, prayerTimes, hijriDate, permission]);
+    }, [prefs, dailyTimings, hijriDate, permission]);
 
     const sendNotification = (title, body) => {
         // Prevent spamming if already notified in this minute

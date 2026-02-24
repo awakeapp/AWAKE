@@ -9,6 +9,7 @@ import { SettingsProvider } from './context/SettingsContext';
 import { TaskContextProvider } from './context/TaskContext';
 import { FinanceContextProvider } from './context/FinanceContext';
 import { VehicleContextProvider } from './context/VehicleContext';
+import { PrayerProvider } from './context/PrayerContext';
 import { RamadanProvider } from './context/RamadanContext';
 import { RAMADAN_MODE } from './lib/featureFlags';
 
@@ -114,13 +115,14 @@ function App() {
           <SettingsProvider>
           <DateContextProvider>
             <DataContextProvider>
-              {/* RamadanProvider is always mounted — routes are conditionally included below */}
-              <RamadanProvider>
-                <TaskContextProvider>
-                  <FinanceContextProvider>
-                    <VehicleContextProvider>
-                      <AnalyticsTracker />
-                      <GlobalErrorBanner />
+              {/* PrayerProvider provides core logic, RamadanProvider handles tracking */}
+              <PrayerProvider>
+                <RamadanProvider>
+                  <TaskContextProvider>
+                    <FinanceContextProvider>
+                      <VehicleContextProvider>
+                        <AnalyticsTracker />
+                        <GlobalErrorBanner />
                       <OnboardingModal />
                       <Suspense fallback={<FullPageLoader />}>
                         <Routes>
@@ -178,6 +180,7 @@ function App() {
                   </FinanceContextProvider>
                 </TaskContextProvider>
               </RamadanProvider>
+            </PrayerProvider>
             </DataContextProvider>
           </DateContextProvider>
           </SettingsProvider>

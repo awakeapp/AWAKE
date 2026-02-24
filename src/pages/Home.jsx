@@ -4,7 +4,7 @@ import { useData } from '../context/DataContext';
 import { useTasks } from '../context/TaskContext';
 import { useFinance } from '../context/FinanceContext';
 import { useAuthContext } from '../hooks/useAuthContext';
-import { useRamadan } from '../context/RamadanContext';
+import { usePrayer } from '../context/PrayerContext';
 import { motion } from 'framer-motion';
 import { Trophy, Target, List, IndianRupee, ArrowRight, Zap, Moon, ChevronRight, Fuel } from 'lucide-react';
 import clsx from 'clsx';
@@ -21,7 +21,7 @@ const Home = () => {
     const { dailyData } = useData();
     const { tasks: workspaceTasks, addTask, currentDateStr } = useTasks();
     const { getDailySpend } = useFinance();
-    const { hijriDate, prayerTimes, loading: ramadanLoading } = useRamadan();
+    const { hijriDate, dailyTimings } = usePrayer();
     const navigate = useNavigate();
     const { t } = useTranslation();
 
@@ -65,14 +65,12 @@ const Home = () => {
     };
 
     // --- Ramadan Mini Widget Logic ---
-    const todayDateNumber = now.getDate();
-    const todayPrayers = prayerTimes?.find(p => parseInt(p.date.gregorian.day, 10) === todayDateNumber);
     let nextEvent = '';
     let countdownStr = '--:--:--';
     const isRamadanActive = hijriDate?.isRamadan;
 
-    if (todayPrayers) {
-        const { Fajr, Maghrib } = todayPrayers.timings;
+    if (dailyTimings) {
+        const { Fajr, Maghrib } = dailyTimings;
         const parseTime = (timeStr) => {
             const [hours, mins] = timeStr.split(' ')[0].split(':');
             const d = new Date(now);
@@ -152,6 +150,31 @@ const Home = () => {
                             <p className="text-[14px] text-white/80 font-medium pb-1 drop-shadow-md">Prayers · Dhikr · Stats</p>
                         )}
                     </div>
+                </div>
+            )}
+
+            {/* Daily Fard Prayers */}
+            {RAMADAN_MODE && dailyTimings && (
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex items-center justify-between overflow-x-auto gap-4 hide-scrollbar">
+                    {['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].map((prayer) => {
+                        const timeRaw = dailyTimings[prayer];
+                        if (!timeRaw) return null;
+                        
+                        // Convert 24h to 12h nicely
+                        const [hStr, mStr] = timeRaw.split(' ')[0].split(':');
+                        const h = parseInt(hStr, 10);
+                        const isPM = h >= 12;
+                        const h12 = h % 12 || 12;
+                        
+                        return (
+                            <div key={prayer} className="flex flex-col items-center justify-center min-w-[50px]">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{prayer}</span>
+                                <span className="text-[14px] font-bold text-slate-800 dark:text-slate-100 tabular-nums">
+                                    {h12}:{mStr}
+                                </span>
+                            </div>
+                        );
+                    })}
                 </div>
             )}
 
