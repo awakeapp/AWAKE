@@ -123,12 +123,12 @@ const Home = () => {
             {RAMADAN_MODE && (
                 <div
                     onClick={() => navigate('/ramadan')}
-                    className="w-full bg-slate-900 rounded-3xl p-6 shadow-lg shadow-black/20 active:scale-[0.98] transition-all duration-75 cursor-pointer relative overflow-hidden flex flex-col justify-between min-h-[220px]"
+                    className="w-full bg-slate-900 rounded-3xl p-6 shadow-lg shadow-black/20 active:scale-[0.98] transition-all duration-75 cursor-pointer relative overflow-hidden flex flex-col justify-between min-h-[190px]"
                 >
                     <RamadanImageSlider />
                     
                     {/* Top Header */}
-                    <div className="flex items-start justify-between relative z-10 w-full mb-6">
+                    <div className="flex items-start justify-between relative z-10 w-full mb-4">
                         <div className="flex gap-4 items-center">
                             <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-sm shrink-0">
                                 <Moon className="w-5 h-5 text-white drop-shadow-md" />
@@ -163,7 +163,7 @@ const Home = () => {
 
                     {/* Bottom Suhoor / Iftar Row */}
                     {dailyTimings && (
-                        <div className="relative z-10 flex justify-between w-full mt-4 pt-4 border-t border-white/20">
+                        <div className="relative z-10 flex justify-between w-full mt-3 pt-3 border-t border-white/20">
                             <div className="text-left">
                                 <p className="text-white/70 text-[10px] uppercase font-bold tracking-wider mb-0.5">Suhoor Ends</p>
                                 <p className="text-white font-bold text-lg drop-shadow-md">{suhoorTimeStr}</p>
@@ -174,31 +174,6 @@ const Home = () => {
                             </div>
                         </div>
                     )}
-                </div>
-            )}
-
-            {/* Daily Fard Prayers */}
-            {RAMADAN_MODE && dailyTimings && (
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex items-center justify-between overflow-x-auto gap-4 hide-scrollbar">
-                    {['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].map((prayer) => {
-                        const timeRaw = dailyTimings[prayer];
-                        if (!timeRaw) return null;
-                        
-                        // Convert 24h to 12h nicely
-                        const [hStr, mStr] = timeRaw.split(' ')[0].split(':');
-                        const h = parseInt(hStr, 10);
-                        const isPM = h >= 12;
-                        const h12 = h % 12 || 12;
-                        
-                        return (
-                            <div key={prayer} className="flex flex-col items-center justify-center min-w-[50px]">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{prayer}</span>
-                                <span className="text-[14px] font-bold text-slate-800 dark:text-slate-100 tabular-nums">
-                                    {h12}:{mStr}
-                                </span>
-                            </div>
-                        );
-                    })}
                 </div>
             )}
 
