@@ -18,7 +18,7 @@ import { RAMADAN_MODE } from '../lib/featureFlags';
 const Home = () => {
     const { user } = useAuthContext();
     const { dailyData } = useData();
-    const { tasks: workspaceTasks, addTask } = useTasks();
+    const { tasks: workspaceTasks, addTask, currentDateStr } = useTasks();
     const { getDailySpend } = useFinance();
     const { hijriDate, prayerTimes, loading: ramadanLoading } = useRamadan();
     const navigate = useNavigate();
@@ -44,9 +44,10 @@ const Home = () => {
     const completedRoutine = outputTasks.filter(t => t.status === 'checked').length;
     const totalRoutine = outputTasks.length;
     const routineProgress = totalRoutine > 0 ? Math.round((completedRoutine / totalRoutine) * 100) : 0;
-    const totalWorkspaceTasks = workspaceTasks.length;
-    const completedWorkspaceTasks = workspaceTasks.filter(t => t.status === 'done' || t.status === 'completed' || t.isCompleted).length;
-    const remainingTasksCount = workspaceTasks.filter(t => t.status !== 'done' && t.status !== 'completed' && !t.isCompleted).length;
+    const todayTasks = workspaceTasks.filter(t => t.date === (currentDateStr || now.toLocaleDateString('en-CA')));
+    const totalWorkspaceTasks = todayTasks.length;
+    const completedWorkspaceTasks = todayTasks.filter(t => t.status === 'done' || t.status === 'completed' || t.isCompleted).length;
+    const remainingTasksCount = todayTasks.filter(t => t.status !== 'done' && t.status !== 'completed' && !t.isCompleted).length;
     const dailySpend = getDailySpend();
 
     let motivation = "";
@@ -149,123 +150,122 @@ const Home = () => {
                 </div>
             )}
 
-            {/* Routine Summary Card */}
-            <div 
-                onClick={() => navigate('/routine')}
-                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm relative overflow-hidden active:bg-slate-50 dark:active:bg-slate-800/80 transition-colors duration-75 cursor-pointer group"
-            >
-                <div 
-                    className="absolute bottom-0 left-0 h-1 bg-indigo-500/20 transition-all duration-1000"
-                    style={{ width: `${routineProgress}%` }}
-                />
-
-                <div className="flex items-center justify-between relative z-10">
-                    <div className="flex items-center gap-5">
-                         <div className={clsx(
-                            "w-14 h-14 rounded-2xl flex items-center justify-center transition-colors shadow-sm",
-                            routineProgress === 100 ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400" : "bg-slate-100 text-indigo-600 dark:bg-slate-800 dark:text-indigo-400"
-                        )}>
-                            {routineProgress === 100 ? <Trophy className="w-7 h-7" /> : <Target className="w-7 h-7" />}
+            {/* Quick Actions Title */}
+            <div className="pt-2 px-1">
+                <h2 className="text-[17px] font-semibold text-slate-900 dark:text-white mb-3">Quick Actions</h2>
+                <div className="grid grid-cols-2 gap-3 text-left">
+                    
+                    {/* Routine Overview */}
+                    <div 
+                        onClick={() => navigate('/routine')}
+                        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-32 active:bg-slate-50 dark:active:bg-slate-800/80 transition-colors duration-75 cursor-pointer shadow-sm relative overflow-hidden group"
+                    >
+                        <div 
+                            className="absolute bottom-0 left-0 h-1 bg-indigo-500/20 transition-all duration-1000"
+                            style={{ width: `${routineProgress}%` }}
+                        />
+                        <div className="flex items-start justify-between relative z-10">
+                            <div className={clsx(
+                                "p-2 rounded-xl shadow-sm",
+                                routineProgress === 100 ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "bg-indigo-50 text-indigo-500 dark:bg-indigo-500/10"
+                            )}>
+                                {routineProgress === 100 ? <Trophy className="w-5 h-5" /> : <Target className="w-5 h-5" />}
+                            </div>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); navigate('/routine'); }}
+                                className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:bg-slate-300 dark:active:bg-slate-600 text-slate-600 dark:text-slate-300 rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm active:scale-95"
+                            >
+                                View
+                            </button>
                         </div>
-                        <div>
-                            <div className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">{t('home.daily_routine', 'Daily Routine')}</div>
-                            <div className="text-lg font-semibold text-slate-900 dark:text-white leading-none">
-                                {routineProgress}% <span className="text-sm font-medium text-slate-400 ml-1">{t('home.done', 'Done')}</span>
+                        <div className="relative z-10 pt-2">
+                            <div className="text-[19px] font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                                {routineProgress}% <span className="text-xs text-slate-400 font-medium">{t('home.done', 'Done')}</span>
+                            </div>
+                            <div className="text-[11.5px] text-slate-500 dark:text-slate-400 font-medium truncate">
+                                {t('home.daily_routine', 'Daily Routine')}
                             </div>
                         </div>
                     </div>
-                    <div className="bg-slate-50 dark:bg-slate-800 p-2 rounded-full text-slate-400 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all">
-                        <ArrowRight className="w-5 h-5" />
-                    </div>
-                </div>
-            </div>
 
-            {/* Combined Tasks Overview & Today's Spent Grid */}
-            <div className="grid grid-cols-2 gap-3">
-                {/* Tasks */}
-                <div 
-                    onClick={() => navigate('/workspace')} 
-                    className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-2xl p-4 flex flex-col justify-between h-32 active:bg-blue-100/50 dark:active:bg-blue-900/30 transition-colors duration-75 cursor-pointer"
-                >
-                    <div className="flex items-start justify-between">
-                         <div className="p-2 bg-white dark:bg-slate-900/50 rounded-xl text-blue-500 shadow-sm">
-                            <List className="w-5 h-5" />
+                    {/* Task Quick Action */}
+                    <div 
+                        onClick={() => setIsTaskModalOpen(true)}
+                        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-32 active:bg-slate-50 dark:active:bg-slate-800/80 transition-colors duration-75 cursor-pointer shadow-sm relative overflow-hidden group"
+                    >
+                        <div className="flex items-start justify-between relative z-10">
+                            <div className="p-2 bg-blue-50 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400 rounded-xl shadow-sm">
+                                <List className="w-5 h-5" />
+                            </div>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); setIsTaskModalOpen(true); }}
+                                className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors active:scale-95 shadow-sm"
+                            >
+                                + Task
+                            </button>
                         </div>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); setIsTaskModalOpen(true); }}
-                            className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors active:scale-95 shadow-sm"
-                        >
-                            + Task
-                        </button>
+                        <div className="relative z-10 pt-2">
+                            <div className="text-[19px] font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                                {remainingTasksCount} <span className="text-xs text-slate-400 font-medium">{t('home.left', 'Left')}</span>
+                            </div>
+                            <div className="text-[11.5px] text-slate-500 dark:text-slate-400 font-medium truncate">
+                                {completedWorkspaceTasks} / {totalWorkspaceTasks} {t('home.completed', 'Completed')}
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <div className="text-xl font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1">
-                            {remainingTasksCount} <span className="text-xs text-slate-400 font-medium">{t('home.left', 'Left')}</span>
-                        </div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate">
-                            {completedWorkspaceTasks} / {totalWorkspaceTasks} {t('home.completed', 'Completed')}
-                        </div>
-                    </div>
-                </div>
 
-                {/* Finance Summary */}
-                <div 
-                    onClick={() => navigate('/finance')}
-                    className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl p-4 flex flex-col justify-between h-32 active:bg-emerald-100/50 dark:active:bg-emerald-900/30 transition-colors duration-75 cursor-pointer"
-                >
-                    <div className="flex items-start justify-between">
-                        <div className="p-2 bg-white dark:bg-slate-900/50 rounded-xl text-emerald-500 shadow-sm">
-                            <IndianRupee className="w-5 h-5" />
+                    {/* Finance Log (Merged Spend) */}
+                    <div 
+                        onClick={() => setIsFinanceModalOpen(true)}
+                        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-32 active:bg-slate-50 dark:active:bg-slate-800/80 transition-colors duration-75 cursor-pointer shadow-sm relative overflow-hidden group"
+                    >
+                        <div className="flex items-start justify-between relative z-10">
+                            <div className="p-2 bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10 dark:text-emerald-400 rounded-xl shadow-sm">
+                                <IndianRupee className="w-5 h-5" />
+                            </div>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); setIsFinanceModalOpen(true); }}
+                                className="bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors active:scale-95 shadow-sm"
+                            >
+                                + Log
+                            </button>
                         </div>
-                        <span className="text-xs font-medium text-emerald-500 uppercase tracking-wider">Spend</span>
+                        <div className="relative z-10 pt-2">
+                            <div className="text-[19px] font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                                <span dir="ltr">₹{dailySpend.toLocaleString()}</span>
+                            </div>
+                            <div className="text-[11.5px] text-slate-500 dark:text-slate-400 font-medium truncate">
+                                {t('home.todays_spend', "Today's Spent")}
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <div className="text-xl font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
-                             <span dir="ltr">₹{dailySpend.toLocaleString()}</span>
-                        </div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate">
-                            {t('home.todays_spend', "Today's Spent")}
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            {/* Minimal Quick Action Bar -> Two Buttons */}
-            <div className="grid grid-cols-2 gap-3">
-                <div 
-                    className="bg-slate-900 dark:bg-white rounded-2xl p-4 flex flex-col justify-between cursor-pointer active:bg-slate-800 dark:active:bg-slate-100 transition-colors duration-75 shadow-lg shadow-slate-900/10 dark:shadow-white/5 h-28"
-                    onClick={() => setIsFuelModalOpen(true)}
-                >
-                    <div className="flex items-start justify-between">
-                        <div className="bg-white/20 dark:bg-slate-900/10 p-2 rounded-xl text-white dark:text-slate-900">
-                            <Fuel className="w-5 h-5 fill-current" />
+                    {/* Fuel Log */}
+                    <div 
+                        onClick={() => setIsFuelModalOpen(true)}
+                        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-32 active:bg-slate-50 dark:active:bg-slate-800/80 transition-colors duration-75 cursor-pointer shadow-sm relative overflow-hidden group"
+                    >
+                        <div className="flex items-start justify-between relative z-10">
+                            <div className="p-2 bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-400 rounded-xl shadow-sm">
+                                <Fuel className="w-5 h-5" />
+                            </div>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); setIsFuelModalOpen(true); }}
+                                className="bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors active:scale-95 shadow-sm"
+                            >
+                                + Fuel
+                            </button>
                         </div>
-                        <div className="bg-white/10 dark:bg-slate-900/5 p-1 rounded-full text-white dark:text-slate-900">
-                            <span className="text-lg leading-none font-medium px-1">+</span>
+                        <div className="relative z-10 pt-2">
+                            <div className="text-[19px] font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                                Vehicle
+                            </div>
+                            <div className="text-[11.5px] text-slate-500 dark:text-slate-400 font-medium truncate">
+                                Add Fill-up
+                            </div>
                         </div>
                     </div>
-                    <div>
-                        <p className="text-sm font-semibold text-white dark:text-slate-900">Fuel Log</p>
-                        <p className="text-[11px] text-slate-300 dark:text-slate-500 font-medium uppercase tracking-wide">Add Fill-up</p>
-                    </div>
-                </div>
 
-                <div 
-                    className="bg-emerald-600 dark:bg-emerald-500 rounded-2xl p-4 flex flex-col justify-between cursor-pointer active:bg-emerald-700 dark:active:bg-emerald-600 transition-colors duration-75 flex-1 shadow-lg shadow-emerald-500/20 h-28"
-                    onClick={() => setIsFinanceModalOpen(true)}
-                >
-                    <div className="flex items-start justify-between">
-                        <div className="bg-white/20 dark:bg-black/10 p-2 rounded-xl text-white dark:text-slate-900">
-                            <IndianRupee className="w-5 h-5 fill-current" />
-                        </div>
-                        <div className="bg-white/10 dark:bg-black/5 p-1 rounded-full text-white dark:text-slate-900">
-                            <span className="text-lg leading-none font-medium px-1">+</span>
-                        </div>
-                    </div>
-                    <div>
-                        <p className="text-sm font-semibold text-white dark:text-slate-900">Finance Log</p>
-                        <p className="text-[11px] text-emerald-100 dark:text-slate-800 font-medium uppercase tracking-wide">Add Expense</p>
-                    </div>
                 </div>
             </div>
 
