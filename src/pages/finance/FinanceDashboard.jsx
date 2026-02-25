@@ -6,16 +6,19 @@ import { useState, useMemo } from 'react';
 import AddTransactionModal from './AddTransactionModal';
 import UpcomingPayments from './UpcomingPayments';
 import BudgetSummary from './BudgetSummary';
+import AnalyticsModal from './AnalyticsModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useThemeColor } from '../../hooks/useThemeColor';
 import { useTheme } from '../../context/ThemeContext';
 import { useSettings } from '../../context/SettingsContext';
+import { useAuthContext } from '../../hooks/useAuthContext';
 
 const FinanceDashboard = () => {
     const navigate = useNavigate();
     const { isDark } = useTheme();
     const { timeFormat } = useSettings();
+    const { user } = useAuthContext();
     useThemeColor(isDark ? '#0f172a' : '#0f172a'); 
     const { t } = useTranslation(); 
     const {
@@ -32,7 +35,7 @@ const FinanceDashboard = () => {
     const [editTransactionId, setEditTransactionId] = useState(null);
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [undoToast, setUndoToast] = useState(null); // { id, message }
-    const [isComingSoonOpen, setIsComingSoonOpen] = useState(false);
+    const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
 
     const monthStats = useMemo(() => {
         const start = startOfMonth(selectedDate);
@@ -91,99 +94,109 @@ const FinanceDashboard = () => {
     );
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24">
-            <div
-                className="fixed top-0 inset-x-0 z-50 bg-slate-900"
-                style={{ height: 'env(safe-area-inset-top, 0px)' }}
-            />
-
-            <header className="bg-slate-900 text-white px-6 pb-12 pt-8">
-                <div className="relative z-10">
-                    <div className="flex items-center justify-between mb-8">
-                        <div className="flex items-center gap-3 bg-white/10 rounded-full px-1 p-1">
-                            <button onClick={() => changeMonth(-1)} className="p-1 hover:bg-white/10 rounded-full transition-colors">
-                                <ChevronLeft className="w-4 h-4 text-slate-300" />
-                            </button>
-                            <span className="text-sm font-bold min-w-[80px] text-center">
-                                {format(selectedDate, 'MMM yyyy')}
-                            </span>
-                            <button onClick={() => changeMonth(1)} className="p-1 hover:bg-white/10 rounded-full transition-colors">
-                                <ChevronRight className="w-4 h-4 text-slate-300" />
-                            </button>
-                        </div>
-
-                        <button
-                            onClick={() => setIsComingSoonOpen(true)}
-                            className="p-2 bg-white/10 rounded-xl hover:bg-white/20 transition-colors"
-                        >
-                            <PieChart className="w-5 h-5 text-white" />
+        <div 
+            className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 6rem)' }}
+        >
+            {/* Header Area */}
+            <header className="px-6 pt-6 pb-4">
+                <div className="flex items-center justify-between mb-6">
+                    <div>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Finance</h1>
+                    </div>
+                    {/* Date Selector in Header */}
+                    <div className="flex items-center gap-1 bg-white dark:bg-slate-900 rounded-full p-1 shadow-sm border border-slate-100 dark:border-slate-800">
+                        <button onClick={() => changeMonth(-1)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                            <ChevronLeft className="w-4 h-4 text-slate-500" />
+                        </button>
+                        <span className="text-sm font-bold min-w-[70px] text-center text-slate-700 dark:text-slate-200">
+                            {format(selectedDate, 'MMM yyyy')}
+                        </span>
+                        <button onClick={() => changeMonth(1)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                            <ChevronRight className="w-4 h-4 text-slate-500" />
                         </button>
                     </div>
+                </div>
 
-                    <div className="text-center mb-10">
-                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">{t('finance.total_net_balance', 'Total Net Balance')}</p>
-                        <h2 className="text-4xl font-bold tracking-tight text-white">
-                            <span dir="ltr">₹{totalBalance.toLocaleString()}</span>
-                        </h2>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-3">
-                        <div className="bg-slate-800/50 p-4 rounded-2xl border border-white/5">
-                            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-3">
-                                <ArrowDown className="w-4 h-4 text-emerald-400" />
+                {/* Main Balance Card */}
+                <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-800 rounded-[2rem] p-6 text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden">
+                    {/* Decorative blobs */}
+                    <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                    <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-black/10 rounded-full blur-2xl"></div>
+                    
+                    <div className="relative z-10">
+                        <div className="flex justify-between items-start mb-4">
+                            <div>
+                                <p className="text-indigo-100 text-sm font-medium mb-1">{t('finance.total_balance', 'Total Balance')}</p>
+                                <h2 className="text-4xl font-bold tracking-tight">
+                                    <span dir="ltr">₹{totalBalance.toLocaleString()}</span>
+                                </h2>
                             </div>
-                            <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">{t('finance.income', 'Income')}</p>
-                            <p className="font-bold text-white text-[15px]"><span dir="ltr">₹{monthStats.income.toLocaleString()}</span></p>
+                            <button
+                                onClick={() => setIsAnalyticsOpen(true)}
+                                className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors backdrop-blur-md"
+                            >
+                                <PieChart className="w-5 h-5 text-white" />
+                            </button>
                         </div>
 
-                        <div className="bg-slate-800/50 p-4 rounded-2xl border border-white/5 relative overflow-hidden">
-                            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center mb-3">
-                                <PiggyBank className="w-4 h-4 text-indigo-400" />
+                        <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/20">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                                    <ArrowDown className="w-4 h-4 text-white" />
+                                </div>
+                                <div>
+                                    <p className="text-indigo-100 text-xs mb-0.5">{t('finance.income', 'Income')}</p>
+                                    <p className="font-bold text-sm"><span dir="ltr">₹{monthStats.income.toLocaleString()}</span></p>
+                                </div>
                             </div>
-                            <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">{t('finance.savings', 'Savings')}</p>
-                            <p className={`font-bold text-[15px] ${monthStats.savings >= 0 ? 'text-indigo-400' : 'text-rose-400'}`}>
-                                {monthStats.savings >= 0 ? '+' : ''}<span dir="ltr">₹{Math.abs(monthStats.savings).toLocaleString()}</span>
-                            </p>
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                                    <TrendingUp className="w-4 h-4 text-white" />
+                                </div>
+                                <div>
+                                    <p className="text-indigo-100 text-xs mb-0.5">{t('finance.expenses', 'Expenses')}</p>
+                                    <p className="font-bold text-sm mt-0.5"><span dir="ltr">₹{monthStats.expense.toLocaleString()}</span></p>
+                                </div>
+                            </div>
                         </div>
-
-                        <button
-                            onClick={() => navigate('/finance/debts')}
-                            className="bg-slate-800/50 p-4 rounded-2xl border border-white/5 hover:bg-slate-800 transition-colors text-left"
-                        >
-                            <div className="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center mb-3">
-                                <Wallet className="w-4 h-4 text-rose-400" />
-                            </div>
-                            <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">{t('finance.debts', 'Debts')}</p>
-                            <p className="font-bold text-rose-400 text-[13px]">{t('finance.manage', 'Manage')}</p>
-                        </button>
                     </div>
                 </div>
             </header>
 
-            <div className="px-4 py-6 space-y-8 -mt-6 rounded-t-[2.5rem] bg-slate-50 dark:bg-slate-950 relative z-10 transition-colors">
-                <section className="overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide scroll-smooth-x">
-                    <div className="flex gap-3 w-max">
-                        <div
-                            onClick={() => setIsBudgetOpen(true)}
-                            className="min-w-[140px] bg-indigo-600 p-5 rounded-2xl shadow-lg shadow-indigo-500/20 cursor-pointer transition-all active:scale-95 flex flex-col justify-between text-white"
-                        >
-                            <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center mb-4">
-                                <PieChart className="w-4 h-4 text-white" />
-                            </div>
-                            <div>
-                                <p className="text-[10px] text-indigo-200 font-bold uppercase tracking-wider mb-1">{t('finance.overview', 'Overview')}</p>
-                                <p className="text-lg font-bold">{t('finance.budgets', 'Budgets')}</p>
-                            </div>
-                        </div>
+            <div className="px-6 flex-1 flex flex-col space-y-6">
+                {/* Secondary Actions */}
+                <div className="grid grid-cols-2 gap-3">
+                    <button 
+                        onClick={() => navigate('/finance/debt')}
+                        className="bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 py-3 rounded-2xl font-bold text-sm shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+                    >
+                        <Undo className="w-4 h-4 text-indigo-500" />
+                        Debt Management
+                    </button>
+                    <button 
+                        onClick={() => setIsBudgetOpen(true)}
+                        className="bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 py-3 rounded-2xl font-bold text-sm shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+                    >
+                        <TrendingUp className="w-4 h-4 text-indigo-500" />
+                        {t('finance.budgets', 'Budgets')}
+                    </button>
+                </div>
 
+                {/* Accounts Grid (3 Columns) */}
+                <section>
+                    <div className="grid grid-cols-3 gap-2">
                         {accounts.filter(a => !a.isArchived).map(acc => (
                             <div
                                 key={acc.id}
                                 onClick={() => navigate(`/finance/account/${acc.id}`)}
-                                className="min-w-[160px] bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 cursor-pointer transition-all active:scale-95"
+                                className="bg-white dark:bg-slate-900 p-3 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 cursor-pointer active:scale-95 transition-transform flex flex-col items-center justify-center text-center"
                             >
-                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-3 leading-none">{acc.name}</p>
-                                <p className="text-lg font-bold text-slate-900 dark:text-white"><span dir="ltr">₹{acc.balance.toLocaleString()}</span></p>
+                                <div className="flex items-center gap-1.5 mb-1 justify-center">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0"></div>
+                                    <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium truncate max-w-full">{acc.name}</p>
+                                </div>
+                                <p className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm truncate w-full"><span dir="ltr">₹{acc.balance.toLocaleString()}</span></p>
                             </div>
                         ))}
                     </div>
@@ -193,32 +206,31 @@ const FinanceDashboard = () => {
                     <UpcomingPayments />
                 </section>
 
-                <section>
-                    <div className="flex items-center justify-between mb-4 px-1">
-                        <div className="flex items-center gap-2">
-                            <h3 className="font-bold text-slate-900 dark:text-white text-lg">{t('finance.transactions', 'Transactions')}</h3>
-                            <span className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-[10px] font-black uppercase px-2 py-0.5 rounded-lg">
-                                {format(selectedDate, 'MMM')}
-                            </span>
-                        </div>
+                {/* Transactions List */}
+                <section className="flex-1">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-bold text-slate-900 dark:text-white text-lg">{t('finance.transactions', 'Transactions')}</h3>
+                        <button className="text-slate-400 text-sm font-medium hover:text-indigo-500 transition-colors">
+                            View all
+                        </button>
                     </div>
 
                     <div className="space-y-3">
                         {sortedMonthlyTx.length === 0 ? (
-                            <div className="text-center py-16 px-6 bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800">
-                                <div className="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
-                                    <TrendingUp className="w-10 h-10" />
+                            <div className="text-center py-12 px-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800">
+                                <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <TrendingUp className="w-8 h-8 text-slate-300" />
                                 </div>
-                                <p className="text-slate-900 dark:text-white font-bold text-xl mb-2">{t('finance.no_expenses', 'No expenses yet')}</p>
-                                <p className="text-slate-500 text-sm mb-8 max-w-[240px] mx-auto leading-relaxed">
-                                    {t('finance.start_tracking', 'Start tracking where your money goes. Record purchases, bills, or any income.')}
+                                <p className="text-slate-900 dark:text-white font-bold mb-1">{t('finance.no_expenses', 'No expenses yet')}</p>
+                                <p className="text-slate-500 text-sm mb-6 max-w-[200px] mx-auto">
+                                    {t('finance.start_tracking', 'Start tracking where your money goes.')}
                                 </p>
                                 <button
                                     onClick={() => {
                                         setEditTransactionId(null);
                                         setIsAddOpen(true);
                                     }}
-                                    className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-4 rounded-2xl font-bold shadow-xl active:scale-95 transition-all"
+                                    className="bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 px-6 py-2.5 rounded-xl font-bold active:scale-95 transition-all text-sm"
                                 >
                                     {t('finance.add_first_record', '+ Add Record')}
                                 </button>
@@ -226,14 +238,15 @@ const FinanceDashboard = () => {
                         ) : (
                             sortedMonthlyTx.map(tx => {
                                 const cat = categories.find(c => c.id === tx.categoryId);
+                                const isIncome = tx.type === 'income';
                                 return (
                                     <div
                                         key={tx.id}
                                         onClick={() => handleEdit(tx.id)}
-                                        className="group relative flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-indigo-500 transition-all cursor-pointer overflow-hidden shadow-sm"
+                                        className="group relative flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-[1.25rem] border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all cursor-pointer overflow-hidden"
                                     >
-                                        <div className="flex items-center gap-4 relative z-10">
-                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl ${cat?.color ? cat.color + '/20' : 'bg-slate-100'} ${cat?.color?.replace('bg-', 'text-') || 'text-slate-500'}`}>
+                                        <div className="flex items-center gap-4 relative z-10 w-full">
+                                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl shrink-0 ${cat?.color ? cat.color + '/10' : 'bg-slate-50 dark:bg-slate-800'} ${cat?.color?.replace('bg-', 'text-') || 'text-slate-500'}`}>
                                                 {cat?.icon === 'Utensils' && '🍽️'}
                                                 {cat?.icon === 'Bus' && '🚌'}
                                                 {cat?.icon === 'ShoppingBag' && '🛍️'}
@@ -241,23 +254,21 @@ const FinanceDashboard = () => {
                                                 {cat?.icon === 'IndianRupee' && '₹'}
                                                 {!cat?.icon && (cat?.name?.[0] || '?')}
                                             </div>
-                                            <div>
-                                                <p className="font-bold text-slate-900 dark:text-white text-[15px]">{tx.note || cat?.name}</p>
-                                                <p className="text-xs text-slate-400 mt-0.5">{format(new Date(tx.date || tx.createdAt), timeFormat === '24h' ? 'MMM d, HH:mm' : 'MMM d, h:mm a')}</p>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="font-bold text-slate-900 dark:text-white text-[15px] truncate">{tx.note || cat?.name || 'Transfer'}</p>
+                                                <p className="text-xs text-slate-400 mt-0.5">{format(new Date(tx.date || tx.createdAt), timeFormat === '24h' ? 'dd MMM, HH:mm' : 'dd MMM, h:mm a')} • {accounts.find(a => a.id === tx.accountId)?.name || 'Account'}</p>
+                                            </div>
+                                            <div className="text-right shrink-0">
+                                                <p className={`text-[16px] font-bold ${isIncome ? 'text-emerald-500' : 'text-slate-900 dark:text-white'}`}>
+                                                    {isIncome ? '+' : '-'}<span dir="ltr">₹{Number(tx.amount).toLocaleString()}</span>
+                                                </p>
                                             </div>
                                         </div>
-                                        <div className="text-right relative z-10">
-                                            <p className={`text-[17px] font-bold ${tx.type === 'income' ? 'text-emerald-500' : 'text-slate-900 dark:text-white'}`}>
-                                                {tx.type === 'income' ? '+' : '-'}<span dir="ltr">₹{Number(tx.amount).toLocaleString()}</span>
-                                            </p>
-                                            <p className="text-[10px] text-slate-300 font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                                                {accounts.find(a => a.id === tx.accountId)?.name}
-                                            </p>
-                                        </div>
 
+                                        {/* Deletion Swipe Action */}
                                         <button
                                             onClick={(e) => handleDelete(e, tx.id)}
-                                            className="absolute right-0 top-0 bottom-0 w-16 bg-rose-500 text-white flex items-center justify-center translate-x-full group-hover:translate-x-0 transition-transform duration-300 z-50 shadow-[-10px_0_20px_rgba(0,0,0,0.1)]"
+                                            className="absolute right-0 top-0 bottom-0 w-16 bg-rose-500 text-white flex items-center justify-center translate-x-full group-hover:translate-x-0 transition-transform duration-300 z-50 rounded-r-[1.25rem]"
                                         >
                                             <X className="w-5 h-5" />
                                         </button>
@@ -269,15 +280,18 @@ const FinanceDashboard = () => {
                 </section>
             </div>
 
-            <button
-                onClick={() => {
-                    setEditTransactionId(null);
-                    setIsAddOpen(true);
-                }}
-                className="fixed bottom-8 right-8 w-16 h-16 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl shadow-2xl flex items-center justify-center active:scale-95 transition-transform z-40"
-            >
-                <Plus className="w-8 h-8" />
-            </button>
+            {/* Floating Action Button */}
+            <div className="fixed bottom-24 right-6 z-40">
+                <button
+                    onClick={() => {
+                        setEditTransactionId(null);
+                        setIsAddOpen(true);
+                    }}
+                    className="w-14 h-14 bg-indigo-600 text-white rounded-full shadow-xl shadow-indigo-600/30 flex items-center justify-center active:scale-95 transition-transform"
+                >
+                    <Plus className="w-6 h-6" />
+                </button>
+            </div>
 
             {isAddOpen && (
                 <AddTransactionModal
@@ -300,49 +314,26 @@ const FinanceDashboard = () => {
                         initial={{ opacity: 0, y: 50 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 50 }}
-                        className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-6 border border-white/10"
+                        className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-4 text-sm font-medium border border-white/10"
                     >
-                        <span className="text-sm font-bold">{undoToast.message}</span>
+                        <span>{undoToast.message}</span>
                         <button
                             onClick={handleUndo}
-                            className="text-indigo-400 hover:text-white text-xs font-black uppercase tracking-widest flex items-center gap-2"
+                            className="text-indigo-400 hover:text-indigo-300 font-bold uppercase text-xs"
                         >
-                            <Undo className="w-4 h-4" />
                             {t('finance.undo', 'Undo')}
                         </button>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            <AnimatePresence>
-                {isComingSoonOpen && (
-                    <motion.div
-                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-                        onClick={() => setIsComingSoonOpen(false)}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] w-full max-w-sm text-center shadow-2xl border border-slate-100 dark:border-slate-800"
-                            onClick={e => e.stopPropagation()}
-                        >
-                            <div className="w-20 h-20 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl flex items-center justify-center mx-auto mb-8">
-                                <TrendingUp className="w-10 h-10 text-indigo-500" />
-                            </div>
-                            <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Analytics</h3>
-                            <p className="text-slate-500 dark:text-slate-400 mb-10 leading-relaxed text-sm">
-                                Deep financial insights and spending trends are coming soon to your dashboard.
-                            </p>
-                            <button
-                                onClick={() => setIsComingSoonOpen(false)}
-                                className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-2xl shadow-lg active:scale-95 transition-all uppercase text-xs tracking-widest"
-                            >
-                                Stay Tuned
-                            </button>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            <AnalyticsModal
+                isOpen={isAnalyticsOpen}
+                onClose={() => setIsAnalyticsOpen(false)}
+                monthStats={monthStats}
+                categories={categories}
+                selectedDate={selectedDate}
+            />
         </div>
     );
 };
