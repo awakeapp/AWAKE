@@ -19,6 +19,8 @@ const AddLoanModal = ({ isOpen, onClose, onSave, vehicle }) => {
     });
 
     const [calculatedEMI, setCalculatedEMI] = useState(0);
+    const [calculatedTotalPayable, setCalculatedTotalPayable] = useState(0);
+    const [calculatedTotalInterest, setCalculatedTotalInterest] = useState(0);
 
     useEffect(() => {
         if (vehicle) {
@@ -35,15 +37,23 @@ const AddLoanModal = ({ isOpen, onClose, onSave, vehicle }) => {
         if (p > 0 && r > 0 && n > 0) {
             if (formData.interestType === 'reducing') {
                 const emi = p * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
-                setCalculatedEMI(Math.round(emi));
+                const emiRounded = Math.round(emi);
+                setCalculatedEMI(emiRounded);
+                setCalculatedTotalPayable(emiRounded * n);
+                setCalculatedTotalInterest((emiRounded * n) - p);
             } else {
                 // Flat
                 const totalInterest = p * (Number(formData.interestRate) / 100) * (n / 12);
                 const emi = (p + totalInterest) / n;
-                setCalculatedEMI(Math.round(emi));
+                const emiRounded = Math.round(emi);
+                setCalculatedEMI(emiRounded);
+                setCalculatedTotalPayable(Math.round(p + totalInterest));
+                setCalculatedTotalInterest(Math.round(totalInterest));
             }
         } else {
             setCalculatedEMI(0);
+            setCalculatedTotalPayable(0);
+            setCalculatedTotalInterest(0);
         }
     }, [formData.totalLoanAmount, formData.interestRate, formData.tenureMonths, formData.interestType]);
 
@@ -52,6 +62,8 @@ const AddLoanModal = ({ isOpen, onClose, onSave, vehicle }) => {
         onSave({
             ...formData,
             emiAmount: calculatedEMI,
+            totalPayable: calculatedTotalPayable,
+            totalInterest: calculatedTotalInterest,
             totalLoanAmount: Number(formData.totalLoanAmount),
             interestRate: Number(formData.interestRate),
             tenureMonths: Number(formData.tenureMonths),

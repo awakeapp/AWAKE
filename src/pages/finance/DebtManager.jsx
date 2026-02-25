@@ -54,51 +54,60 @@ const DebtManager = () => {
  const totalPayable = payables.reduce((sum, d) => sum + (Number(d.amount) - (d.paidAmount || 0)), 0);
 
  return (
- <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
+ <div 
+     className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
+     style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 2rem)' }}
+ >
  {/* Header */}
- <header className="bg-slate-900 text-white p-6 rounded-b-[2.5rem] shadow-2xl shadow-slate-900/30 animate-in slide-in-from-top-4 duration-300">
+ <header className="px-6 pt-6 pb-4">
  <div className="flex items-center justify-between mb-6">
  <button
  onClick={() => navigate(-1)}
- className="p-2 bg-transparent hover:bg-white/20 rounded-full transition-colors text-white -ml-2 focus:outline-none"
+ className="p-2 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white -ml-2 focus:outline-none shadow-sm border border-slate-100 dark:border-slate-800"
  >
- <ArrowLeft className="w-6 h-6" />
+ <ArrowLeft className="w-5 h-5" />
  </button>
- <h1 className="text-lg font-bold tracking-wide leading-tight">Debts & Lending</h1>
- <div className="w-10" />
+ <h1 className="text-xl font-bold text-slate-900 dark:text-white">Debts & Lending</h1>
+ <div className="w-9" />
  </div>
 
- <div className="grid grid-cols-2 gap-4">
- <div className="bg-white/10 p-4 rounded-2xl">
- <p className="text-[10px] text-emerald-300 uppercase font-bold tracking-wider mb-1">To Receive</p>
- <h2 className="text-2xl font-bold text-emerald-400">₹{totalReceivable.toLocaleString()}</h2>
+ <div className="grid grid-cols-2 gap-3">
+ <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+ <p className="text-xs text-slate-500 flex items-center gap-1.5 mb-2 font-medium">
+ <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+ To Receive
+ </p>
+ <h2 className="text-2xl font-bold text-slate-900 dark:text-white">₹{totalReceivable.toLocaleString()}</h2>
  </div>
- <div className="bg-white/10 p-4 rounded-2xl">
- <p className="text-[10px] text-red-300 uppercase font-bold tracking-wider mb-1">To Pay</p>
- <h2 className="text-2xl font-bold text-red-400">₹{totalPayable.toLocaleString()}</h2>
+ <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+ <p className="text-xs text-slate-500 flex items-center gap-1.5 mb-2 font-medium">
+ <span className="w-2 h-2 rounded-full bg-red-500"></span>
+ To Pay
+ </p>
+ <h2 className="text-2xl font-bold text-slate-900 dark:text-white">₹{totalPayable.toLocaleString()}</h2>
  </div>
  </div>
  </header>
 
- <div className="p-4 space-y-8">
+ <div className="px-6 flex-1 flex flex-col space-y-6">
  {isAdding ? (
- <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-200">
- <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Add New Record</h3>
+ <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 p-6 rounded-[1.5rem] shadow-sm border border-slate-100 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-200">
+ <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">New Record</h3>
 
- <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl mb-6">
+ <div className="flex p-1 bg-slate-100 dark:bg-slate-800/50 rounded-xl mb-6">
  <button
  type="button"
  onClick={() => setType('receivable')}
- className={`flex-1 py-3 text-sm font-bold rounded-lg transition-all ${type === 'receivable' ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}
+ className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${type === 'receivable' ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
  >
- I Lent (Get Back)
+ I Lent
  </button>
  <button
  type="button"
  onClick={() => setType('payable')}
- className={`flex-1 py-3 text-sm font-bold rounded-lg transition-all ${type === 'payable' ? 'bg-white dark:bg-slate-700 shadow-sm text-red-600 dark:text-red-400' : 'text-slate-500'}`}
+ className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${type === 'payable' ? 'bg-white dark:bg-slate-700 shadow-sm text-red-600 dark:text-red-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
  >
- I Borrowed (Pay)
+ I Borrowed
  </button>
  </div>
 
@@ -157,13 +166,13 @@ const DebtManager = () => {
  <button
  type="button"
  onClick={() => setIsAdding(false)}
- className="flex-1 py-3 font-semibold text-slate-500 hover:bg-slate-50 rounded-xl transition-colors"
+ className="flex-1 py-3 font-semibold text-slate-500 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 rounded-xl transition-colors text-sm"
  >
  Cancel
  </button>
  <button
  type="submit"
- className="flex-1 py-3 bg-slate-900 text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] transition-transform"
+ className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/30 active:scale-[0.98] transition-transform text-sm"
  >
  Save Record
  </button>
@@ -172,7 +181,7 @@ const DebtManager = () => {
  ) : (
  <button
  onClick={() => setIsAdding(true)}
- className="w-full py-4 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-3xl flex items-center justify-center gap-2 text-slate-500 hover:border-indigo-500 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-all font-bold"
+ className="w-full py-4 bg-white dark:bg-slate-900 rounded-[1.5rem] flex items-center justify-center gap-2 text-slate-500 hover:text-indigo-500 transition-all font-bold shadow-sm border border-slate-100 dark:border-slate-800 border-dashed hover:border-indigo-500 text-sm"
  >
  <Plus className="w-5 h-5" />
  Add New Record
@@ -202,11 +211,11 @@ const DebtManager = () => {
  </div>
  )}
 
- <div className="space-y-8">
+ <div className="space-y-6">
  {receivables.length > 0 && (
  <div>
- <h3 className="font-bold text-slate-900 dark:text-white mb-3 pl-2 flex items-center gap-2">
- <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Expected to Receive
+ <h3 className="font-bold text-slate-900 dark:text-white mb-3 text-sm pl-1 flex items-center gap-2">
+ Expected to Receive
  </h3>
  <div className="space-y-3">
  {receivables.map(d => <DebtItem key={d.id} debt={d} onRepay={() => { setSelectedDebt(d); setRepayModalOpen(true); }} />)}
@@ -215,8 +224,8 @@ const DebtManager = () => {
  )}
  {payables.length > 0 && (
  <div>
- <h3 className="font-bold text-slate-900 dark:text-white mb-3 pl-2 flex items-center gap-2">
- <span className="w-2 h-2 rounded-full bg-red-500"></span> Need to Pay
+ <h3 className="font-bold text-slate-900 dark:text-white mb-3 text-sm pl-1 flex items-center gap-2">
+ Need to Pay
  </h3>
  <div className="space-y-3">
  {payables.map(d => <DebtItem key={d.id} debt={d} onRepay={() => { setSelectedDebt(d); setRepayModalOpen(true); }} />)}
@@ -256,7 +265,7 @@ const DebtManager = () => {
  setRepayAmount('');
  }
  }}
- className="py-3 bg-slate-900 text-white font-bold rounded-xl"
+ className="py-3 bg-indigo-600 text-white font-bold rounded-xl"
  >
  Confirm
  </button>
