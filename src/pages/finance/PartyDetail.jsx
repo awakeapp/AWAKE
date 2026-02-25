@@ -1,9 +1,7 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
 import { ArrowLeft, Plus, MoreVertical, Trash2, RotateCcw, AlertTriangle, Calendar, Lock, CreditCard, ToggleLeft, ToggleRight, Check, ChevronDown, Clock, Bell, MessageCircle, Copy, Send, Wallet, FileText, Image as ImageIcon } from 'lucide-react';
-import html2canvas from 'html2canvas';
-import { PDFDocument, rgb } from 'pdf-lib';
 import { format, isBefore, isAfter, startOfDay, endOfDay, differenceInDays } from 'date-fns';
 import JumpDateModal from '../../components/organisms/JumpDateModal';
 import { useScrollLock } from '../../hooks/useScrollLock';
@@ -155,10 +153,6 @@ const PartyDetail = () => {
 
     const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(0);
     const [reminderMessage, setReminderMessage] = useState('');
-    const [generatedFileUrl, setGeneratedFileUrl] = useState(null);
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [pdfTemplateFile, setPdfTemplateFile] = useState(null);
-    const hiddenImageRef = useRef(null);
 
     const templates = useMemo(() => {
         const amtStr = totalPending.toLocaleString();
@@ -185,8 +179,6 @@ const PartyDetail = () => {
         setSelectedTemplateIndex(0);
         setReminderMessage(templates[0].text);
         setCopied(false);
-        setGeneratedFileUrl(null);
-        setPdfTemplateFile(null);
         setIsReminderOpen(true);
     };
 
@@ -203,85 +195,21 @@ const PartyDetail = () => {
         } catch { /* fallback: ignore */ }
     };
 
-    const generateReminderDocument = async () => {
-        setIsGenerating(true);
-        try {
-            if (party.is_client) {
-                if (!pdfTemplateFile) {
-                    alert('Please upload an empty PDF invoice template first.');
-                    setIsGenerating(false);
-                    return;
-                }
-                const arrayBuffer = await pdfTemplateFile.arrayBuffer();
-                const pdfDoc = await PDFDocument.load(arrayBuffer);
-                const pages = pdfDoc.getPages();
-                const firstPage = pages[0];
-                const { height } = firstPage.getSize();
-                
-                firstPage.drawText(`To: ${party.name}\nAmount Due: INR ${totalPending.toLocaleString()}\nDate: ${format(new Date(), 'dd MMM yyyy')}\n\nNotes:\n${reminderMessage}`, {
-                    x: 50,
-                    y: height - 150,
-                    size: 11,
-                    color: rgb(0, 0, 0),
-                    lineHeight: 14,
-                });
-                
-                const pdfBytes = await pdfDoc.save();
-                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-                setGeneratedFileUrl(URL.createObjectURL(blob));
-            } else {
-                if (!hiddenImageRef.current) return;
-                const canvas = await html2canvas(hiddenImageRef.current, { scale: 2, backgroundColor: '#0f172a' });
-                canvas.toBlob((blob) => {
-                    setGeneratedFileUrl(URL.createObjectURL(blob));
-                }, 'image/png');
-            }
-        } catch (error) {
-            console.error('Failed to generate document:', error);
-            alert('Generation failed. Ensure the uploaded file is a valid PDF if in client mode.');
-        }
-        setIsGenerating(false);
-    };
-
     const handleSendReminder = async () => {
-        if (generatedFileUrl) {
-            try {
-                const response = await fetch(generatedFileUrl);
-                const blob = await response.blob();
-                const ext = party.is_client ? 'pdf' : 'png';
-                const file = new File([blob], `${party.name.replace(/\s+/g, '_')}_Reminder.${ext}`, { type: blob.type });
-                
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({
-                        files: [file],
-                        title: 'Invoice / Reminder',
-                        text: reminderMessage
-                    });
-                } else {
-                    const a = document.createElement('a');
-                    a.href = generatedFileUrl;
-                    a.download = `${party.name.replace(/\s+/g, '_')}_Reminder.${ext}`;
-                    a.click();
-                    alert(`The ${ext.toUpperCase()} has been downloaded. Please attach it manually in the chat as this browser does not support seamless file sharing.`);
-                    
-                    const encoded = encodeURIComponent(reminderMessage + `\n\n(Please see attached ${ext.toUpperCase()} document)`);
-                    window.open(`https://wa.me/${fullPhone}?text=${encoded}`, '_blank');
-                }
-            } catch (err) {
-                console.log('Share canceled or failed', err);
-            }
+        if (!party.phone_number) {
+            alert("No phone number is attached to this party. Please enter a valid number to send direct messages.");
+            return;
+        }
+
+        const encoded = encodeURIComponent(reminderMessage);
+        if (reminderMethod === 'whatsapp') {
+            window.open(`https://wa.me/${fullPhone}?text=${encoded}`, '_blank');
         } else {
-            const encoded = encodeURIComponent(reminderMessage);
-            if (reminderMethod === 'whatsapp') {
-                window.open(`https://wa.me/${fullPhone}?text=${encoded}`, '_blank');
-            } else {
-                window.open(`sms:${fullPhone}?body=${encoded}`, '_blank');
-            }
+            window.open(`sms:${fullPhone}?body=${encoded}`, '_blank');
         }
         
         await updateDebtParty(partyId, { last_reminder_sent_at: new Date().toISOString() });
         setIsReminderOpen(false);
-        setGeneratedFileUrl(null);
     };
 
     const lastReminderDaysAgo = useMemo(() => {
@@ -873,7 +801,6 @@ const PartyDetail = () => {
                             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">
                                 <h3 className="text-xl font-bold text-slate-900 dark:text-white">Send Reminder</h3>
                                 <div className="flex items-center gap-2">
-                                    {party.is_client && <span className="text-[9px] font-black uppercase bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400 tracking-wider px-2 py-1 rounded-md">Client Mode</span>}
                                     <span className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md ${reminderMethod === 'whatsapp' ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300' : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300'}`}>
                                         via {reminderMethod === 'whatsapp' ? 'WhatsApp' : 'SMS'}
                                     </span>
@@ -900,64 +827,23 @@ const PartyDetail = () => {
                                 <textarea
                                     value={reminderMessage}
                                     onChange={e => setReminderMessage(e.target.value)}
-                                    rows={5}
+                                    rows={6}
                                     className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-sm text-slate-900 dark:text-white font-medium leading-relaxed outline-none focus:ring-2 focus:ring-indigo-500 resize-none shadow-sm"
                                 />
                             </div>
 
-                            <div className="mb-6 p-4 bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-2xl">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">
-                                    {party.is_client ? 'Official PDF Invoice' : 'Visual Reminder Snippet'}
-                                </label>
-                                
-                                {party.is_client && !generatedFileUrl && (
-                                    <div className="mb-4">
-                                        <p className="text-xs text-slate-500 mb-2 leading-relaxed">
-                                            Upload an empty invoice PDF blueprint. <br />
-                                            <span className="font-bold text-indigo-500 dark:text-indigo-400">Safe Zone:</span> Overlay text begins near the bottom-left coordinate (x: 50, y: 150 from bottom). Please ensure your layout accommodates this.
-                                        </p>
-                                        <input 
-                                            type="file" 
-                                            accept="application/pdf"
-                                            onChange={(e) => setPdfTemplateFile(e.target.files[0])}
-                                            className="block w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-indigo-100 file:text-indigo-700 dark:file:bg-indigo-500/20 dark:file:text-indigo-400 hover:file:bg-indigo-200 dark:hover:file:bg-indigo-500/30 transition-all cursor-pointer"
-                                        />
+                            <div className="flex items-center justify-between bg-indigo-50 dark:bg-indigo-500/10 p-3 rounded-xl border border-indigo-100 dark:border-indigo-500/20 mb-6">
+                                <div className="flex items-center gap-3">
+                                    <FileText className="w-5 h-5 text-indigo-500" />
+                                    <div>
+                                        <p className="text-xs font-bold text-slate-900 dark:text-white">Static Brand Templates</p>
+                                        <p className="text-[10px] text-slate-500">Attach our standard branded formats manually</p>
                                     </div>
-                                )}
-
-                                {generatedFileUrl ? (
-                                    <div className="flex flex-col items-center justify-center p-2">
-                                        {party.is_client ? (
-                                            <div className="w-full flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                                                <div className="flex items-center gap-3">
-                                                    <FileText className="w-8 h-8 text-rose-500" />
-                                                    <div>
-                                                        <p className="text-sm font-bold text-slate-900 dark:text-white">Generated Invoice</p>
-                                                        <p className="text-[10px] text-slate-500 font-medium tracking-wide text-rose-500/80 uppercase">Ready to share</p>
-                                                    </div>
-                                                </div>
-                                                <button onClick={() => setGeneratedFileUrl(null)} className="p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 transition-colors rounded-full"><Trash2 className="w-5 h-5"/></button>
-                                            </div>
-                                        ) : (
-                                            <div className="relative group rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm w-full max-w-[200px] aspect-[4/5]">
-                                                <img src={generatedFileUrl} alt="Preview" className="w-full h-full object-cover" />
-                                                <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
-                                                    <button onClick={() => setGeneratedFileUrl(null)} className="px-4 py-2 bg-rose-500 hover:bg-rose-600 transition-colors text-white rounded-xl text-xs font-bold shadow-md flex items-center gap-1.5"><Trash2 className="w-4 h-4" />Discard</button>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <button 
-                                        type="button" 
-                                        onClick={generateReminderDocument}
-                                        disabled={isGenerating || (party.is_client && !pdfTemplateFile)}
-                                        className="w-full py-3 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-sm rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
-                                    >
-                                        {isGenerating ? <RotateCcw className="w-4 h-4 animate-spin" /> : party.is_client ? <FileText className="w-4 h-4 text-indigo-500" /> : <ImageIcon className="w-4 h-4 text-indigo-500" />}
-                                        {isGenerating ? 'Generating...' : party.is_client ? 'Generate PDF Invoice' : 'Generate Temporary Image'}
-                                    </button>
-                                )}
+                                </div>
+                                <div className="flex flex-col gap-1 items-end">
+                                   <a href="/templates/awake-reminder-template.pdf" download className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline">Download PDF</a>
+                                   <a href="/templates/awake-reminder-template.png" download className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline">Download Image</a>
+                                </div>
                             </div>
 
                             <div className="flex gap-3">
@@ -965,7 +851,7 @@ const PartyDetail = () => {
                                     {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
                                 </button>
                                 <button type="button" onClick={handleSendReminder} className="flex-[2] py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl shadow-lg shadow-emerald-500/30 active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
-                                    <Send className="w-4 h-4" /> Send {generatedFileUrl && '+ Attach'}
+                                    <Send className="w-4 h-4" /> Send Message
                                 </button>
                             </div>
                         </motion.div>
@@ -977,37 +863,6 @@ const PartyDetail = () => {
             <JumpDateModal isOpen={dueDatePickerOpen} onClose={() => setDueDatePickerOpen(false)} initialDate={dueDate ? new Date(dueDate + 'T00:00:00') : new Date()} onSelect={(d) => { if (d) { setDueDate(format(d, 'yyyy-MM-dd')); } else { setDueDate(''); } setDueDatePickerOpen(false); }} />
             <JumpDateModal isOpen={dateFromPickerOpen} onClose={() => setDateFromPickerOpen(false)} initialDate={dateFrom ? new Date(dateFrom + 'T00:00:00') : new Date()} onSelect={(d) => { if (d) setDateFrom(format(d, 'yyyy-MM-dd')); setDateFromPickerOpen(false); }} />
             <JumpDateModal isOpen={dateToPickerOpen} onClose={() => setDateToPickerOpen(false)} initialDate={dateTo ? new Date(dateTo + 'T00:00:00') : new Date()} onSelect={(d) => { if (d) setDateTo(format(d, 'yyyy-MM-dd')); setDateToPickerOpen(false); }} />
-        
-            {/* Hidden Element for html2canvas to render temporary visual reminder */}
-            <div className="absolute top-0 left-[-9999px]">
-                <div ref={hiddenImageRef} className="w-[600px] bg-slate-900 text-white p-12 flex flex-col items-center justify-center text-center font-sans tracking-tight">
-                    <h1 className="text-[52px] font-black text-indigo-400 mb-6 uppercase tracking-widest leading-none">AWAKE</h1>
-                    <p className="text-xl font-bold text-slate-400 uppercase tracking-[0.2em] mb-12">Account Summary</p>
-                    
-                    <div className="bg-slate-800/80 rounded-[2.5rem] p-10 w-full border border-slate-700/50 shadow-2xl mb-8">
-                        <div className="mb-10 text-left w-full border-b border-slate-700/80 pb-6">
-                            <p className="text-sm font-black text-slate-500 uppercase tracking-widest mb-2">Prepared For</p>
-                            <h2 className="text-3xl font-black text-white">{party.name}</h2>
-                            <p className="text-slate-400 text-xl font-medium mt-1">{party.country_code || '+91'} {party.phone_number}</p>
-                        </div>
-                        
-                        <p className="text-sm font-black text-slate-500 uppercase tracking-widest mb-3">Total Outstanding Balance</p>
-                        <p className={`text-[80px] leading-none font-black mb-10 tracking-tighter ${isReceivable ? 'text-emerald-400' : 'text-rose-400'}`}>
-                            ₹{totalPending.toLocaleString()}
-                        </p>
-                        
-                        <div className="bg-slate-900/50 rounded-3xl p-6 border border-slate-700/50 text-left">
-                           <p className="text-slate-300 whitespace-pre-wrap leading-relaxed px-2 font-medium text-lg">{reminderMessage}</p>
-                        </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between w-full px-6 opacity-60">
-                         <p className="text-sm text-slate-400 font-bold uppercase tracking-widest">Generated automatically</p>
-                         <p className="text-sm text-slate-400 font-bold tracking-widest">{format(new Date(), 'dd MMM yyyy')}</p>
-                    </div>
-                </div>
-            </div>
-            
         </div>
     );
 };
