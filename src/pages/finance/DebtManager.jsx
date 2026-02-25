@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { User, Plus, ArrowLeft, MoreVertical, Search, CheckCircle, MessageCircle, MessageSquare, UserPlus, Phone, X } from 'lucide-react';
+import { User, Plus, ArrowLeft, MoreVertical, Search, CheckCircle, UserPlus, Phone, X } from 'lucide-react';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -30,7 +30,7 @@ const DebtManager = () => {
     const [countryCode, setCountryCode] = useState('+91');
     const [tag, setTag] = useState('');
     const [creditLimit, setCreditLimit] = useState('');
-    const [reminderMethod, setReminderMethod] = useState('whatsapp');
+
     const [phonePickerNumbers, setPhonePickerNumbers] = useState([]);
     const [isPhonePickerOpen, setIsPhonePickerOpen] = useState(false);
     const [contactError, setContactError] = useState('');
@@ -112,15 +112,18 @@ const DebtManager = () => {
                     }
                 }
             } else {
-                // Fallback: open vCard file picker
+                // Fallback: open vCard (.vcf) file picker for iOS/desktop
+                setContactError('Select a contact file (.vcf) to import');
+                setTimeout(() => setContactError(''), 4000);
                 if (vcfInputRef.current) vcfInputRef.current.click();
             }
         } catch (err) {
             if (err.name === 'SecurityError' || err.name === 'NotAllowedError') {
-                setContactError('Contact access denied. Please allow in Settings.');
+                setContactError('Contact access denied. Please allow in device Settings.');
                 setTimeout(() => setContactError(''), 5000);
             } else if (err.name !== 'AbortError') {
-                // Fallback to vCard import
+                setContactError('Select a contact file (.vcf) to import');
+                setTimeout(() => setContactError(''), 4000);
                 if (vcfInputRef.current) vcfInputRef.current.click();
             }
         }
@@ -161,7 +164,7 @@ const DebtManager = () => {
             country_code: countryCode,
             tag,
             credit_limit: creditLimit ? Number(creditLimit) : null,
-            preferred_reminder_method: reminderMethod,
+            preferred_reminder_method: 'whatsapp',
             last_reminder_sent_at: null
         });
 
@@ -335,17 +338,7 @@ const DebtManager = () => {
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Reminder Method</label>
-                                    <div className="flex bg-slate-100 dark:bg-slate-800/30 rounded-xl p-1 gap-1 border border-slate-200 dark:border-slate-700/30 shadow-sm">
-                                        <button type="button" onClick={() => setReminderMethod('whatsapp')} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${reminderMethod === 'whatsapp' ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
-                                            <MessageCircle className="w-4 h-4" /> WhatsApp
-                                        </button>
-                                        <button type="button" onClick={() => setReminderMethod('sms')} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${reminderMethod === 'sms' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
-                                            <MessageSquare className="w-4 h-4" /> SMS
-                                        </button>
-                                    </div>
-                                </div>
+
                             </div>
 
                             <div className="flex gap-3 mt-8">

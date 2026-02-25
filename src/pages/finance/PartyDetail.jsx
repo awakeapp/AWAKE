@@ -150,7 +150,7 @@ const PartyDetail = () => {
 
     const canRemind = party.phone_number && balance !== 0;
     const totalPending = Math.abs(balance);
-    const reminderMethod = party.preferred_reminder_method || 'whatsapp';
+    const [reminderMethod, setReminderMethod] = useState(party.preferred_reminder_method || 'whatsapp');
     const fullPhone = `${(party.country_code || '+91').replace('+', '')}${party.phone_number || ''}`;
 
     const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(0);
@@ -1040,10 +1040,13 @@ const PartyDetail = () => {
                         >
                             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">
                                 <h3 className="text-xl font-bold text-slate-900 dark:text-white">Send Reminder</h3>
-                                <div className="flex items-center gap-2">
-                                    <span className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md ${reminderMethod === 'whatsapp' ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300' : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300'}`}>
-                                        via {reminderMethod === 'whatsapp' ? 'WhatsApp' : 'SMS'}
-                                    </span>
+                                <div className="flex bg-slate-100 dark:bg-slate-800/50 rounded-lg p-0.5 gap-0.5">
+                                    <button type="button" onClick={() => setReminderMethod('whatsapp')} className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-md transition-all flex items-center gap-1.5 ${reminderMethod === 'whatsapp' ? 'bg-white dark:bg-slate-700 text-green-600 dark:text-green-400 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}>
+                                        <MessageCircle className="w-3.5 h-3.5" /> WA
+                                    </button>
+                                    <button type="button" onClick={() => setReminderMethod('sms')} className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-md transition-all flex items-center gap-1.5 ${reminderMethod === 'sms' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}>
+                                        <MessageSquare className="w-3.5 h-3.5" /> SMS
+                                    </button>
                                 </div>
                             </div>
 
