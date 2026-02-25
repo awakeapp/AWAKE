@@ -279,7 +279,7 @@ const TaskDashboard = () => {
  </div>
 
  {/* Task Lists */}
- <div className="space-y-6 max-w-md mx-auto w-full">
+ <div className="space-y-6 max-w-md mx-auto w-full px-4">
  {/* 1. Current Day Tasks */}
  <section>
  {currentTasks.length > 0 ? (

@@ -127,7 +127,7 @@ const WorkspaceLayout = ({ children }) => {
 
             {/* Main Content Area */}
             <main 
-                className="relative z-10 px-4 max-w-lg mx-auto w-full"
+                className="relative z-10 w-full"
                 style={{ paddingTop: 'env(safe-area-inset-top)' }}
             >
                 <div className="pt-6">

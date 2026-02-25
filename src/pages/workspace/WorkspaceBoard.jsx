@@ -20,7 +20,7 @@ const WorkspaceBoard = () => {
     const activeTasks = tasks.filter(t => t.status !== 'completed' && !t.isCompleted);
 
     return (
-        <div className="h-[calc(100vh-140px)] overflow-x-auto overflow-y-hidden">
+        <div className="h-[calc(100vh-140px)] overflow-x-auto overflow-y-hidden px-4">
             <div className="flex gap-6 h-full min-w-max pb-4">
                 {categories.map(cat => {
                     const catTasks = activeTasks.filter(t => t.category === cat);

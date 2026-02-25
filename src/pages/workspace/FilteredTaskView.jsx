@@ -41,7 +41,7 @@ const FilteredTaskView = () => {
  const HeaderIcon = header.icon;
 
  return (
- <div className="space-y-6 pb-24">
+ <div className="space-y-6 pb-24 max-w-md mx-auto w-full px-4">
  {/* Header */}
  <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
  <button
