@@ -102,29 +102,34 @@ const FinanceDashboard = () => {
         >
             {/* Header Area */}
             <header className="px-6 pt-6 pb-4">
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Finance</h1>
-                    </div>
-                    {/* Date Selector in Header */}
-                    <div className="flex items-center gap-1 bg-white dark:bg-slate-900 rounded-full p-1 shadow-sm border border-slate-100 dark:border-slate-800">
+                <div className="grid grid-cols-3 items-center mb-6">
+                    <h1 className="text-xl font-bold text-slate-900 dark:text-white">Finance</h1>
+                    
+                    <div className="flex items-center justify-self-center gap-1 bg-white dark:bg-slate-900 rounded-full p-1 shadow-sm border border-slate-100 dark:border-slate-800">
                         <button onClick={() => changeMonth(-1)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
-                            <ChevronLeft className="w-4 h-4 text-slate-500" />
+                            <ChevronLeft className="w-3.5 h-3.5 text-slate-500" />
                         </button>
-                        <span className="text-sm font-bold min-w-[70px] text-center text-slate-700 dark:text-slate-200">
+                        <span className="text-[10px] font-black uppercase tracking-widest min-w-[70px] text-center text-slate-700 dark:text-slate-200">
                             {format(selectedDate, 'MMM yyyy')}
                         </span>
                         <button onClick={() => changeMonth(1)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
-                            <ChevronRight className="w-4 h-4 text-slate-500" />
+                            <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
                         </button>
                     </div>
+
+                    <button 
+                        onClick={() => setShowAccounts(!showAccounts)}
+                        className={`justify-self-end flex items-center gap-2 px-4 py-2 rounded-full font-black text-[9px] uppercase tracking-[0.2em] transition-all ${showAccounts ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'bg-white dark:bg-slate-900 text-slate-500 border border-slate-100 dark:border-slate-800'}`}
+                    >
+                        {showAccounts ? 'Close' : 'More'}
+                        <Plus className={`w-3.5 h-3.5 transition-transform duration-500 ${showAccounts ? 'rotate-45' : ''}`} />
+                    </button>
                 </div>
 
                 {/* Total Balance Card (Clickable to reveal accounts) */}
                 <motion.div 
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => setShowAccounts(!showAccounts)}
-                    className="bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-800 rounded-[2rem] p-6 text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden cursor-pointer"
+                    className="bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-800 rounded-[2rem] p-6 text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden"
                 >
                     {/* Decorative blobs */}
                     <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
@@ -146,11 +151,6 @@ const FinanceDashboard = () => {
                                 >
                                     <PieChart className="w-5 h-5 text-white" />
                                 </button>
-                                <div className="px-2 py-1 bg-white/10 rounded-lg backdrop-blur-md border border-white/10">
-                                    <p className="text-[8px] font-black uppercase tracking-tighter text-indigo-100">
-                                        {showAccounts ? 'Hide Wallets' : 'Show Wallets'}
-                                    </p>
-                                </div>
                             </div>
                         </div>
 
@@ -182,11 +182,11 @@ const FinanceDashboard = () => {
                 {/* Secondary Actions */}
                 <div className="grid grid-cols-2 gap-3">
                     <button 
-                        onClick={() => navigate('/finance/debt')}
+                        onClick={() => navigate('/finance/debts')}
                         className="bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
                     >
                         <Undo className="w-4 h-4 text-indigo-500" />
-                        Repayments
+                        Debt Manager
                     </button>
                     <button 
                         onClick={() => setIsBudgetOpen(true)}
