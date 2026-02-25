@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { ArrowLeft, Plus, MoreVertical, Trash2, RotateCcw, AlertTriangle, Calendar, Lock, CreditCard, ToggleLeft, ToggleRight, Check, ChevronDown, Clock, Bell, MessageCircle, Copy, Send, Wallet, FileText, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Plus, MoreVertical, Trash2, RotateCcw, AlertTriangle, Calendar, Lock, CreditCard, ToggleLeft, ToggleRight, Check, ChevronDown, Clock, Bell, MessageCircle, Copy, Send, Wallet, FileText, Image as ImageIcon, Download } from 'lucide-react';
+import html2canvas from 'html2canvas';
 import { format, isBefore, isAfter, startOfDay, endOfDay, differenceInDays } from 'date-fns';
 import JumpDateModal from '../../components/organisms/JumpDateModal';
 import { useScrollLock } from '../../hooks/useScrollLock';
@@ -153,6 +154,9 @@ const PartyDetail = () => {
 
     const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(0);
     const [reminderMessage, setReminderMessage] = useState('');
+    const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+    const [isSendingWithImage, setIsSendingWithImage] = useState(false);
+    const hiddenImageRef = useRef(null);
 
     const templates = useMemo(() => {
         const amtStr = totalPending.toLocaleString();
@@ -195,21 +199,131 @@ const PartyDetail = () => {
         } catch { /* fallback: ignore */ }
     };
 
+    const generatePDFInvoice = async () => {
+        setIsGeneratingPdf(true);
+        try {
+            const { jsPDF } = await import("jspdf");
+            const doc = new jsPDF();
+            const width = doc.internal.pageSize.getWidth();
+            const isReceiv = balance > 0;
+            
+            // Header BG
+            doc.setFillColor(15, 23, 42); // slate-900
+            doc.rect(0, 0, width, 120, "F");
+
+            // Header Text
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(28);
+            doc.text("AWAKE INVOICE", 20, 25);
+
+            doc.setFontSize(12);
+            doc.setTextColor(148, 163, 184); // slate-400
+            doc.text(`DATE: ${format(new Date(), 'dd MMM yyyy')}`, 20, 35);
+
+            // Details Card
+            doc.setFillColor(255, 255, 255);
+            doc.roundedRect(20, 50, width - 40, 60, 4, 4, "F");
+
+            doc.setTextColor(15, 23, 42);
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "bold");
+            doc.text("PREPARED FOR:", 25, 65);
+            
+            doc.setFontSize(18);
+            doc.text(party.name, 25, 75);
+
+            doc.setFontSize(11);
+            doc.setFont("helvetica", "normal");
+            doc.text(`${party.country_code || '+91'} ${party.phone_number}`, 25, 83);
+
+            doc.setFont("helvetica", "bold");
+            doc.text("TOTAL OUTSTANDING:", 25, 100);
+            
+            doc.setFontSize(20);
+            if (isReceiv) doc.setTextColor(16, 185, 129); // emerald
+            else doc.setTextColor(244, 63, 94); // rose
+            doc.text(`Rs ${totalPending.toLocaleString()}`, 80, 100);
+
+            // Message Body
+            doc.setTextColor(15, 23, 42);
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            const splitMessage = doc.splitTextToSize(reminderMessage, width - 50);
+            doc.text(splitMessage, 25, 130);
+            
+            // Footer
+            doc.setFontSize(9);
+            doc.setTextColor(148, 163, 184);
+            doc.text("Generated automatically via AWAKE", width / 2, doc.internal.pageSize.getHeight() - 15, { align: "center" });
+
+            doc.save(`${party.name.replace(/\s+/g, '_')}_Invoice.pdf`);
+        } catch (e) {
+            console.error(e);
+            alert("Error generating PDF");
+        } finally {
+            setIsGeneratingPdf(false);
+        }
+    };
+
     const handleSendReminder = async () => {
         if (!party.phone_number) {
             alert("No phone number is attached to this party. Please enter a valid number to send direct messages.");
             return;
         }
 
-        const encoded = encodeURIComponent(reminderMessage);
+        setIsSendingWithImage(true);
+        try {
+            let file = null;
+            if (hiddenImageRef.current) {
+                const canvas = await html2canvas(hiddenImageRef.current, { scale: 2, backgroundColor: '#0f172a' });
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+                file = new File([blob], `${party.name.replace(/\s+/g, '_')}_Overview.jpg`, { type: 'image/jpeg' });
+            }
+
+            const encoded = encodeURIComponent(reminderMessage);
+
+            if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Account Overview',
+                        text: reminderMessage
+                    });
+                } catch (shareErr) {
+                    if (shareErr.name !== 'AbortError') {
+                        triggerDownloadAndRedirect(file, encoded);
+                    }
+                }
+            } else {
+                if (file) triggerDownloadAndRedirect(file, encoded);
+                else redirectToMessenger(encoded);
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Failed to create reminder image");
+        }
+        setIsSendingWithImage(false);
+        await updateDebtParty(partyId, { last_reminder_sent_at: new Date().toISOString() });
+        setIsReminderOpen(false);
+    };
+
+    const triggerDownloadAndRedirect = (file, encoded) => {
+        const url = URL.createObjectURL(file);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = file.name;
+        a.click();
+        URL.revokeObjectURL(url);
+        setTimeout(() => redirectToMessenger(encoded), 500);
+    };
+
+    const redirectToMessenger = (encoded) => {
         if (reminderMethod === 'whatsapp') {
             window.open(`https://wa.me/${fullPhone}?text=${encoded}`, '_blank');
         } else {
             window.open(`sms:${fullPhone}?body=${encoded}`, '_blank');
         }
-        
-        await updateDebtParty(partyId, { last_reminder_sent_at: new Date().toISOString() });
-        setIsReminderOpen(false);
     };
 
     const lastReminderDaysAgo = useMemo(() => {
@@ -827,7 +941,7 @@ const PartyDetail = () => {
                                 <textarea
                                     value={reminderMessage}
                                     onChange={e => setReminderMessage(e.target.value)}
-                                    rows={6}
+                                    rows={5}
                                     className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-sm text-slate-900 dark:text-white font-medium leading-relaxed outline-none focus:ring-2 focus:ring-indigo-500 resize-none shadow-sm"
                                 />
                             </div>
@@ -836,13 +950,15 @@ const PartyDetail = () => {
                                 <div className="flex items-center gap-3">
                                     <FileText className="w-5 h-5 text-indigo-500" />
                                     <div>
-                                        <p className="text-xs font-bold text-slate-900 dark:text-white">Static Brand Templates</p>
-                                        <p className="text-[10px] text-slate-500">Attach our standard branded formats manually</p>
+                                        <p className="text-xs font-bold text-slate-900 dark:text-white">Professional Attachments</p>
+                                        <p className="text-[10px] text-slate-500">Auto-generated with current details</p>
                                     </div>
                                 </div>
-                                <div className="flex flex-col gap-1 items-end">
-                                   <a href="/templates/awake-reminder-template.pdf" download className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline">Download PDF</a>
-                                   <a href="/templates/awake-reminder-template.png" download className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline">Download Image</a>
+                                <div className="flex flex-col gap-2 items-end">
+                                   <button disabled={isGeneratingPdf} onClick={generatePDFInvoice} className="text-[10px] uppercase font-bold text-white bg-indigo-600 dark:bg-indigo-500 px-3 py-1.5 rounded-lg hover:bg-indigo-700 active:scale-95 transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50">
+                                       {isGeneratingPdf ? <RotateCcw className="w-3 h-3 animate-spin"/> : <Download className="w-3 h-3" />}
+                                       Download PDF
+                                   </button>
                                 </div>
                             </div>
 
@@ -850,8 +966,9 @@ const PartyDetail = () => {
                                 <button type="button" onClick={handleCopyMessage} className={`flex-1 py-4 font-bold rounded-xl flex items-center justify-center gap-2 transition-all border ${copied ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 border-emerald-200 dark:border-emerald-500/30' : 'text-slate-500 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
                                     {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
                                 </button>
-                                <button type="button" onClick={handleSendReminder} className="flex-[2] py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl shadow-lg shadow-emerald-500/30 active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
-                                    <Send className="w-4 h-4" /> Send Message
+                                <button disabled={isSendingWithImage} type="button" onClick={handleSendReminder} className="flex-[2] py-4 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:bg-emerald-700 text-white font-black rounded-xl shadow-lg shadow-emerald-500/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                                    {isSendingWithImage ? <RotateCcw className="w-4 h-4 animate-spin"/> : <Send className="w-4 h-4" />} 
+                                    {isSendingWithImage ? 'Processing Overview...' : 'Send Message + Overview'}
                                 </button>
                             </div>
                         </motion.div>
@@ -863,6 +980,36 @@ const PartyDetail = () => {
             <JumpDateModal isOpen={dueDatePickerOpen} onClose={() => setDueDatePickerOpen(false)} initialDate={dueDate ? new Date(dueDate + 'T00:00:00') : new Date()} onSelect={(d) => { if (d) { setDueDate(format(d, 'yyyy-MM-dd')); } else { setDueDate(''); } setDueDatePickerOpen(false); }} />
             <JumpDateModal isOpen={dateFromPickerOpen} onClose={() => setDateFromPickerOpen(false)} initialDate={dateFrom ? new Date(dateFrom + 'T00:00:00') : new Date()} onSelect={(d) => { if (d) setDateFrom(format(d, 'yyyy-MM-dd')); setDateFromPickerOpen(false); }} />
             <JumpDateModal isOpen={dateToPickerOpen} onClose={() => setDateToPickerOpen(false)} initialDate={dateTo ? new Date(dateTo + 'T00:00:00') : new Date()} onSelect={(d) => { if (d) setDateTo(format(d, 'yyyy-MM-dd')); setDateToPickerOpen(false); }} />
+        
+            {/* Hidden Element for html2canvas to render temporary visual reminder */}
+            <div className="absolute top-0 left-[-9999px]">
+                <div ref={hiddenImageRef} className="w-[600px] bg-slate-900 text-white p-12 flex flex-col items-center justify-center text-center font-sans tracking-tight">
+                    <h1 className="text-[52px] font-black text-indigo-400 mb-6 uppercase tracking-widest leading-none">AWAKE</h1>
+                    <p className="text-xl font-bold text-slate-400 uppercase tracking-[0.2em] mb-12">Account Overview</p>
+                    
+                    <div className="bg-slate-800/80 rounded-[2.5rem] p-10 w-full border border-slate-700/50 shadow-2xl mb-8">
+                        <div className="mb-10 text-left w-full border-b border-slate-700/80 pb-6">
+                            <p className="text-sm font-black text-slate-500 uppercase tracking-widest mb-2">Prepared For</p>
+                            <h2 className="text-3xl font-black text-white">{party.name}</h2>
+                            <p className="text-slate-400 text-xl font-medium mt-1">{party.country_code || '+91'} {party.phone_number}</p>
+                        </div>
+                        
+                        <p className="text-sm font-black text-slate-500 uppercase tracking-widest mb-3">Total Outstanding Balance</p>
+                        <p className={`text-[80px] leading-none font-black mb-10 tracking-tighter ${(balance > 0) ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            ₹{totalPending.toLocaleString()}
+                        </p>
+                        
+                        <div className="bg-slate-900/50 rounded-3xl p-6 border border-slate-700/50 text-left">
+                           <p className="text-slate-300 whitespace-pre-wrap leading-relaxed px-2 font-medium text-lg">{reminderMessage}</p>
+                        </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between w-full px-6 opacity-60">
+                         <p className="text-sm text-slate-400 font-bold uppercase tracking-widest">Generated automatically</p>
+                         <p className="text-sm text-slate-400 font-bold tracking-widest">{format(new Date(), 'dd MMM yyyy')}</p>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };
