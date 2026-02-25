@@ -163,42 +163,12 @@ const FinanceDashboard = () => {
                         </button>
                     </div>
 
-                    <div className="relative justify-self-end">
-                        <button 
-                            onClick={() => setShowAccounts(!showAccounts)}
-                            className={`p-2 rounded-xl transition-all ${showAccounts ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-500'}`}
+                    <button 
+                            onClick={() => navigate('/finance/more')}
+                            className="p-2 rounded-xl transition-all bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95"
                         >
-                            {showAccounts ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                            <Menu className="w-5 h-5" />
                         </button>
-
-                        <AnimatePresence>
-                            {showAccounts && (
-                                <>
-                                    <div className="fixed inset-0 z-40" onClick={() => setShowAccounts(false)} />
-                                    <motion.div
-                                        initial={{ opacity: 0, x: 20, scale: 0.95 }}
-                                        animate={{ opacity: 1, x: 0, scale: 1 }}
-                                        exit={{ opacity: 0, x: 20, scale: 0.95 }}
-                                        className="absolute top-12 right-0 w-48 bg-white dark:bg-slate-900 rounded-[1.5rem] shadow-2xl border border-slate-100 dark:border-slate-800 p-2 z-50 flex flex-col gap-1 overflow-hidden"
-                                    >
-                                        <div className="px-3 py-2 border-b border-slate-50 dark:border-slate-800 mb-1">
-                                            <p className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Your Wallets</p>
-                                        </div>
-                                        {activeAccounts.map(acc => (
-                                            <div
-                                                key={acc.id}
-                                                onClick={() => { navigate(`/finance/account/${acc.id}`); setShowAccounts(false); }}
-                                                className="px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-xl cursor-pointer flex flex-col transition-colors active:scale-[0.98]"
-                                            >
-                                                <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{acc.name}</p>
-                                                <p className="font-black text-slate-900 dark:text-white text-sm mt-0.5">₹{acc.balance.toLocaleString()}</p>
-                                            </div>
-                                        ))}
-                                    </motion.div>
-                                </>
-                            )}
-                        </AnimatePresence>
-                    </div>
 
                 </div>
 
