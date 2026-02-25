@@ -102,18 +102,18 @@ const UpcomingPayments = () => {
 
 
 
-            {/* Summary Card */}
-            < div className="bg-slate-100 dark:bg-slate-800/50 p-4 rounded-2xl flex items-center justify-between mx-2 mb-2" >
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
-                        <RefreshCw className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+            {/* Summary Card - More compact */}
+            <div className="mx-2 mb-2 p-3 bg-slate-100 dark:bg-slate-800/40 rounded-xl flex items-center justify-between border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all">
+                <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 flex items-center justify-center shadow-sm">
+                        <RefreshCw className="w-4 h-4 text-indigo-500" />
                     </div>
                     <div>
-                        <p className="text-xs text-slate-400 uppercase font-bold tracking-wider">{t('finance.monthly_recurring', 'Monthly Recurring')}</p>
-                        <p className="text-lg font-bold text-slate-900 dark:text-white"><span dir="ltr">₹{totalMonthlyCost.toLocaleString()}</span></p>
+                        <p className="text-[8px] text-slate-400 uppercase font-black tracking-widest">{t('finance.monthly_recurring', 'Monthly Total')}</p>
+                        <p className="text-sm font-black text-slate-900 dark:text-white">₹{totalMonthlyCost.toLocaleString()}</p>
                     </div>
                 </div>
-            </div >
+            </div>
 
             {/* Horizontal Scroll List */}
             < div className="overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide flex gap-3" >
@@ -132,29 +132,32 @@ const UpcomingPayments = () => {
                         const daysLeft = getDaysLeft(sub.nextBillingDate || sub.dueDate);
 
                         return (
-                            <div key={sub.id} className="min-w-[140px] p-4 rounded-[1.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm relative group transition-all hover:border-indigo-500/50">
+                            <div key={sub.id} className="min-w-[120px] p-2.5 rounded-[1.25rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm relative group transition-all hover:border-indigo-500/50">
                                 {/* Action Buttons */}
-                                <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="absolute top-1.5 right-1.5 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                                     <button
                                         onClick={(e) => { e.stopPropagation(); toggleSubscriptionStatus(sub.id); }}
                                         className="p-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 transition-colors text-slate-500"
-                                        title={sub.status === 'active' ? "Pause" : "Resume"}
                                     >
-                                        {sub.status === 'active' ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+                                        {sub.status === 'active' ? <Pause className="w-2.5 h-2.5" /> : <Play className="w-2.5 h-2.5" />}
+                                    </button>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); if(confirm('Delete this subscription?')) deleteSubscription(sub.id); }}
+                                        className="p-1.5 bg-rose-50 dark:bg-rose-900/20 rounded-lg hover:bg-rose-100 transition-colors text-rose-500"
+                                    >
+                                        <Trash2 className="w-2.5 h-2.5" />
                                     </button>
                                 </div>
 
-                                <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center mb-3">
-                                    <Icon className="w-4 h-4 text-indigo-500" />
+                                <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center mb-2">
+                                    <Icon className="w-3.5 h-3.5 text-indigo-500" />
                                 </div>
 
-                                <h4 className="font-black text-slate-900 dark:text-white text-[12px] leading-tight mb-0.5 truncate">{sub.name}</h4>
-                                <p className="text-slate-400 text-[10px] font-black mb-3 uppercase tracking-tighter">₹{Number(sub.amount).toLocaleString()}</p>
+                                <h4 className="font-black text-slate-900 dark:text-white text-[10px] leading-tight mb-0.5 truncate pr-8">{sub.name}</h4>
+                                <p className="text-slate-400 text-[9px] font-black mb-2 uppercase tracking-tighter">₹{Number(sub.amount).toLocaleString()}</p>
 
-                                <div className="flex items-center justify-between">
-                                    <div className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest ${sub.status !== 'active' ? 'bg-slate-100 dark:bg-slate-800 text-slate-400' : daysLeft.includes('Overdue') ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600' : 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600'}`}>
-                                        {sub.status === 'active' ? daysLeft : 'Paused'}
-                                    </div>
+                                <div className={`inline-block px-1.5 py-0.5 rounded-md text-[7px] font-black uppercase tracking-widest ${sub.status !== 'active' ? 'bg-slate-100 dark:bg-slate-800 text-slate-400' : daysLeft.includes('Overdue') ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600' : 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600'}`}>
+                                    {sub.status === 'active' ? daysLeft : 'Paused'}
                                 </div>
                             </div>
                         );
@@ -165,58 +168,71 @@ const UpcomingPayments = () => {
             {/* Add Modal */}
             {
                 isAdding && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsAdding(false)} />
-                        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl w-full max-w-sm relative z-10 shadow-2xl animate-in zoom-in-95 duration-200">
-                            <h3 className="text-lg font-bold mb-4">Add Subscription</h3>
-
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                <div>
-                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Name</label>
-                                    <input
-                                        type="text"
-                                        value={name}
-                                        onChange={e => setName(e.target.value)}
-                                        placeholder="Netflix"
-                                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 font-bold"
-                                        autoFocus
-                                    />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
+                    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+                        <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-md" onClick={() => setIsAdding(false)} />
+                        <div className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-t-[2.5rem] sm:rounded-[2.5rem] p-8 shadow-2xl relative z-10 max-h-[92vh] overflow-hidden flex flex-col border border-white/10 shrink-0">
+                            <div className="flex justify-between items-center mb-8 shrink-0">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl flex items-center justify-center">
+                                        <Zap className="w-6 h-6 text-indigo-500" />
+                                    </div>
                                     <div>
-                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Amount</label>
+                                        <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Recurring Bill</h2>
+                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Subscription Manager</p>
+                                    </div>
+                                </div>
+                                <button onClick={() => setIsAdding(false)} className="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 hover:rotate-90 transition-transform">
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleSubmit} className="space-y-6 overflow-y-auto pr-1 scrollbar-hide pb-2">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Name</label>
+                                        <input
+                                            type="text"
+                                            value={name}
+                                            onChange={e => setName(e.target.value)}
+                                            placeholder="Spotify"
+                                            className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-indigo-500/30 rounded-2xl p-4 text-xs font-bold text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-0 transition-all"
+                                            autoFocus
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Amount</label>
                                         <input
                                             type="number"
                                             value={amount}
                                             onChange={e => setAmount(e.target.value)}
-                                            placeholder="500"
-                                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 font-bold"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Due Day (1-31)</label>
-                                        <input
-                                            type="number"
-                                            value={day}
-                                            onChange={e => setDay(e.target.value)}
-                                            placeholder="15"
-                                            min="1"
-                                            max="31"
-                                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 font-bold"
+                                            placeholder="0"
+                                            className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-indigo-500/30 rounded-2xl p-4 text-xs font-bold text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-0 transition-all text-right"
                                         />
                                     </div>
                                 </div>
 
-                                {/* Icons Grid */}
-                                <div>
-                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Icon</label>
-                                    <div className="flex gap-2 overflow-x-auto pb-2">
+                                <div className="space-y-1.5">
+                                    <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Due Day (1-31)</label>
+                                    <input
+                                        type="number"
+                                        value={day}
+                                        onChange={e => setDay(e.target.value)}
+                                        placeholder="15"
+                                        min="1"
+                                        max="31"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-indigo-500/30 rounded-2xl p-4 text-xs font-bold text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-0 transition-all"
+                                    />
+                                </div>
+
+                                <div className="space-y-3">
+                                    <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Visual Symbol</label>
+                                    <div className="grid grid-cols-5 gap-3">
                                         {ICONS.map((item, idx) => (
                                             <button
                                                 key={idx}
                                                 type="button"
                                                 onClick={() => setSelectedIconIdx(idx)}
-                                                className={`p-2 rounded-xl border-2 transition-all ${selectedIconIdx === idx ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20' : 'border-slate-100 dark:border-slate-800'}`}
+                                                className={`aspect-square rounded-2xl flex items-center justify-center border-2 transition-all ${selectedIconIdx === idx ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20' : 'border-slate-50 dark:border-slate-800'}`}
                                             >
                                                 <item.icon className={`w-5 h-5 ${selectedIconIdx === idx ? 'text-indigo-600' : 'text-slate-400'}`} />
                                             </button>
@@ -224,23 +240,22 @@ const UpcomingPayments = () => {
                                     </div>
                                 </div>
 
-                                {/* Color Grid */}
-                                <div>
-                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Color</label>
-                                    <div className="flex gap-2 overflow-x-auto pb-2">
+                                <div className="space-y-3">
+                                    <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Theme Palette</label>
+                                    <div className="flex gap-4 pb-2">
                                         {COLORS.map((g, idx) => (
                                             <button
                                                 key={idx}
                                                 type="button"
                                                 onClick={() => setSelectedColorIdx(idx)}
-                                                className={`w-8 h-8 rounded-full bg-gradient-to-br ${g} ring-2 ring-offset-2 ring-offset-white dark:ring-offset-slate-900 transition-all ${selectedColorIdx === idx ? 'ring-indigo-500 scale-110' : 'ring-transparent opacity-70'}`}
+                                                className={`w-10 h-10 rounded-full bg-gradient-to-br ${g} ring-2 ring-offset-4 ring-offset-white dark:ring-offset-slate-900 transition-all ${selectedColorIdx === idx ? 'ring-indigo-500 scale-110' : 'ring-transparent opacity-60'}`}
                                             />
                                         ))}
                                     </div>
                                 </div>
 
-                                <button type="submit" className="w-full bg-slate-900 text-white font-bold py-3 rounded-xl mt-4">
-                                    Save Subscription
+                                <button type="submit" className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black uppercase text-xs tracking-[0.2em] py-5 rounded-2xl shadow-2xl active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-4">
+                                    Secure Subscription
                                 </button>
                             </form>
                         </div>

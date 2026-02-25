@@ -202,34 +202,33 @@ const BudgetSummary = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Footer Actions */}
-                <div className="pt-6 shrink-0 border-t border-slate-50 dark:border-slate-800 bg-white dark:bg-slate-900">
+                <div className="pt-6 shrink-0 bg-white dark:bg-slate-900">
                     {!isAllocating ? (
                         <button 
                             onClick={handleStartAllocation}
-                            className="w-full py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black uppercase text-[10px] tracking-[0.2em] rounded-[1.5rem] shadow-2xl active:scale-[0.98] transition-all flex items-center justify-center gap-2 mb-3"
+                            className="w-full py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black uppercase text-[10px] tracking-[0.2em] rounded-2xl shadow-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2 mb-3"
                         >
                             <Settings2 className="w-4 h-4" />
-                            Configure Rules
+                            Edit Budget Limits
                         </button>
                     ) : (
                         <div className="grid grid-cols-2 gap-3 mb-3">
                             <button 
                                 onClick={() => setIsAllocating(false)}
-                                className="py-5 bg-slate-100 dark:bg-slate-800 text-slate-500 font-black uppercase text-[10px] tracking-[0.2em] rounded-2xl active:scale-[0.98] transition-all"
+                                className="py-5 bg-slate-100 dark:bg-slate-800 text-slate-500 font-black uppercase text-[10px] tracking-[0.1em] rounded-2xl active:scale-[0.98] transition-all"
                             >Discard</button>
                             <button 
-                                onClick={handleSaveBudgets}
-                                className="py-5 bg-indigo-600 text-white font-black uppercase text-[10px] tracking-[0.2em] rounded-2xl shadow-xl shadow-indigo-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                                onClick={async () => {
+                                    await handleSaveBudgets();
+                                    onClose();
+                                }}
+                                className="py-5 bg-indigo-600 text-white font-black uppercase text-[10px] tracking-[0.1em] rounded-2xl shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                             >
                                 <CheckCircle2 className="w-4 h-4" />
-                                Commit Changes
+                                Commit
                             </button>
                         </div>
                     )}
-                    <button 
-                        onClick={onClose}
-                        className="w-full py-2 text-slate-300 font-black text-[8px] uppercase tracking-[0.4em] hover:text-slate-500 transition-colors"
-                    >Dismiss Center</button>
                 </div>
             </motion.div>
         </div>

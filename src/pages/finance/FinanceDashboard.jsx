@@ -26,6 +26,7 @@ const FinanceDashboard = () => {
         categories,
         transactions,
         accounts,
+        subscriptions,
         deleteTransaction,
         restoreTransaction
     } = useFinance();
@@ -91,6 +92,9 @@ const FinanceDashboard = () => {
 
     const totalBalance = getTotalBalance();
     const activeAccounts = accounts.filter(a => !a.isArchived);
+    const recurringTotal = useMemo(() => 
+        subscriptions.filter(s => s.status === 'active').reduce((sum, s) => sum + Number(s.amount), 0),
+    [subscriptions]);
     const sortedMonthlyTx = [...monthStats.transactions].sort((a, b) =>
         new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)
     );
@@ -154,24 +158,23 @@ const FinanceDashboard = () => {
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/10">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-emerald-400/20 flex items-center justify-center">
-                                    <ArrowDown className="w-4 h-4 text-emerald-300" />
-                                </div>
-                                <div className="flex flex-col">
-                                    <p className="text-[8px] font-black text-indigo-100 uppercase tracking-widest mb-0.5">{t('finance.income', 'Income')}</p>
-                                    <p className="font-black text-sm"><span dir="ltr">₹{monthStats.income.toLocaleString()}</span></p>
-                                </div>
+                        <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/10 gap-2">
+                            <div className="flex flex-col items-start">
+                                <p className="text-[7px] font-black text-indigo-100 uppercase tracking-widest mb-1">{t('finance.income', 'Income')}</p>
+                                <p className="font-black text-xs">₹{monthStats.income.toLocaleString()}</p>
                             </div>
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-rose-400/20 flex items-center justify-center">
-                                    <TrendingUp className="w-4 h-4 text-rose-300" />
+                            
+                            <div className="flex flex-col items-center flex-1">
+                                <div className="px-3 py-1 bg-white/10 rounded-full backdrop-blur-md mb-1.5 flex items-center gap-1.5 border border-white/5">
+                                    <div className="w-1 h-1 rounded-full bg-rose-400"></div>
+                                    <p className="text-[7px] font-black text-indigo-100 uppercase tracking-widest">{t('finance.expenses', 'Expenses')}</p>
                                 </div>
-                                <div className="flex flex-col text-right">
-                                    <p className="text-[8px] font-black text-indigo-100 uppercase tracking-widest mb-0.5">{t('finance.expenses', 'Expenses')}</p>
-                                    <p className="font-black text-sm"><span dir="ltr">₹{monthStats.expense.toLocaleString()}</span></p>
-                                </div>
+                                <p className="font-black text-lg">₹{monthStats.expense.toLocaleString()}</p>
+                            </div>
+
+                            <div className="flex flex-col items-end">
+                                <p className="text-[7px] font-black text-indigo-100 uppercase tracking-widest mb-1">Recurring</p>
+                                <p className="font-black text-xs">₹{recurringTotal.toLocaleString()}</p>
                             </div>
                         </div>
                     </div>
@@ -265,7 +268,7 @@ const FinanceDashboard = () => {
                                     <div
                                         key={tx.id}
                                         onClick={() => handleEdit(tx.id)}
-                                        className="group relative flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-[1.25rem] border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all cursor-pointer overflow-hidden"
+                                        className="relative flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-[1.25rem] border border-slate-100 dark:border-slate-800 active:scale-[0.98] transition-all cursor-pointer overflow-hidden"
                                     >
                                         <div className="flex items-center gap-4 relative z-10 w-full">
                                             <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl shrink-0 ${cat?.color ? cat.color + '/10' : 'bg-slate-50 dark:bg-slate-800'} ${cat?.color?.replace('bg-', 'text-') || 'text-slate-500'}`}>
@@ -286,14 +289,6 @@ const FinanceDashboard = () => {
                                                 </p>
                                             </div>
                                         </div>
-
-                                        {/* Deletion Swipe Action */}
-                                        <button
-                                            onClick={(e) => handleDelete(e, tx.id)}
-                                            className="absolute right-0 top-0 bottom-0 w-16 bg-rose-500 text-white flex items-center justify-center translate-x-full group-hover:translate-x-0 transition-transform duration-300 z-50 rounded-r-[1.25rem]"
-                                        >
-                                            <X className="w-5 h-5" />
-                                        </button>
                                     </div>
                                 );
                             })
