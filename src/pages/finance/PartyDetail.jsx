@@ -52,7 +52,9 @@ const PartyDetail = () => {
         addSettlementPayment,
         getPartyStatus,
         getEntrySettledAmount,
-        updateDebtParty
+        updateDebtParty,
+        addTransaction,
+        accounts
     } = context;
 
     const party = debtParties.find(p => p.id === partyId && !p.is_deleted);
@@ -138,6 +140,7 @@ const PartyDetail = () => {
     const [settleOldest, setSettleOldest] = useState(true);
     const [selectedSettleEntries, setSelectedSettleEntries] = useState({});
     const [settleNote, setSettleNote] = useState('');
+    const [createFinanceEntry, setCreateFinanceEntry] = useState(false);
 
     // --- Reminder states ---
     const [isReminderOpen, setIsReminderOpen] = useState(false);
@@ -317,11 +320,27 @@ const PartyDetail = () => {
                 notes: settleNote || 'Payment — selected entries'
             });
         }
+
+        if (createFinanceEntry) {
+            const activeAccount = accounts.find(a => !a.isArchived) || accounts[0];
+            if (activeAccount) {
+                await addTransaction({
+                    type: settleTxType === 'you_received' ? 'income' : 'expense',
+                    amount: amt,
+                    accountId: activeAccount.id,
+                    categoryId: '', // Custom note covers it
+                    date: new Date(date + 'T12:00:00').toISOString(),
+                    note: `Debt Settlement: ${party.name}${settleNote ? ` - ${settleNote}` : ''}`
+                });
+            }
+        }
+
         resetForm();
         setIsSettleOpen(false);
         setSelectedSettleEntries({});
         setSettleOldest(true);
         setSettleNote('');
+        setCreateFinanceEntry(false);
     };
 
     const resetForm = () => {
@@ -722,6 +741,21 @@ const PartyDetail = () => {
                                 <input type="text" value={settleNote} onChange={e => setSettleNote(e.target.value)} placeholder="Payment note..."
                                     className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white font-medium text-sm outline-none" />
                             </div>
+
+                            {/* Bridge Toggle */}
+                            <div className="mt-5 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer" onClick={() => setCreateFinanceEntry(!createFinanceEntry)}>
+                                <div>
+                                    <p className="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-1.5">
+                                        <Wallet className="w-4 h-4 text-indigo-500" /> 
+                                        {isReceivable ? 'Record as Income' : 'Record as Expense'}
+                                    </p>
+                                    <p className="text-[10px] text-slate-500 mt-0.5">Add to main finance ledger</p>
+                                </div>
+                                <button type="button">
+                                    {createFinanceEntry ? <ToggleRight className="w-8 h-8 text-indigo-600" /> : <ToggleLeft className="w-8 h-8 text-slate-400" />}
+                                </button>
+                            </div>
+
                             <div className="flex gap-3 mt-8">
                                 <button type="button" onClick={() => { setIsSettleOpen(false); setSelectedSettleEntries({}); }} className="flex-1 py-3.5 font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl">Cancel</button>
                                 <button type="button" onClick={handleSettleSubmit} disabled={!settleOldest && totalSelectedAllocation <= 0}

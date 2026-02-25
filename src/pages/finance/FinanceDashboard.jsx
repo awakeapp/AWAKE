@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { Plus, Wallet, PieChart, ChevronLeft, ChevronRight, PiggyBank, ArrowDown, TrendingUp, Undo, X, Menu } from 'lucide-react';
-import { format, startOfMonth, endOfMonth, isWithinInterval, subMonths, addMonths } from 'date-fns';
+import { Plus, Wallet, PieChart, ChevronLeft, ChevronRight, PiggyBank, ArrowDown, TrendingUp, Undo, X, Menu, Clock } from 'lucide-react';
+import { format, startOfMonth, endOfMonth, isWithinInterval, subMonths, addMonths, isBefore } from 'date-fns';
 import { useState, useMemo } from 'react';
 import AddTransactionModal from './AddTransactionModal';
 import UpcomingPayments from './UpcomingPayments';
@@ -28,7 +28,12 @@ const FinanceDashboard = () => {
         accounts,
         subscriptions,
         deleteTransaction,
-        restoreTransaction
+        restoreTransaction,
+        debtParties,
+        debtTransactions,
+        getPartyBalance,
+        getEntrySettledAmount,
+        getPendingEntries
     } = useFinance();
 
     const [isAddOpen, setIsAddOpen] = useState(false);
@@ -98,6 +103,44 @@ const FinanceDashboard = () => {
     const sortedMonthlyTx = [...monthStats.transactions].sort((a, b) =>
         new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)
     );
+
+    // --- Debt Summary ---
+    const debtSummary = useMemo(() => {
+        const now = new Date();
+        const monthStart = startOfMonth(selectedDate);
+        const monthEnd = endOfMonth(selectedDate);
+        let totalReceivable = 0;
+        let totalPayable = 0;
+        let overdueTotal = 0;
+
+        const activeParties = (debtParties || []).filter(p => !p.is_deleted);
+        for (const party of activeParties) {
+            const bal = getPartyBalance(party.id);
+            if (bal > 0) totalReceivable += bal;
+            if (bal < 0) totalPayable += Math.abs(bal);
+
+            // Overdue: sum remaining on entries past due
+            const pending = getPendingEntries(party.id);
+            for (const entry of pending) {
+                if (entry.due_date && isBefore(new Date(entry.due_date), now)) {
+                    overdueTotal += entry.remaining;
+                }
+            }
+        }
+
+        // This month recovery: sum of you_received + you_repaid in selected month
+        const monthRecovery = (debtTransactions || [])
+            .filter(t => !t.is_deleted && (t.type === 'you_received' || t.type === 'you_repaid'))
+            .filter(t => {
+                const d = new Date(t.date);
+                return isWithinInterval(d, { start: monthStart, end: monthEnd });
+            })
+            .reduce((sum, t) => sum + Number(t.amount), 0);
+
+        const netPosition = totalReceivable - totalPayable;
+
+        return { totalReceivable, totalPayable, netPosition, overdueTotal, monthRecovery };
+    }, [debtParties, debtTransactions, selectedDate, getPartyBalance, getPendingEntries]);
 
     return (
         <div 
@@ -230,6 +273,26 @@ const FinanceDashboard = () => {
                     </button>
                 </div>
 
+                {/* Debt Summary Blocks */}
+                {(debtParties || []).filter(p => !p.is_deleted).length > 0 && (
+                    <div className="space-y-2">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Debt Overview</p>
+                        <div className="grid grid-cols-3 gap-2">
+                            <DebtCell label="Receivable" value={`₹${debtSummary.totalReceivable.toLocaleString()}`} color="text-emerald-600 dark:text-emerald-400" />
+                            <DebtCell label="Payable" value={`₹${debtSummary.totalPayable.toLocaleString()}`} color="text-red-500 dark:text-red-400" />
+                            <DebtCell
+                                label="Net Position"
+                                value={`${debtSummary.netPosition >= 0 ? '+' : '-'}₹${Math.abs(debtSummary.netPosition).toLocaleString()}`}
+                                color={debtSummary.netPosition >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}
+                            />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                            <DebtCell label="Overdue" value={debtSummary.overdueTotal > 0 ? `₹${debtSummary.overdueTotal.toLocaleString()}` : '—'} color={debtSummary.overdueTotal > 0 ? 'text-red-500' : 'text-slate-400'} />
+                            <DebtCell label="This Month Recovery" value={`₹${debtSummary.monthRecovery.toLocaleString()}`} color="text-indigo-600 dark:text-indigo-400" />
+                        </div>
+                    </div>
+                )}
+
                 <section>
                     <UpcomingPayments />
                 </section>
@@ -359,5 +422,13 @@ const FinanceDashboard = () => {
         </div>
     );
 };
+
+// --- Summary Cell Component ---
+const DebtCell = ({ label, value, color }) => (
+    <div className="bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center text-center shadow-sm">
+        <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1 leading-tight">{label}</p>
+        <p className={`text-sm font-black tracking-tight ${color}`}>{value}</p>
+    </div>
+);
 
 export default FinanceDashboard;
