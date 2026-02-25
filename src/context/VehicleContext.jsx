@@ -554,19 +554,25 @@ export const VehicleContextProvider = ({ children }) => {
         const currentMonth = now.getMonth();
         const dueDate = new Date(currentYear, currentMonth, loan.dueDateDay);
 
-        // Find if any EMI payment made this month
+        // Find if any EMI payment made this cycle
         const hasPaidThisMonth = loan.history?.some(p => {
             const pDate = new Date(p.date);
             return pDate.getFullYear() === currentYear && pDate.getMonth() === currentMonth && p.type === 'EMI';
         });
 
-        const status = !hasPaidThisMonth && now > dueDate ? 'overdue' : (hasPaidThisMonth ? 'paid' : 'pending');
+        let nextDueDate = new Date(dueDate);
+        if (hasPaidThisMonth) {
+            nextDueDate.setMonth(nextDueDate.getMonth() + 1);
+        }
+
+        const isOverdue = !hasPaidThisMonth && now > dueDate;
+        const status = isOverdue ? 'overdue' : (hasPaidThisMonth ? 'paid' : 'pending');
 
         // Interest Balance (Simplified for Flat vs Reducing)
         let interestBalance = 0;
         if (loan.interestType === 'reducing') {
             const monthlyRate = (loan.interestRate / 100) / 12;
-            interestBalance = loan.remainingPrincipal * monthlyRate;
+            interestBalance = Math.max(0, loan.remainingPrincipal * monthlyRate);
         } else {
             // Flat: Total Interest / Tenure (Rough estimate per month)
             const totalInterest = loan.totalLoanAmount * (loan.interestRate / 100) * (loan.tenureMonths / 12);
@@ -575,10 +581,10 @@ export const VehicleContextProvider = ({ children }) => {
 
         return {
             status,
-            dueDate: dueDate.toISOString(),
-            isPastDue: !hasPaidThisMonth && now > dueDate,
+            dueDate: nextDueDate.toISOString(),
+            isPastDue: isOverdue,
             interestBalance: Math.round(interestBalance),
-            daysLate: !hasPaidThisMonth && now > dueDate ? Math.floor((now - dueDate) / (1000 * 60 * 60 * 24)) : 0
+            daysLate: isOverdue ? Math.floor((now - dueDate) / (1000 * 60 * 60 * 24)) : 0
         };
     }, [loans]);
 
@@ -588,28 +594,65 @@ export const VehicleContextProvider = ({ children }) => {
 
         const records = serviceRecords.filter(r => r.vehicleId === vehicleId);
         const vFollowUps = followUps.filter(f => f.vehicleId === vehicleId && f.status !== 'completed');
-
-        // Financials
-        const totalSpend = records.reduce((sum, r) => sum + (Number(r.cost) || 0), 0);
+        const loan = loans.find(l => l.vehicleId === vehicleId && l.status !== 'closed');
+        const loanPayments = loan ? (loan.history || []) : [];
 
         const now = new Date();
-        const thisMonth = records.filter(r => new Date(r.date) > new Date(now.getFullYear(), now.getMonth(), 1));
-        const monthSpend = thisMonth.reduce((sum, r) => sum + (Number(r.cost) || 0), 0);
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(now.getDate() - 30);
+
+        // Breakdown & Financials
+        let totalFuel = 0;
+        let totalService = 0;
+        let totalInsurance = 0;
+
+        records.forEach(r => {
+            const cost = Number(r.cost) || 0;
+            const type = (r.type || '').toLowerCase();
+            if (type.includes('fuel')) totalFuel += cost;
+            else if (type.includes('insurance')) totalInsurance += cost;
+            else totalService += cost;
+        });
+
+        const totalEMI = loanPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+        const totalSpend = totalFuel + totalService + totalInsurance + totalEMI;
+
+        // Rolling 30 Days (Month Spend)
+        const recentRecords = records.filter(r => new Date(r.date) >= thirtyDaysAgo);
+        const recentLoans = loanPayments.filter(p => new Date(p.date) >= thirtyDaysAgo);
+
+        const monthSpend = recentRecords.reduce((sum, r) => sum + (Number(r.cost) || 0), 0) + 
+                           recentLoans.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
 
         // Approximate ownership duration in months for ownership cost
         const purchaseDate = new Date(vehicle.purchaseDate);
         const monthsOwned = Math.max(1, (now.getFullYear() - purchaseDate.getFullYear()) * 12 + (now.getMonth() - purchaseDate.getMonth()));
         const costPerMonth = Math.round(totalSpend / monthsOwned);
 
+        // Cost per km
+        const odometer = Number(vehicle.odometer) || 0;
+        const costPerKm = odometer > 0 ? (totalSpend / odometer).toFixed(2) : 0;
+
+        const breakdown = {
+            fuel: totalFuel,
+            service: totalService,
+            emi: totalEMI,
+            insurance: totalInsurance
+        };
+
         // Overdue & Soon calculation
         const alerts = vFollowUps.filter(f => {
             let isOverdue = false;
             if ((f.frequencyType === 'date' || f.frequencyType === 'both') && f.dueDate && new Date(f.dueDate) < now) isOverdue = true;
-            if ((f.frequencyType === 'odometer' || f.frequencyType === 'both') && f.dueOdometer && Number(vehicle.odometer) >= Number(f.dueOdometer)) isOverdue = true;
+            if ((f.frequencyType === 'odometer' || f.frequencyType === 'both') && f.dueOdometer && odometer >= Number(f.dueOdometer)) isOverdue = true;
             return isOverdue;
         });
 
         const overdueCount = alerts.length;
+
+        // Health Score
+        let healthScore = 100 - (overdueCount * 10);
+        if (healthScore < 0) healthScore = 0;
 
         // Last Service
         const lastService = records.sort((a, b) => new Date(b.date) - new Date(a.date))[0];
@@ -618,11 +661,14 @@ export const VehicleContextProvider = ({ children }) => {
             totalSpend,
             monthSpend,
             costPerMonth,
+            costPerKm,
+            breakdown,
             overdueCount,
+            healthScore,
             lastServiceDate: lastService?.date,
             lastServiceType: lastService?.type
         };
-    }, [vehicles, serviceRecords, followUps]);
+    }, [vehicles, serviceRecords, followUps, loans]);
 
     const getVehicleRisks = useCallback((vehicleId) => {
         const vehicle = vehicles.find(v => v.id === vehicleId);
