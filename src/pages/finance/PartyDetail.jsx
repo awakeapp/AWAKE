@@ -267,9 +267,41 @@ const PartyDetail = () => {
         }
     };
 
+    const normalizePhone = (code, num) => {
+        const cleanCode = (code || '+91').replace(/[^+\d]/g, '');
+        const cleanNum = (num || '').replace(/[\s\-\(\)\.]/g, '');
+        return `${cleanCode.replace('+', '')}${cleanNum}`;
+    };
+
     const handleSendReminder = async () => {
         if (!party.phone_number) {
             alert("No phone number is attached to this party. Please enter a valid number to send direct messages.");
+            return;
+        }
+
+        const phone = normalizePhone(party.country_code, party.phone_number);
+        if (!phone || phone.length < 8) {
+            alert("Invalid phone number. Please verify the party's contact details.");
+            return;
+        }
+
+        const encoded = encodeURIComponent(reminderMessage);
+
+        // IMMEDIATELY redirect to WhatsApp/SMS — no delay
+        if (reminderMethod === 'whatsapp') {
+            window.location.href = `https://wa.me/${phone}?text=${encoded}`;
+        } else {
+            window.location.href = `sms:${phone}?body=${encoded}`;
+        }
+
+        // Update reminder timestamp (non-blocking)
+        updateDebtParty(partyId, { last_reminder_sent_at: new Date().toISOString() }).catch(() => {});
+        setIsReminderOpen(false);
+    };
+
+    const handleShareWithImage = async () => {
+        if (!party.phone_number) {
+            alert("No phone number is attached to this party.");
             return;
         }
 
@@ -282,49 +314,43 @@ const PartyDetail = () => {
                 file = new File([blob], `${party.name.replace(/\s+/g, '_')}_Overview.jpg`, { type: 'image/jpeg' });
             }
 
-            const encoded = encodeURIComponent(reminderMessage);
-
             if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                    await navigator.share({
-                        files: [file],
-                        title: 'Account Overview',
-                        text: reminderMessage
-                    });
-                } catch (shareErr) {
-                    if (shareErr.name !== 'AbortError') {
-                        triggerDownloadAndRedirect(file, encoded);
-                    }
-                }
+                await navigator.share({
+                    files: [file],
+                    title: 'Account Overview',
+                    text: reminderMessage
+                });
+            } else if (file) {
+                // Fallback: download file, then redirect
+                const url = URL.createObjectURL(file);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = file.name;
+                a.click();
+                URL.revokeObjectURL(url);
+
+                const phone = normalizePhone(party.country_code, party.phone_number);
+                const encoded = encodeURIComponent(reminderMessage);
+                setTimeout(() => {
+                    window.location.href = reminderMethod === 'whatsapp'
+                        ? `https://wa.me/${phone}?text=${encoded}`
+                        : `sms:${phone}?body=${encoded}`;
+                }, 600);
             } else {
-                if (file) triggerDownloadAndRedirect(file, encoded);
-                else redirectToMessenger(encoded);
+                // No image, just redirect
+                handleSendReminder();
+                return;
             }
         } catch (e) {
-            console.error(e);
-            alert("Failed to create reminder image");
+            if (e.name !== 'AbortError') {
+                // If share fails, still redirect
+                handleSendReminder();
+                return;
+            }
         }
         setIsSendingWithImage(false);
-        await updateDebtParty(partyId, { last_reminder_sent_at: new Date().toISOString() });
+        updateDebtParty(partyId, { last_reminder_sent_at: new Date().toISOString() }).catch(() => {});
         setIsReminderOpen(false);
-    };
-
-    const triggerDownloadAndRedirect = (file, encoded) => {
-        const url = URL.createObjectURL(file);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = file.name;
-        a.click();
-        URL.revokeObjectURL(url);
-        setTimeout(() => redirectToMessenger(encoded), 500);
-    };
-
-    const redirectToMessenger = (encoded) => {
-        if (reminderMethod === 'whatsapp') {
-            window.open(`https://wa.me/${fullPhone}?text=${encoded}`, '_blank');
-        } else {
-            window.open(`sms:${fullPhone}?body=${encoded}`, '_blank');
-        }
     };
 
     const lastReminderDaysAgo = useMemo(() => {
@@ -1062,13 +1088,18 @@ const PartyDetail = () => {
                                 </div>
                             </div>
 
-                            <div className="flex gap-3">
-                                <button type="button" onClick={handleCopyMessage} className={`flex-1 py-4 font-bold rounded-xl flex items-center justify-center gap-2 transition-all border ${copied ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 border-emerald-200 dark:border-emerald-500/30' : 'text-slate-500 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
-                                    {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
-                                </button>
-                                <button disabled={isSendingWithImage} type="button" onClick={handleSendReminder} className="flex-[2] py-4 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:bg-emerald-700 text-white font-black rounded-xl shadow-lg shadow-emerald-500/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                                    {isSendingWithImage ? <RotateCcw className="w-4 h-4 animate-spin"/> : <Send className="w-4 h-4" />} 
-                                    {isSendingWithImage ? 'Processing Overview...' : 'Send Message + Overview'}
+                            <div className="space-y-3">
+                                <div className="flex gap-3">
+                                    <button type="button" onClick={handleCopyMessage} className={`w-14 shrink-0 py-4 font-bold rounded-xl flex items-center justify-center transition-all border ${copied ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 border-emerald-200 dark:border-emerald-500/30' : 'text-slate-500 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                                        {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+                                    </button>
+                                    <button type="button" onClick={handleSendReminder} className="flex-1 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl shadow-lg shadow-emerald-500/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm">
+                                        <Send className="w-4 h-4" /> Send via {reminderMethod === 'whatsapp' ? 'WhatsApp' : 'SMS'}
+                                    </button>
+                                </div>
+                                <button disabled={isSendingWithImage} type="button" onClick={handleShareWithImage} className="w-full py-3.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold rounded-xl border border-indigo-200 dark:border-indigo-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm hover:bg-indigo-100 dark:hover:bg-indigo-500/15 disabled:opacity-50">
+                                    {isSendingWithImage ? <RotateCcw className="w-4 h-4 animate-spin"/> : <ImageIcon className="w-4 h-4" />}
+                                    {isSendingWithImage ? 'Generating...' : 'Share with Account Overview'}
                                 </button>
                             </div>
                         </motion.div>

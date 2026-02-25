@@ -344,6 +344,7 @@ export const FinanceContextProvider = ({ children }) => {
             amount: Number(tx.amount),
             categoryId: tx.categoryId,
             date: tx.date || new Date().toISOString(),
+            note: tx.note || tx.description || '',
             description: tx.note || tx.description || 'Transaction',
             createdAt: Date.now(),
             metadata: { ...tx }

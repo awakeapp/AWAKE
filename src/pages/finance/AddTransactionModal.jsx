@@ -46,7 +46,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                 } else {
                     setCategoryId(tx.categoryId || '');
                 }
-                setNote(tx.note || '');
+                setNote(tx.description || tx.note || '');
                 if (tx.date) setDate(format(new Date(tx.date), 'yyyy-MM-dd'));
             }
         }

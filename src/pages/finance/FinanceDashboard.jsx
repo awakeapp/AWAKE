@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { Plus, Wallet, PieChart, ChevronLeft, ChevronRight, PiggyBank, ArrowDown, TrendingUp, Undo, X, Menu, Clock, BookOpen, CreditCard, Settings } from 'lucide-react';
+import { Plus, Wallet, PieChart, ChevronLeft, ChevronRight, PiggyBank, ArrowDown, TrendingUp, Undo, X, Menu, Clock, BookOpen, CreditCard, Settings, MoreHorizontal } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, isWithinInterval, subMonths, addMonths, isBefore } from 'date-fns';
 import { useState, useMemo } from 'react';
 import AddTransactionModal from './AddTransactionModal';
@@ -42,7 +42,6 @@ const FinanceDashboard = () => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [undoToast, setUndoToast] = useState(null); // { id, message }
     const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
-    const [showAccounts, setShowAccounts] = useState(false);
 
     const monthStats = useMemo(() => {
         const start = startOfMonth(selectedDate);
@@ -264,36 +263,22 @@ const FinanceDashboard = () => {
 
             <div className="px-6 flex-1 flex flex-col space-y-6">
                 
-                {/* Quick Actions Menu */}
-                <div className="space-y-2">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Quick Access</p>
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm divide-y divide-slate-50 dark:divide-slate-800">
-                        {[
-                            { icon: Wallet, label: 'Wallets', desc: `${activeAccounts.length} accounts`, onClick: () => setShowAccounts(!showAccounts) },
-                            { icon: CreditCard, label: "EMI's", desc: 'Loan repayments', onClick: () => navigate('/finance/emi') },
-                            { icon: PieChart, label: 'Analytics', desc: 'Charts & insights', onClick: () => setIsAnalyticsOpen(true) },
-                            { icon: TrendingUp, label: t('finance.budgets', 'Budgets'), desc: 'Category budgets', onClick: () => setIsBudgetOpen(true) },
-                            { icon: Settings, label: 'Settings', desc: 'Finance preferences', onClick: () => navigate('/finance/settings') },
-                        ].map((item, idx, arr) => (
-                            <button 
-                                key={item.label}
-                                onClick={item.onClick}
-                                className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 active:bg-slate-100 dark:active:bg-slate-800 transition-colors"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
-                                        <item.icon className="w-4 h-4 text-indigo-500" />
-                                    </div>
-                                    <div className="text-left">
-                                        <p className="text-[14px] font-bold text-slate-900 dark:text-white leading-tight">{item.label}</p>
-                                        <p className="text-[11px] text-slate-400 font-medium">{item.desc}</p>
-                                    </div>
-                                </div>
-                                <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600" />
-                            </button>
-                        ))}
+                {/* More Options */}
+                <button
+                    onClick={() => navigate('/finance/more')}
+                    className="w-full flex items-center justify-between bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 px-4 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 active:bg-slate-100 dark:active:bg-slate-800 transition-colors shadow-sm"
+                >
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
+                            <MoreHorizontal className="w-4 h-4 text-indigo-500" />
+                        </div>
+                        <div className="text-left">
+                            <p className="text-[14px] font-bold text-slate-900 dark:text-white leading-tight">More Options</p>
+                            <p className="text-[11px] text-slate-400 font-medium">Wallets, EMI, Analytics, Settings</p>
+                        </div>
                     </div>
-                </div>
+                    <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600" />
+                </button>
 
                 {/* Debt Summary Blocks */}
                 {(debtParties || []).filter(p => !p.is_deleted).length > 0 && (
@@ -370,7 +355,7 @@ const FinanceDashboard = () => {
                                                 {!cat?.icon && (cat?.name?.[0] || '?')}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="font-bold text-slate-900 dark:text-white text-[15px] truncate">{tx.note || cat?.name || 'Transfer'}</p>
+                                                <p className="font-bold text-slate-900 dark:text-white text-[15px] truncate">{tx.description || tx.note || cat?.name || 'Transaction'}</p>
                                                 <p className="text-xs text-slate-400 mt-0.5">{format(new Date(tx.date || tx.createdAt), timeFormat === '24h' ? 'dd MMM, HH:mm' : 'dd MMM, h:mm a')} • {accounts.find(a => a.id === tx.accountId)?.name || 'Account'}</p>
                                             </div>
                                             <div className="text-right shrink-0">
