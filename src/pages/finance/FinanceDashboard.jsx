@@ -221,7 +221,15 @@ const FinanceDashboard = () => {
                                     <span dir="ltr">{totalBalance.toLocaleString()}</span>
                                 </h2>
                             </div>
-                            {/* Button moved down for better hierarchy */}
+                            <div className="flex flex-col items-end">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); navigate('/finance/debts'); }}
+                                    className="px-4 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 rounded-2xl font-black text-[10px] uppercase tracking-widest text-white flex items-center justify-center gap-2 shadow-xl shadow-black/5 active:scale-95 transition-all"
+                                >
+                                    <BookOpen className="w-4 h-4" />
+                                    {t('finance.debt_ledger', 'Ledger')}
+                                </button>
+                            </div>
                         </div>
 
                         <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/10 gap-2">
