@@ -89,7 +89,7 @@ const MainLayout = ({ children }) => {
             ) : (
                 <main className={cn(
                     "px-4 max-w-md mx-auto w-full",
-                    showHeader ? "pt-[calc(56px+env(safe-area-inset-top))]" : "pt-0"
+                    showHeader ? "pt-4" : "pt-0"
                 )}>
                     <Suspense fallback={Loader}>
                         {children || <Outlet />}

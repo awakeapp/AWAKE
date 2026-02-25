@@ -154,7 +154,7 @@ const Routine = () => {
             </div>
 
             <div 
-                className="max-w-md mx-auto w-full px-4"
+                className="max-w-md mx-auto w-full"
                 style={{ paddingTop: 'calc(72px + env(safe-area-inset-top) + 20px)' }}
             >
                 <div className="space-y-6">
