@@ -130,11 +130,9 @@ const WorkspaceLayout = ({ children }) => {
                 className="relative z-10 w-full"
                 style={{ paddingTop: 'env(safe-area-inset-top)' }}
             >
-                <div className="pt-6">
-                    <Suspense fallback={<div className="flex items-center justify-center p-12"><div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div></div>}>
-                        {children || <Outlet />}
-                    </Suspense>
-                </div>
+                <Suspense fallback={<div className="flex items-center justify-center p-12"><div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div></div>}>
+                    {children || <Outlet />}
+                </Suspense>
             </main>
 
             <BottomNavigation />
