@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { Plus, Wallet, PieChart, ChevronLeft, ChevronRight, PiggyBank, ArrowDown, TrendingUp, Undo, X, Menu, Clock } from 'lucide-react';
+import { Plus, Wallet, PieChart, ChevronLeft, ChevronRight, PiggyBank, ArrowDown, TrendingUp, Undo, X, Menu, Clock, BookOpen } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, isWithinInterval, subMonths, addMonths, isBefore } from 'date-fns';
 import { useState, useMemo } from 'react';
 import AddTransactionModal from './AddTransactionModal';
@@ -221,14 +221,7 @@ const FinanceDashboard = () => {
                                     <span dir="ltr">{totalBalance.toLocaleString()}</span>
                                 </h2>
                             </div>
-                            <div className="flex flex-col items-end gap-2">
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); navigate('/finance/debts'); }}
-                                    className="px-3.5 py-2.5 bg-white text-indigo-600 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-1.5 shadow-lg shadow-black/10 active:scale-95 transition-transform"
-                                >
-                                    <Undo className="w-4 h-4" /> Debt Manager
-                                </button>
-                            </div>
+                            {/* Button moved down for better hierarchy */}
                         </div>
 
                         <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/10 gap-2">
@@ -255,6 +248,26 @@ const FinanceDashboard = () => {
             </header>
 
             <div className="px-6 flex-1 flex flex-col space-y-6">
+                
+                {/* Primary Feature Button */}
+                <button 
+                    onClick={() => navigate('/finance/debts')}
+                    className="w-full flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-[1.5rem] border border-slate-100 dark:border-slate-800 shadow-[0_2px_10px_rgba(0,0,0,0.03)] dark:shadow-none active:scale-[0.98] transition-all duration-200 group"
+                >
+                    <div className="flex items-center gap-4">
+                        <div className="w-[52px] h-[52px] rounded-2xl flex items-center justify-center bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 group-hover:scale-105 transition-transform duration-300">
+                            <BookOpen className="w-[24px] h-[24px]" strokeWidth={2} />
+                        </div>
+                        <div className="text-left">
+                            <h3 className="text-[17px] font-bold text-slate-900 dark:text-white leading-tight mb-0.5">Debt Ledger</h3>
+                            <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Manage lent & borrowed funds</p>
+                        </div>
+                    </div>
+                    <div className="w-8 h-8 flex items-center justify-center text-slate-300 dark:text-slate-600 group-active:translate-x-1 transition-transform mr-1">
+                        <ChevronRight className="w-[22px] h-[22px]" strokeWidth={2.5} />
+                    </div>
+                </button>
+
                 {/* Secondary Actions */}
                 <div className="grid grid-cols-2 gap-3">
                     <button 
