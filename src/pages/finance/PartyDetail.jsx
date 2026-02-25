@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
 import { ArrowLeft, Plus, MoreVertical, Trash2, RotateCcw, AlertTriangle, Calendar, Lock, CreditCard, ToggleLeft, ToggleRight, Check, ChevronDown, Clock, Bell, MessageCircle, Copy, Send, Wallet, FileText, Image as ImageIcon, Download } from 'lucide-react';
 import html2canvas from 'html2canvas';
-import { format, isBefore, isAfter, startOfDay, endOfDay, differenceInDays } from 'date-fns';
+import { format, isBefore, isAfter, startOfDay, endOfDay, differenceInDays, addDays } from 'date-fns';
 import JumpDateModal from '../../components/organisms/JumpDateModal';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -130,10 +130,12 @@ const PartyDetail = () => {
     const [txType, setTxType] = useState('you_gave');
     const [amount, setAmount] = useState('');
     const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
-    const [dueDate, setDueDate] = useState('');
+    const [dueDate, setDueDate] = useState(format(addDays(new Date(), 10), 'yyyy-MM-dd'));
     const [note, setNote] = useState('');
     const [datePickerOpen, setDatePickerOpen] = useState(false);
     const [dueDatePickerOpen, setDueDatePickerOpen] = useState(false);
+    const [dueDateManuallySet, setDueDateManuallySet] = useState(false);
+    const [showAdvancedTypes, setShowAdvancedTypes] = useState(false);
 
     // --- Settlement states ---
     const [isSettleOpen, setIsSettleOpen] = useState(false);
@@ -331,7 +333,7 @@ const PartyDetail = () => {
         return differenceInDays(new Date(), new Date(summary.lastReminder));
     }, [summary.lastReminder]);
 
-    useScrollLock(isSettleOpen || isReminderOpen);
+    useScrollLock(isAddCardOpen || isSettleOpen || isReminderOpen);
 
     // Collapsible notes
     const [expandedNotes, setExpandedNotes] = useState({});
@@ -482,8 +484,11 @@ const PartyDetail = () => {
         setIsAddCardOpen(false);
         setAmount('');
         setNote('');
-        setDueDate('');
+        setDueDate(format(addDays(new Date(), 10), 'yyyy-MM-dd'));
+        setDate(format(new Date(), 'yyyy-MM-dd'));
         setTxType('you_gave');
+        setDueDateManuallySet(false);
+        setShowAdvancedTypes(false);
     };
 
     const toggleEntrySelection = (entryId, entryRemaining) => {
@@ -713,67 +718,152 @@ const PartyDetail = () => {
             {/* ========== New Entry Modal ========== */}
             <AnimatePresence>
                 {isAddCardOpen && (
-                    <div className="fixed inset-0 z-50 flex items-end justify-center p-4 pb-24 sm:p-6 sm:items-center">
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsAddCardOpen(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+                    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => resetForm()} className="absolute inset-0 bg-black/50 backdrop-blur-md" />
                         <motion.form
-                            initial={{ y: "100%", opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: "100%", opacity: 0 }} transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            initial={{ y: "100%", opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: "100%", opacity: 0 }} transition={{ type: "spring", damping: 28, stiffness: 300 }}
                             onSubmit={handleSubmit}
-                            className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2rem] p-6 shadow-2xl border border-slate-100 dark:border-slate-800 relative z-10 max-h-[85vh] overflow-y-auto"
+                            className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl border border-white/10 dark:border-slate-800 relative z-10 max-h-[90vh] overflow-hidden flex flex-col"
                         >
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">New Entry</h3>
-                            <div className="space-y-5">
-                                <div>
-                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Type</label>
-                                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
-                                        {TRANSACTION_TYPES.map(type => (
+                            {/* Header */}
+                            <div className="px-8 pt-8 pb-0 shrink-0">
+                                <div className="flex items-center justify-between mb-8">
+                                    <div>
+                                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">New Entry</h3>
+                                        <p className="text-[11px] text-slate-400 font-medium mt-0.5">{party.name}</p>
+                                    </div>
+                                    <button type="button" onClick={() => resetForm()} className="w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 hover:text-slate-900 dark:hover:text-white active:scale-90 transition-all">
+                                        <Plus className="w-5 h-5 rotate-45" />
+                                    </button>
+                                </div>
+
+                                {/* Type Selection — Primary 2 */}
+                                <div className="flex gap-2 mb-2">
+                                    {[{ id: 'you_gave', label: 'Given', emoji: '📤' }, { id: 'you_received', label: 'Received', emoji: '📥' }].map(t => (
+                                        <button
+                                            key={t.id}
+                                            type="button"
+                                            onClick={() => { setTxType(t.id); setShowAdvancedTypes(false); }}
+                                            className={`flex-1 py-3.5 rounded-2xl text-sm font-black uppercase tracking-wider transition-all border-2 ${
+                                                txType === t.id
+                                                    ? t.id === 'you_gave'
+                                                        ? 'bg-rose-50 dark:bg-rose-500/10 border-rose-500 text-rose-600 dark:text-rose-400 shadow-lg shadow-rose-500/10'
+                                                        : 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-lg shadow-emerald-500/10'
+                                                    : 'bg-slate-50 dark:bg-slate-800/50 border-transparent text-slate-400 hover:border-slate-200 dark:hover:border-slate-700'
+                                            }`}
+                                        >
+                                            <span className="mr-1.5">{t.emoji}</span> {t.label}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {/* Advanced Types Toggle */}
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAdvancedTypes(!showAdvancedTypes)}
+                                    className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1 hover:text-indigo-500 transition-colors"
+                                >
+                                    <ChevronDown className={`w-3 h-3 transition-transform ${showAdvancedTypes ? 'rotate-180' : ''}`} />
+                                    {showAdvancedTypes ? 'Hide' : 'More options'}
+                                </button>
+                                {showAdvancedTypes && (
+                                    <div className="grid grid-cols-2 gap-2 mb-4">
+                                        {TRANSACTION_TYPES.filter(t => !['you_gave', 'you_received'].includes(t.id)).map(type => (
                                             <button key={type.id} type="button" onClick={() => setTxType(type.id)}
-                                                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all border ${txType === type.id ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-600/30' : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 border-slate-200 dark:border-slate-700 hover:border-indigo-400/50'}`}
+                                                className={`py-2.5 px-3 rounded-xl text-[11px] font-bold transition-all border ${txType === type.id ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 border-slate-200 dark:border-slate-700'}`}
                                             >{type.label}</button>
                                         ))}
                                     </div>
-                                </div>
+                                )}
+
                                 {isSettlementType && pendingEntries.length > 0 && (
-                                    <div className="bg-indigo-50 dark:bg-indigo-500/10 p-3 rounded-xl border border-indigo-100 dark:border-indigo-500/20">
+                                    <div className="bg-indigo-50 dark:bg-indigo-500/10 p-3 rounded-xl border border-indigo-100 dark:border-indigo-500/20 mb-4">
                                         <p className="text-xs text-indigo-700 dark:text-indigo-300 font-medium">{pendingEntries.length} pending {pendingEntries.length === 1 ? 'entry' : 'entries'} for settlement.</p>
                                     </div>
                                 )}
-                                <div>
-                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Amount</label>
-                                    <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-black text-slate-400">₹</span>
-                                        <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0" autoFocus
-                                            className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl py-4 pl-10 pr-4 text-2xl font-black text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none" />
+
+                                {/* Amount — Dominant Visual */}
+                                <div className="text-center py-6 mb-2">
+                                    <div className="inline-flex items-baseline gap-1">
+                                        <span className="text-3xl font-black text-slate-300 dark:text-slate-600">₹</span>
+                                        <input
+                                            type="number"
+                                            inputMode="decimal"
+                                            value={amount}
+                                            onChange={e => setAmount(e.target.value)}
+                                            placeholder="0"
+                                            autoFocus
+                                            className="bg-transparent border-none text-[56px] font-black text-slate-900 dark:text-white placeholder:text-slate-200 dark:placeholder:text-slate-800 focus:ring-0 p-0 w-full max-w-[280px] text-center outline-none"
+                                        />
                                     </div>
                                     {isSettlementType && pendingEntries.length > 0 && Number(amount) > maxSettleAmount && (
-                                        <p className="text-xs text-amber-600 dark:text-amber-400 mt-1.5 font-medium">Max: ₹{maxSettleAmount.toLocaleString()}</p>
+                                        <p className="text-xs text-amber-600 dark:text-amber-400 mt-2 font-bold">Max: ₹{maxSettleAmount.toLocaleString()}</p>
                                     )}
                                 </div>
+                            </div>
+
+                            {/* Configurable Section */}
+                            <div className="flex-1 overflow-y-auto px-8 pb-4 space-y-5 scrollbar-hide">
                                 <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Date</label>
-                                        <button type="button" onClick={() => setDatePickerOpen(true)} className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white font-medium text-left flex items-center gap-2 text-sm">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Date</label>
+                                        <button type="button" onClick={() => setDatePickerOpen(true)} className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-left flex items-center gap-2.5 text-[13px] transition-all hover:border-indigo-400/50">
                                             <Calendar className="w-4 h-4 text-slate-400 shrink-0" />{format(new Date(date + 'T00:00:00'), 'MMM d, yyyy')}
                                         </button>
                                     </div>
-                                    <div>
-                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Due (Opt)</label>
-                                        <button type="button" onClick={() => setDueDatePickerOpen(true)} className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white font-medium text-left flex items-center gap-2 text-sm">
-                                            <Calendar className="w-4 h-4 text-slate-400 shrink-0" />{dueDate ? format(new Date(dueDate + 'T00:00:00'), 'MMM d, yyyy') : 'No Date'}
+                                    <div className="space-y-1.5">
+                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Due Date</label>
+                                        <button type="button" onClick={() => setDueDatePickerOpen(true)} className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-left flex items-center gap-2.5 text-[13px] transition-all hover:border-indigo-400/50">
+                                            <Clock className="w-4 h-4 text-slate-400 shrink-0" />{dueDate ? format(new Date(dueDate + 'T00:00:00'), 'MMM d, yyyy') : 'No Date'}
                                         </button>
                                     </div>
                                 </div>
-                                <div>
-                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Notes</label>
-                                    <input type="text" value={note} onChange={e => setNote(e.target.value)} placeholder="Reason..."
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white font-medium text-sm outline-none" />
+                                <div className="space-y-1.5">
+                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Note</label>
+                                    <input type="text" value={note} onChange={e => setNote(e.target.value)} placeholder="Reason or reference..."
+                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-[13px] outline-none focus:border-indigo-400/50 transition-all placeholder:text-slate-400" />
                                 </div>
                             </div>
-                            <div className="flex gap-3 mt-8">
-                                <button type="button" onClick={() => setIsAddCardOpen(false)} className="flex-1 py-3.5 font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl">Cancel</button>
-                                <button type="submit" disabled={!amount} className="flex-[2] py-3.5 bg-indigo-600 disabled:bg-indigo-400 disabled:opacity-50 text-white font-black rounded-xl shadow-lg shadow-indigo-500/30 active:scale-[0.98] transition-transform">
-                                    {isSettlementType && pendingEntries.length > 0 ? 'Allocate →' : 'Save Entry'}
-                                </button>
+
+                            {/* Footer Actions */}
+                            <div className="px-8 py-6 border-t border-slate-100 dark:border-slate-800/50 shrink-0">
+                                <div className="flex gap-3">
+                                    <button type="button" onClick={() => resetForm()} className="flex-1 py-4 font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl transition-colors text-sm">
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={!amount || Number(amount) <= 0}
+                                        className="flex-[2] py-4 bg-indigo-600 disabled:bg-indigo-400 disabled:opacity-40 text-white font-black rounded-2xl shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all text-sm uppercase tracking-wider"
+                                    >
+                                        {isSettlementType && pendingEntries.length > 0 ? 'Allocate →' : 'Save Entry'}
+                                    </button>
+                                </div>
                             </div>
+
+                            <JumpDateModal
+                                isOpen={datePickerOpen}
+                                onClose={() => setDatePickerOpen(false)}
+                                initialDate={new Date(date + 'T00:00:00')}
+                                onSelect={(d) => {
+                                    const newDate = format(d, 'yyyy-MM-dd');
+                                    setDate(newDate);
+                                    if (!dueDateManuallySet) {
+                                        setDueDate(format(addDays(d, 10), 'yyyy-MM-dd'));
+                                    }
+                                    setDatePickerOpen(false);
+                                }}
+                            />
+                            <JumpDateModal
+                                isOpen={dueDatePickerOpen}
+                                onClose={() => setDueDatePickerOpen(false)}
+                                initialDate={dueDate ? new Date(dueDate + 'T00:00:00') : addDays(new Date(), 10)}
+                                onSelect={(d) => {
+                                    setDueDate(format(d, 'yyyy-MM-dd'));
+                                    setDueDateManuallySet(true);
+                                    setDueDatePickerOpen(false);
+                                }}
+                            />
                         </motion.form>
                     </div>
                 )}
@@ -976,8 +1066,7 @@ const PartyDetail = () => {
                 )}
             </AnimatePresence>
 
-            <JumpDateModal isOpen={datePickerOpen} onClose={() => setDatePickerOpen(false)} initialDate={new Date(date + 'T00:00:00')} onSelect={(d) => { if (d) setDate(format(d, 'yyyy-MM-dd')); setDatePickerOpen(false); }} />
-            <JumpDateModal isOpen={dueDatePickerOpen} onClose={() => setDueDatePickerOpen(false)} initialDate={dueDate ? new Date(dueDate + 'T00:00:00') : new Date()} onSelect={(d) => { if (d) { setDueDate(format(d, 'yyyy-MM-dd')); } else { setDueDate(''); } setDueDatePickerOpen(false); }} />
+
             <JumpDateModal isOpen={dateFromPickerOpen} onClose={() => setDateFromPickerOpen(false)} initialDate={dateFrom ? new Date(dateFrom + 'T00:00:00') : new Date()} onSelect={(d) => { if (d) setDateFrom(format(d, 'yyyy-MM-dd')); setDateFromPickerOpen(false); }} />
             <JumpDateModal isOpen={dateToPickerOpen} onClose={() => setDateToPickerOpen(false)} initialDate={dateTo ? new Date(dateTo + 'T00:00:00') : new Date()} onSelect={(d) => { if (d) setDateTo(format(d, 'yyyy-MM-dd')); setDateToPickerOpen(false); }} />
         
