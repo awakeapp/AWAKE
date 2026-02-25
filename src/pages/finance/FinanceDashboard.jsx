@@ -223,10 +223,10 @@ const FinanceDashboard = () => {
                             </div>
                             <div className="flex flex-col items-end gap-2">
                                 <button
-                                    onClick={(e) => { e.stopPropagation(); setIsAnalyticsOpen(true); }}
-                                    className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center transition-colors backdrop-blur-md"
+                                    onClick={(e) => { e.stopPropagation(); navigate('/finance/debts'); }}
+                                    className="px-3.5 py-2.5 bg-white text-indigo-600 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-1.5 shadow-lg shadow-black/10 active:scale-95 transition-transform"
                                 >
-                                    <PieChart className="w-5 h-5 text-white" />
+                                    <Undo className="w-4 h-4" /> Debt Manager
                                 </button>
                             </div>
                         </div>
@@ -258,11 +258,11 @@ const FinanceDashboard = () => {
                 {/* Secondary Actions */}
                 <div className="grid grid-cols-2 gap-3">
                     <button 
-                        onClick={() => navigate('/finance/debts')}
+                        onClick={() => setIsAnalyticsOpen(true)}
                         className="bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
                     >
-                        <Undo className="w-4 h-4 text-indigo-500" />
-                        Debt Manager
+                        <PieChart className="w-4 h-4 text-indigo-500" />
+                        Analytics
                     </button>
                     <button 
                         onClick={() => setIsBudgetOpen(true)}

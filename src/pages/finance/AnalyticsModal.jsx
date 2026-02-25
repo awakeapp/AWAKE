@@ -2,8 +2,10 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, PieChart, TrendingUp, TrendingDown } from 'lucide-react';
 import { format } from 'date-fns';
+import { useScrollLock } from '../../hooks/useScrollLock';
 
 const AnalyticsModal = ({ isOpen, onClose, monthStats, categories, selectedDate }) => {
+    useScrollLock(isOpen);
     const { income, expense, transactions } = monthStats || { income: 0, expense: 0, transactions: [] };
 
     // Calculate Category Breakdown for Expenses
