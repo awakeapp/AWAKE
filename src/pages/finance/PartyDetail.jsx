@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { ArrowLeft, Plus, MoreVertical, Trash2, RotateCcw, AlertTriangle, Calendar, Lock, CreditCard, ToggleLeft, ToggleRight, Check, ChevronDown, Clock, Bell, MessageCircle, Copy, Send, Wallet, FileText, Image as ImageIcon, Download } from 'lucide-react';
+import { ArrowLeft, Plus, MoreVertical, Trash2, RotateCcw, AlertTriangle, Calendar, Lock, CreditCard, ToggleLeft, ToggleRight, Check, ChevronDown, Clock, Bell, MessageCircle, Copy, Send, Wallet, FileText, Image as ImageIcon, Download, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { format, isBefore, isAfter, startOfDay, endOfDay, differenceInDays, addDays } from 'date-fns';
 import JumpDateModal from '../../components/organisms/JumpDateModal';
@@ -135,7 +135,6 @@ const PartyDetail = () => {
     const [datePickerOpen, setDatePickerOpen] = useState(false);
     const [dueDatePickerOpen, setDueDatePickerOpen] = useState(false);
     const [dueDateManuallySet, setDueDateManuallySet] = useState(false);
-    const [showAdvancedTypes, setShowAdvancedTypes] = useState(false);
 
     // --- Settlement states ---
     const [isSettleOpen, setIsSettleOpen] = useState(false);
@@ -488,7 +487,6 @@ const PartyDetail = () => {
         setDate(format(new Date(), 'yyyy-MM-dd'));
         setTxType('you_gave');
         setDueDateManuallySet(false);
-        setShowAdvancedTypes(false);
     };
 
     const toggleEntrySelection = (entryId, entryRemaining) => {
@@ -505,36 +503,60 @@ const PartyDetail = () => {
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 6rem)' }}>
 
             {/* ===== STICKY HEADER + SUMMARY ===== */}
-            <header className="sticky top-0 z-30 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-100 dark:border-slate-800">
+            <header className="sticky top-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl">
                 {/* Top bar */}
-                <div className="px-6 pt-5 pb-3 flex items-center justify-between">
-                    <button onClick={() => navigate(-1)} className="p-2 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white -ml-2 shadow-sm border border-slate-100 dark:border-slate-800">
+                <div className="px-5 pt-4 pb-3 flex items-center justify-between">
+                    <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white -ml-1">
                         <ArrowLeft className="w-5 h-5" />
                     </button>
-                    <div className="flex items-center gap-2">
-                        <h1 className="text-lg font-bold text-slate-900 dark:text-white truncate max-w-[140px]">{party.name}</h1>
-                        <span className={`text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${statusBadge.cls}`}>{statusBadge.label}</span>
+                    <div className="flex flex-col items-center">
+                        <h1 className="text-lg font-black text-slate-900 dark:text-white truncate max-w-[180px] tracking-tight">{party.name}</h1>
+                        <span className={`text-[8px] font-black uppercase tracking-[0.2em] px-2.5 py-0.5 rounded-full mt-0.5 ${statusBadge.cls}`}>{statusBadge.label}</span>
                     </div>
-                    <button className="p-2 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white -mr-2 shadow-sm border border-slate-100 dark:border-slate-800">
+                    <button className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white -mr-1">
                         <MoreVertical className="w-5 h-5" />
                     </button>
                 </div>
 
-                {/* Summary grid */}
-                <div className="px-6 pb-4">
-                    <div className="grid grid-cols-3 gap-2">
-                        <SummaryCell label="Receivable" value={`₹${summary.totalReceivable.toLocaleString()}`} color="text-emerald-600 dark:text-emerald-400" />
-                        <SummaryCell label="Payable" value={`₹${summary.totalPayable.toLocaleString()}`} color="text-red-500 dark:text-red-400" />
-                        <SummaryCell
-                            label="Net Position"
-                            value={`${balance >= 0 ? '+' : '-'}₹${Math.abs(balance).toLocaleString()}`}
-                            color={balance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}
-                        />
-                    </div>
-                    <div className="grid grid-cols-3 gap-2 mt-2">
-                        <SummaryCell label="Overdue" value={summary.overdueAmount > 0 ? `₹${summary.overdueAmount.toLocaleString()}` : '—'} color={summary.overdueAmount > 0 ? 'text-red-500' : 'text-slate-400'} icon={<Clock className="w-3 h-3" />} />
-                        <SummaryCell label="Last Txn" value={summary.lastTxDate ? format(new Date(summary.lastTxDate), 'dd MMM') : '—'} color="text-slate-600 dark:text-slate-300" icon={<Calendar className="w-3 h-3" />} />
-                        <SummaryCell label="Reminder" value={summary.lastReminder ? format(new Date(summary.lastReminder), 'dd MMM') : 'Never'} color="text-slate-600 dark:text-slate-300" icon={<Bell className="w-3 h-3" />} />
+                {/* Balance Card */}
+                <div className="px-5 pb-4">
+                    <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 dark:from-indigo-600 dark:to-indigo-900 rounded-[1.5rem] p-5 text-white relative overflow-hidden">
+                        <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
+                        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-black/10 rounded-full blur-2xl" />
+                        <div className="relative z-10">
+                            <div className="grid grid-cols-3 gap-3 mb-4">
+                                <div className="text-center">
+                                    <p className="text-[8px] font-black uppercase tracking-[0.2em] text-indigo-200/70 mb-1">Receivable</p>
+                                    <p className="text-base font-black text-emerald-300">₹{summary.totalReceivable.toLocaleString()}</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-[8px] font-black uppercase tracking-[0.2em] text-indigo-200/70 mb-1">Payable</p>
+                                    <p className="text-base font-black text-red-300">₹{summary.totalPayable.toLocaleString()}</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-[8px] font-black uppercase tracking-[0.2em] text-indigo-200/70 mb-1">Net</p>
+                                    <p className={`text-base font-black ${balance >= 0 ? 'text-emerald-300' : 'text-red-300'}`}>{balance >= 0 ? '+' : '-'}₹{Math.abs(balance).toLocaleString()}</p>
+                                </div>
+                            </div>
+                            <div className="h-px bg-white/10 my-3" />
+                            <div className="grid grid-cols-3 gap-3">
+                                <div className="flex flex-col items-center">
+                                    <Clock className="w-3 h-3 text-indigo-200/60 mb-1" />
+                                    <p className="text-[7px] font-black uppercase tracking-[0.15em] text-indigo-200/50">Overdue</p>
+                                    <p className={`text-[11px] font-bold mt-0.5 ${summary.overdueAmount > 0 ? 'text-red-300' : 'text-white/50'}`}>{summary.overdueAmount > 0 ? `₹${summary.overdueAmount.toLocaleString()}` : '—'}</p>
+                                </div>
+                                <div className="flex flex-col items-center">
+                                    <Calendar className="w-3 h-3 text-indigo-200/60 mb-1" />
+                                    <p className="text-[7px] font-black uppercase tracking-[0.15em] text-indigo-200/50">Last Txn</p>
+                                    <p className="text-[11px] font-bold mt-0.5 text-white/80">{summary.lastTxDate ? format(new Date(summary.lastTxDate), 'dd MMM') : '—'}</p>
+                                </div>
+                                <div className="flex flex-col items-center">
+                                    <Bell className="w-3 h-3 text-indigo-200/60 mb-1" />
+                                    <p className="text-[7px] font-black uppercase tracking-[0.15em] text-indigo-200/50">Reminder</p>
+                                    <p className="text-[11px] font-bold mt-0.5 text-white/80">{summary.lastReminder ? format(new Date(summary.lastReminder), 'dd MMM') : 'Never'}</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -596,11 +618,11 @@ const PartyDetail = () => {
                     )}
                 </div>
 
-                {/* Timeline header */}
+                {/* Ledger header */}
                 <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-slate-900 dark:text-white text-base">Ledger <span className="text-slate-400 font-medium text-sm ml-1">({filteredTransactions.length})</span></h3>
-                    <button onClick={() => setIsAddCardOpen(true)} className="text-indigo-600 dark:text-indigo-400 text-sm font-bold flex items-center gap-1 bg-indigo-50 dark:bg-indigo-500/10 px-3 py-1.5 rounded-lg active:scale-95 transition-transform">
-                        <Plus className="w-4 h-4" /> Entry
+                    <h3 className="font-black text-slate-900 dark:text-white text-base tracking-tight">Ledger <span className="text-slate-400 font-bold text-sm ml-1">({filteredTransactions.length})</span></h3>
+                    <button onClick={() => setIsAddCardOpen(true)} className="text-white text-[11px] font-black flex items-center gap-1.5 bg-indigo-600 px-4 py-2 rounded-xl active:scale-95 transition-transform shadow-md shadow-indigo-500/20 uppercase tracking-wider">
+                        <Plus className="w-3.5 h-3.5" /> Entry
                     </button>
                 </div>
 
@@ -630,9 +652,9 @@ const PartyDetail = () => {
                                     <div className="p-4">
                                         <div className="flex items-start gap-3">
                                             {/* Type indicator */}
-                                            <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${typeDef.color}`}>
-                                                {locked ? <Lock className="w-3.5 h-3.5" /> : (
-                                                    <span className="text-sm font-black">{isPositive ? '+' : '−'}</span>
+                                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${typeDef.color}`}>
+                                                {locked ? <Lock className="w-4 h-4" /> : (
+                                                    isPositive ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownLeft className="w-4 h-4" />
                                                 )}
                                             </div>
 
@@ -726,66 +748,54 @@ const PartyDetail = () => {
                             className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl border border-white/10 dark:border-slate-800 relative z-10 max-h-[90vh] overflow-hidden flex flex-col"
                         >
                             {/* Header */}
-                            <div className="px-8 pt-8 pb-0 shrink-0">
-                                <div className="flex items-center justify-between mb-8">
+                            <div className="px-7 pt-7 pb-0 shrink-0">
+                                <div className="flex items-center justify-between mb-6">
                                     <div>
                                         <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">New Entry</h3>
                                         <p className="text-[11px] text-slate-400 font-medium mt-0.5">{party.name}</p>
                                     </div>
-                                    <button type="button" onClick={() => resetForm()} className="w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 hover:text-slate-900 dark:hover:text-white active:scale-90 transition-all">
+                                    <button type="button" onClick={() => resetForm()} className="w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-full text-slate-400 hover:text-slate-900 dark:hover:text-white active:scale-90 transition-all">
                                         <Plus className="w-5 h-5 rotate-45" />
                                     </button>
                                 </div>
 
-                                {/* Type Selection — Primary 2 */}
-                                <div className="flex gap-2 mb-2">
-                                    {[{ id: 'you_gave', label: 'Given', emoji: '📤' }, { id: 'you_received', label: 'Received', emoji: '📥' }].map(t => (
-                                        <button
-                                            key={t.id}
-                                            type="button"
-                                            onClick={() => { setTxType(t.id); setShowAdvancedTypes(false); }}
-                                            className={`flex-1 py-3.5 rounded-2xl text-sm font-black uppercase tracking-wider transition-all border-2 ${
-                                                txType === t.id
-                                                    ? t.id === 'you_gave'
-                                                        ? 'bg-rose-50 dark:bg-rose-500/10 border-rose-500 text-rose-600 dark:text-rose-400 shadow-lg shadow-rose-500/10'
-                                                        : 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-lg shadow-emerald-500/10'
-                                                    : 'bg-slate-50 dark:bg-slate-800/50 border-transparent text-slate-400 hover:border-slate-200 dark:hover:border-slate-700'
-                                            }`}
-                                        >
-                                            <span className="mr-1.5">{t.emoji}</span> {t.label}
-                                        </button>
-                                    ))}
+                                {/* Type Selection — Given / Received only */}
+                                <div className="flex gap-3 mb-6">
+                                    <button
+                                        type="button"
+                                        onClick={() => setTxType('you_gave')}
+                                        className={`flex-1 py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all border-2 flex items-center justify-center gap-2.5 ${
+                                            txType === 'you_gave'
+                                                ? 'bg-rose-50 dark:bg-rose-500/10 border-rose-500 text-rose-600 dark:text-rose-400 shadow-lg shadow-rose-500/10'
+                                                : 'bg-slate-50 dark:bg-slate-800/50 border-transparent text-slate-400 hover:border-slate-200 dark:hover:border-slate-700'
+                                        }`}
+                                    >
+                                        <ArrowUpRight className="w-5 h-5" /> Given
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setTxType('you_received')}
+                                        className={`flex-1 py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all border-2 flex items-center justify-center gap-2.5 ${
+                                            txType === 'you_received'
+                                                ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-lg shadow-emerald-500/10'
+                                                : 'bg-slate-50 dark:bg-slate-800/50 border-transparent text-slate-400 hover:border-slate-200 dark:hover:border-slate-700'
+                                        }`}
+                                    >
+                                        <ArrowDownLeft className="w-5 h-5" /> Received
+                                    </button>
                                 </div>
 
-                                {/* Advanced Types Toggle */}
-                                <button
-                                    type="button"
-                                    onClick={() => setShowAdvancedTypes(!showAdvancedTypes)}
-                                    className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1 hover:text-indigo-500 transition-colors"
-                                >
-                                    <ChevronDown className={`w-3 h-3 transition-transform ${showAdvancedTypes ? 'rotate-180' : ''}`} />
-                                    {showAdvancedTypes ? 'Hide' : 'More options'}
-                                </button>
-                                {showAdvancedTypes && (
-                                    <div className="grid grid-cols-2 gap-2 mb-4">
-                                        {TRANSACTION_TYPES.filter(t => !['you_gave', 'you_received'].includes(t.id)).map(type => (
-                                            <button key={type.id} type="button" onClick={() => setTxType(type.id)}
-                                                className={`py-2.5 px-3 rounded-xl text-[11px] font-bold transition-all border ${txType === type.id ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 border-slate-200 dark:border-slate-700'}`}
-                                            >{type.label}</button>
-                                        ))}
-                                    </div>
-                                )}
-
                                 {isSettlementType && pendingEntries.length > 0 && (
-                                    <div className="bg-indigo-50 dark:bg-indigo-500/10 p-3 rounded-xl border border-indigo-100 dark:border-indigo-500/20 mb-4">
+                                    <div className="bg-indigo-50 dark:bg-indigo-500/10 p-3 rounded-xl border border-indigo-100 dark:border-indigo-500/20 mb-5">
                                         <p className="text-xs text-indigo-700 dark:text-indigo-300 font-medium">{pendingEntries.length} pending {pendingEntries.length === 1 ? 'entry' : 'entries'} for settlement.</p>
                                     </div>
                                 )}
 
-                                {/* Amount — Dominant Visual */}
-                                <div className="text-center py-6 mb-2">
+                                {/* Amount — Hero Size */}
+                                <div className="text-center py-4 mb-2">
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Amount</p>
                                     <div className="inline-flex items-baseline gap-1">
-                                        <span className="text-3xl font-black text-slate-300 dark:text-slate-600">₹</span>
+                                        <span className="text-4xl font-black text-slate-300 dark:text-slate-600">₹</span>
                                         <input
                                             type="number"
                                             inputMode="decimal"
@@ -793,7 +803,7 @@ const PartyDetail = () => {
                                             onChange={e => setAmount(e.target.value)}
                                             placeholder="0"
                                             autoFocus
-                                            className="bg-transparent border-none text-[56px] font-black text-slate-900 dark:text-white placeholder:text-slate-200 dark:placeholder:text-slate-800 focus:ring-0 p-0 w-full max-w-[280px] text-center outline-none"
+                                            className="bg-transparent border-none text-[72px] leading-none font-black text-slate-900 dark:text-white placeholder:text-slate-200 dark:placeholder:text-slate-700 focus:ring-0 p-0 w-full max-w-[280px] text-center outline-none"
                                         />
                                     </div>
                                     {isSettlementType && pendingEntries.length > 0 && Number(amount) > maxSettleAmount && (
@@ -803,18 +813,18 @@ const PartyDetail = () => {
                             </div>
 
                             {/* Configurable Section */}
-                            <div className="flex-1 overflow-y-auto px-8 pb-4 space-y-5 scrollbar-hide">
+                            <div className="flex-1 overflow-y-auto px-7 pb-4 space-y-4 scrollbar-hide">
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="space-y-1.5">
                                         <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Date</label>
                                         <button type="button" onClick={() => setDatePickerOpen(true)} className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-left flex items-center gap-2.5 text-[13px] transition-all hover:border-indigo-400/50">
-                                            <Calendar className="w-4 h-4 text-slate-400 shrink-0" />{format(new Date(date + 'T00:00:00'), 'MMM d, yyyy')}
+                                            <Calendar className="w-4 h-4 text-indigo-400 shrink-0" />{format(new Date(date + 'T00:00:00'), 'MMM d, yyyy')}
                                         </button>
                                     </div>
                                     <div className="space-y-1.5">
                                         <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Due Date</label>
                                         <button type="button" onClick={() => setDueDatePickerOpen(true)} className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-left flex items-center gap-2.5 text-[13px] transition-all hover:border-indigo-400/50">
-                                            <Clock className="w-4 h-4 text-slate-400 shrink-0" />{dueDate ? format(new Date(dueDate + 'T00:00:00'), 'MMM d, yyyy') : 'No Date'}
+                                            <Clock className="w-4 h-4 text-indigo-400 shrink-0" />{dueDate ? format(new Date(dueDate + 'T00:00:00'), 'MMM d, yyyy') : 'No Date'}
                                         </button>
                                     </div>
                                 </div>
@@ -826,15 +836,15 @@ const PartyDetail = () => {
                             </div>
 
                             {/* Footer Actions */}
-                            <div className="px-8 py-6 border-t border-slate-100 dark:border-slate-800/50 shrink-0">
+                            <div className="px-7 py-5 border-t border-slate-100 dark:border-slate-800/50 shrink-0">
                                 <div className="flex gap-3">
-                                    <button type="button" onClick={() => resetForm()} className="flex-1 py-4 font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl transition-colors text-sm">
+                                    <button type="button" onClick={() => resetForm()} className="flex-1 py-4 font-bold text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl transition-colors text-sm">
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={!amount || Number(amount) <= 0}
-                                        className="flex-[2] py-4 bg-indigo-600 disabled:bg-indigo-400 disabled:opacity-40 text-white font-black rounded-2xl shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all text-sm uppercase tracking-wider"
+                                        className="flex-[2] py-4 bg-indigo-600 disabled:bg-slate-200 dark:disabled:bg-slate-800 disabled:text-slate-400 disabled:shadow-none text-white font-black rounded-2xl shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all text-sm uppercase tracking-wider"
                                     >
                                         {isSettlementType && pendingEntries.length > 0 ? 'Allocate →' : 'Save Entry'}
                                     </button>
@@ -1105,11 +1115,11 @@ const PartyDetail = () => {
 
 // --- Summary Cell Component ---
 const SummaryCell = ({ label, value, color, icon }) => (
-    <div className="bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-100 dark:border-slate-800 text-center">
-        <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1 flex items-center justify-center gap-1">
+    <div className="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 text-center">
+        <p className="text-[8px] font-black uppercase tracking-[0.15em] text-slate-400 mb-1.5 flex items-center justify-center gap-1">
             {icon}{label}
         </p>
-        <p className={`text-sm font-black ${color}`}>{value}</p>
+        <p className={`text-[15px] font-black ${color}`}>{value}</p>
     </div>
 );
 

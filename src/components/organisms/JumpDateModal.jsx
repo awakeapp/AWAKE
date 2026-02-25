@@ -116,7 +116,7 @@ const JumpDateModal = ({ isOpen, onClose, initialDate, onSelect, minDate }) => {
                         <div className="p-4 border-b dark:border-slate-800 flex items-center justify-between">
                             <h3 className="font-bold text-lg dark:text-white flex items-center gap-2">
                                 <Calendar className="w-5 h-5 text-indigo-500" />
-                                Jump to Date
+                                Select Date
                             </h3>
                             <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-full dark:hover:bg-slate-800 transition-colors">
                                 <X className="w-5 h-5 text-slate-500 dark:text-slate-400" />
@@ -149,7 +149,7 @@ const JumpDateModal = ({ isOpen, onClose, initialDate, onSelect, minDate }) => {
                                 <button
                                     onClick={() => changeMonth(1)}
                                     disabled={selectedDate.getMonth() === today.getMonth() && selectedDate.getFullYear() === today.getFullYear()}
-                                    className="p-1 hover:bg-slate-100 rounded-lg dark:hover:bg-slate-800 disabled:opacity-30"
+                                    className="p-1 hover:bg-slate-100 rounded-lg dark:hover:bg-slate-800"
                                 >
                                     <ChevronRight className="w-5 h-5 text-slate-600 dark:text-slate-400" />
                                 </button>
