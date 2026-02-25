@@ -206,54 +206,56 @@ const FinanceDashboard = () => {
                 {/* Total Balance Card (Clickable to reveal accounts) */}
                 <motion.div 
                     whileTap={{ scale: 0.98 }}
-                    className="bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-800 rounded-[2rem] p-6 text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden"
+                    className="bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-800 rounded-[2.5rem] p-8 text-white shadow-2xl shadow-indigo-500/30 relative overflow-hidden"
                 >
                     {/* Decorative blobs */}
-                    <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-                    <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-black/10 rounded-full blur-2xl"></div>
+                    <div className="absolute -top-12 -right-12 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+                    <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-black/10 rounded-full blur-3xl"></div>
                     
                     <div className="relative z-10">
-                        <div className="flex justify-between items-start mb-4">
-                            <div>
-                                <p className="text-indigo-100 text-[10px] font-bold uppercase tracking-widest mb-1">{t('finance.total_balance', 'Total Balance')}</p>
-                                <h2 className="text-4xl font-black tracking-tight flex items-baseline gap-1">
-                                    <span className="text-xl opacity-60">₹</span>
+                        <div className="flex justify-between items-center mb-10">
+                            <div className="space-y-1">
+                                <p className="text-indigo-100/70 text-[11px] font-black uppercase tracking-[0.2em]">{t('finance.total_balance', 'Total Balance')}</p>
+                                <h2 className="text-[44px] font-black tracking-tightest leading-tight flex items-baseline gap-1.5">
+                                    <span className="text-2xl opacity-40 font-bold">₹</span>
                                     <span dir="ltr">{totalBalance.toLocaleString()}</span>
                                 </h2>
                             </div>
-                            <div className="flex flex-col items-end">
+                            <div className="shrink-0">
                                 <button
                                     onClick={(e) => { e.stopPropagation(); navigate('/finance/debts'); }}
-                                    className="w-[84px] h-[96px] bg-white/15 hover:bg-white/25 backdrop-blur-2xl border border-white/30 rounded-[1.75rem] flex flex-col items-center justify-center gap-2 shadow-2xl shadow-indigo-950/20 active:scale-95 transition-all group"
+                                    className="w-[92px] h-[108px] bg-white/10 hover:bg-white/20 backdrop-blur-3xl border border-white/20 rounded-[2rem] flex flex-col items-center justify-center gap-3 shadow-2xl shadow-black/20 active:scale-95 transition-all group"
                                 >
-                                    <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                        <BookOpen className="w-5 h-5 text-white" />
+                                    <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-all duration-300">
+                                        <BookOpen className="w-6 h-6 text-white" strokeWidth={2.5} />
                                     </div>
-                                    <div className="flex flex-col items-center">
-                                        <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/90 leading-none">Debt</span>
-                                        <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white leading-none mt-1">Ledger</span>
+                                    <div className="flex flex-col items-center space-y-0.5">
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Debt</span>
+                                        <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white">Ledger</span>
                                     </div>
                                 </button>
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/10 gap-2">
-                            <div className="flex flex-col items-start">
-                                <p className="text-[7px] font-black text-indigo-100 uppercase tracking-widest mb-1">{t('finance.income', 'Income')}</p>
-                                <p className="font-black text-xs">₹{monthStats.income.toLocaleString()}</p>
+                        <div className="w-full h-px bg-white/10 mb-8" />
+
+                        <div className="flex items-end justify-between gap-4">
+                            <div className="flex flex-col">
+                                <p className="text-[8px] font-black text-indigo-100/60 uppercase tracking-widest mb-1.5">{t('finance.income', 'Income')}</p>
+                                <p className="font-extrabold text-sm tracking-tight text-white/90">₹{monthStats.income.toLocaleString()}</p>
                             </div>
                             
                             <div className="flex flex-col items-center flex-1">
-                                <div className="px-3 py-1 bg-white/10 rounded-full backdrop-blur-md mb-1.5 flex items-center gap-1.5 border border-white/5">
-                                    <div className="w-1 h-1 rounded-full bg-rose-400"></div>
-                                    <p className="text-[7px] font-black text-indigo-100 uppercase tracking-widest">{t('finance.expenses', 'Expenses')}</p>
+                                <div className="px-3 py-1 bg-white/10 rounded-full backdrop-blur-md mb-2 flex items-center gap-2 border border-white/5">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.5)]"></div>
+                                    <p className="text-[8px] font-black text-white uppercase tracking-[0.15em]">{t('finance.expenses', 'Expenses')}</p>
                                 </div>
-                                <p className="font-black text-lg">₹{monthStats.expense.toLocaleString()}</p>
+                                <p className="font-black text-2xl tracking-tight">₹{monthStats.expense.toLocaleString()}</p>
                             </div>
 
                             <div className="flex flex-col items-end">
-                                <p className="text-[7px] font-black text-indigo-100 uppercase tracking-widest mb-1">Recurring</p>
-                                <p className="font-black text-xs">₹{recurringTotal.toLocaleString()}</p>
+                                <p className="text-[8px] font-black text-indigo-100/60 uppercase tracking-widest mb-1.5">Recurring</p>
+                                <p className="font-extrabold text-sm tracking-tight text-white/90">₹{recurringTotal.toLocaleString()}</p>
                             </div>
                         </div>
                     </div>
