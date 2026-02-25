@@ -48,6 +48,7 @@ const Overview = lazy(() => import('./pages/workspace/Overview'));
 
 const FinanceDashboard = lazy(() => import('./pages/finance/FinanceDashboard'));
 const DebtManager = lazy(() => import('./pages/finance/DebtManager'));
+const PartyDetail = lazy(() => import('./pages/finance/PartyDetail'));
 const AccountDetail = lazy(() => import('./pages/finance/AccountDetail'));
 const MonthlyOverview = lazy(() => import('./pages/finance/MonthlyOverview'));
 
@@ -146,6 +147,7 @@ function App() {
                             {/* Finance */}
                             <Route path="/finance" element={<FinanceDashboard />} />
                             <Route path="/finance/debts" element={<DebtManager />} />
+                            <Route path="/finance/debts/:partyId" element={<PartyDetail />} />
                             <Route path="/finance/account/:id" element={<AccountDetail />} />
                             <Route path="/finance/monthly" element={<MonthlyOverview />} />
 

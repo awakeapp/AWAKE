@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuthContext } from '../hooks/useAuthContext';
-import { format, startOfMonth, endOfMonth, isWithinInterval, addDays, addWeeks, addMonths, addYears, isBefore, isSameDay, startOfWeek, endOfWeek } from 'date-fns';
+import { format, startOfMonth, endOfMonth, isWithinInterval, addDays, subDays, addWeeks, addMonths, addYears, isBefore, isSameDay, startOfWeek, endOfWeek } from 'date-fns';
 import { FirestoreService } from '../services/firestore-service';
 import { CloudFunctionService } from '../services/cloud-function-service'; // Import
 import { orderBy, where, query, limit } from 'firebase/firestore';
@@ -38,6 +38,8 @@ export const FinanceContextProvider = ({ children }) => {
     const [accounts, setAccounts] = useState([]);
     const [savingsGoals, setSavingsGoals] = useState([]);
     const [debts, setDebts] = useState([]);
+    const [debtParties, setDebtParties] = useState([]);
+    const [debtTransactions, setDebtTransactions] = useState([]);
     const [subscriptions, setSubscriptions] = useState([]);
     const [recurringRules, setRecurringRules] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -52,6 +54,8 @@ export const FinanceContextProvider = ({ children }) => {
             setAccounts(DEFAULT_ACCOUNTS);
             setSavingsGoals([]);
             setDebts([]);
+            setDebtParties([]);
+            setDebtTransactions([]);
             setSubscriptions([]);
             setRecurringRules([]);
             setIsLoading(false);
@@ -96,6 +100,16 @@ export const FinanceContextProvider = ({ children }) => {
             (data) => setDebts(data)
         );
 
+        const unsubDebtParties = FirestoreService.subscribeToCollection(
+            `users/${user.uid}/debtParties`,
+            (data) => setDebtParties(data)
+        );
+
+        const unsubDebtTransactions = FirestoreService.subscribeToCollection(
+            `users/${user.uid}/debtTransactions`,
+            (data) => setDebtTransactions(data)
+        );
+
         const unsubSubs = FirestoreService.subscribeToCollection(
             `users/${user.uid}/subscriptions`,
             (data) => setSubscriptions(data)
@@ -112,6 +126,8 @@ export const FinanceContextProvider = ({ children }) => {
             unsubAccounts();
             unsubGoals();
             unsubDebts();
+            unsubDebtParties();
+            unsubDebtTransactions();
             unsubSubs();
             unsubRules();
         };
@@ -579,6 +595,135 @@ export const FinanceContextProvider = ({ children }) => {
     }, [user]);
 
 
+    const ENTRY_LOCK_DAYS = 30;
+
+    const isEntryLocked = useCallback((tx) => {
+        if (!tx || !tx.date) return false;
+        const txDate = new Date(tx.date);
+        const lockDate = subDays(new Date(), ENTRY_LOCK_DAYS);
+        return isBefore(txDate, lockDate);
+    }, []);
+
+    const addDebtParty = useCallback(async (party) => {
+        if (!user) return;
+        const newParty = {
+            created_at: new Date().toISOString(),
+            is_deleted: false,
+            ...party
+        };
+        await FirestoreService.addItem(`users/${user.uid}/debtParties`, newParty);
+    }, [user]);
+
+    const updateDebtParty = useCallback(async (id, updates) => {
+        if (!user) return;
+        await FirestoreService.updateItem(`users/${user.uid}/debtParties`, id, updates);
+    }, [user]);
+
+    const softDeleteDebtParty = useCallback(async (id) => {
+        if (!user) return;
+        await FirestoreService.updateItem(`users/${user.uid}/debtParties`, id, { is_deleted: true });
+    }, [user]);
+
+    const addDebtTransaction = useCallback(async (tx) => {
+        if (!user) return;
+        const newTx = {
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            is_deleted: false,
+            edit_history: [],
+            ...tx
+        };
+        await FirestoreService.addItem(`users/${user.uid}/debtTransactions`, newTx);
+    }, [user]);
+
+    const editDebtTransaction = useCallback(async (id, updates) => {
+        if (!user) return;
+        const tx = debtTransactions.find(t => t.id === id);
+        if (!tx || isEntryLocked(tx)) return;
+        
+        const historyEntry = {
+            edited_at: new Date().toISOString(),
+            changes: updates
+        };
+
+        await FirestoreService.updateItem(`users/${user.uid}/debtTransactions`, id, {
+            ...updates,
+            updated_at: new Date().toISOString(),
+            edit_history: [...(tx.edit_history || []), historyEntry]
+        });
+    }, [user, debtTransactions, isEntryLocked]);
+
+    const softDeleteDebtTransaction = useCallback(async (id) => {
+        if (!user) return;
+        const tx = debtTransactions.find(t => t.id === id);
+        if (!tx || isEntryLocked(tx)) return;
+        
+        await FirestoreService.updateItem(`users/${user.uid}/debtTransactions`, id, {
+            is_deleted: true,
+            updated_at: new Date().toISOString()
+        });
+    }, [user, debtTransactions, isEntryLocked]);
+
+    const reverseDebtTransaction = useCallback(async (id) => {
+        if (!user) return;
+        const tx = debtTransactions.find(t => t.id === id);
+        if (!tx) return;
+        
+        let reverseType;
+        switch(tx.type) {
+            case 'you_gave': reverseType = 'you_received'; break;
+            case 'you_received': reverseType = 'you_gave'; break;
+            case 'you_borrowed': reverseType = 'you_repaid'; break;
+            case 'you_repaid': reverseType = 'you_borrowed'; break;
+            case 'adjustment': reverseType = 'adjustment'; break; 
+            case 'write_off': reverseType = 'adjustment'; break; 
+            default: reverseType = 'adjustment';
+        }
+        
+        const newTx = {
+            party_id: tx.party_id,
+            type: reverseType,
+            amount: reverseType === 'adjustment' && tx.type === 'adjustment' ? -Number(tx.amount) : Number(tx.amount),
+            date: new Date().toISOString(),
+            notes: `Reversal of ${tx.type} transaction`,
+            is_reversal: true,
+            reversed_tx_id: tx.id,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            is_deleted: false,
+            edit_history: []
+        };
+        await FirestoreService.addItem(`users/${user.uid}/debtTransactions`, newTx);
+    }, [user, debtTransactions]);
+
+    const getPartyTransactions = useCallback((partyId) => {
+        return debtTransactions
+            .filter(t => t.party_id === partyId && !t.is_deleted)
+            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }, [debtTransactions]);
+
+    const getPartyBalance = useCallback((partyId) => {
+        const txs = getPartyTransactions(partyId);
+        let balance = 0;
+        
+        const sortedOldestFirst = [...txs].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        
+        for (const t of sortedOldestFirst) {
+            const amt = Number(t.amount);
+            switch(t.type) {
+                case 'you_gave': balance += amt; break;
+                case 'you_received': balance -= amt; break;
+                case 'you_borrowed': balance -= amt; break;
+                case 'you_repaid': balance += amt; break;
+                case 'adjustment': balance += amt; break;
+                case 'write_off': balance = 0; break;
+            }
+        }
+        
+        return balance;
+    }, [getPartyTransactions]);
+
+
     const loadMoreTransactions = useCallback(() => setTxLimit(prev => prev + 50), []);
 
     const value = useMemo(() => ({
@@ -587,6 +732,8 @@ export const FinanceContextProvider = ({ children }) => {
         accounts,
         savingsGoals,
         debts,
+        debtParties,
+        debtTransactions,
         subscriptions,
         addTransaction,
         addTransfer,
@@ -614,14 +761,26 @@ export const FinanceContextProvider = ({ children }) => {
         getBudgetStats,
         getDailySpend,
         getWeeklySavings,
+        addDebtParty,
+        updateDebtParty,
+        softDeleteDebtParty,
+        addDebtTransaction,
+        editDebtTransaction,
+        softDeleteDebtTransaction,
+        reverseDebtTransaction,
+        getPartyTransactions,
+        getPartyBalance,
+        isEntryLocked,
         isLoading,
         loadMoreTransactions
     }), [
-        transactions, categories, accounts, savingsGoals, debts, subscriptions, recurringRules, isLoading,
+        transactions, categories, accounts, savingsGoals, debts, debtParties, debtTransactions, subscriptions, recurringRules, isLoading,
         addTransaction, addTransfer, deleteTransaction, editTransaction, restoreTransaction, checkDuplicate,
         getAccountBalance, getTotalBalance, getMonthlySpend, getCategorySpend, updateCategoryBudget, addCategory,
         addDebt, addDebtPayment, settleDebt, addSubscription, updateSubscription, toggleSubscriptionStatus, deleteSubscription,
         updateAccount, toggleArchiveAccount, addRecurringRule, getBudgetStats, getDailySpend, getWeeklySavings,
+        addDebtParty, updateDebtParty, softDeleteDebtParty, addDebtTransaction, editDebtTransaction,
+        softDeleteDebtTransaction, reverseDebtTransaction, getPartyTransactions, getPartyBalance, isEntryLocked,
         loadMoreTransactions
     ]);
 

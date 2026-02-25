@@ -1,344 +1,233 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { User, Plus, Check, RotateCcw, ArrowLeft, Calendar } from 'lucide-react';
-import { format } from 'date-fns';
-import { useState } from 'react';
-import JumpDateModal from '../../components/organisms/JumpDateModal';
+import { User, Plus, ArrowLeft, MoreVertical, Search, CheckCircle } from 'lucide-react';
 import { useScrollLock } from '../../hooks/useScrollLock';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const DebtManager = () => {
-  const navigate = useNavigate();
-  const context = useFinance();
-  
-  // Defensive check if context or debts is missing
-  if (!context || !context.debts) {
+    const navigate = useNavigate();
+    const context = useFinance();
+
+    if (!context || !context.debtParties) {
+        return (
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-6">
+                <div className="animate-pulse flex flex-col items-center">
+                    <div className="w-12 h-12 bg-slate-200 dark:bg-slate-800 rounded-full mb-4"></div>
+                    <div className="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                </div>
+            </div>
+        );
+    }
+
+    const { debtParties, addDebtParty, getPartyBalance, getPartyTransactions } = context;
+    const [isAdding, setIsAdding] = useState(false);
+    useScrollLock(isAdding);
+
+    // Form State
+    const [name, setName] = useState('');
+    const [phone, setPhone] = useState('');
+    const [countryCode, setCountryCode] = useState('+91');
+    const [tag, setTag] = useState('');
+    const [creditLimit, setCreditLimit] = useState('');
+    const [reminderMethod, setReminderMethod] = useState('whatsapp');
+
+    const activeParties = (debtParties || []).filter(p => !p.is_deleted);
+
+    // Calculate totals over all non-deleted parties
+    let totalReceivable = 0;
+    let totalPayable = 0;
+
+    const partyData = activeParties.map(p => {
+        const bal = getPartyBalance(p.id);
+        const txs = getPartyTransactions(p.id);
+        const lastTxDate = txs.length > 0 ? txs[0].date : p.created_at;
+
+        if (bal > 0) totalReceivable += bal;
+        else if (bal < 0) totalPayable += Math.abs(bal);
+
+        return { ...p, balance: bal, lastTxDate };
+    }).sort((a, b) => new Date(b.lastTxDate).getTime() - new Date(a.lastTxDate).getTime());
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!name) return;
+
+        await addDebtParty({
+            name,
+            phone_number: phone,
+            country_code: countryCode,
+            tag,
+            credit_limit: creditLimit ? Number(creditLimit) : null,
+            preferred_reminder_method: reminderMethod,
+            last_reminder_sent_at: null
+        });
+
+        setIsAdding(false);
+        setName('');
+        setPhone('');
+        setTag('');
+        setCreditLimit('');
+    };
+
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-6">
-        <div className="animate-pulse flex flex-col items-center">
-            <div className="w-12 h-12 bg-slate-200 dark:bg-slate-800 rounded-full mb-4"></div>
-            <div className="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 2rem)' }}>
+            {/* Header */}
+            <header className="px-6 pt-6 pb-4 relative z-10">
+                <div className="flex items-center justify-between mb-6">
+                    <button onClick={() => navigate(-1)} className="p-2 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white -ml-2 focus:outline-none shadow-sm border border-slate-100 dark:border-slate-800">
+                        <ArrowLeft className="w-5 h-5" />
+                    </button>
+                    <h1 className="text-xl font-bold text-slate-900 dark:text-white">Debts & Lending</h1>
+                    <button onClick={() => setIsAdding(true)} className="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full transition-colors -mr-2 shadow-sm shadow-indigo-500/30">
+                        <Plus className="w-5 h-5" />
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-emerald-50 text-emerald-900 dark:bg-emerald-500/10 dark:text-emerald-100 p-5 rounded-[2rem] shadow-sm border border-emerald-100 dark:border-emerald-500/20">
+                        <p className="text-xs font-bold uppercase tracking-widest opacity-80 mb-2">Net Receivable</p>
+                        <h2 className="text-2xl font-black">₹{totalReceivable.toLocaleString()}</h2>
+                    </div>
+                    <div className="bg-red-50 text-red-900 dark:bg-red-500/10 dark:text-red-100 p-5 rounded-[2rem] shadow-sm border border-red-100 dark:border-red-500/20">
+                        <p className="text-xs font-bold uppercase tracking-widest opacity-80 mb-2">Net Payable</p>
+                        <h2 className="text-2xl font-black">₹{totalPayable.toLocaleString()}</h2>
+                    </div>
+                </div>
+            </header>
+
+            <div className="px-6 flex-1 flex flex-col space-y-4">
+                <div className="relative mt-2">
+                    <input type="text" placeholder="Search parties..." className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500" />
+                    <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                </div>
+
+                <div className="space-y-3 pb-8">
+                    {partyData.length === 0 ? (
+                        <div className="text-center py-16 px-6">
+                            <div className="w-20 h-20 bg-indigo-50 dark:bg-indigo-900/20 rounded-full flex items-center justify-center mx-auto mb-6 text-indigo-300">
+                                <User className="w-10 h-10" />
+                            </div>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No parties yet</h3>
+                            <p className="text-slate-500 text-sm mb-8 leading-relaxed max-w-xs mx-auto">
+                                Add friends, clients, or businesses you lend to or borrow from.
+                            </p>
+                            <button onClick={() => setIsAdding(true)} className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-indigo-500/20 hover:scale-[1.02] transition-transform">
+                                + Add Party
+                            </button>
+                        </div>
+                    ) : (
+                        partyData.map(party => {
+                            const bal = party.balance;
+                            const isReceivable = bal > 0;
+                            const isPayable = bal < 0;
+                            const isSettled = bal === 0;
+
+                            return (
+                                <motion.div key={party.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} onClick={() => navigate(`/finance/debts/${party.id}`)} className="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-500 font-bold text-lg shrink-0 overflow-hidden">
+                                            {party.name[0].toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-slate-900 dark:text-white capitalize truncate max-w-[130px] sm:max-w-[200px]">{party.name}</p>
+                                            <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                                                {party.tag && (
+                                                    <span className="text-[10px] bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded uppercase tracking-wider text-slate-500 font-bold">{party.tag}</span>
+                                                )}
+                                                <span className="text-xs text-slate-400 font-medium">Updated {new Date(party.lastTxDate).toLocaleDateString()}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="text-right">
+                                        {isSettled ? (
+                                            <div className="flex items-center justify-end gap-1 text-slate-400">
+                                                <CheckCircle className="w-4 h-4" />
+                                                <span className="text-xs font-bold uppercase tracking-wider">Settled</span>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <p className={`text-base font-black ${isReceivable ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                    ₹{Math.abs(bal).toLocaleString()}
+                                                </p>
+                                                <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                                                    {isReceivable ? 'To Get' : 'To Pay'}
+                                                </p>
+                                            </>
+                                        )}
+                                    </div>
+                                </motion.div>
+                            );
+                        })
+                    )}
+                </div>
+            </div>
+
+            {/* Add Party Drawer */}
+            <AnimatePresence>
+                {isAdding && (
+                    <div className="fixed inset-0 z-50 flex items-end justify-center p-4 pb-24 sm:p-6 sm:items-center">
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsAdding(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+                        
+                        <motion.form 
+                            initial={{ y: "100%", opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: "100%", opacity: 0 }} transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            onSubmit={handleSubmit} 
+                            className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2rem] p-6 shadow-2xl border border-slate-100 dark:border-slate-800 relative z-10 max-h-[85vh] overflow-y-auto"
+                        >
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">New Party Details</h3>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Name</label>
+                                    <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="John Doe" className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500" autoFocus />
+                                </div>
+
+                                <div className="grid grid-cols-3 gap-3">
+                                    <div className="col-span-1">
+                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Code</label>
+                                        <input type="text" value={countryCode} onChange={e => setCountryCode(e.target.value)} placeholder="+91" className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500" />
+                                    </div>
+                                    <div className="col-span-2">
+                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Phone No. (Opt)</label>
+                                        <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="9876543210" className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500" />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Tag (Opt)</label>
+                                        <input type="text" value={tag} onChange={e => setTag(e.target.value)} placeholder="Vendor, Friend" className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500" />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Cred. Limit (Opt)</label>
+                                        <input type="number" value={creditLimit} onChange={e => setCreditLimit(e.target.value)} placeholder="₹0" className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500" />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Reminder Method</label>
+                                    <div className="flex bg-slate-100 dark:bg-slate-800/50 rounded-xl p-1">
+                                        <button type="button" onClick={() => setReminderMethod('whatsapp')} className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${reminderMethod === 'whatsapp' ? 'bg-white dark:bg-slate-700 text-green-600 shadow-sm' : 'text-slate-500'}`}>WhatsApp</button>
+                                        <button type="button" onClick={() => setReminderMethod('sms')} className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${reminderMethod === 'sms' ? 'bg-white dark:bg-slate-700 text-indigo-600 shadow-sm' : 'text-slate-500'}`}>SMS</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3 mt-8">
+                                <button type="button" onClick={() => setIsAdding(false)} className="flex-1 py-3.5 font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors">
+                                    Cancel
+                                </button>
+                                <button type="submit" className="flex-[2] py-3.5 bg-indigo-600 text-white font-black rounded-xl shadow-lg shadow-indigo-500/30 active:scale-[0.98] transition-transform">
+                                    Save Party
+                                </button>
+                            </div>
+                        </motion.form>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
-      </div>
     );
-  }
-
-  const { debts, addDebt, settleDebt, addDebtPayment } = context;
-  const [isAdding, setIsAdding] = useState(false);
-
-  // Form State
-  const [type, setType] = useState('receivable'); // 'receivable' (They owe me) | 'payable' (I owe them)
-  const [person, setPerson] = useState('');
-  const [amount, setAmount] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [note, setNote] = useState('');
-  const [dueDatePickerOpen, setDueDatePickerOpen] = useState(false);
-
-  // Repayment State
-  const [repayModalOpen, setRepayModalOpen] = useState(false);
-  const [selectedDebt, setSelectedDebt] = useState(null);
-  const [repayAmount, setRepayAmount] = useState('');
-
-  useScrollLock(repayModalOpen);
-
-  const activeDebts = Array.isArray(debts) ? debts.filter(d => !d.isSettled) : [];
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!person || !amount) return;
-
-    addDebt({
-      type,
-      person,
-      amount: Number(amount),
-      note,
-      dueDate: dueDate || null
-    });
-    setIsAdding(false);
-    setPerson('');
-    setAmount('');
-    setDueDate('');
-    setNote('');
-  };
-
-  const receivables = activeDebts.filter(d => d.type === 'receivable');
-  const payables = activeDebts.filter(d => d.type === 'payable');
-  // Summary based on REMAINING amount
-  const totalReceivable = receivables.reduce((sum, d) => sum + (Number(d.amount) - (Number(d.paidAmount) || 0)), 0);
-  const totalPayable = payables.reduce((sum, d) => sum + (Number(d.amount) - (Number(d.paidAmount) || 0)), 0);
-
-  return (
-    <div 
-        className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 2rem)' }}
-    >
- {/* Header */}
- <header className="px-6 pt-6 pb-4">
- <div className="flex items-center justify-between mb-6">
- <button
- onClick={() => navigate(-1)}
- className="p-2 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white -ml-2 focus:outline-none shadow-sm border border-slate-100 dark:border-slate-800"
- >
- <ArrowLeft className="w-5 h-5" />
- </button>
- <h1 className="text-xl font-bold text-slate-900 dark:text-white">Debts & Lending</h1>
- <div className="w-9" />
- </div>
-
- <div className="grid grid-cols-2 gap-3">
- <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
- <p className="text-xs text-slate-500 flex items-center gap-1.5 mb-2 font-medium">
- <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
- To Receive
- </p>
- <h2 className="text-2xl font-bold text-slate-900 dark:text-white">₹{totalReceivable.toLocaleString()}</h2>
- </div>
- <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
- <p className="text-xs text-slate-500 flex items-center gap-1.5 mb-2 font-medium">
- <span className="w-2 h-2 rounded-full bg-red-500"></span>
- To Pay
- </p>
- <h2 className="text-2xl font-bold text-slate-900 dark:text-white">₹{totalPayable.toLocaleString()}</h2>
- </div>
- </div>
- </header>
-
- <div className="px-6 flex-1 flex flex-col space-y-6">
- {isAdding ? (
- <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 p-6 rounded-[1.5rem] shadow-sm border border-slate-100 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-200">
- <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">New Record</h3>
-
- <div className="flex p-1 bg-slate-100 dark:bg-slate-800/50 rounded-xl mb-6">
- <button
- type="button"
- onClick={() => setType('receivable')}
- className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${type === 'receivable' ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
- >
- I Lent
- </button>
- <button
- type="button"
- onClick={() => setType('payable')}
- className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${type === 'payable' ? 'bg-white dark:bg-slate-700 shadow-sm text-red-600 dark:text-red-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
- >
- I Borrowed
- </button>
- </div>
-
- <div className="space-y-4">
- <div>
- <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Person Name</label>
- <input
- type="text"
- value={person}
- onChange={e => setPerson(e.target.value)}
- placeholder="John Doe"
- className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500"
- autoFocus
- />
- </div>
- <div>
- <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Amount</label>
- <input
- type="number"
- value={amount}
- onChange={e => setAmount(e.target.value)}
- placeholder="500"
- className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500"
- />
- </div>
- <div>
- <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Due Date (Optional)</label>
- <button
- type="button"
- onClick={() => setDueDatePickerOpen(true)}
- className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 text-left flex items-center gap-2"
- >
- <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
- {dueDate ? format(new Date(dueDate + 'T00:00:00'), 'MMM d, yyyy') : 'Select date'}
- </button>
- <JumpDateModal
- isOpen={dueDatePickerOpen}
- onClose={() => setDueDatePickerOpen(false)}
- initialDate={dueDate ? new Date(dueDate + 'T00:00:00') : new Date()}
- onSelect={(d) => { if (d) { setDueDate(format(d, 'yyyy-MM-dd')); } else { setDueDate(''); } setDueDatePickerOpen(false); }}
- />
- </div>
- <div>
- <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Note</label>
- <input
- type="text"
- value={note}
- onChange={e => setNote(e.target.value)}
- placeholder="Reason..."
- className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500"
- />
- </div>
- </div>
-
- <div className="flex gap-3 mt-8">
- <button
- type="button"
- onClick={() => setIsAdding(false)}
- className="flex-1 py-3 font-semibold text-slate-500 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 rounded-xl transition-colors text-sm"
- >
- Cancel
- </button>
- <button
- type="submit"
- className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/30 active:scale-[0.98] transition-transform text-sm"
- >
- Save Record
- </button>
- </div>
- </form>
- ) : (
- <button
- onClick={() => setIsAdding(true)}
- className="w-full py-4 bg-white dark:bg-slate-900 rounded-[1.5rem] flex items-center justify-center gap-2 text-slate-500 hover:text-indigo-500 transition-all font-bold shadow-sm border border-slate-100 dark:border-slate-800 border-dashed hover:border-indigo-500 text-sm"
- >
- <Plus className="w-5 h-5" />
- Add New Record
- </button>
- )}
-
- {/* Lists */}
- {/* Lists logic with progress bars */}
- </div>
-
- {/* Lists with Zero State */}
- {receivables.length === 0 && payables.length === 0 && !isAdding && (
- <div className="text-center py-16 px-6">
- <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
- <User className="w-10 h-10" />
- </div>
- <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No active debts</h3>
- <p className="text-slate-500 text-sm mb-8 leading-relaxed max-w-xs mx-auto">
- Keep track of money you lend to friends or borrow from others. Everything is balanced!
- </p>
- <button
- onClick={() => setIsAdding(true)}
- className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-4 rounded-2xl font-bold shadow-xl hover:scale-[1.02] transition-transform"
- >
- + Add Person
- </button>
- </div>
- )}
-
- <div className="space-y-6">
- {receivables.length > 0 && (
- <div>
- <h3 className="font-bold text-slate-900 dark:text-white mb-3 text-sm pl-1 flex items-center gap-2">
- Expected to Receive
- </h3>
- <div className="space-y-3">
- {receivables.map(d => <DebtItem key={d.id} debt={d} onRepay={() => { setSelectedDebt(d); setRepayModalOpen(true); }} />)}
- </div>
- </div>
- )}
- {payables.length > 0 && (
- <div>
- <h3 className="font-bold text-slate-900 dark:text-white mb-3 text-sm pl-1 flex items-center gap-2">
- Need to Pay
- </h3>
- <div className="space-y-3">
- {payables.map(d => <DebtItem key={d.id} debt={d} onRepay={() => { setSelectedDebt(d); setRepayModalOpen(true); }} />)}
- </div>
- </div>
- )}
- </div>
-
- {/* Repay Modal */}
- {repayModalOpen && selectedDebt && (
- <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
- <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setRepayModalOpen(false)} />
- <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl w-full max-w-sm relative z-10 shadow-2xl">
- <h3 className="text-xl font-bold mb-4">Record Repayment</h3>
- <p className="text-sm text-slate-500 mb-4">
- How much {selectedDebt.type === 'receivable' ? 'did you receive' : 'did you pay'}?
- </p>
-
- <div className="mb-4">
- <input
- type="number"
- value={repayAmount}
- onChange={e => setRepayAmount(e.target.value)}
- placeholder={`Remaining: ${Number(selectedDebt.amount) - (selectedDebt.paidAmount || 0)}`}
- className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 text-xl font-bold"
- autoFocus
- />
- </div>
-
- <div className="grid grid-cols-2 gap-3">
- <button onClick={() => setRepayModalOpen(false)} className="py-3 font-bold text-slate-500">Cancel</button>
- <button
- onClick={() => {
- if (repayAmount) {
- addDebtPayment(selectedDebt.id, repayAmount);
- setRepayModalOpen(false);
- setRepayAmount('');
- }
- }}
- className="py-3 bg-indigo-600 text-white font-bold rounded-xl"
- >
- Confirm
- </button>
- </div>
- </div>
- </div>
- )}
- </div>
- );
-};
-
-// Component for List Item
-const DebtItem = ({ debt, onRepay }) => {
- const paid = Number(debt.paidAmount) || 0;
- const total = Number(debt.amount);
- const percent = Math.min((paid / total) * 100, 100);
- const remaining = total - paid;
-
- return (
- <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
- <div className="flex justify-between items-start mb-2">
- <div className="flex items-center gap-3">
- <div className={`w-10 h-10 rounded-full flex items-center justify-center ${debt.type === 'receivable' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
- <User className="w-5 h-5" />
- </div>
- <div>
- <p className="font-bold text-slate-900 dark:text-white">{debt.person}</p>
- <p className="text-xs text-slate-400">{debt.note}</p>
- </div>
- </div>
- <div className="text-right">
- <p className={`font-bold ${debt.type === 'receivable' ? 'text-emerald-600' : 'text-red-600'}`}>
- ₹{remaining.toLocaleString()}
- </p>
- <p className="text-[10px] text-slate-400">of ₹{total.toLocaleString()}</p>
- </div>
- </div>
-
- {/* Progress Bar */}
- <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-3">
- <div
- className={`h-full rounded-full ${debt.type === 'receivable' ? 'bg-emerald-500' : 'bg-red-500'}`}
- style={{ width: `${percent}%` }}
- />
- </div>
-
- <div className="flex justify-between items-center">
- <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
- {debt.dueDate ? `Due ${new Date(debt.dueDate).toLocaleDateString()}` : 'No Due Date'}
- </span>
- <button
- onClick={onRepay}
- className="text-xs font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-3 py-1.5 rounded-lg"
- >
- Record Payment
- </button>
- </div>
- </div>
- );
 };
 
 export default DebtManager;
