@@ -102,18 +102,7 @@ const UpcomingPayments = () => {
 
 
 
-            {/* Summary Card - More compact */}
-            <div className="mx-2 mb-2 p-3 bg-slate-100 dark:bg-slate-800/40 rounded-xl flex items-center justify-between border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all">
-                <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 flex items-center justify-center shadow-sm">
-                        <RefreshCw className="w-4 h-4 text-indigo-500" />
-                    </div>
-                    <div>
-                        <p className="text-[8px] text-slate-400 uppercase font-black tracking-widest">{t('finance.monthly_recurring', 'Monthly Total')}</p>
-                        <p className="text-sm font-black text-slate-900 dark:text-white">₹{totalMonthlyCost.toLocaleString()}</p>
-                    </div>
-                </div>
-            </div>
+
 
             {/* Horizontal Scroll List */}
             < div className="overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide flex gap-3" >
@@ -132,34 +121,38 @@ const UpcomingPayments = () => {
                         const daysLeft = getDaysLeft(sub.nextBillingDate || sub.dueDate);
 
                         return (
-                            <div key={sub.id} className="min-w-[120px] p-2.5 rounded-[1.25rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm relative group transition-all hover:border-indigo-500/50">
+                            <div key={sub.id} className="min-w-[150px] p-2 rounded-[1rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm relative group transition-all hover:border-indigo-500/50 flex items-center gap-2.5">
                                 {/* Action Buttons */}
-                                <div className="absolute top-1.5 right-1.5 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                <div className="absolute top-1 right-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-lg p-0.5 shadow-sm">
                                     <button
                                         onClick={(e) => { e.stopPropagation(); toggleSubscriptionStatus(sub.id); }}
                                         className="p-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 transition-colors text-slate-500"
                                     >
-                                        {sub.status === 'active' ? <Pause className="w-2.5 h-2.5" /> : <Play className="w-2.5 h-2.5" />}
+                                        {sub.status === 'active' ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
                                     </button>
                                     <button
                                         onClick={(e) => { e.stopPropagation(); if(confirm('Delete this subscription?')) deleteSubscription(sub.id); }}
                                         className="p-1.5 bg-rose-50 dark:bg-rose-900/20 rounded-lg hover:bg-rose-100 transition-colors text-rose-500"
                                     >
-                                        <Trash2 className="w-2.5 h-2.5" />
+                                        <Trash2 className="w-3 h-3" />
                                     </button>
                                 </div>
 
-                                <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center mb-2">
-                                    <Icon className="w-3.5 h-3.5 text-indigo-500" />
+                                <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center shrink-0">
+                                    <Icon className="w-4 h-4 text-indigo-500" />
                                 </div>
 
-                                <h4 className="font-black text-slate-900 dark:text-white text-[10px] leading-tight mb-0.5 truncate pr-8">{sub.name}</h4>
-                                <p className="text-slate-400 text-[9px] font-black mb-2 uppercase tracking-tighter">₹{Number(sub.amount).toLocaleString()}</p>
-
-                                <div className={`inline-block px-1.5 py-0.5 rounded-md text-[7px] font-black uppercase tracking-widest ${sub.status !== 'active' ? 'bg-slate-100 dark:bg-slate-800 text-slate-400' : daysLeft.includes('Overdue') ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600' : 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600'}`}>
-                                    {sub.status === 'active' ? daysLeft : 'Paused'}
+                                <div className="flex-1 min-w-0 py-0.5 pr-2">
+                                    <div className="flex items-center justify-between mb-0.5 gap-2">
+                                        <h4 className="font-black text-slate-900 dark:text-white text-[10px] leading-tight truncate">{sub.name}</h4>
+                                        <div className={`shrink-0 px-1 py-[2px] rounded text-[6px] font-black uppercase tracking-widest ${sub.status !== 'active' ? 'bg-slate-100 dark:bg-slate-800 text-slate-400' : daysLeft.includes('Overdue') ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600' : 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600'}`}>
+                                            {sub.status === 'active' ? daysLeft : 'Paused'}
+                                        </div>
+                                    </div>
+                                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-tighter">₹{Number(sub.amount).toLocaleString()}</p>
                                 </div>
                             </div>
+
                         );
                     })
                 }

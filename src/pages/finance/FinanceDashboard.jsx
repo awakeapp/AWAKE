@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { Plus, Wallet, PieChart, ChevronLeft, ChevronRight, PiggyBank, ArrowDown, TrendingUp, Undo, X } from 'lucide-react';
+import { Plus, Wallet, PieChart, ChevronLeft, ChevronRight, PiggyBank, ArrowDown, TrendingUp, Undo, X, Menu } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, isWithinInterval, subMonths, addMonths } from 'date-fns';
 import { useState, useMemo } from 'react';
 import AddTransactionModal from './AddTransactionModal';
@@ -121,13 +121,43 @@ const FinanceDashboard = () => {
                         </button>
                     </div>
 
-                    <button 
-                        onClick={() => setShowAccounts(!showAccounts)}
-                        className={`justify-self-end flex items-center gap-2 px-4 py-2 rounded-full font-black text-[9px] uppercase tracking-[0.2em] transition-all ${showAccounts ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'bg-white dark:bg-slate-900 text-slate-500 border border-slate-100 dark:border-slate-800'}`}
-                    >
-                        {showAccounts ? 'Close' : 'More'}
-                        <Plus className={`w-3.5 h-3.5 transition-transform duration-500 ${showAccounts ? 'rotate-45' : ''}`} />
-                    </button>
+                    <div className="relative justify-self-end">
+                        <button 
+                            onClick={() => setShowAccounts(!showAccounts)}
+                            className={`p-2 rounded-xl transition-all ${showAccounts ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-500'}`}
+                        >
+                            {showAccounts ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                        </button>
+
+                        <AnimatePresence>
+                            {showAccounts && (
+                                <>
+                                    <div className="fixed inset-0 z-40" onClick={() => setShowAccounts(false)} />
+                                    <motion.div
+                                        initial={{ opacity: 0, x: 20, scale: 0.95 }}
+                                        animate={{ opacity: 1, x: 0, scale: 1 }}
+                                        exit={{ opacity: 0, x: 20, scale: 0.95 }}
+                                        className="absolute top-12 right-0 w-48 bg-white dark:bg-slate-900 rounded-[1.5rem] shadow-2xl border border-slate-100 dark:border-slate-800 p-2 z-50 flex flex-col gap-1 overflow-hidden"
+                                    >
+                                        <div className="px-3 py-2 border-b border-slate-50 dark:border-slate-800 mb-1">
+                                            <p className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Your Wallets</p>
+                                        </div>
+                                        {activeAccounts.map(acc => (
+                                            <div
+                                                key={acc.id}
+                                                onClick={() => { navigate(`/finance/account/${acc.id}`); setShowAccounts(false); }}
+                                                className="px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-xl cursor-pointer flex flex-col transition-colors active:scale-[0.98]"
+                                            >
+                                                <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{acc.name}</p>
+                                                <p className="font-black text-slate-900 dark:text-white text-sm mt-0.5">₹{acc.balance.toLocaleString()}</p>
+                                            </div>
+                                        ))}
+                                    </motion.div>
+                                </>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
                 </div>
 
                 {/* Total Balance Card (Clickable to reveal accounts) */}
@@ -204,32 +234,7 @@ const FinanceDashboard = () => {
                     <UpcomingPayments />
                 </section>
 
-                {/* Toggleable Accounts Grid */}
-                <AnimatePresence>
-                    {showAccounts && (
-                        <motion.section
-                            initial={{ height: 0, opacity: 0, marginBottom: 0 }}
-                            animate={{ height: 'auto', opacity: 1, marginBottom: 24 }}
-                            exit={{ height: 0, opacity: 0, marginBottom: 0 }}
-                            className="overflow-hidden"
-                        >
-                            <div className="grid grid-cols-3 gap-2 p-1">
-                                {activeAccounts.map(acc => (
-                                    <motion.div
-                                        key={acc.id}
-                                        initial={{ scale: 0.9, opacity: 0 }}
-                                        animate={{ scale: 1, opacity: 1 }}
-                                        onClick={() => navigate(`/finance/account/${acc.id}`)}
-                                        className="bg-white dark:bg-slate-900 p-3.5 rounded-[1.5rem] shadow-sm border border-slate-100 dark:border-slate-800 cursor-pointer active:scale-95 transition-all flex flex-col items-center justify-center text-center hover:border-indigo-500/30"
-                                    >
-                                        <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest mb-1.5 truncate max-w-full">{acc.name}</p>
-                                        <p className="font-black text-slate-900 dark:text-white text-xs truncate w-full">₹{acc.balance.toLocaleString()}</p>
-                                    </motion.div>
-                                ))}
-                            </div>
-                        </motion.section>
-                    )}
-                </AnimatePresence>
+
 
                 {/* Transactions List */}
                 <section className="flex-1">

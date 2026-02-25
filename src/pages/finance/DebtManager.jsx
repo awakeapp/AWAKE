@@ -20,7 +20,7 @@ const DebtManager = () => {
         );
     }
 
-    const { debtParties, addDebtParty, getPartyBalance, getPartyTransactions } = context;
+    const { debtParties, addDebtParty, getPartyBalance, getPartyTransactions, getPartyStatus } = context;
     const [isAdding, setIsAdding] = useState(false);
     useScrollLock(isAdding);
 
@@ -122,6 +122,13 @@ const DebtManager = () => {
                             const isReceivable = bal > 0;
                             const isPayable = bal < 0;
                             const isSettled = bal === 0;
+                            const status = getPartyStatus(party.id);
+                            const statusMap = {
+                                active: { label: 'Active', cls: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300' },
+                                cleared: { label: 'Cleared', cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300' },
+                                overdue: { label: 'Overdue', cls: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300' },
+                            };
+                            const badge = statusMap[status] || statusMap.active;
 
                             return (
                                 <motion.div key={party.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} onClick={() => navigate(`/finance/debts/${party.id}`)} className="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all">
@@ -130,7 +137,10 @@ const DebtManager = () => {
                                             {party.name[0].toUpperCase()}
                                         </div>
                                         <div>
-                                            <p className="font-bold text-slate-900 dark:text-white capitalize truncate max-w-[130px] sm:max-w-[200px]">{party.name}</p>
+                                            <div className="flex items-center gap-2">
+                                                <p className="font-bold text-slate-900 dark:text-white capitalize truncate max-w-[110px] sm:max-w-[170px]">{party.name}</p>
+                                                <span className={`text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full ${badge.cls}`}>{badge.label}</span>
+                                            </div>
                                             <div className="flex flex-wrap items-center gap-1.5 mt-1">
                                                 {party.tag && (
                                                     <span className="text-[10px] bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded uppercase tracking-wider text-slate-500 font-bold">{party.tag}</span>

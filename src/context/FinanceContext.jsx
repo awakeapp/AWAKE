@@ -723,6 +723,96 @@ export const FinanceContextProvider = ({ children }) => {
         return balance;
     }, [getPartyTransactions]);
 
+    // --- Settlement Logic ---
+
+    // Returns how much of entry `entryId` has been settled by payment txs
+    const getEntrySettledAmount = useCallback((entryId) => {
+        return debtTransactions
+            .filter(t => !t.is_deleted && t.settlements)
+            .reduce((sum, t) => {
+                const match = (t.settlements || []).find(s => s.entry_id === entryId);
+                return sum + (match ? Number(match.amount) : 0);
+            }, 0);
+    }, [debtTransactions]);
+
+    // Returns outstanding (unsettled) entries for a party
+    // "Outstanding" = you_gave or you_borrowed entries with remaining > 0
+    const getPendingEntries = useCallback((partyId) => {
+        const txs = debtTransactions
+            .filter(t => t.party_id === partyId && !t.is_deleted)
+            .filter(t => t.type === 'you_gave' || t.type === 'you_borrowed')
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()); // oldest first
+
+        return txs.map(t => {
+            const settled = getEntrySettledAmount(t.id);
+            const remaining = Number(t.amount) - settled;
+            return { ...t, settled, remaining };
+        }).filter(t => t.remaining > 0);
+    }, [debtTransactions, getEntrySettledAmount]);
+
+    // settleOldestFirst: boolean
+    // selectedEntries: [{ entry_id, amount }] — only used when settleOldestFirst=false
+    const addSettlementPayment = useCallback(async (partyId, totalAmount, { settleOldestFirst = false, selectedEntries = [], txType, date, notes }) => {
+        if (!user) return;
+        let remaining = Number(totalAmount);
+        if (remaining <= 0) return;
+
+        let settlements = [];
+
+        if (settleOldestFirst) {
+            const pending = getPendingEntries(partyId);
+            for (const entry of pending) {
+                if (remaining <= 0) break;
+                const allocate = Math.min(entry.remaining, remaining);
+                settlements.push({ entry_id: entry.id, amount: allocate });
+                remaining -= allocate;
+            }
+        } else {
+            // Use user-selected entries
+            for (const sel of selectedEntries) {
+                if (remaining <= 0) break;
+                const entry = debtTransactions.find(t => t.id === sel.entry_id);
+                if (!entry) continue;
+                const settled = getEntrySettledAmount(sel.entry_id);
+                const entryRemaining = Number(entry.amount) - settled;
+                const allocate = Math.min(Number(sel.amount), entryRemaining, remaining);
+                if (allocate > 0) {
+                    settlements.push({ entry_id: sel.entry_id, amount: allocate });
+                    remaining -= allocate;
+                }
+            }
+        }
+
+        // Create the payment transaction with settlement references
+        const paymentTx = {
+            party_id: partyId,
+            type: txType || 'you_received',
+            amount: Number(totalAmount) - remaining, // actual allocated amount (prevents over-allocation)
+            date: date || new Date().toISOString(),
+            notes: notes || 'Payment',
+            settlements,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            is_deleted: false,
+            edit_history: []
+        };
+
+        await FirestoreService.addItem(`users/${user.uid}/debtTransactions`, paymentTx);
+    }, [user, getPendingEntries, debtTransactions, getEntrySettledAmount]);
+
+    // Party status: 'cleared' | 'overdue' | 'active'
+    const getPartyStatus = useCallback((partyId) => {
+        const bal = getPartyBalance(partyId);
+        if (bal === 0) return 'cleared';
+
+        const pending = getPendingEntries(partyId);
+        const now = new Date();
+        const hasOverdue = pending.some(t => t.due_date && isBefore(new Date(t.due_date), now));
+        if (hasOverdue) return 'overdue';
+
+        return 'active';
+    }, [getPartyBalance, getPendingEntries]);
+
 
     const loadMoreTransactions = useCallback(() => setTxLimit(prev => prev + 50), []);
 
@@ -771,6 +861,10 @@ export const FinanceContextProvider = ({ children }) => {
         getPartyTransactions,
         getPartyBalance,
         isEntryLocked,
+        getEntrySettledAmount,
+        getPendingEntries,
+        addSettlementPayment,
+        getPartyStatus,
         isLoading,
         loadMoreTransactions
     }), [
@@ -781,6 +875,7 @@ export const FinanceContextProvider = ({ children }) => {
         updateAccount, toggleArchiveAccount, addRecurringRule, getBudgetStats, getDailySpend, getWeeklySavings,
         addDebtParty, updateDebtParty, softDeleteDebtParty, addDebtTransaction, editDebtTransaction,
         softDeleteDebtTransaction, reverseDebtTransaction, getPartyTransactions, getPartyBalance, isEntryLocked,
+        getEntrySettledAmount, getPendingEntries, addSettlementPayment, getPartyStatus,
         loadMoreTransactions
     ]);
 
