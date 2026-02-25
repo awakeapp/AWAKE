@@ -238,9 +238,20 @@ export const FinanceContextProvider = ({ children }) => {
         return accounts.find(a => a.id === accountId)?.balance || 0;
     }, [accounts]);
 
+    const getCalculatedBalance = useCallback(() => {
+        const income = transactions
+            .filter(t => !t.isDeleted && t.type === 'income')
+            .reduce((acc, t) => acc + Number(t.amount), 0);
+        const expense = transactions
+            .filter(t => !t.isDeleted && t.type === 'expense')
+            .reduce((acc, t) => acc + Number(t.amount), 0);
+        return income - expense;
+    }, [transactions]);
+
     const getTotalBalance = useCallback(() => {
-        return accounts.filter(a => !a.isArchived).reduce((acc, curr) => acc + curr.balance, 0);
-    }, [accounts]);
+        // User requested Total Income - Total Expense logic
+        return getCalculatedBalance();
+    }, [getCalculatedBalance]);
 
     const getMonthlySpend = useCallback(() => {
         const now = new Date();
@@ -444,7 +455,14 @@ export const FinanceContextProvider = ({ children }) => {
 
     const addCategory = useCallback(async (cat) => {
         if (!user) return;
-        await FirestoreService.addItem(`users/${user.uid}/categories`, cat);
+        const newCat = {
+            id: `cat_${Date.now()}`,
+            budget: 0,
+            color: 'bg-indigo-500',
+            icon: 'IndianRupee',
+            ...cat
+        };
+        await FirestoreService.addItem(`users/${user.uid}/categories`, newCat);
     }, [user]);
 
     const addDebt = useCallback(async (debt, linkToTransaction = false, accountId = null) => {

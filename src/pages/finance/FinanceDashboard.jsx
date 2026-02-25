@@ -36,6 +36,7 @@ const FinanceDashboard = () => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [undoToast, setUndoToast] = useState(null); // { id, message }
     const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
+    const [showAccounts, setShowAccounts] = useState(false);
 
     const monthStats = useMemo(() => {
         const start = startOfMonth(selectedDate);
@@ -89,6 +90,7 @@ const FinanceDashboard = () => {
     };
 
     const totalBalance = getTotalBalance();
+    const activeAccounts = accounts.filter(a => !a.isArchived);
     const sortedMonthlyTx = [...monthStats.transactions].sort((a, b) =>
         new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)
     );
@@ -118,8 +120,12 @@ const FinanceDashboard = () => {
                     </div>
                 </div>
 
-                {/* Main Balance Card */}
-                <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-800 rounded-[2rem] p-6 text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden">
+                {/* Total Balance Card (Clickable to reveal accounts) */}
+                <motion.div 
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setShowAccounts(!showAccounts)}
+                    className="bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-800 rounded-[2rem] p-6 text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden cursor-pointer"
+                >
                     {/* Decorative blobs */}
                     <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
                     <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-black/10 rounded-full blur-2xl"></div>
@@ -127,41 +133,49 @@ const FinanceDashboard = () => {
                     <div className="relative z-10">
                         <div className="flex justify-between items-start mb-4">
                             <div>
-                                <p className="text-indigo-100 text-sm font-medium mb-1">{t('finance.total_balance', 'Total Balance')}</p>
-                                <h2 className="text-4xl font-bold tracking-tight">
-                                    <span dir="ltr">₹{totalBalance.toLocaleString()}</span>
+                                <p className="text-indigo-100 text-[10px] font-bold uppercase tracking-widest mb-1">{t('finance.total_balance', 'Total Balance')}</p>
+                                <h2 className="text-4xl font-black tracking-tight flex items-baseline gap-1">
+                                    <span className="text-xl opacity-60">₹</span>
+                                    <span dir="ltr">{totalBalance.toLocaleString()}</span>
                                 </h2>
                             </div>
-                            <button
-                                onClick={() => setIsAnalyticsOpen(true)}
-                                className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors backdrop-blur-md"
-                            >
-                                <PieChart className="w-5 h-5 text-white" />
-                            </button>
+                            <div className="flex flex-col items-end gap-2">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); setIsAnalyticsOpen(true); }}
+                                    className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center transition-colors backdrop-blur-md"
+                                >
+                                    <PieChart className="w-5 h-5 text-white" />
+                                </button>
+                                <div className="px-2 py-1 bg-white/10 rounded-lg backdrop-blur-md border border-white/10">
+                                    <p className="text-[8px] font-black uppercase tracking-tighter text-indigo-100">
+                                        {showAccounts ? 'Hide Wallets' : 'Show Wallets'}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/20">
+                        <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/10">
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                                    <ArrowDown className="w-4 h-4 text-white" />
+                                <div className="w-8 h-8 rounded-full bg-emerald-400/20 flex items-center justify-center">
+                                    <ArrowDown className="w-4 h-4 text-emerald-300" />
                                 </div>
-                                <div>
-                                    <p className="text-indigo-100 text-xs mb-0.5">{t('finance.income', 'Income')}</p>
-                                    <p className="font-bold text-sm"><span dir="ltr">₹{monthStats.income.toLocaleString()}</span></p>
+                                <div className="flex flex-col">
+                                    <p className="text-[8px] font-black text-indigo-100 uppercase tracking-widest mb-0.5">{t('finance.income', 'Income')}</p>
+                                    <p className="font-black text-sm"><span dir="ltr">₹{monthStats.income.toLocaleString()}</span></p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                                    <TrendingUp className="w-4 h-4 text-white" />
+                                <div className="w-8 h-8 rounded-full bg-rose-400/20 flex items-center justify-center">
+                                    <TrendingUp className="w-4 h-4 text-rose-300" />
                                 </div>
-                                <div>
-                                    <p className="text-indigo-100 text-xs mb-0.5">{t('finance.expenses', 'Expenses')}</p>
-                                    <p className="font-bold text-sm mt-0.5"><span dir="ltr">₹{monthStats.expense.toLocaleString()}</span></p>
+                                <div className="flex flex-col text-right">
+                                    <p className="text-[8px] font-black text-indigo-100 uppercase tracking-widest mb-0.5">{t('finance.expenses', 'Expenses')}</p>
+                                    <p className="font-black text-sm"><span dir="ltr">₹{monthStats.expense.toLocaleString()}</span></p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </motion.div>
             </header>
 
             <div className="px-6 flex-1 flex flex-col space-y-6">
@@ -169,42 +183,50 @@ const FinanceDashboard = () => {
                 <div className="grid grid-cols-2 gap-3">
                     <button 
                         onClick={() => navigate('/finance/debt')}
-                        className="bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 py-3 rounded-2xl font-bold text-sm shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+                        className="bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
                     >
                         <Undo className="w-4 h-4 text-indigo-500" />
-                        Debt Management
+                        Repayments
                     </button>
                     <button 
                         onClick={() => setIsBudgetOpen(true)}
-                        className="bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 py-3 rounded-2xl font-bold text-sm shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+                        className="bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
                     >
                         <TrendingUp className="w-4 h-4 text-indigo-500" />
                         {t('finance.budgets', 'Budgets')}
                     </button>
                 </div>
 
-                {/* Accounts Grid (3 Columns) */}
-                <section>
-                    <div className="grid grid-cols-3 gap-2">
-                        {accounts.filter(a => !a.isArchived).map(acc => (
-                            <div
-                                key={acc.id}
-                                onClick={() => navigate(`/finance/account/${acc.id}`)}
-                                className="bg-white dark:bg-slate-900 p-3 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 cursor-pointer active:scale-95 transition-transform flex flex-col items-center justify-center text-center"
-                            >
-                                <div className="flex items-center gap-1.5 mb-1 justify-center">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0"></div>
-                                    <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium truncate max-w-full">{acc.name}</p>
-                                </div>
-                                <p className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm truncate w-full"><span dir="ltr">₹{acc.balance.toLocaleString()}</span></p>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
                 <section>
                     <UpcomingPayments />
                 </section>
+
+                {/* Toggleable Accounts Grid */}
+                <AnimatePresence>
+                    {showAccounts && (
+                        <motion.section
+                            initial={{ height: 0, opacity: 0, marginBottom: 0 }}
+                            animate={{ height: 'auto', opacity: 1, marginBottom: 24 }}
+                            exit={{ height: 0, opacity: 0, marginBottom: 0 }}
+                            className="overflow-hidden"
+                        >
+                            <div className="grid grid-cols-3 gap-2 p-1">
+                                {activeAccounts.map(acc => (
+                                    <motion.div
+                                        key={acc.id}
+                                        initial={{ scale: 0.9, opacity: 0 }}
+                                        animate={{ scale: 1, opacity: 1 }}
+                                        onClick={() => navigate(`/finance/account/${acc.id}`)}
+                                        className="bg-white dark:bg-slate-900 p-3.5 rounded-[1.5rem] shadow-sm border border-slate-100 dark:border-slate-800 cursor-pointer active:scale-95 transition-all flex flex-col items-center justify-center text-center hover:border-indigo-500/30"
+                                    >
+                                        <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest mb-1.5 truncate max-w-full">{acc.name}</p>
+                                        <p className="font-black text-slate-900 dark:text-white text-xs truncate w-full">₹{acc.balance.toLocaleString()}</p>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </motion.section>
+                    )}
+                </AnimatePresence>
 
                 {/* Transactions List */}
                 <section className="flex-1">

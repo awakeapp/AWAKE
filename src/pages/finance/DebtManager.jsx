@@ -8,56 +8,70 @@ import JumpDateModal from '../../components/organisms/JumpDateModal';
 import { useScrollLock } from '../../hooks/useScrollLock';
 
 const DebtManager = () => {
- const navigate = useNavigate();
- const { debts, addDebt, settleDebt, addDebtPayment } = useFinance();
- const [isAdding, setIsAdding] = useState(false);
+  const navigate = useNavigate();
+  const context = useFinance();
+  
+  // Defensive check if context or debts is missing
+  if (!context || !context.debts) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-6">
+        <div className="animate-pulse flex flex-col items-center">
+            <div className="w-12 h-12 bg-slate-200 dark:bg-slate-800 rounded-full mb-4"></div>
+            <div className="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
+        </div>
+      </div>
+    );
+  }
 
- // Form State
- const [type, setType] = useState('receivable'); // 'receivable' (They owe me) | 'payable' (I owe them)
- const [person, setPerson] = useState('');
- const [amount, setAmount] = useState('');
- const [dueDate, setDueDate] = useState('');
- const [note, setNote] = useState('');
- const [dueDatePickerOpen, setDueDatePickerOpen] = useState(false);
+  const { debts, addDebt, settleDebt, addDebtPayment } = context;
+  const [isAdding, setIsAdding] = useState(false);
 
- // Repayment State
- const [repayModalOpen, setRepayModalOpen] = useState(false);
- const [selectedDebt, setSelectedDebt] = useState(null);
- const [repayAmount, setRepayAmount] = useState('');
+  // Form State
+  const [type, setType] = useState('receivable'); // 'receivable' (They owe me) | 'payable' (I owe them)
+  const [person, setPerson] = useState('');
+  const [amount, setAmount] = useState('');
+  const [dueDate, setDueDate] = useState('');
+  const [note, setNote] = useState('');
+  const [dueDatePickerOpen, setDueDatePickerOpen] = useState(false);
 
- useScrollLock(repayModalOpen);
+  // Repayment State
+  const [repayModalOpen, setRepayModalOpen] = useState(false);
+  const [selectedDebt, setSelectedDebt] = useState(null);
+  const [repayAmount, setRepayAmount] = useState('');
 
- const activeDebts = debts.filter(d => !d.isSettled);
+  useScrollLock(repayModalOpen);
 
- const handleSubmit = (e) => {
- e.preventDefault();
- if (!person || !amount) return;
+  const activeDebts = Array.isArray(debts) ? debts.filter(d => !d.isSettled) : [];
 
- addDebt({
- type,
- person,
- amount: Number(amount),
- note,
- dueDate: dueDate || null
- });
- setIsAdding(false);
- setPerson('');
- setAmount('');
- setDueDate('');
- setNote('');
- };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!person || !amount) return;
 
- const receivables = activeDebts.filter(d => d.type === 'receivable');
- const payables = activeDebts.filter(d => d.type === 'payable');
- // Summary based on REMAINING amount
- const totalReceivable = receivables.reduce((sum, d) => sum + (Number(d.amount) - (d.paidAmount || 0)), 0);
- const totalPayable = payables.reduce((sum, d) => sum + (Number(d.amount) - (d.paidAmount || 0)), 0);
+    addDebt({
+      type,
+      person,
+      amount: Number(amount),
+      note,
+      dueDate: dueDate || null
+    });
+    setIsAdding(false);
+    setPerson('');
+    setAmount('');
+    setDueDate('');
+    setNote('');
+  };
 
- return (
- <div 
-     className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
-     style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 2rem)' }}
- >
+  const receivables = activeDebts.filter(d => d.type === 'receivable');
+  const payables = activeDebts.filter(d => d.type === 'payable');
+  // Summary based on REMAINING amount
+  const totalReceivable = receivables.reduce((sum, d) => sum + (Number(d.amount) - (Number(d.paidAmount) || 0)), 0);
+  const totalPayable = payables.reduce((sum, d) => sum + (Number(d.amount) - (Number(d.paidAmount) || 0)), 0);
+
+  return (
+    <div 
+        className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 2rem)' }}
+    >
  {/* Header */}
  <header className="px-6 pt-6 pb-4">
  <div className="flex items-center justify-between mb-6">
