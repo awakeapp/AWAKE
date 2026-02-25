@@ -175,11 +175,12 @@ export const PrayerProvider = ({ children }) => {
                     if (dataPrayer.code === 200) {
                         const hijri = dataPrayer.data.date.hijri;
                         const cleanHijriMonth = hijri.month.en.replace(/\s/g, '');
+                        let hijriDay = parseInt(hijri.day, 10);
                         
                         const pData = {
                             dailyTimings: dataPrayer.data.timings,
                             hijriDate: {
-                                day: parseInt(hijri.day, 10),
+                                day: hijriDay,
                                 month: hijri.month.number,
                                 monthName: cleanHijriMonth,
                                 year: parseInt(hijri.year, 10),
@@ -210,8 +211,9 @@ export const PrayerProvider = ({ children }) => {
             }
         };
 
-        // Debounce 30 seconds (or 1s if first load)
-        const delay = prayerData.dailyTimings ? 30000 : 1000;
+        // Debounce: If settings changed, fetch almost immediately (100ms).
+        // Otherwise, use 30s for periodic refreshes.
+        const delay = isFetchingRef.current ? 30000 : (prayerData.dailyTimings ? 100 : 1000);
         fetchTimeoutRef.current = setTimeout(executeFetch, delay);
 
         return () => {

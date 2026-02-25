@@ -146,7 +146,7 @@ const TaskDashboard = () => {
  const [isPickerOpen, setIsPickerOpen] = useState(false);
 
  return (
- <div className="space-y-6 pb-24 h-full relative" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 92px)' }}>
+ <div className="pb-24 h-full relative" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 92px)' }}>
  {/* ── FIXED TODO HEADER BAR ── */}
  <div 
  className="fixed top-0 left-0 right-0 z-40 bg-slate-50/90 dark:bg-[#020617]/90 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 transition-all duration-300"

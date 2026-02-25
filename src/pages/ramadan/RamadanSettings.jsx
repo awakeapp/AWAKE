@@ -112,6 +112,7 @@ const RamadanSettings = () => {
                             <SettingsRow 
                                 icon={Globe2} 
                                 title="Calculation Method" 
+                                className="pointer-events-none" // Let the select handle clicks
                                 right={
                                     <div className="flex items-center bg-slate-100 dark:bg-[#2C2C2E] px-3 py-1.5 rounded-lg">
                                         <span className="text-[15px] text-slate-500 dark:text-[#8E8E93] mr-1.5 font-medium">
@@ -124,7 +125,7 @@ const RamadanSettings = () => {
                             <select
                                 value={localSettings.method || ''}
                                 onChange={(e) => handleChange('method', Number(e.target.value))}
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                             >
                                 {ALADHAN_METHODS.map(m => (
                                     <option key={m.id} value={m.id}>{m.name}</option>
@@ -137,6 +138,7 @@ const RamadanSettings = () => {
                                 icon={BookOpen} 
                                 title="Asr Madhab" 
                                 isLast={true}
+                                className="pointer-events-none" // Let the select handle clicks
                                 right={
                                     <div className="flex items-center bg-slate-100 dark:bg-[#2C2C2E] px-3 py-1.5 rounded-lg">
                                         <span className="text-[15px] text-slate-500 dark:text-[#8E8E93] mr-1.5 font-medium">
@@ -149,7 +151,7 @@ const RamadanSettings = () => {
                             <select
                                 value={localSettings.madhab ?? ''}
                                 onChange={(e) => handleChange('madhab', Number(e.target.value))}
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                             >
                                 {MADHABS.map(m => (
                                     <option key={m.id} value={m.id}>{m.name}</option>
@@ -200,12 +202,7 @@ const RamadanSettings = () => {
                         </div>
                     </SettingsGroup>
 
-                    {/* Footer / Support Group */}
-                    <SettingsGroup>
-                        <SettingsRow icon={HelpCircle} title="Help and feedback" onClick={() => {}} />
-                        <SettingsRow icon={UserPlus} title="Invite a friend" onClick={() => {}} />
-                        <SettingsRow icon={FileText} title="Feedback" isLast={true} onClick={() => {}} />
-                    </SettingsGroup>
+
 
                 </div>
 

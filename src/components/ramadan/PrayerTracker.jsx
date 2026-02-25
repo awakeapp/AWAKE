@@ -48,17 +48,20 @@ const PrayerRow = ({ prayerKey, label, time, data, onUpdate, allowMode, allowCou
             "flex items-center justify-between py-3 px-0 transition-colors",
             !isLast && "border-b border-slate-100 dark:border-[#38383A]"
         )}>
-            <div className="flex items-center gap-2 flex-1 min-w-0">
+            <div className="flex items-center justify-between flex-1 min-w-0">
                 <span className={clsx(
                     "text-[15px] font-medium leading-tight",
                     completed ? "text-slate-900 dark:text-white" : "text-slate-500 dark:text-slate-400"
                 )}>
                     {label}
                 </span>
+                
                 {time && (
-                    <span className="text-[12px] text-slate-400 dark:text-slate-500 font-medium tabular-nums ml-1">
-                        • {time}
-                    </span>
+                    <div className="w-[85px] py-1 bg-slate-50 dark:bg-slate-800/80 rounded-lg border border-slate-100 dark:border-slate-700/50 flex justify-center">
+                        <span className="text-[13px] text-slate-600 dark:text-indigo-300 font-semibold tabular-nums">
+                            {time}
+                        </span>
+                    </div>
                 )}
             </div>
 
