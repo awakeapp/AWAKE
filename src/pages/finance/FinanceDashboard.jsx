@@ -224,10 +224,15 @@ const FinanceDashboard = () => {
                             <div className="flex flex-col items-end">
                                 <button
                                     onClick={(e) => { e.stopPropagation(); navigate('/finance/debts'); }}
-                                    className="px-4 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 rounded-2xl font-black text-[10px] uppercase tracking-widest text-white flex items-center justify-center gap-2 shadow-xl shadow-black/5 active:scale-95 transition-all"
+                                    className="w-[84px] h-[96px] bg-white/15 hover:bg-white/25 backdrop-blur-2xl border border-white/30 rounded-[1.75rem] flex flex-col items-center justify-center gap-2 shadow-2xl shadow-indigo-950/20 active:scale-95 transition-all group"
                                 >
-                                    <BookOpen className="w-4 h-4" />
-                                    {t('finance.debt_ledger', 'Ledger')}
+                                    <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                        <BookOpen className="w-5 h-5 text-white" />
+                                    </div>
+                                    <div className="flex flex-col items-center">
+                                        <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/90 leading-none">Debt</span>
+                                        <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white leading-none mt-1">Ledger</span>
+                                    </div>
                                 </button>
                             </div>
                         </div>
@@ -257,25 +262,6 @@ const FinanceDashboard = () => {
 
             <div className="px-6 flex-1 flex flex-col space-y-6">
                 
-                {/* Primary Feature Button */}
-                <button 
-                    onClick={() => navigate('/finance/debts')}
-                    className="w-full flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-[1.5rem] border border-slate-100 dark:border-slate-800 shadow-[0_2px_10px_rgba(0,0,0,0.03)] dark:shadow-none active:scale-[0.98] transition-all duration-200 group"
-                >
-                    <div className="flex items-center gap-4">
-                        <div className="w-[52px] h-[52px] rounded-2xl flex items-center justify-center bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 group-hover:scale-105 transition-transform duration-300">
-                            <BookOpen className="w-[24px] h-[24px]" strokeWidth={2} />
-                        </div>
-                        <div className="text-left">
-                            <h3 className="text-[17px] font-bold text-slate-900 dark:text-white leading-tight mb-0.5">Debt Ledger</h3>
-                            <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Manage lent & borrowed funds</p>
-                        </div>
-                    </div>
-                    <div className="w-8 h-8 flex items-center justify-center text-slate-300 dark:text-slate-600 group-active:translate-x-1 transition-transform mr-1">
-                        <ChevronRight className="w-[22px] h-[22px]" strokeWidth={2.5} />
-                    </div>
-                </button>
-
                 {/* Secondary Actions */}
                 <div className="grid grid-cols-2 gap-3">
                     <button 
