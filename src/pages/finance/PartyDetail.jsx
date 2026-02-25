@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { ArrowLeft, Plus, MoreVertical, Trash2, RotateCcw, AlertTriangle, Calendar, Lock, CreditCard, ToggleLeft, ToggleRight, Check, ChevronDown, Clock, Bell } from 'lucide-react';
-import { format, isBefore, isAfter, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
+import { ArrowLeft, Plus, MoreVertical, Trash2, RotateCcw, AlertTriangle, Calendar, Lock, CreditCard, ToggleLeft, ToggleRight, Check, ChevronDown, Clock, Bell, MessageCircle, Copy, Send } from 'lucide-react';
+import { format, isBefore, isAfter, startOfDay, endOfDay, differenceInDays } from 'date-fns';
 import JumpDateModal from '../../components/organisms/JumpDateModal';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -51,7 +51,8 @@ const PartyDetail = () => {
         getPendingEntries,
         addSettlementPayment,
         getPartyStatus,
-        getEntrySettledAmount
+        getEntrySettledAmount,
+        updateDebtParty
     } = context;
 
     const party = debtParties.find(p => p.id === partyId && !p.is_deleted);
@@ -98,7 +99,20 @@ const PartyDetail = () => {
         const lastTxDate = allTransactions.length > 0 ? allTransactions[0].date : null;
         const lastReminder = party.last_reminder_sent_at || null;
 
-        return { totalReceivable, totalPayable, overdueAmount, lastTxDate, lastReminder };
+        // Find oldest due date from pending entries
+        let oldestDueDate = null;
+        for (const tx of allTransactions) {
+            if ((tx.type === 'you_gave' || tx.type === 'you_borrowed') && tx.due_date) {
+                const settled = getEntrySettledAmount(tx.id);
+                if (Number(tx.amount) - settled > 0) {
+                    if (!oldestDueDate || isBefore(new Date(tx.due_date), new Date(oldestDueDate))) {
+                        oldestDueDate = tx.due_date;
+                    }
+                }
+            }
+        }
+
+        return { totalReceivable, totalPayable, overdueAmount, lastTxDate, lastReminder, oldestDueDate };
     }, [allTransactions, party, getEntrySettledAmount]);
 
     // --- Filter + date range state ---
@@ -125,7 +139,61 @@ const PartyDetail = () => {
     const [selectedSettleEntries, setSelectedSettleEntries] = useState({});
     const [settleNote, setSettleNote] = useState('');
 
-    useScrollLock(isSettleOpen);
+    // --- Reminder states ---
+    const [isReminderOpen, setIsReminderOpen] = useState(false);
+    const [copied, setCopied] = useState(false);
+
+    const canRemind = party.phone_number && balance !== 0;
+    const totalPending = Math.abs(balance);
+    const reminderMethod = party.preferred_reminder_method || 'whatsapp';
+    const fullPhone = `${(party.country_code || '+91').replace('+', '')}${party.phone_number || ''}`;
+
+    const defaultMessage = useMemo(() => {
+        const lines = [
+            `Hi ${party.name},`,
+            ``,
+            `This is a friendly reminder regarding the pending balance of ₹${totalPending.toLocaleString()} as of ${format(new Date(), 'dd MMM yyyy')}.`,
+        ];
+        if (summary.oldestDueDate) {
+            lines.push(`Oldest due date: ${format(new Date(summary.oldestDueDate), 'dd MMM yyyy')}.`);
+        }
+        lines.push(``, `Please settle at your earliest convenience.`, `Thank you.`);
+        return lines.join('\n');
+    }, [party.name, totalPending, summary.oldestDueDate]);
+
+    const [reminderMessage, setReminderMessage] = useState('');
+
+    const openReminderModal = () => {
+        setReminderMessage(defaultMessage);
+        setCopied(false);
+        setIsReminderOpen(true);
+    };
+
+    const handleCopyMessage = async () => {
+        try {
+            await navigator.clipboard.writeText(reminderMessage);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch { /* fallback: ignore */ }
+    };
+
+    const handleSendReminder = async () => {
+        const encoded = encodeURIComponent(reminderMessage);
+        if (reminderMethod === 'whatsapp') {
+            window.open(`https://wa.me/${fullPhone}?text=${encoded}`, '_blank');
+        } else {
+            window.open(`sms:${fullPhone}?body=${encoded}`, '_blank');
+        }
+        await updateDebtParty(partyId, { last_reminder_sent_at: new Date().toISOString() });
+        setIsReminderOpen(false);
+    };
+
+    const lastReminderDaysAgo = useMemo(() => {
+        if (!summary.lastReminder) return null;
+        return differenceInDays(new Date(), new Date(summary.lastReminder));
+    }, [summary.lastReminder]);
+
+    useScrollLock(isSettleOpen || isReminderOpen);
 
     // Collapsible notes
     const [expandedNotes, setExpandedNotes] = useState({});
@@ -315,14 +383,35 @@ const PartyDetail = () => {
             {/* ===== BODY ===== */}
             <div className="px-6 flex-1 flex flex-col space-y-4 mt-4">
 
-                {/* Quick action */}
-                {balance !== 0 && (
+                {/* Quick actions */}
+                <div className="flex gap-2">
+                    {balance !== 0 && (
+                        <button
+                            onClick={() => { setTxType(isReceivable ? 'you_received' : 'you_repaid'); setIsAddCardOpen(true); }}
+                            className="flex-1 py-3 bg-indigo-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all text-sm"
+                        >
+                            <CreditCard className="w-4 h-4" /> Record Payment
+                        </button>
+                    )}
                     <button
-                        onClick={() => { setTxType(isReceivable ? 'you_received' : 'you_repaid'); setIsAddCardOpen(true); }}
-                        className="w-full py-3 bg-indigo-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all text-sm"
+                        onClick={openReminderModal}
+                        disabled={!canRemind}
+                        className={`py-3 rounded-2xl font-bold flex items-center justify-center gap-2 text-sm transition-all active:scale-[0.98] ${
+                            balance !== 0 ? 'px-4' : 'flex-1 px-4'
+                        } ${
+                            canRemind
+                                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                                : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
+                        }`}
                     >
-                        <CreditCard className="w-4 h-4" /> Record Payment
+                        <MessageCircle className="w-4 h-4" />
+                        {balance === 0 ? 'Settled' : !party.phone_number ? 'No Phone' : 'Remind'}
                     </button>
+                </div>
+                {lastReminderDaysAgo !== null && (
+                    <p className="text-[11px] text-slate-400 font-medium text-center -mt-1">
+                        Last reminder sent {lastReminderDaysAgo === 0 ? 'today' : `${lastReminderDaysAgo} day${lastReminderDaysAgo === 1 ? '' : 's'} ago`}
+                    </p>
                 )}
 
                 {/* Filters */}
@@ -638,6 +727,50 @@ const PartyDetail = () => {
                                 <button type="button" onClick={handleSettleSubmit} disabled={!settleOldest && totalSelectedAllocation <= 0}
                                     className="flex-[2] py-3.5 bg-indigo-600 disabled:bg-indigo-400 disabled:opacity-50 text-white font-black rounded-xl shadow-lg shadow-indigo-500/30 active:scale-[0.98] transition-transform">
                                     Confirm Payment
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ========== Reminder Preview Modal ========== */}
+            <AnimatePresence>
+                {isReminderOpen && (
+                    <div className="fixed inset-0 z-50 flex items-end justify-center p-4 pb-24 sm:p-6 sm:items-center">
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsReminderOpen(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+                        <motion.div
+                            initial={{ y: "100%", opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: "100%", opacity: 0 }} transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2rem] p-6 shadow-2xl border border-slate-100 dark:border-slate-800 relative z-10 max-h-[85vh] overflow-y-auto"
+                        >
+                            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Send Reminder</h3>
+                                <span className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${reminderMethod === 'whatsapp' ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300' : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300'}`}>
+                                    via {reminderMethod === 'whatsapp' ? 'WhatsApp' : 'SMS'}
+                                </span>
+                            </div>
+
+                            <div>
+                                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Message Preview</label>
+                                <textarea
+                                    value={reminderMessage}
+                                    onChange={e => setReminderMessage(e.target.value)}
+                                    rows={8}
+                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-sm text-slate-900 dark:text-white font-medium leading-relaxed outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                                />
+                            </div>
+
+                            <div className="flex items-center justify-between mt-3 text-[11px] text-slate-400">
+                                <span>To: {party.country_code || '+91'} {party.phone_number}</span>
+                                <span>₹{totalPending.toLocaleString()} pending</span>
+                            </div>
+
+                            <div className="flex gap-3 mt-6">
+                                <button type="button" onClick={handleCopyMessage} className={`flex-1 py-3.5 font-bold rounded-xl flex items-center justify-center gap-2 transition-all border ${copied ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 border-emerald-200 dark:border-emerald-500/30' : 'text-slate-500 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                                    {copied ? <><Check className="w-4 h-4" /> Copied</> : <><Copy className="w-4 h-4" /> Copy</>}
+                                </button>
+                                <button type="button" onClick={handleSendReminder} className="flex-[2] py-3.5 bg-emerald-600 text-white font-black rounded-xl shadow-lg shadow-emerald-500/30 active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
+                                    <Send className="w-4 h-4" /> Send
                                 </button>
                             </div>
                         </motion.div>
