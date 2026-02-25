@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { User, Plus, ArrowLeft, MoreVertical, Search, CheckCircle, MessageCircle, MessageSquare } from 'lucide-react';
+import { User, Plus, ArrowLeft, MoreVertical, Search, CheckCircle, MessageCircle, MessageSquare, UserPlus, Phone, X } from 'lucide-react';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -31,6 +31,86 @@ const DebtManager = () => {
     const [tag, setTag] = useState('');
     const [creditLimit, setCreditLimit] = useState('');
     const [reminderMethod, setReminderMethod] = useState('whatsapp');
+    const [phonePickerNumbers, setPhonePickerNumbers] = useState([]);
+    const [isPhonePickerOpen, setIsPhonePickerOpen] = useState(false);
+    const [contactError, setContactError] = useState('');
+
+    const contactPickerSupported = typeof navigator !== 'undefined' && 'contacts' in navigator && 'ContactsManager' in window;
+
+    const cleanPhoneNumber = useCallback((raw) => {
+        if (!raw) return { code: '+91', number: '' };
+        let cleaned = raw.replace(/[\s\-\(\)\.]/g, '');
+        // Detect country code
+        if (cleaned.startsWith('+')) {
+            // Try common formats: +91XXXXXXXXXX, +1XXXXXXXXXX, etc.
+            if (cleaned.startsWith('+91') && cleaned.length >= 13) {
+                return { code: '+91', number: cleaned.slice(3) };
+            } else if (cleaned.startsWith('+1') && cleaned.length >= 12) {
+                return { code: '+1', number: cleaned.slice(2) };
+            } else if (cleaned.startsWith('+44') && cleaned.length >= 13) {
+                return { code: '+44', number: cleaned.slice(3) };
+            } else if (cleaned.startsWith('+971') && cleaned.length >= 13) {
+                return { code: '+971', number: cleaned.slice(4) };
+            } else if (cleaned.startsWith('+966') && cleaned.length >= 13) {
+                return { code: '+966', number: cleaned.slice(4) };
+            } else {
+                // Generic: assume first 2-4 digits are code
+                const match = cleaned.match(/^(\+\d{1,4})(\d+)$/);
+                if (match) return { code: match[1], number: match[2] };
+            }
+        }
+        // No country code prefix
+        if (cleaned.startsWith('0')) cleaned = cleaned.slice(1);
+        return { code: '+91', number: cleaned };
+    }, []);
+
+    const pickContact = useCallback(async () => {
+        setContactError('');
+        try {
+            if (!contactPickerSupported) {
+                setContactError('Contact picker not supported on this device. Please type manually.');
+                setTimeout(() => setContactError(''), 4000);
+                return;
+            }
+            const props = ['name', 'tel'];
+            const opts = { multiple: false };
+            const contacts = await navigator.contacts.select(props, opts);
+            if (!contacts || contacts.length === 0) return;
+
+            const contact = contacts[0];
+            // Fill name
+            if (contact.name && contact.name.length > 0) {
+                setName(contact.name[0]);
+            }
+            // Fill phone
+            if (contact.tel && contact.tel.length > 0) {
+                if (contact.tel.length === 1) {
+                    const { code, number } = cleanPhoneNumber(contact.tel[0]);
+                    setCountryCode(code);
+                    setPhone(number);
+                } else {
+                    // Multiple numbers — show picker
+                    setPhonePickerNumbers(contact.tel);
+                    setIsPhonePickerOpen(true);
+                }
+            }
+        } catch (err) {
+            if (err.name === 'SecurityError' || err.name === 'NotAllowedError') {
+                setContactError('Contact access denied. Please allow permission in Settings.');
+            } else if (err.name !== 'AbortError') {
+                setContactError('Could not access contacts. Please type manually.');
+            }
+            setTimeout(() => setContactError(''), 5000);
+        }
+    }, [contactPickerSupported, cleanPhoneNumber]);
+
+    const selectPhoneNumber = useCallback((num) => {
+        const { code, number } = cleanPhoneNumber(num);
+        setCountryCode(code);
+        setPhone(number);
+        setIsPhonePickerOpen(false);
+        setPhonePickerNumbers([]);
+    }, [cleanPhoneNumber]);
 
     const activeParties = (debtParties || []).filter(p => !p.is_deleted);
 
@@ -190,7 +270,22 @@ const DebtManager = () => {
                             <div className="space-y-5">
                                 <div>
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Name</label>
-                                    <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="John Doe" className="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm" autoFocus />
+                                    <div className="relative">
+                                        <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="John Doe" className="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 pr-12 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm" autoFocus />
+                                        <button
+                                            type="button"
+                                            onClick={pickContact}
+                                            className="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 active:scale-90 transition-all"
+                                            title="Import from contacts"
+                                        >
+                                            <UserPlus className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                    {contactError && (
+                                        <p className="text-[11px] text-amber-600 dark:text-amber-400 font-medium mt-1.5 flex items-center gap-1">
+                                            <span className="shrink-0">⚠</span> {contactError}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="grid grid-cols-[100px_1fr] gap-4">
@@ -237,6 +332,40 @@ const DebtManager = () => {
                                 </button>
                             </div>
                         </motion.form>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Phone Number Selection Modal */}
+            <AnimatePresence>
+                {isPhonePickerOpen && (
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-6">
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => { setIsPhonePickerOpen(false); setPhonePickerNumbers([]); }} className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+                            className="bg-white dark:bg-slate-900 w-full max-w-xs rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-800 relative z-10 overflow-hidden"
+                        >
+                            <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                <h4 className="text-base font-bold text-slate-900 dark:text-white">Select Number</h4>
+                                <button onClick={() => { setIsPhonePickerOpen(false); setPhonePickerNumbers([]); }} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                                    <X className="w-4 h-4 text-slate-400" />
+                                </button>
+                            </div>
+                            <div className="p-2 max-h-60 overflow-y-auto">
+                                {phonePickerNumbers.map((num, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => selectPhoneNumber(num)}
+                                        className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                                    >
+                                        <div className="w-9 h-9 rounded-full bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center shrink-0">
+                                            <Phone className="w-4 h-4 text-indigo-500" />
+                                        </div>
+                                        <span className="text-sm font-bold text-slate-900 dark:text-white">{num}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </motion.div>
                     </div>
                 )}
             </AnimatePresence>
