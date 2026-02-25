@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { User, Plus, ArrowLeft, MoreVertical, Search, CheckCircle, MessageCircle, MessageSquare } from 'lucide-react';
+import { User, Plus, ArrowLeft, MoreVertical, Search, CheckCircle, MessageCircle, MessageSquare, ToggleLeft, ToggleRight, Briefcase } from 'lucide-react';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -31,6 +31,7 @@ const DebtManager = () => {
     const [tag, setTag] = useState('');
     const [creditLimit, setCreditLimit] = useState('');
     const [reminderMethod, setReminderMethod] = useState('whatsapp');
+    const [isClient, setIsClient] = useState(false);
 
     const activeParties = (debtParties || []).filter(p => !p.is_deleted);
 
@@ -60,7 +61,8 @@ const DebtManager = () => {
             tag,
             credit_limit: creditLimit ? Number(creditLimit) : null,
             preferred_reminder_method: reminderMethod,
-            last_reminder_sent_at: null
+            last_reminder_sent_at: null,
+            is_client: isClient
         });
 
         setIsAdding(false);
@@ -68,6 +70,7 @@ const DebtManager = () => {
         setPhone('');
         setTag('');
         setCreditLimit('');
+        setIsClient(false);
     };
 
     return (
@@ -213,6 +216,19 @@ const DebtManager = () => {
                                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Cred. Limit (Opt)</label>
                                         <input type="number" value={creditLimit} onChange={e => setCreditLimit(e.target.value)} placeholder="₹0" className="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm" />
                                     </div>
+                                </div>
+
+                                {/* Is Client Toggle */}
+                                <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 cursor-pointer shadow-sm" onClick={() => setIsClient(!isClient)}>
+                                    <div className="flex flex-col">
+                                        <p className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                            <Briefcase className="w-4 h-4 text-indigo-500" /> Is Client?
+                                        </p>
+                                        <p className="text-[10px] text-slate-500 mt-0.5 font-medium">Enable for official PDF invoices on reminders</p>
+                                    </div>
+                                    <button type="button">
+                                        {isClient ? <ToggleRight className="w-8 h-8 text-indigo-600" /> : <ToggleLeft className="w-8 h-8 text-slate-400" />}
+                                    </button>
                                 </div>
 
                                 <div>
