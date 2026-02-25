@@ -34,73 +34,95 @@ const DebtManager = () => {
     const [phonePickerNumbers, setPhonePickerNumbers] = useState([]);
     const [isPhonePickerOpen, setIsPhonePickerOpen] = useState(false);
     const [contactError, setContactError] = useState('');
+    const vcfInputRef = React.useRef(null);
 
     const contactPickerSupported = typeof navigator !== 'undefined' && 'contacts' in navigator && 'ContactsManager' in window;
 
     const cleanPhoneNumber = useCallback((raw) => {
         if (!raw) return { code: '+91', number: '' };
         let cleaned = raw.replace(/[\s\-\(\)\.]/g, '');
-        // Detect country code
         if (cleaned.startsWith('+')) {
-            // Try common formats: +91XXXXXXXXXX, +1XXXXXXXXXX, etc.
-            if (cleaned.startsWith('+91') && cleaned.length >= 13) {
-                return { code: '+91', number: cleaned.slice(3) };
-            } else if (cleaned.startsWith('+1') && cleaned.length >= 12) {
-                return { code: '+1', number: cleaned.slice(2) };
-            } else if (cleaned.startsWith('+44') && cleaned.length >= 13) {
-                return { code: '+44', number: cleaned.slice(3) };
-            } else if (cleaned.startsWith('+971') && cleaned.length >= 13) {
-                return { code: '+971', number: cleaned.slice(4) };
-            } else if (cleaned.startsWith('+966') && cleaned.length >= 13) {
-                return { code: '+966', number: cleaned.slice(4) };
-            } else {
-                // Generic: assume first 2-4 digits are code
-                const match = cleaned.match(/^(\+\d{1,4})(\d+)$/);
-                if (match) return { code: match[1], number: match[2] };
-            }
+            if (cleaned.startsWith('+91') && cleaned.length >= 13) return { code: '+91', number: cleaned.slice(3) };
+            if (cleaned.startsWith('+1') && cleaned.length >= 12) return { code: '+1', number: cleaned.slice(2) };
+            if (cleaned.startsWith('+44') && cleaned.length >= 13) return { code: '+44', number: cleaned.slice(3) };
+            if (cleaned.startsWith('+971') && cleaned.length >= 13) return { code: '+971', number: cleaned.slice(4) };
+            if (cleaned.startsWith('+966') && cleaned.length >= 13) return { code: '+966', number: cleaned.slice(4) };
+            const match = cleaned.match(/^(\+\d{1,4})(\d+)$/);
+            if (match) return { code: match[1], number: match[2] };
         }
-        // No country code prefix
         if (cleaned.startsWith('0')) cleaned = cleaned.slice(1);
         return { code: '+91', number: cleaned };
     }, []);
 
+    const parseVCard = useCallback((text) => {
+        const lines = text.split(/\r?\n/);
+        let contactName = '';
+        const phones = [];
+        for (const line of lines) {
+            if (line.startsWith('FN:') || line.startsWith('FN;')) {
+                contactName = line.split(':').slice(1).join(':').trim();
+            }
+            if (line.startsWith('TEL') || line.startsWith('tel')) {
+                const val = line.split(':').slice(1).join(':').trim();
+                if (val) phones.push(val);
+            }
+        }
+        return { name: contactName, phones };
+    }, []);
+
+    const handleVcfImport = useCallback((e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            const text = evt.target.result;
+            const { name: cName, phones } = parseVCard(text);
+            if (cName) setName(cName);
+            if (phones.length === 1) {
+                const { code, number } = cleanPhoneNumber(phones[0]);
+                setCountryCode(code);
+                setPhone(number);
+            } else if (phones.length > 1) {
+                setPhonePickerNumbers(phones);
+                setIsPhonePickerOpen(true);
+            }
+        };
+        reader.readAsText(file);
+        if (vcfInputRef.current) vcfInputRef.current.value = '';
+    }, [parseVCard, cleanPhoneNumber]);
+
     const pickContact = useCallback(async () => {
         setContactError('');
         try {
-            if (!contactPickerSupported) {
-                setContactError('Contact picker not supported on this device. Please type manually.');
-                setTimeout(() => setContactError(''), 4000);
-                return;
-            }
-            const props = ['name', 'tel'];
-            const opts = { multiple: false };
-            const contacts = await navigator.contacts.select(props, opts);
-            if (!contacts || contacts.length === 0) return;
-
-            const contact = contacts[0];
-            // Fill name
-            if (contact.name && contact.name.length > 0) {
-                setName(contact.name[0]);
-            }
-            // Fill phone
-            if (contact.tel && contact.tel.length > 0) {
-                if (contact.tel.length === 1) {
-                    const { code, number } = cleanPhoneNumber(contact.tel[0]);
-                    setCountryCode(code);
-                    setPhone(number);
-                } else {
-                    // Multiple numbers — show picker
-                    setPhonePickerNumbers(contact.tel);
-                    setIsPhonePickerOpen(true);
+            if (contactPickerSupported) {
+                const props = ['name', 'tel'];
+                const opts = { multiple: false };
+                const contacts = await navigator.contacts.select(props, opts);
+                if (!contacts || contacts.length === 0) return;
+                const contact = contacts[0];
+                if (contact.name && contact.name.length > 0) setName(contact.name[0]);
+                if (contact.tel && contact.tel.length > 0) {
+                    if (contact.tel.length === 1) {
+                        const { code, number } = cleanPhoneNumber(contact.tel[0]);
+                        setCountryCode(code);
+                        setPhone(number);
+                    } else {
+                        setPhonePickerNumbers(contact.tel);
+                        setIsPhonePickerOpen(true);
+                    }
                 }
+            } else {
+                // Fallback: open vCard file picker
+                if (vcfInputRef.current) vcfInputRef.current.click();
             }
         } catch (err) {
             if (err.name === 'SecurityError' || err.name === 'NotAllowedError') {
-                setContactError('Contact access denied. Please allow permission in Settings.');
+                setContactError('Contact access denied. Please allow in Settings.');
+                setTimeout(() => setContactError(''), 5000);
             } else if (err.name !== 'AbortError') {
-                setContactError('Could not access contacts. Please type manually.');
+                // Fallback to vCard import
+                if (vcfInputRef.current) vcfInputRef.current.click();
             }
-            setTimeout(() => setContactError(''), 5000);
         }
     }, [contactPickerSupported, cleanPhoneNumber]);
 
@@ -267,11 +289,14 @@ const DebtManager = () => {
                         >
                             <h3 className="text-xl font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800/50 pb-5 mb-6 leading-tight">New Party Details</h3>
 
+                            {/* Hidden vCard file input for fallback contact import */}
+                            <input type="file" ref={vcfInputRef} accept=".vcf,.vcard" onChange={handleVcfImport} className="hidden" />
+
                             <div className="space-y-5">
                                 <div>
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Name</label>
                                     <div className="relative">
-                                        <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="John Doe" className="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 pr-12 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm" autoFocus />
+                                        <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="John Doe" autoComplete="name" className="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 pr-12 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm" autoFocus />
                                         <button
                                             type="button"
                                             onClick={pickContact}
@@ -295,7 +320,7 @@ const DebtManager = () => {
                                     </div>
                                     <div>
                                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Phone No. (Opt)</label>
-                                        <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="9876543210" className="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm" />
+                                        <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="9876543210" autoComplete="tel" className="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm" />
                                     </div>
                                 </div>
 

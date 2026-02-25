@@ -154,13 +154,13 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
 
                              <div className="text-center mb-10">
                                 <div className="inline-flex items-baseline gap-2">
-                                    <span className="text-2xl font-black text-slate-300 dark:text-slate-700">₹</span>
+                                    <span className="text-4xl font-black text-slate-300 dark:text-slate-700">₹</span>
                                     <input
                                         type="number"
                                         inputMode="decimal"
                                         value={amount}
                                         onChange={e => setAmount(e.target.value)}
-                                        className="bg-transparent border-none text-6xl font-black text-slate-900 dark:text-white placeholder:text-slate-100 dark:placeholder:text-slate-800 focus:ring-0 p-0 w-full max-w-[280px] text-center"
+                                        className="bg-transparent border-none text-[72px] font-black text-slate-900 dark:text-white placeholder:text-slate-100 dark:placeholder:text-slate-800 focus:ring-0 p-0 w-full max-w-[280px] text-center leading-none"
                                         placeholder="0"
                                         autoFocus
                                     />

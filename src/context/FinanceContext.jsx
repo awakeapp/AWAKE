@@ -361,16 +361,25 @@ export const FinanceContextProvider = ({ children }) => {
     const addTransfer = useCallback(async ({ amount, fromAccountId, toAccountId, note, date }) => {
         if (!user) return;
 
-        await CloudFunctionService.commitFinancialTransaction({
+        const newTx = {
             transactionId: crypto.randomUUID(),
             accountId: fromAccountId,
             toAccountId: toAccountId,
             type: 'transfer',
             amount: Number(amount),
             date: date || new Date().toISOString(),
+            note: note || '',
             description: note || 'Fund Transfer',
-            categoryId: 'cat_transfer'
-        });
+            categoryId: 'cat_transfer',
+            createdAt: Date.now()
+        };
+
+        try {
+            await FirestoreService.addItem(`users/${user.uid}/transactions`, newTx);
+        } catch (error) {
+            console.error("Failed to add transfer via FirestoreService:", error);
+            throw error;
+        }
     }, [user]);
 
     const addRecurringRule = useCallback(async (ruleData) => {
@@ -386,63 +395,56 @@ export const FinanceContextProvider = ({ children }) => {
     // SOFT DELETE REFACTOR: Compensation Transaction
     const deleteTransaction = useCallback(async (id) => {
         if (!user) return;
-        const tx = transactions.find(t => t.transactionId === id || t.id === id); // Handle legacy ID vs new UUID
+        const tx = transactions.find(t => t.transactionId === id || t.id === id);
         if (!tx) return;
         if (tx.isDeleted) return;
 
-        // 1. Mark as Deleted (Metadata update only, safe in rules? 
-        // Rules say transactions are append-only. 
-        // So we strictly obey that: We DON'T update 'isDeleted'. 
-        // We create a COMPENSATION transaction.
-
-        // Logic: If we delete an Income, we create an Expense of same amount.
-        // If we delete an Expense, we create an Income.
-        // If we delete a Transfer, we create a Reverse Transfer.
-
-        const compensationId = crypto.randomUUID();
-        let compType = tx.type === 'income' ? 'expense' : 'income'; // Swap
-        let compFrom = tx.accountId;
-        let compTo = undefined;
-
-        if (tx.type === 'transfer') {
-            compType = 'transfer';
-            compFrom = tx.toAccountId; // Swap source/dest
-            compTo = tx.accountId;
+        const docId = tx.id;
+        try {
+            await FirestoreService.updateItem(`users/${user.uid}/transactions`, docId, {
+                isDeleted: true,
+                deletedAt: Date.now()
+            });
+        } catch (error) {
+            console.error("Failed to delete transaction:", error);
+            throw error;
         }
-
-        await CloudFunctionService.commitFinancialTransaction({
-            transactionId: compensationId,
-            accountId: compFrom,
-            toAccountId: compTo,
-            type: compType,
-            amount: Number(tx.amount),
-            date: new Date().toISOString(),
-            description: `Correction: Undo ${tx.description || 'Transaction'}`,
-            metadata: {
-                isCompensation: true,
-                originalTransactionId: tx.transactionId || tx.id
-            }
-        });
-
-        // Optimistically hide from UI? 
-        // Or wait for it to appear as a correction?
-        // App logic might need to filter 'isCompensation' or 'isDeleted'.
-        // For now, we respect the strict primitive.
     }, [user, transactions]);
 
     const restoreTransaction = useCallback(async (id) => {
-        // Not applicable if we use compensation logic. 
-        // You can't "restore" a compensated transaction, you just create a new one.
-        // Legacy functionality removed or re-implemented as "Redo".
-        console.warn("restoreTransaction is deprecated in strict ledger mode.");
-    }, []);
+        if (!user) return;
+        const tx = transactions.find(t => t.transactionId === id || t.id === id);
+        if (!tx) return;
+
+        const docId = tx.id;
+        try {
+            await FirestoreService.updateItem(`users/${user.uid}/transactions`, docId, {
+                isDeleted: false,
+                deletedAt: null
+            });
+        } catch (error) {
+            console.error("Failed to restore transaction:", error);
+        }
+    }, [user, transactions]);
 
     const editTransaction = useCallback(async (id, updatedTx) => {
         if (!user) return;
-        // Edit = Compensate Old + Create New
-        await deleteTransaction(id);
-        await addTransaction(updatedTx);
-    }, [user, deleteTransaction, addTransaction]);
+        const tx = transactions.find(t => t.transactionId === id || t.id === id);
+        if (!tx) return;
+
+        const docId = tx.id;
+        try {
+            await FirestoreService.updateItem(`users/${user.uid}/transactions`, docId, {
+                ...updatedTx,
+                note: updatedTx.note || updatedTx.description || '',
+                description: updatedTx.note || updatedTx.description || tx.description,
+                updatedAt: Date.now()
+            });
+        } catch (error) {
+            console.error("Failed to edit transaction:", error);
+            throw error;
+        }
+    }, [user, transactions]);
 
     const checkDuplicate = useCallback((newTx) => {
         // ... existing logic ...
