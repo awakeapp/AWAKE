@@ -164,11 +164,11 @@ const FinanceDashboard = () => {
                     </div>
 
                     <button 
-                            onClick={() => navigate('/finance/more')}
-                            className="p-2 rounded-xl transition-all bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95"
-                        >
-                            <Menu className="w-5 h-5" />
-                        </button>
+                        onClick={() => navigate('/finance/more')}
+                        className="p-2 rounded-xl transition-all bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 justify-self-end"
+                    >
+                        <Menu className="w-5 h-5" />
+                    </button>
 
                 </div>
 
@@ -232,23 +232,6 @@ const FinanceDashboard = () => {
             </header>
 
             <div className="px-6 flex-1 flex flex-col space-y-6">
-                
-                {/* More Options */}
-                <button
-                    onClick={() => navigate('/finance/more')}
-                    className="w-full flex items-center justify-between bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 px-4 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 active:bg-slate-100 dark:active:bg-slate-800 transition-colors shadow-sm"
-                >
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
-                            <MoreHorizontal className="w-4 h-4 text-indigo-500" />
-                        </div>
-                        <div className="text-left">
-                            <p className="text-[14px] font-bold text-slate-900 dark:text-white leading-tight">More Options</p>
-                            <p className="text-[11px] text-slate-400 font-medium">Wallets, EMI, Analytics, Settings</p>
-                        </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600" />
-                </button>
 
                 {/* Debt Summary Blocks */}
                 {(debtParties || []).filter(p => !p.is_deleted).length > 0 && (
