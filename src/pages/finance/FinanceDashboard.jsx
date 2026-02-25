@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { Plus, Wallet, PieChart, ChevronLeft, ChevronRight, PiggyBank, ArrowDown, TrendingUp, Undo, X, Menu, Clock, BookOpen } from 'lucide-react';
+import { Plus, Wallet, PieChart, ChevronLeft, ChevronRight, PiggyBank, ArrowDown, TrendingUp, Undo, X, Menu, Clock, BookOpen, CreditCard, Settings } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, isWithinInterval, subMonths, addMonths, isBefore } from 'date-fns';
 import { useState, useMemo } from 'react';
 import AddTransactionModal from './AddTransactionModal';
@@ -264,22 +264,35 @@ const FinanceDashboard = () => {
 
             <div className="px-6 flex-1 flex flex-col space-y-6">
                 
-                {/* Secondary Actions */}
-                <div className="grid grid-cols-2 gap-3">
-                    <button 
-                        onClick={() => setIsAnalyticsOpen(true)}
-                        className="bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
-                    >
-                        <PieChart className="w-4 h-4 text-indigo-500" />
-                        Analytics
-                    </button>
-                    <button 
-                        onClick={() => setIsBudgetOpen(true)}
-                        className="bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
-                    >
-                        <TrendingUp className="w-4 h-4 text-indigo-500" />
-                        {t('finance.budgets', 'Budgets')}
-                    </button>
+                {/* Quick Actions Menu */}
+                <div className="space-y-2">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Quick Access</p>
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm divide-y divide-slate-50 dark:divide-slate-800">
+                        {[
+                            { icon: Wallet, label: 'Wallets', desc: `${activeAccounts.length} accounts`, onClick: () => setShowAccounts(!showAccounts) },
+                            { icon: CreditCard, label: "EMI's", desc: 'Loan repayments', onClick: () => navigate('/finance/emi') },
+                            { icon: PieChart, label: 'Analytics', desc: 'Charts & insights', onClick: () => setIsAnalyticsOpen(true) },
+                            { icon: TrendingUp, label: t('finance.budgets', 'Budgets'), desc: 'Category budgets', onClick: () => setIsBudgetOpen(true) },
+                            { icon: Settings, label: 'Settings', desc: 'Finance preferences', onClick: () => navigate('/finance/settings') },
+                        ].map((item, idx, arr) => (
+                            <button 
+                                key={item.label}
+                                onClick={item.onClick}
+                                className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 active:bg-slate-100 dark:active:bg-slate-800 transition-colors"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
+                                        <item.icon className="w-4 h-4 text-indigo-500" />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="text-[14px] font-bold text-slate-900 dark:text-white leading-tight">{item.label}</p>
+                                        <p className="text-[11px] text-slate-400 font-medium">{item.desc}</p>
+                                    </div>
+                                </div>
+                                <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600" />
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Debt Summary Blocks */}

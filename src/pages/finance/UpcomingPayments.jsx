@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useFinance } from '../../context/FinanceContext';
-import { Plus, Trash2, Calendar, Zap, CreditCard, Music, Monitor, Smartphone, Briefcase, ShoppingBag, Pause, Play, RefreshCw } from 'lucide-react';
+import { Plus, Trash2, Calendar, Zap, CreditCard, Music, Monitor, Smartphone, Briefcase, ShoppingBag, Pause, Play, RefreshCw, X } from 'lucide-react';
 import { format, differenceInDays, isBefore, addMonths } from 'date-fns';
 import { useTranslation } from 'react-i18next'; // Added i18n support
 import { useScrollLock } from '../../hooks/useScrollLock';
@@ -121,9 +121,9 @@ const UpcomingPayments = () => {
                         const daysLeft = getDaysLeft(sub.nextBillingDate || sub.dueDate);
 
                         return (
-                            <div key={sub.id} className="min-w-[150px] p-2 rounded-[1rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm relative group transition-all hover:border-indigo-500/50 flex items-center gap-2.5">
+                            <div key={sub.id} className="min-w-[160px] max-w-[200px] p-3 rounded-[1.25rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm relative group transition-all hover:border-indigo-500/50 flex flex-col gap-2">
                                 {/* Action Buttons */}
-                                <div className="absolute top-1 right-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-lg p-0.5 shadow-sm">
+                                <div className="absolute top-2 right-2 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-lg p-0.5 shadow-sm">
                                     <button
                                         onClick={(e) => { e.stopPropagation(); toggleSubscriptionStatus(sub.id); }}
                                         className="p-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 transition-colors text-slate-500"
@@ -138,18 +138,17 @@ const UpcomingPayments = () => {
                                     </button>
                                 </div>
 
-                                <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center shrink-0">
-                                    <Icon className="w-4 h-4 text-indigo-500" />
-                                </div>
-
-                                <div className="flex-1 min-w-0 py-0.5 pr-2">
-                                    <div className="flex items-center justify-between mb-0.5 gap-2">
-                                        <h4 className="font-black text-slate-900 dark:text-white text-[10px] leading-tight truncate">{sub.name}</h4>
-                                        <div className={`shrink-0 px-1 py-[2px] rounded text-[6px] font-black uppercase tracking-widest ${sub.status !== 'active' ? 'bg-slate-100 dark:bg-slate-800 text-slate-400' : daysLeft.includes('Overdue') ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600' : 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600'}`}>
-                                            {sub.status === 'active' ? daysLeft : 'Paused'}
-                                        </div>
+                                <div className="flex items-center gap-2.5">
+                                    <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center shrink-0">
+                                        <Icon className="w-4 h-4 text-indigo-500" />
                                     </div>
-                                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-tighter">₹{Number(sub.amount).toLocaleString()}</p>
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className="font-black text-slate-900 dark:text-white text-[11px] leading-tight truncate">{sub.name}</h4>
+                                        <p className="text-slate-400 text-[11px] font-extrabold mt-0.5">₹{Number(sub.amount).toLocaleString()}</p>
+                                    </div>
+                                </div>
+                                <div className={`w-full text-center py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${sub.status !== 'active' ? 'bg-slate-100 dark:bg-slate-800 text-slate-400' : daysLeft.includes('Overdue') ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-500' : 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600'}`}>
+                                    {sub.status === 'active' ? daysLeft : 'Paused'}
                                 </div>
                             </div>
 
