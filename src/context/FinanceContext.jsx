@@ -23,6 +23,7 @@ export const FinanceContextProvider = ({ children }) => {
         { id: 'cat_shopping', name: 'Shopping', type: 'expense', budget: 3000, color: 'bg-pink-500', icon: 'ShoppingBag' },
         { id: 'cat_bills', name: 'Bills & Utilities', type: 'expense', budget: 4000, color: 'bg-yellow-500', icon: 'Zap' },
         { id: 'cat_salary', name: 'Salary', type: 'income', budget: 0, color: 'bg-emerald-500', icon: 'IndianRupee' },
+        { id: 'cat_savings', name: 'Savings Allocation', type: 'savings', budget: 2000, color: 'bg-teal-500', icon: 'Wallet' },
     ];
 
     const DEFAULT_ACCOUNTS = [
@@ -140,6 +141,8 @@ export const FinanceContextProvider = ({ children }) => {
             const cats = await FirestoreService.getCollection(`users/${user.uid}/categories`);
             if (cats.length === 0) {
                 await Promise.all(DEFAULT_CATEGORIES.map(c => FirestoreService.addItem(`users/${user.uid}/categories`, c)));
+            } else if (!cats.some(c => c.type === 'savings')) {
+                await FirestoreService.addItem(`users/${user.uid}/categories`, { id: 'cat_savings', name: 'Savings Allocation', type: 'savings', budget: 0, color: 'bg-teal-500', icon: 'Wallet' });
             }
             const accs = await FirestoreService.getCollection(`users/${user.uid}/accounts`);
             if (accs.length === 0) {
@@ -261,7 +264,10 @@ export const FinanceContextProvider = ({ children }) => {
         const expense = transactions
             .filter(t => !t.isDeleted && t.type === 'expense')
             .reduce((acc, t) => acc + Number(t.amount), 0);
-        return income - expense;
+        const savings = transactions
+            .filter(t => !t.isDeleted && t.type === 'savings')
+            .reduce((acc, t) => acc + Number(t.amount), 0);
+        return income - expense - savings;
     }, [transactions]);
 
     const getTotalBalance = useCallback(() => {

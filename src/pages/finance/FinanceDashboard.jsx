@@ -32,6 +32,7 @@ const FinanceDashboard = () => {
     } = useFinance();
 
     const [isAddOpen, setIsAddOpen] = useState(false);
+    const [addType, setAddType] = useState('expense');
     const [isBudgetOpen, setIsBudgetOpen] = useState(false);
     const [editTransactionId, setEditTransactionId] = useState(null);
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -140,36 +141,47 @@ const FinanceDashboard = () => {
                     <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-black/10 rounded-full blur-3xl"></div>
                     
                     <div className="relative z-10">
-                        <div className="mb-10">
-                            <div className="space-y-1">
+                        <div className="mb-8 w-full flex flex-col items-center">
+                            <div className="space-y-1 flex flex-col items-center">
                                 <p className="text-indigo-100/70 text-[11px] font-black uppercase tracking-[0.2em]">{t('finance.total_balance', 'Total Balance')}</p>
-                                <h2 className="text-[44px] font-black tracking-tightest leading-tight flex items-baseline gap-1.5">
-                                    <span className="text-2xl opacity-40 font-bold">₹</span>
+                                <h2 className="text-[52px] font-black tracking-tightest leading-tight flex items-center justify-center gap-1.5 mt-1">
+                                    <span className="text-3xl opacity-40 font-bold">₹</span>
                                     <span dir="ltr">{totalBalance.toLocaleString()}</span>
                                 </h2>
                             </div>
                         </div>
 
-                        <div className="w-full h-px bg-white/10 mb-8" />
+                        <div className="w-full h-px bg-white/10 mb-6" />
 
-                        <div className="flex items-end justify-between gap-4">
-                            <div className="flex flex-col">
-                                <p className="text-[8px] font-black text-indigo-100/60 uppercase tracking-widest mb-1.5">{t('finance.income', 'Income')}</p>
-                                <p className="font-extrabold text-sm tracking-tight text-white/90">₹{monthStats.income.toLocaleString()}</p>
+                        <div className="flex items-center justify-center gap-4 w-full mb-6">
+                            <div className="flex items-center gap-1.5 font-bold text-[13px] tracking-tight">
+                                <span className="text-emerald-300">Income</span>
+                                <span className="text-white">₹{monthStats.income.toLocaleString()}</span>
                             </div>
-                            
-                            <div className="flex flex-col items-center flex-1">
-                                <div className="px-3 py-1 bg-white/10 rounded-full backdrop-blur-md mb-2 flex items-center gap-2 border border-white/5">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.5)]"></div>
-                                    <p className="text-[8px] font-black text-white uppercase tracking-[0.15em]">{t('finance.expenses', 'Expenses')}</p>
-                                </div>
-                                <p className="font-black text-2xl tracking-tight">₹{monthStats.expense.toLocaleString()}</p>
+                            <span className="text-white/20 select-none">|</span>
+                            <div className="flex items-center gap-1.5 font-bold text-[13px] tracking-tight">
+                                <span className="text-rose-300">Expense</span>
+                                <span className="text-white">₹{monthStats.expense.toLocaleString()}</span>
                             </div>
+                            <span className="text-white/20 select-none">|</span>
+                            <div className="flex items-center gap-1.5 font-bold text-[13px] tracking-tight">
+                                <span className="text-slate-300">Recurring</span>
+                                <span className="text-white">₹{recurringTotal.toLocaleString()}</span>
+                            </div>
+                        </div>
 
-                            <div className="flex flex-col items-end">
-                                <p className="text-[8px] font-black text-indigo-100/60 uppercase tracking-widest mb-1.5">Recurring</p>
-                                <p className="font-extrabold text-sm tracking-tight text-white/90">₹{recurringTotal.toLocaleString()}</p>
-                            </div>
+                        <div className="flex justify-center w-full">
+                            <button 
+                                onClick={(e) => { 
+                                    e.stopPropagation(); 
+                                    setEditTransactionId(null); 
+                                    setAddType('savings'); 
+                                    setIsAddOpen(true); 
+                                }} 
+                                className="px-6 py-2 rounded-full border border-white/20 bg-transparent hover:bg-white/5 active:scale-95 transition-all text-xs font-bold tracking-wider uppercase text-white"
+                            >
+                                Savings
+                            </button>
                         </div>
                     </div>
                 </motion.div>
@@ -227,6 +239,7 @@ const FinanceDashboard = () => {
                                 <button
                                     onClick={() => {
                                         setEditTransactionId(null);
+                                        setAddType('expense');
                                         setIsAddOpen(true);
                                     }}
                                     className="bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 px-6 py-2.5 rounded-xl font-bold active:scale-95 transition-all text-sm"
@@ -276,6 +289,7 @@ const FinanceDashboard = () => {
                 <button
                     onClick={() => {
                         setEditTransactionId(null);
+                        setAddType('expense');
                         setIsAddOpen(true);
                     }}
                     className="w-14 h-14 bg-indigo-600 text-white rounded-full shadow-xl shadow-indigo-600/30 flex items-center justify-center active:scale-95 transition-transform"
@@ -289,6 +303,7 @@ const FinanceDashboard = () => {
                     isOpen={true}
                     onClose={() => setIsAddOpen(false)}
                     editTransactionId={editTransactionId}
+                    initialType={addType}
                     onDelete={(id) => {
                         deleteTransaction(id);
                         setUndoToast({ id, message: 'Transaction deleted.' });

@@ -8,12 +8,12 @@ import { FirestoreService } from '../../services/firestore-service';
 import JumpDateModal from '../../components/organisms/JumpDateModal';
 import { useScrollLock } from '../../hooks/useScrollLock';
 
-const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDelete }) => {
+const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDelete, initialType = 'expense' }) => {
     useScrollLock(isOpen);
     const { addTransaction, addTransfer, editTransaction, deleteTransaction, checkDuplicate, categories, accounts, transactions, addRecurringRule, getBudgetStats } = useFinance();
     const { user } = useAuthContext();
     const [amount, setAmount] = useState('');
-    const [type, setType] = useState('expense'); // expense | income | transfer
+    const [type, setType] = useState(initialType); // expense | income | transfer | savings
     const [categoryId, setCategoryId] = useState('');
     const [accountId, setAccountId] = useState('');
     const [toAccountId, setToAccountId] = useState(''); // Only for transfer
@@ -22,6 +22,12 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
     
     const [datePickerOpen, setDatePickerOpen] = useState(false);
     const [duplicateWarning, setDuplicateWarning] = useState(null);
+
+    useEffect(() => {
+        if (isOpen && !editTransactionId) {
+            setType(initialType);
+        }
+    }, [isOpen, initialType, editTransactionId]);
 
     useEffect(() => {
         if (!editTransactionId && user) {
@@ -93,7 +99,9 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
     };
 
     const activeAccounts = accounts.filter(a => !a.isArchived);
-    const currentCategories = type === 'income' ? categories.filter(c => c.type === 'income') : categories.filter(c => c.type === 'expense');
+    const currentCategories = type === 'income' ? categories.filter(c => c.type === 'income') 
+        : type === 'savings' ? categories.filter(c => c.type === 'savings') 
+        : categories.filter(c => c.type === 'expense');
 
     return (
         <AnimatePresence>
@@ -119,7 +127,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                             <div className="flex justify-between items-center mb-8">
                                 <div className="flex items-center gap-3">
                                     <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl flex items-center justify-center">
-                                        {type === 'expense' ? <Trash className="w-6 h-6 text-indigo-500" /> : type === 'income' ? <ArrowRight className="w-6 h-6 text-indigo-500" /> : <ArrowRightLeft className="w-6 h-6 text-indigo-500" />}
+                                        {type === 'expense' ? <Trash className="w-6 h-6 text-indigo-500" /> : type === 'income' ? <ArrowRight className="w-6 h-6 text-indigo-500" /> : type === 'savings' ? <Wallet className="w-6 h-6 text-indigo-500" /> : <ArrowRightLeft className="w-6 h-6 text-indigo-500" />}
                                     </div>
                                     <div>
                                         <h2 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">
@@ -142,7 +150,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
 
                             {/* Type Selection - High Priority Hierarchy */}
                             <div className="flex p-1 bg-slate-100 dark:bg-slate-800/10 rounded-2xl mb-8">
-                                {['expense', 'income', 'transfer'].map(t => (
+                                {['income', 'expense', 'savings'].map(t => (
                                     <button
                                         key={t}
                                         type="button"
