@@ -113,19 +113,23 @@ const DebtManager = () => {
                     }
                 }
             } else {
-                // Fallback: open vCard (.vcf) file picker for iOS/desktop
-                setContactError('Select a contact file (.vcf) to import');
-                setTimeout(() => setContactError(''), 4000);
-                if (vcfInputRef.current) vcfInputRef.current.click();
+                // Fallback: iOS/desktop don't support the Contact Picker API. 
+                // Don't open a confusing file picker, just tell them.
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                if (isIOS) {
+                    setContactError('Contact picker not supported on iOS Safari. Please type name/number or use keyboard AutoFill.');
+                } else {
+                    setContactError('Contact picker not supported on your browser. Please type it manually.');
+                }
+                setTimeout(() => setContactError(''), 5000);
             }
         } catch (err) {
             if (err.name === 'SecurityError' || err.name === 'NotAllowedError') {
                 setContactError('Contact access denied. Please allow in device Settings.');
                 setTimeout(() => setContactError(''), 5000);
             } else if (err.name !== 'AbortError') {
-                setContactError('Select a contact file (.vcf) to import');
+                setContactError('Contact picker error. Please type manually.');
                 setTimeout(() => setContactError(''), 4000);
-                if (vcfInputRef.current) vcfInputRef.current.click();
             }
         }
     }, [contactPickerSupported, cleanPhoneNumber]);

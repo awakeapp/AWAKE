@@ -275,10 +275,18 @@ const FinanceDashboard = () => {
                                         <div className="flex items-center gap-4 relative z-10 w-full">
                                             <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl shrink-0 ${cat?.color ? cat.color + '/10' : 'bg-slate-50 dark:bg-slate-800'} ${cat?.color?.replace('bg-', 'text-') || 'text-slate-500'}`}>
                                                 {(() => {
-                                                    if (cat?.icon) {
-                                                        const IconComponent = LucideIcons[cat.icon];
-                                                        if (IconComponent) return <IconComponent className="w-6 h-6 opacity-90" />;
+                                                    let iconName = cat?.icon;
+                                                    if (!iconName) {
+                                                        if (cat?.name === 'Food & Dining') iconName = 'Utensils';
+                                                        else if (cat?.name === 'Transport') iconName = 'Bus';
+                                                        else if (cat?.name === 'Shopping') iconName = 'ShoppingBag';
+                                                        else if (cat?.name === 'Bills & Utilities') iconName = 'Zap';
+                                                        else if (cat?.name === 'Salary') iconName = 'IndianRupee';
+                                                        else if (cat?.name === 'Savings Allocation') iconName = 'Wallet';
+                                                        else iconName = 'HelpCircle';
                                                     }
+                                                    const IconComponent = LucideIcons[iconName];
+                                                    if (IconComponent) return <IconComponent className="w-5 h-5 opacity-90" />;
                                                     return cat?.name?.[0] || '?';
                                                 })()}
                                             </div>
@@ -301,7 +309,7 @@ const FinanceDashboard = () => {
             </div>
 
             {/* Floating Action Button — sits above Finance bottom nav */}
-            <div className="fixed bottom-[88px] right-6 z-40">
+            <div className="fixed right-6 z-40" style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 88px)' }}>
                 <button
                     onClick={() => {
                         setEditTransactionId(null);
