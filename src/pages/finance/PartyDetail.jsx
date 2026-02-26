@@ -162,7 +162,8 @@ const PartyDetail = () => {
         if (isReminderOpen) {
             setSelectedEntryIds(pendingEntries.map(e => e.id));
         }
-    }, [isReminderOpen, pendingEntries]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isReminderOpen]);
 
     const selectedPendingEntries = useMemo(() => 
         pendingEntries.filter(e => selectedEntryIds.includes(e.id)),
