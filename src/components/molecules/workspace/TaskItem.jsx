@@ -5,7 +5,7 @@ import ToggleSwitch from '../../atoms/ToggleSwitch';
 import ThreeStateCheckbox from '../../atoms/ThreeStateCheckbox';
 import { inferIcon, getIconComponent } from '../../../utils/iconInference';
 import clsx from 'clsx';
-import { Clock, ArrowUp, Trash2, Calendar as CalendarIcon, Tag, Info } from 'lucide-react';
+import { Clock, ArrowUp, Trash2, Calendar as CalendarIcon, Tag, Info, Edit2 } from 'lucide-react';
 import { useSettings } from '../../../context/SettingsContext';
 import JumpDateModal from '../../organisms/JumpDateModal';
 import { format } from 'date-fns';
@@ -175,6 +175,13 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                                     </span>
                                 </div>
                             )}
+                        </div>
+                    )}
+
+                    {/* Edit Icon Overlay */}
+                    {!isCarryOver && onEdit && (
+                        <div className="absolute inset-y-0 right-10 flex items-center pr-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                           <Edit2 className="w-4 h-4 text-slate-300 dark:text-slate-600" />
                         </div>
                     )}
 

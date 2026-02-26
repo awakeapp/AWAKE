@@ -25,6 +25,15 @@ service cloud.firestore {
         allow delete: if isOwner(userId);
       }
 
+      // Tasks: Validate fields to prevent malicious schema bloat
+      match /tasks/{docId} {
+        allow read: if isOwner(userId);
+        allow delete: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && request.resource.data.title is string
+          && request.resource.data.status in ['pending', 'completed'];
+      }
+
       // Other subcollections: owner-only with no special validation
       match /{subCollection}/{docId} {
         allow read, write: if isOwner(userId);

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { format } from 'date-fns';
 import { FirestoreService } from '../services/firestore-service';
@@ -21,6 +21,11 @@ export const TaskContextProvider = ({ children }) => {
     const [completedLimit, setCompletedLimit] = useState(50);
     const [lockedDays, setLockedDays] = useState({});
     const [isLoading, setIsLoading] = useState(true);
+    const tasksRef = useRef([]);
+
+    useEffect(() => {
+        tasksRef.current = [...activeTasks, ...completedTasks];
+    }, [activeTasks, completedTasks]);
 
     // Default Settings
     const [settings, setSettings] = useState({
@@ -60,7 +65,7 @@ export const TaskContextProvider = ({ children }) => {
             },
             where('status', '==', 'pending'),
             orderBy('createdAt', 'desc'),
-            limit(200)
+            limit(1000)
         );
 
         // 2. Subscribe to Completed Tasks (Limited)
@@ -129,7 +134,7 @@ export const TaskContextProvider = ({ children }) => {
         // Wait, 'tasks' is defined AFTER this in original code? 
         // actually 'tasks' is defined below. We need to restructure or use activeTasks/completedTasks directly.
         // Let's use activeTasks/completedTasks state directly which are available here.
-        const allTasks = [...activeTasks, ...completedTasks];
+        const allTasks = tasksRef.current;
         const dayTasks = allTasks.filter(t => t.date === dateStr);
         if (dayTasks.length === 0) return 0;
         const completed = dayTasks.filter(t => t.status === 'completed' || t.isCompleted).length;
@@ -171,6 +176,10 @@ export const TaskContextProvider = ({ children }) => {
         };
 
         try {
+            // Check duplicate active task
+            if (tasksRef.current.some(t => t.title.toLowerCase() === title.toLowerCase() && t.status === 'pending' && t.date === taskDate)) {
+                throw new Error("A pending task with this title already exists on this date.");
+            }
             // Tasks are now individual documents in the collection
             const docRef = await FirestoreService.addItem(`users/${user.uid}/tasks`, newTask);
             return { ...newTask, id: docRef.id };
@@ -188,7 +197,7 @@ export const TaskContextProvider = ({ children }) => {
         // The original code checked 'isDayLocked(task.date)'. 
         // We need the task object. 
         // We can find it in [...activeTasks, ...completedTasks].
-        const allTasks = [...activeTasks, ...completedTasks];
+        const allTasks = tasksRef.current;
         const task = allTasks.find(t => t.id === id);
         
         if (!task) return;
@@ -201,27 +210,31 @@ export const TaskContextProvider = ({ children }) => {
         // Optimistic update (optional, but UI listens to onSnapshot so it will bounce back quickly)
         // Here we just fire and forget the update
         await FirestoreService.updateItem(`users/${user.uid}/tasks`, id, updates);
-    }, [user, activeTasks, completedTasks, currentDateStr]);
+    }, [user, currentDateStr]);
 
     const deleteTask = useCallback(async (id) => {
         if (!user) return;
-        const allTasks = [...activeTasks, ...completedTasks];
+        const allTasks = tasksRef.current;
         const task = allTasks.find(t => t.id === id);
         if (task && task.date < currentDateStr) {
             console.warn("Cannot delete tasks of a locked day.");
             return;
         }
         await FirestoreService.deleteItem(`users/${user.uid}/tasks`, id);
-    }, [user, activeTasks, completedTasks, currentDateStr]);
+    }, [user, currentDateStr]);
 
     const rescheduleTask = useCallback(async (id, newDateStr) => {
         if (!user) return;
+        if (newDateStr && newDateStr < currentDateStr) {
+            console.warn("Cannot reschedule to a locked past day.");
+            return;
+        }
         await FirestoreService.updateItem(`users/${user.uid}/tasks`, id, { date: newDateStr });
-    }, [user]);
+    }, [user, currentDateStr]);
 
     const smartToggleTask = useCallback(async (id) => {
         if (!user) return;
-        const allTasks = [...activeTasks, ...completedTasks];
+        const allTasks = tasksRef.current;
         const task = allTasks.find(t => t.id === id);
         if (!task) return;
 
@@ -246,7 +259,7 @@ export const TaskContextProvider = ({ children }) => {
             status: newStatus,
             isCompleted: isNowCompleted
         });
-    }, [user, activeTasks, completedTasks, currentDateStr]);
+    }, [user, currentDateStr]);
     
     // Alias for compatibility
     const toggleTask = smartToggleTask;
@@ -255,7 +268,7 @@ export const TaskContextProvider = ({ children }) => {
         if (!user) return 0;
         // logic duplicated from getDailyScore to avoid dependency issues if possible, 
         // or just rely on state. 
-        const allTasks = [...activeTasks, ...completedTasks];
+        const allTasks = tasksRef.current;
         const dayTasks = allTasks.filter(t => t.date === currentDateStr);
         let score = 0;
         if (dayTasks.length > 0) {
@@ -275,16 +288,16 @@ export const TaskContextProvider = ({ children }) => {
         setLockedDays(newLockedDays); // Optimistic
         await FirestoreService.setItem(`users/${user.uid}/data`, 'lockedDays', { days: newLockedDays });
         return score;
-    }, [user, activeTasks, completedTasks, currentDateStr, lockedDays]);
+    }, [user, currentDateStr, lockedDays]);
 
     const clearAllTasks = useCallback(async () => {
         // Warning: This could be heavy if there are thousands. For now, we iterate.
         if (!user) return;
-        const allTasks = [...activeTasks, ...completedTasks];
+        const allTasks = tasksRef.current;
         // Batching would be better but keeping it simple for now as requested.
         const promises = allTasks.map(t => FirestoreService.deleteItem(`users/${user.uid}/tasks`, t.id));
         await Promise.all(promises);
-    }, [user, activeTasks, completedTasks]);
+    }, [user]);
 
     const [activePopoverId, setActivePopoverId] = useState(null);
 

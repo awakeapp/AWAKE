@@ -39,18 +39,17 @@ const EditTaskModal = ({ isOpen, onClose, task }) => {
 
  const handleDescriptionChange = (e) => {
  const text = e.target.value;
- if (getWordCount(text) <= 20) {
  setDescription(text);
- } else {
- // Trim to exactly 20 words if pasted
- const words = text.trim().split(/\s+/);
- setDescription(words.slice(0, 20).join(' '));
- }
  };
 
  const handleSubmit = async (e) => {
  e.preventDefault();
  if (!title.trim() || isSubmitting || !task) return;
+
+ if (wordCount > 20) {
+     alert("Description must be 20 words or less.");
+     return;
+ }
 
  setIsSubmitting(true);
  try {
