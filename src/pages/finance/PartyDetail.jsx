@@ -340,21 +340,27 @@ const PartyDetail = () => {
         }
 
         if (file) {
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                    await navigator.share({
-                        files: [file],
-                        title: type === 'pdf' ? 'Account Invoice' : 'Account Overview',
-                        text: reminderMessage
-                    });
-                } catch (e) {
-                    if (e.name !== 'AbortError') {
-                        handleSendReminderTextOnly();
-                    }
+            // 1. Force the download of the file
+            const url = URL.createObjectURL(file);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = file.name;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            // 2. Redirect to specific contact
+            const phone = normalizePhone(party.country_code, party.phone_number);
+            const encoded = encodeURIComponent(reminderMessage);
+
+            // Give a slight delay for the download to register before navigating to WhatsApp
+            setTimeout(() => {
+                if (reminderMethod === 'whatsapp') {
+                    window.location.href = `https://wa.me/${phone}?text=${encoded}`;
+                } else {
+                    window.location.href = `sms:${phone}?body=${encoded}`;
                 }
-            } else {
-                handleSendReminderTextOnly(); // fallback directly if can't share
-            }
+            }, 600);
+            
         } else {
             handleSendReminderTextOnly();
         }
