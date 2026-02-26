@@ -1,9 +1,10 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { User, Plus, ArrowLeft, MoreVertical, Search, CheckCircle, UserPlus, Phone, X } from 'lucide-react';
+import { User, Plus, MoreVertical, Search, CheckCircle, UserPlus, Phone, X } from 'lucide-react';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import { motion, AnimatePresence } from 'framer-motion';
+import FinanceBottomNav from '../../components/finance/FinanceBottomNav';
 
 const DebtManager = () => {
     const navigate = useNavigate();
@@ -176,13 +177,10 @@ const DebtManager = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 2rem)' }}>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col pt-[env(safe-area-inset-top)]" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5rem)' }}>
             {/* Header */}
             <header className="px-6 pt-6 pb-4 relative z-10">
                 <div className="flex items-center justify-between mb-6">
-                    <button onClick={() => navigate(-1)} className="p-2 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white -ml-2 focus:outline-none shadow-sm border border-slate-100 dark:border-slate-800">
-                        <ArrowLeft className="w-5 h-5" />
-                    </button>
                     <h1 className="text-xl font-bold text-slate-900 dark:text-white">Debts & Lending</h1>
                     <button onClick={() => setIsAdding(true)} className="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full transition-colors -mr-2 shadow-sm shadow-indigo-500/30">
                         <Plus className="w-5 h-5" />
@@ -387,6 +385,8 @@ const DebtManager = () => {
                     </div>
                 )}
             </AnimatePresence>
+
+            <FinanceBottomNav />
         </div>
     );
 };
