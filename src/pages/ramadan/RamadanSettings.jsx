@@ -80,10 +80,12 @@ const RamadanSettings = () => {
         { id: 1, name: 'Hanafi' },
     ];
 
-    const handleChange = (key, value) => setLocalSettings(prev => ({ ...prev, [key]: value }));
+    const handleChange = (key, value) => {
+        setLocalSettings(prev => ({ ...prev, [key]: value }));
+        updateSettings({ [key]: value });
+    };
 
     const handleSave = async () => {
-        updateSettings(localSettings);
         // Add a small haptic feedback/delay for premium feel
         setTimeout(() => navigate(-1), 100);
     };
@@ -212,7 +214,7 @@ const RamadanSettings = () => {
                         onClick={handleSave}
                         className="w-full max-w-xs py-4 px-6 bg-indigo-600 dark:bg-white text-white dark:text-black active:bg-indigo-700 dark:active:bg-slate-200 rounded-2xl font-bold transition-all shadow-lg active:scale-[0.97]"
                     >
-                        Apply Changes
+                        Done
                     </button>
                     
                     <div className="text-center space-y-1">

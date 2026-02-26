@@ -176,15 +176,37 @@ export const PrayerProvider = ({ children }) => {
                         const hijri = dataPrayer.data.date.hijri;
                         const cleanHijriMonth = hijri.month.en.replace(/\s/g, '');
                         let hijriDay = parseInt(hijri.day, 10);
+                        let hijriMonthNumber = hijri.month.number;
+                        let hijriYear = parseInt(hijri.year, 10);
+
+                        // Apply manual hijri offset since AlAdhan API ignores it on this endpoint
+                        if (currentHijriOffset !== 0) {
+                            hijriDay += currentHijriOffset;
+                            if (hijriDay > 30) {
+                                hijriDay -= 30;
+                                hijriMonthNumber += 1;
+                                if (hijriMonthNumber > 12) {
+                                    hijriMonthNumber = 1;
+                                    hijriYear += 1;
+                                }
+                            } else if (hijriDay < 1) {
+                                hijriDay += 30;
+                                hijriMonthNumber -= 1;
+                                if (hijriMonthNumber < 1) {
+                                    hijriMonthNumber = 12;
+                                    hijriYear -= 1;
+                                }
+                            }
+                        }
                         
                         const pData = {
                             dailyTimings: dataPrayer.data.timings,
                             hijriDate: {
                                 day: hijriDay,
-                                month: hijri.month.number,
+                                month: hijriMonthNumber,
                                 monthName: cleanHijriMonth,
-                                year: parseInt(hijri.year, 10),
-                                isRamadan: hijri.month.number === 9
+                                year: hijriYear,
+                                isRamadan: hijriMonthNumber === 9
                             },
                             timezone: dataPrayer.data.meta.timezone || currentTimezone
                         };
