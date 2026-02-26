@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
 import { ArrowLeft, Plus, MoreVertical, Trash2, RotateCcw, AlertTriangle, Calendar, Lock, CreditCard, ToggleLeft, ToggleRight, Check, ChevronDown, Clock, Bell, MessageCircle, MessageSquare, Copy, Send, Wallet, FileText, Image as ImageIcon, Download, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
@@ -164,32 +164,40 @@ const PartyDetail = () => {
         const dStr = format(new Date(), 'dd MMM yyyy');
         const dueStr = summary.oldestDueDate ? format(new Date(summary.oldestDueDate), 'dd MMM yyyy') : '';
 
+        const formattedAmt = reminderMethod === 'whatsapp' ? `*₹${amtStr}*` : `₹${amtStr}`;
+        const formattedDate = reminderMethod === 'whatsapp' ? `*${dStr}*` : dStr;
+        const formattedDue = reminderMethod === 'whatsapp' ? `*${dueStr}*` : dueStr;
+
         return [
             {
                 id: 'friendly', label: 'Friendly',
-                text: `Hi ${party.name},\n\nHope this message finds you well.\n\nThis is a friendly reminder regarding the pending balance of ₹${amtStr} as of ${dStr}.${dueStr ? ` The oldest due date was ${dueStr}.` : ''}\n\nPlease settle at your earliest convenience.\n\nThank you.`
+                text: `Hi ${party.name},\n\nHope this message finds you well.\n\nThis is a friendly reminder regarding the pending balance of ${formattedAmt} as of ${formattedDate}.${dueStr ? ` The oldest due date was ${formattedDue}.` : ''}\n\nPlease settle at your earliest convenience.\n\nThank you.`
             },
             {
                 id: 'formal', label: 'Formal',
-                text: `Dear ${party.name},\n\nThis is a formal reminder that an amount of ₹${amtStr} is currently outstanding on your account as of ${dStr}.\n\nWe would appreciate it if you could process this payment promptly to keep your account current.\n\nThank you for your business.`
+                text: `Dear ${party.name},\n\nThis is a formal reminder that an amount of ${formattedAmt} is currently outstanding on your account as of ${formattedDate}.\n\nWe would appreciate it if you could process this payment promptly to keep your account current.\n\nThank you for your business.`
             },
             {
                 id: 'urgent', label: 'Urgent',
-                text: `Attn: ${party.name},\n\nPlease be advised that your payment of ₹${amtStr} is now overdue.\n\nWe urge you to settle this balance immediately${dueStr ? ` (originally due on ${dueStr})` : ''} to avoid any disruption or further action.\nLet us know if you have already processed the payment.\n\nRegards.`
+                text: `Attn: ${party.name},\n\nPlease be advised that your payment of ${formattedAmt} is now overdue.\n\nWe urge you to settle this balance immediately${dueStr ? ` (originally due on ${formattedDue})` : ''} to avoid any disruption or further action.\nLet us know if you have already processed the payment.\n\nRegards.`
             }
         ];
-    }, [party.name, totalPending, summary.oldestDueDate]);
+    }, [party.name, totalPending, summary.oldestDueDate, reminderMethod]);
+
+    useEffect(() => {
+        if (isReminderOpen && templates[selectedTemplateIndex]) {
+            setReminderMessage(templates[selectedTemplateIndex].text);
+        }
+    }, [reminderMethod, selectedTemplateIndex, templates, isReminderOpen]);
 
     const openReminderModal = () => {
         setSelectedTemplateIndex(0);
-        setReminderMessage(templates[0].text);
         setCopied(false);
         setIsReminderOpen(true);
     };
 
     const handleTemplateChange = (index) => {
         setSelectedTemplateIndex(index);
-        setReminderMessage(templates[index].text);
     };
 
     const handleCopyMessage = async () => {
@@ -200,70 +208,80 @@ const PartyDetail = () => {
         } catch { /* fallback: ignore */ }
     };
 
-    const generatePDFInvoice = async () => {
-        setIsGeneratingPdf(true);
-        try {
-            const { jsPDF } = await import("jspdf");
-            const doc = new jsPDF();
-            const width = doc.internal.pageSize.getWidth();
-            const isReceiv = balance > 0;
-            
-            // Header BG
-            doc.setFillColor(15, 23, 42); // slate-900
-            doc.rect(0, 0, width, 120, "F");
+    const generatePDFBlob = async () => {
+        const { jsPDF } = await import("jspdf");
+        const doc = new jsPDF();
+        const width = doc.internal.pageSize.getWidth();
+        const isReceiv = balance > 0;
+        
+        doc.setFillColor(15, 23, 42); 
+        doc.rect(0, 0, width, 120, "F");
 
-            // Header Text
-            doc.setTextColor(255, 255, 255);
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(28);
-            doc.text("AWAKE INVOICE", 20, 25);
+        doc.setTextColor(255, 255, 255);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(28);
+        doc.text("AWAKE INVOICE", 20, 25);
 
-            doc.setFontSize(12);
-            doc.setTextColor(148, 163, 184); // slate-400
-            doc.text(`DATE: ${format(new Date(), 'dd MMM yyyy')}`, 20, 35);
+        doc.setFontSize(12);
+        doc.setTextColor(148, 163, 184); 
+        doc.text(`DATE: ${format(new Date(), 'dd MMM yyyy')}`, 20, 35);
 
-            // Details Card
-            doc.setFillColor(255, 255, 255);
-            doc.roundedRect(20, 50, width - 40, 60, 4, 4, "F");
+        doc.setFillColor(255, 255, 255);
+        doc.roundedRect(20, 50, width - 40, 60, 4, 4, "F");
 
-            doc.setTextColor(15, 23, 42);
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "bold");
-            doc.text("PREPARED FOR:", 25, 65);
-            
-            doc.setFontSize(18);
-            doc.text(party.name, 25, 75);
+        doc.setTextColor(15, 23, 42);
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text("PREPARED FOR:", 25, 65);
+        
+        doc.setFontSize(18);
+        doc.text(party.name, 25, 75);
 
-            doc.setFontSize(11);
-            doc.setFont("helvetica", "normal");
-            doc.text(`${party.country_code || '+91'} ${party.phone_number}`, 25, 83);
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "normal");
+        doc.text(`${party.country_code || '+91'} ${party.phone_number}`, 25, 83);
 
-            doc.setFont("helvetica", "bold");
-            doc.text("TOTAL OUTSTANDING:", 25, 100);
-            
-            doc.setFontSize(20);
-            if (isReceiv) doc.setTextColor(16, 185, 129); // emerald
-            else doc.setTextColor(244, 63, 94); // rose
-            doc.text(`Rs ${totalPending.toLocaleString()}`, 80, 100);
+        doc.setFont("helvetica", "bold");
+        doc.text("TOTAL OUTSTANDING:", 25, 100);
+        
+        doc.setFontSize(20);
+        if (isReceiv) doc.setTextColor(16, 185, 129); 
+        else doc.setTextColor(244, 63, 94); 
+        doc.text(`Rs ${totalPending.toLocaleString()}`, 80, 100);
 
-            // Message Body
-            doc.setTextColor(15, 23, 42);
-            doc.setFontSize(12);
-            doc.setFont("helvetica", "normal");
-            const splitMessage = doc.splitTextToSize(reminderMessage, width - 50);
-            doc.text(splitMessage, 25, 130);
-            
-            // Footer
-            doc.setFontSize(9);
-            doc.setTextColor(148, 163, 184);
-            doc.text("Generated automatically via AWAKE", width / 2, doc.internal.pageSize.getHeight() - 15, { align: "center" });
+        doc.setTextColor(15, 23, 42);
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "normal");
+        const splitMessage = doc.splitTextToSize(reminderMessage, width - 50);
+        doc.text(splitMessage, 25, 130);
+        
+        doc.setFontSize(9);
+        doc.setTextColor(148, 163, 184);
+        doc.text("Generated automatically via AWAKE", width / 2, doc.internal.pageSize.getHeight() - 15, { align: "center" });
 
-            doc.save(`${party.name.replace(/\s+/g, '_')}_Invoice.pdf`);
-        } catch (e) {
-            console.error(e);
-            alert("Error generating PDF");
-        } finally {
+        return doc.output('blob');
+    };
+
+    const handlePreviewAttachment = async (type) => {
+        let blob;
+        if (type === 'pdf') {
+            setIsGeneratingPdf(true);
+            try { blob = await generatePDFBlob(); } catch(e) {}
             setIsGeneratingPdf(false);
+        } else {
+            setIsSendingWithImage(true);
+            try {
+                if (hiddenImageRef.current) {
+                    const canvas = await html2canvas(hiddenImageRef.current, { scale: 2, backgroundColor: '#0f172a' });
+                    blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+                }
+            } catch(e) {}
+            setIsSendingWithImage(false);
+        }
+        
+        if (blob) {
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
         }
     };
 
@@ -273,82 +291,74 @@ const PartyDetail = () => {
         return `${cleanCode.replace('+', '')}${cleanNum}`;
     };
 
-    const handleSendReminder = async () => {
+    const handleSendReminderTextOnly = () => {
         if (!party.phone_number) {
-            alert("No phone number is attached to this party. Please enter a valid number to send direct messages.");
+            alert("No phone number is attached to this party.");
             return;
         }
-
         const phone = normalizePhone(party.country_code, party.phone_number);
-        if (!phone || phone.length < 8) {
-            alert("Invalid phone number. Please verify the party's contact details.");
-            return;
-        }
-
         const encoded = encodeURIComponent(reminderMessage);
 
-        // IMMEDIATELY redirect to WhatsApp/SMS — no delay
         if (reminderMethod === 'whatsapp') {
             window.location.href = `https://wa.me/${phone}?text=${encoded}`;
         } else {
             window.location.href = `sms:${phone}?body=${encoded}`;
         }
-
-        // Update reminder timestamp (non-blocking)
         updateDebtParty(partyId, { last_reminder_sent_at: new Date().toISOString() }).catch(() => {});
         setIsReminderOpen(false);
     };
 
-    const handleShareWithImage = async () => {
+    const handleShareAttachment = async (type) => {
         if (!party.phone_number) {
             alert("No phone number is attached to this party.");
             return;
         }
 
-        setIsSendingWithImage(true);
-        try {
-            let file = null;
-            if (hiddenImageRef.current) {
-                const canvas = await html2canvas(hiddenImageRef.current, { scale: 2, backgroundColor: '#0f172a' });
-                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
-                file = new File([blob], `${party.name.replace(/\s+/g, '_')}_Overview.jpg`, { type: 'image/jpeg' });
-            }
-
-            if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    files: [file],
-                    title: 'Account Overview',
-                    text: reminderMessage
-                });
-            } else if (file) {
-                // Fallback: download file, then redirect
-                const url = URL.createObjectURL(file);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = file.name;
-                a.click();
-                URL.revokeObjectURL(url);
-
-                const phone = normalizePhone(party.country_code, party.phone_number);
-                const encoded = encodeURIComponent(reminderMessage);
-                setTimeout(() => {
-                    window.location.href = reminderMethod === 'whatsapp'
-                        ? `https://wa.me/${phone}?text=${encoded}`
-                        : `sms:${phone}?body=${encoded}`;
-                }, 600);
-            } else {
-                // No image, just redirect
-                handleSendReminder();
-                return;
-            }
-        } catch (e) {
-            if (e.name !== 'AbortError') {
-                // If share fails, still redirect
-                handleSendReminder();
-                return;
-            }
+        if (type === 'none') {
+            handleSendReminderTextOnly();
+            return;
         }
-        setIsSendingWithImage(false);
+
+        let file = null;
+        if (type === 'pdf') {
+            setIsGeneratingPdf(true);
+            try {
+                const blob = await generatePDFBlob();
+                file = new File([blob], `${party.name.replace(/\\s+/g, '_')}_Invoice.pdf`, { type: 'application/pdf' });
+            } catch(e) { }
+            setIsGeneratingPdf(false);
+        } else if (type === 'image') {
+            setIsSendingWithImage(true);
+            try {
+                if (hiddenImageRef.current) {
+                    const canvas = await html2canvas(hiddenImageRef.current, { scale: 2, backgroundColor: '#0f172a' });
+                    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+                    file = new File([blob], `${party.name.replace(/\\s+/g, '_')}_Overview.jpg`, { type: 'image/jpeg' });
+                }
+            } catch (e) { }
+            setIsSendingWithImage(false);
+        }
+
+        if (file) {
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: type === 'pdf' ? 'Account Invoice' : 'Account Overview',
+                        text: reminderMessage
+                    });
+                } catch (e) {
+                    if (e.name !== 'AbortError') {
+                        handleSendReminderTextOnly();
+                    }
+                }
+            } else {
+                handleSendReminderTextOnly(); // fallback directly if can't share
+            }
+        } else {
+            handleSendReminderTextOnly();
+        }
+
         updateDebtParty(partyId, { last_reminder_sent_at: new Date().toISOString() }).catch(() => {});
         setIsReminderOpen(false);
     };
@@ -1092,37 +1102,39 @@ const PartyDetail = () => {
                                     />
                                 </div>
 
-                                <div className="flex items-center justify-between bg-indigo-50 dark:bg-indigo-500/10 p-4 rounded-2xl border border-indigo-100 dark:border-indigo-500/20">
-                                    <div className="flex items-center gap-3">
-                                        <FileText className="w-6 h-6 text-indigo-500 shrink-0" />
-                                        <div>
-                                            <p className="text-[13px] font-bold text-slate-900 dark:text-white leading-tight">Professional Invoice</p>
-                                            <p className="text-[10px] text-slate-500 mt-0.5">Auto-generated with balance</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-col gap-2 items-end">
-                                       <button disabled={isGeneratingPdf} onClick={generatePDFInvoice} className="text-[10px] uppercase font-bold text-white bg-indigo-600 dark:bg-indigo-500 px-3 py-2 rounded-xl hover:bg-indigo-700 active:scale-95 transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50 tracking-wider">
-                                           {isGeneratingPdf ? <RotateCcw className="w-3.5 h-3.5 animate-spin"/> : <Download className="w-3.5 h-3.5" />}
-                                           Download
-                                       </button>
+                                <div>
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Attachments & Preview</label>
+                                    <div className="flex gap-2">
+                                        <button type="button" onClick={() => handlePreviewAttachment('image')} disabled={isSendingWithImage} className="flex-1 flex items-center justify-center gap-1.5 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 disabled:opacity-50">
+                                            {isSendingWithImage ? <RotateCcw className="w-3.5 h-3.5 animate-spin" /> : <ImageIcon className="w-3.5 h-3.5" />} Preview Image
+                                        </button>
+                                        <button type="button" onClick={() => handlePreviewAttachment('pdf')} disabled={isGeneratingPdf} className="flex-1 flex items-center justify-center gap-1.5 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 disabled:opacity-50">
+                                            {isGeneratingPdf ? <RotateCcw className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />} Preview PDF
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                             
                             {/* Footer Actions */}
-                            <div className="px-7 py-5 border-t border-slate-100 dark:border-slate-800/50 shrink-0 space-y-3">
-                                <div className="flex gap-3">
-                                    <button type="button" onClick={handleCopyMessage} className={`w-[60px] shrink-0 py-4 font-bold rounded-2xl flex items-center justify-center transition-all border ${copied ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 border-emerald-200 dark:border-emerald-500/30' : 'text-slate-500 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
-                                        {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+                            <div className="px-7 py-5 border-t border-slate-100 dark:border-slate-800/50 shrink-0 space-y-3 bg-white dark:bg-slate-900">
+                                <div className="flex gap-2 pb-1">
+                                    <button type="button" onClick={() => handleShareAttachment('image')} disabled={isSendingWithImage || isGeneratingPdf} className="flex-1 py-3.5 bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/30 active:scale-[0.98] transition-all flex flex-col items-center justify-center text-[11px] uppercase tracking-wider gap-1 hover:bg-indigo-500">
+                                        <div className="flex items-center gap-1"><ImageIcon className="w-3.5 h-3.5"/> Image</div>
+                                        <span className="opacity-80 text-[8px] tracking-normal font-medium capitalize">Send + Text</span>
                                     </button>
-                                    <button type="button" onClick={handleSendReminder} className="flex-1 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-2xl shadow-lg shadow-emerald-500/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wider">
-                                        <Send className="w-4 h-4" /> Send Reminder
+                                    <button type="button" onClick={() => handleShareAttachment('pdf')} disabled={isSendingWithImage || isGeneratingPdf} className="flex-1 py-3.5 bg-emerald-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 active:scale-[0.98] transition-all flex flex-col items-center justify-center text-[11px] uppercase tracking-wider gap-1 hover:bg-emerald-500">
+                                        <div className="flex items-center gap-1"><FileText className="w-3.5 h-3.5"/> PDF</div>
+                                        <span className="opacity-80 text-[8px] tracking-normal font-medium capitalize">Send + Text</span>
                                     </button>
                                 </div>
-                                <button disabled={isSendingWithImage} type="button" onClick={handleShareWithImage} className="w-full py-3.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold rounded-2xl border border-indigo-200 dark:border-indigo-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-[13px] hover:bg-indigo-100 dark:hover:bg-indigo-500/15 disabled:opacity-50">
-                                    {isSendingWithImage ? <RotateCcw className="w-4 h-4 animate-spin"/> : <ImageIcon className="w-4 h-4" />}
-                                    {isSendingWithImage ? 'Generating...' : 'Share with Account Overview Image'}
-                                </button>
+                                <div className="flex justify-between border-t border-slate-100 dark:border-slate-800/50 pt-4 px-1">
+                                    <button type="button" onClick={handleCopyMessage} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 flex items-center gap-1.5 text-xs font-bold transition-colors">
+                                        {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />} Copy Text
+                                    </button>
+                                    <button type="button" onClick={() => handleShareAttachment('none')} className="text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1.5 text-xs font-bold transition-colors">
+                                        <Send className="w-3.5 h-3.5" /> Send Text Only
+                                    </button>
+                                </div>
                             </div>
                         </motion.div>
                     </div>
