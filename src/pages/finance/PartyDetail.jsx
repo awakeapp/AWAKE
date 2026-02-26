@@ -55,6 +55,9 @@ const PartyDetail = () => {
         updateDebtParty,
         addTransaction,
         editDebtTransaction,
+        getPartyStatus,
+        getPendingEntries,
+        addSettlementPayment,
         accounts
     } = context;
 
