@@ -487,7 +487,7 @@ export const FinanceContextProvider = ({ children }) => {
 
     const updateCategoryBudget = useCallback(async (catId, newLimit) => {
         if (!user) return;
-        await FirestoreService.updateItem(`users/${user.uid}/categories`, catId, { budget: newLimit });
+        await FirestoreService.setItem(`users/${user.uid}/categories`, catId, { budget: newLimit }, true);
     }, [user]);
 
     const addCategory = useCallback(async (cat) => {
