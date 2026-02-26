@@ -200,8 +200,9 @@ const RamadanDhikr = () => {
  );
  }
 
- const todayKey = now.toLocaleDateString('en-CA');
- const todayData = ramadanData?.days?.[todayKey] || {};
+    const { serverTodayKey } = usePrayer();
+    const todayKey = serverTodayKey || now.toLocaleDateString('en-CA');
+    const todayData = ramadanData?.days?.[todayKey] || {};
 
  const handleSave = (field, newVal) => {
  updateRamadanDay(todayKey, { [field]: newVal });

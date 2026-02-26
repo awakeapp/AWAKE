@@ -56,13 +56,24 @@ export const RamadanProvider = ({ children }) => {
         const yearId = String(hijriDate.year);
         const path = `users/${user.uid}/ramadan`;
 
-        const existingDayData = ramadanData?.days?.[dateKey] || {};
-        const mergedDayData = { ...existingDayData, ...updates };
+        // Optimistic update to UI
+        setRamadanData(prev => {
+            if (!prev) return prev;
+            const existingDayData = prev.days?.[dateKey] || {};
+            return {
+                ...prev,
+                days: {
+                    ...prev.days,
+                    [dateKey]: { ...existingDayData, ...updates }
+                }
+            };
+        });
 
+        // Deep merge on Firestore side (setDoc with { merge: true })
         const payload = {
             hijriYear: yearId,
             days: {
-                [dateKey]: mergedDayData
+                [dateKey]: updates
             }
         };
 

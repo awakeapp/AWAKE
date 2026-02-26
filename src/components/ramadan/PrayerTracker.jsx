@@ -105,8 +105,24 @@ const PrayerRow = ({ prayerKey, label, time, data, onUpdate, allowMode, allowCou
 
 const PrayerTracker = () => {
     const { ramadanData, updateRamadanDay, updateCustomPrayers, hijriDate } = useRamadan();
-    const { dailyTimings } = usePrayer();
-    const todayKey = new Date().toLocaleDateString('en-CA');
+    const { dailyTimings, serverTodayKey } = usePrayer();
+    
+    // Fallback to local date if API hasn't loaded, ensures dynamic updates across midnight
+    const [todayKey, setTodayKey] = useState(serverTodayKey || new Date().toLocaleDateString('en-CA'));
+    
+    // Update whenever serverKey changes
+    useEffect(() => {
+        if (serverTodayKey) {
+            setTodayKey(serverTodayKey);
+        } else {
+            // Setup a midnight roller if serverKey isn't working
+            const interval = setInterval(() => {
+                setTodayKey(new Date().toLocaleDateString('en-CA'));
+            }, 60000);
+            return () => clearInterval(interval);
+        }
+    }, [serverTodayKey]);
+
     const todayData = ramadanData?.days?.[todayKey] || {};
     const customPrayers = ramadanData?.customPrayers || [];
     

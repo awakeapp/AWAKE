@@ -206,6 +206,10 @@ export const PrayerProvider = ({ children }) => {
                             }
                         }
                         
+                        const gregorianStr = dataPrayer.data.date.gregorian.date; // e.g. "27-02-2026"
+                        const [gDay, gMonth, gYear] = gregorianStr.split('-');
+                        const serverTodayKey = `${gYear}-${gMonth}-${gDay}`; // "YYYY-MM-DD"
+
                         const pData = {
                             dailyTimings: dataPrayer.data.timings,
                             hijriDate: {
@@ -215,6 +219,7 @@ export const PrayerProvider = ({ children }) => {
                                 year: hijriYear,
                                 isRamadan: hijriMonthNumber === 9
                             },
+                            serverTodayKey,
                             timezone: dataPrayer.data.meta.timezone || currentTimezone
                         };
                         
@@ -311,6 +316,7 @@ export const PrayerProvider = ({ children }) => {
         hijriOffset: settings.hijriOffset ?? 0,
         dailyTimings: prayerData.dailyTimings,
         hijriDate: prayerData.hijriDate,
+        serverTodayKey: prayerData.serverTodayKey,
         loading,
         error,
         requestLocation,
