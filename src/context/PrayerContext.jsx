@@ -128,6 +128,8 @@ export const PrayerProvider = ({ children }) => {
     useEffect(() => {
         if (!location) return;
 
+        const abortController = new AbortController();
+
         const executeFetch = async () => {
             if (isFetchingRef.current) return;
             isFetchingRef.current = true;
@@ -138,7 +140,9 @@ export const PrayerProvider = ({ children }) => {
                 try {
                     // Only fetch if we don't have details or location changed significantly
                     const details = await locationService.reverseGeocode(location.lat, location.lng);
-                    setLocationDetails(details);
+                    if (!abortController.signal.aborted) {
+                        setLocationDetails(details);
+                    }
                 } catch (geoErr) {
                     console.warn("Geocoding failed, using fallback display:", geoErr);
                 }
@@ -155,10 +159,12 @@ export const PrayerProvider = ({ children }) => {
                 
                 const cachedData = localStorage.getItem(cacheKey);
                 if (cachedData) {
-                    setPrayerData(JSON.parse(cachedData));
-                    setLoading(false);
-                    isFetchingRef.current = false;
-                    setError(null);
+                    if (!abortController.signal.aborted) {
+                        setPrayerData(JSON.parse(cachedData));
+                        setLoading(false);
+                        isFetchingRef.current = false;
+                        setError(null);
+                    }
                     return;
                 }
 
@@ -166,13 +172,14 @@ export const PrayerProvider = ({ children }) => {
                     const timestamp = Math.floor(Date.now() / 1000);
                     // Explicitly pass timezone parameter as requested
                     const resPrayer = await fetch(
-                        `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${location.lat}&longitude=${location.lng}&method=${currentMethod}&school=${currentMadhab}&adjustment=${currentHijriOffset}&timezone=${currentTimezone}`
+                        `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${location.lat}&longitude=${location.lng}&method=${currentMethod}&school=${currentMadhab}&adjustment=${currentHijriOffset}&timezone=${currentTimezone}`,
+                        { signal: abortController.signal }
                     );
                     
                     if (!resPrayer.ok) throw new Error("Failed to fetch timings");
                     const dataPrayer = await resPrayer.json();
 
-                    if (dataPrayer.code === 200) {
+                    if (dataPrayer.code === 200 && !abortController.signal.aborted) {
                         const hijri = dataPrayer.data.date.hijri;
                         const cleanHijriMonth = hijri.month.en.replace(/\s/g, '');
                         let hijriDay = parseInt(hijri.day, 10);
@@ -221,15 +228,21 @@ export const PrayerProvider = ({ children }) => {
                         setError(null);
                     }
                 } catch (prayerErr) {
-                    console.error("Prayer API fetch failed:", prayerErr);
-                    setError("Timings unavailable. Please check your connection.");
+                    if (!abortController.signal.aborted) {
+                        console.error("Prayer API fetch failed:", prayerErr);
+                        setError("Timings unavailable. Please check your connection.");
+                    }
                 }
             } catch (err) {
-                console.error("Prayer/Location Engine Error:", err);
-                setError("An error occurred loading settings.");
+                if (!abortController.signal.aborted) {
+                    console.error("Prayer/Location Engine Error:", err);
+                    setError("An error occurred loading settings.");
+                }
             } finally {
-                setLoading(false);
-                isFetchingRef.current = false;
+                if (!abortController.signal.aborted) {
+                    setLoading(false);
+                    isFetchingRef.current = false;
+                }
             }
         };
 
@@ -239,6 +252,7 @@ export const PrayerProvider = ({ children }) => {
         fetchTimeoutRef.current = setTimeout(executeFetch, delay);
 
         return () => {
+            abortController.abort();
             clearTimeout(fetchTimeoutRef.current);
             isFetchingRef.current = false;
         };

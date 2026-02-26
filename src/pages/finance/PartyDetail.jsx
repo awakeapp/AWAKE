@@ -152,6 +152,8 @@ const PartyDetail = () => {
     const totalPending = Math.abs(balance);
     const [reminderMethod, setReminderMethod] = useState(party.preferred_reminder_method || 'whatsapp');
     const fullPhone = `${(party.country_code || '+91').replace('+', '')}${party.phone_number || ''}`;
+    const [isSendingWithImage, setIsSendingWithImage] = useState(false);
+    const hiddenImageRef = useRef(null);
 
     const generatedMessage = useMemo(() => {
         const amtStr = totalPending.toLocaleString();
