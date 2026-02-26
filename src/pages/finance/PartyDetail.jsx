@@ -153,59 +153,27 @@ const PartyDetail = () => {
     const [reminderMethod, setReminderMethod] = useState(party.preferred_reminder_method || 'whatsapp');
     const fullPhone = `${(party.country_code || '+91').replace('+', '')}${party.phone_number || ''}`;
 
-    const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(0);
-    const [reminderMessage, setReminderMessage] = useState('');
-    const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-    const [isSendingWithImage, setIsSendingWithImage] = useState(false);
-    const hiddenImageRef = useRef(null);
-
-    const templates = useMemo(() => {
+    const generatedMessage = useMemo(() => {
         const amtStr = totalPending.toLocaleString();
         const dStr = format(new Date(), 'dd MMM yyyy');
-        const dueStr = summary.oldestDueDate ? format(new Date(summary.oldestDueDate), 'dd MMM yyyy') : '';
+        
+        const isWhatsapp = reminderMethod === 'whatsapp';
+        const PENDING_LIST = pendingEntries.map(e => {
+            const dateStr = format(new Date(e.date), 'dd MMM yyyy');
+            const desc = e.notes || 'Entry';
+            const amt = e.remaining.toLocaleString();
+            return `• ${dateStr} - ${desc} - ₹${amt}`;
+        }).join('\n');
 
-        const formattedAmt = reminderMethod === 'whatsapp' ? `*₹${amtStr}*` : `₹${amtStr}`;
-        const formattedDate = reminderMethod === 'whatsapp' ? `*${dStr}*` : dStr;
-        const formattedDue = reminderMethod === 'whatsapp' ? `*${dueStr}*` : dueStr;
-
-        return [
-            {
-                id: 'friendly', label: 'Friendly',
-                text: `Hi ${party.name},\n\nHope this message finds you well.\n\nThis is a friendly reminder regarding the pending balance of ${formattedAmt} as of ${formattedDate}.${dueStr ? ` The oldest due date was ${formattedDue}.` : ''}\n\nPlease settle at your earliest convenience.\n\nThank you.`
-            },
-            {
-                id: 'formal', label: 'Formal',
-                text: `Dear ${party.name},\n\nThis is a formal reminder that an amount of ${formattedAmt} is currently outstanding on your account as of ${formattedDate}.\n\nWe would appreciate it if you could process this payment promptly to keep your account current.\n\nThank you for your business.`
-            },
-            {
-                id: 'urgent', label: 'Urgent',
-                text: `Attn: ${party.name},\n\nPlease be advised that your payment of ${formattedAmt} is now overdue.\n\nWe urge you to settle this balance immediately${dueStr ? ` (originally due on ${formattedDue})` : ''} to avoid any disruption or further action.\nLet us know if you have already processed the payment.\n\nRegards.`
-            }
-        ];
-    }, [party.name, totalPending, summary.oldestDueDate, reminderMethod]);
-
-    useEffect(() => {
-        if (isReminderOpen && templates[selectedTemplateIndex]) {
-            setReminderMessage(templates[selectedTemplateIndex].text);
+        if (isWhatsapp) {
+            return `Hi ${party.name},\n\n*Pending payments:*\n\n${PENDING_LIST}\n\n*TOTAL: ₹${amtStr}*`;
+        } else {
+            return `Hi ${party.name},\nPending payments:\n${PENDING_LIST}\n\nTOTAL: ₹${amtStr}`;
         }
-    }, [reminderMethod, selectedTemplateIndex, templates, isReminderOpen]);
+    }, [party.name, totalPending, pendingEntries, reminderMethod]);
 
     const openReminderModal = () => {
-        setSelectedTemplateIndex(0);
-        setCopied(false);
         setIsReminderOpen(true);
-    };
-
-    const handleTemplateChange = (index) => {
-        setSelectedTemplateIndex(index);
-    };
-
-    const handleCopyMessage = async () => {
-        try {
-            await navigator.clipboard.writeText(reminderMessage);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        } catch { /* fallback: ignore */ }
     };
 
     const generatePDFBlob = async () => {
@@ -249,10 +217,11 @@ const PartyDetail = () => {
         else doc.setTextColor(244, 63, 94); 
         doc.text(`Rs ${totalPending.toLocaleString()}`, 80, 100);
 
+        // Message Body (No change since it is not PDF anymore, wait if the user hits PDF it won't exist. Let's just remove PDF entirely in UI).
         doc.setTextColor(15, 23, 42);
         doc.setFontSize(12);
         doc.setFont("helvetica", "normal");
-        const splitMessage = doc.splitTextToSize(reminderMessage, width - 50);
+        const splitMessage = doc.splitTextToSize(generatedMessage, width - 50);
         doc.text(splitMessage, 25, 130);
         
         doc.setFontSize(9);
@@ -297,7 +266,7 @@ const PartyDetail = () => {
             return;
         }
         const phone = normalizePhone(party.country_code, party.phone_number);
-        const encoded = encodeURIComponent(reminderMessage);
+        const encoded = encodeURIComponent(generatedMessage);
 
         if (reminderMethod === 'whatsapp') {
             window.location.href = `https://wa.me/${phone}?text=${encoded}`;
@@ -340,7 +309,6 @@ const PartyDetail = () => {
         }
 
         if (file) {
-            // 1. Force the download of the file
             const url = URL.createObjectURL(file);
             const a = document.createElement('a');
             a.href = url;
@@ -348,11 +316,9 @@ const PartyDetail = () => {
             a.click();
             URL.revokeObjectURL(url);
 
-            // 2. Redirect to specific contact
             const phone = normalizePhone(party.country_code, party.phone_number);
-            const encoded = encodeURIComponent(reminderMessage);
+            const encoded = encodeURIComponent(generatedMessage);
 
-            // Give a slight delay for the download to register before navigating to WhatsApp
             setTimeout(() => {
                 if (reminderMethod === 'whatsapp') {
                     window.location.href = `https://wa.me/${phone}?text=${encoded}`;
@@ -455,6 +421,10 @@ const PartyDetail = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!amount || Number(amount) <= 0) return;
+        if (!note.trim()) {
+            alert("Please provide a description (What is this for?).");
+            return;
+        }
 
         if (isSettlementType && pendingEntries.length > 0) {
             setSettleAmount(amount);
@@ -871,8 +841,8 @@ const PartyDetail = () => {
                                     </div>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Note</label>
-                                    <input type="text" value={note} onChange={e => setNote(e.target.value)} placeholder="Reason or reference..."
+                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">What is this for?</label>
+                                    <input type="text" value={note} onChange={e => setNote(e.target.value)} placeholder="Enter description..." required
                                         className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-[13px] outline-none focus:border-indigo-400/50 transition-all placeholder:text-slate-400" />
                                 </div>
                             </div>
@@ -1067,81 +1037,20 @@ const PartyDetail = () => {
                                 </div>
                             </div>
 
-                            {/* Scrollable Content */}
-                            <div className="flex-1 overflow-y-auto px-7 py-4 space-y-6 scrollbar-hide">
-                                
-                                {/* Method Select */}
-                                <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Method</label>
-                                    <div className="flex bg-slate-100 dark:bg-slate-800/50 rounded-xl p-1 gap-1">
-                                         <button type="button" onClick={() => setReminderMethod('whatsapp')} className={`flex-1 py-2.5 text-[11px] font-black uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 ${reminderMethod === 'whatsapp' ? 'bg-white dark:bg-slate-700 text-green-600 dark:text-green-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
-                                            <MessageCircle className="w-4 h-4" /> WhatsApp
-                                        </button>
-                                        <button type="button" onClick={() => setReminderMethod('sms')} className={`flex-1 py-2.5 text-[11px] font-black uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 ${reminderMethod === 'sms' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
-                                            <MessageSquare className="w-4 h-4" /> SMS
-                                        </button>
+                            {/* Main Content Actions */}
+                            <div className="flex-1 p-7 flex flex-col justify-center space-y-4">
+                                {pendingEntries.length > 4 && (
+                                    <div className="bg-amber-50 dark:bg-amber-500/10 p-3 rounded-lg border border-amber-200 dark:border-amber-500/30 text-center mb-2">
+                                        <p className="text-[11px] font-bold text-amber-700 dark:text-amber-400">Large breakdown. Sending as Image is recommended.</p>
                                     </div>
-                                </div>
+                                )}
+                                <button type="button" onClick={() => handleShareAttachment('none')} className="w-full py-4.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 text-sm uppercase tracking-wider">
+                                    <MessageSquare className="w-5 h-5" /> Send as Text
+                                </button>
 
-                                <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Templates</label>
-                                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2">
-                                        {templates.map((tpl, idx) => (
-                                            <button 
-                                                key={tpl.id} 
-                                                onClick={() => handleTemplateChange(idx)}
-                                                className={`whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold transition-all ${selectedTemplateIndex === idx ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700'}`}
-                                            >
-                                                {tpl.label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Message Text</label>
-                                    <textarea
-                                        value={reminderMessage}
-                                        onChange={e => setReminderMessage(e.target.value)}
-                                        rows={6}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-sm text-slate-900 dark:text-white font-medium leading-relaxed outline-none focus:border-indigo-400/50 transition-all resize-none shadow-sm"
-                                    />
-                                </div>
-
-                                <div className="mt-1 flex items-center justify-end gap-3 px-1">
-                                    <button type="button" onClick={handleCopyMessage} className="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider transition-all p-2 -mr-2">
-                                        {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />} Copy Text
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            {/* Footer Actions */}
-                            <div className="px-7 py-6 border-t border-slate-100 dark:border-slate-800/50 shrink-0 bg-white dark:bg-slate-900 rounded-b-[2.5rem]">
-                                <div className="space-y-4">
-                                    <button type="button" onClick={() => handleShareAttachment('none')} className="w-full py-4.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-2xl shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 text-[13px] uppercase tracking-wider">
-                                        <Send className="w-4 h-4" /> Send Text Only
-                                    </button>
-
-                                    <div className="flex gap-3">
-                                        <div className="flex-1 flex flex-col gap-2.5">
-                                            <button type="button" onClick={() => handleShareAttachment('image')} disabled={isSendingWithImage || isGeneratingPdf} className="w-full py-3.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-bold rounded-xl border border-indigo-200 dark:border-indigo-500/30 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 text-[11px] uppercase tracking-wider hover:bg-indigo-100 dark:hover:bg-indigo-500/30 disabled:opacity-50">
-                                                {isSendingWithImage ? <RotateCcw className="w-3.5 h-3.5 animate-spin"/> : <ImageIcon className="w-3.5 h-3.5"/>} Visual + Text
-                                            </button>
-                                            <button type="button" onClick={() => handlePreviewAttachment('image')} className="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 text-[9px] font-bold uppercase tracking-[0.15em] text-center transition-colors">
-                                                Preview Visual
-                                            </button>
-                                        </div>
-
-                                        <div className="flex-1 flex flex-col gap-2.5">
-                                            <button type="button" onClick={() => handleShareAttachment('pdf')} disabled={isSendingWithImage || isGeneratingPdf} className="w-full py-3.5 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl border border-slate-200 dark:border-slate-700 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 text-[11px] uppercase tracking-wider hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-50">
-                                                {isGeneratingPdf ? <RotateCcw className="w-3.5 h-3.5 animate-spin"/> : <FileText className="w-3.5 h-3.5"/>} Invoice + Text
-                                            </button>
-                                            <button type="button" onClick={() => handlePreviewAttachment('pdf')} className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 text-[9px] font-bold uppercase tracking-[0.15em] text-center transition-colors">
-                                                Preview Invoice
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                                <button type="button" onClick={() => handleShareAttachment('image')} disabled={isSendingWithImage} className="w-full py-4.5 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-black rounded-2xl active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 text-sm uppercase tracking-wider hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 border border-slate-200 dark:border-slate-700">
+                                    {isSendingWithImage ? <RotateCcw className="w-5 h-5 animate-spin"/> : <ImageIcon className="w-5 h-5"/>} Send as Image
+                                </button>
                             </div>
                         </motion.div>
                     </div>
@@ -1171,7 +1080,20 @@ const PartyDetail = () => {
                         </p>
                         
                         <div className="bg-slate-900/50 rounded-3xl p-6 border border-slate-700/50 text-left">
-                           <p className="text-slate-300 whitespace-pre-wrap leading-relaxed px-2 font-medium text-lg">{reminderMessage}</p>
+                           <p className="text-slate-400 font-black uppercase tracking-widest text-sm mb-4">Pending Breakdown</p>
+                           <div className="space-y-3">
+                               {pendingEntries.map(e => (
+                                   <div key={e.id} className="flex justify-between items-center text-slate-300 border-b border-slate-800 pb-2">
+                                       <div>
+                                            <p className="font-bold">{e.notes || 'Entry'}</p>
+                                            <p className="text-sm opacity-60">
+                                                {format(new Date(e.date), 'dd MMM yyyy')}
+                                            </p>
+                                       </div>
+                                       <span className="font-black">₹{e.remaining.toLocaleString()}</span>
+                                   </div>
+                               ))}
+                           </div>
                         </div>
                     </div>
                     
