@@ -156,11 +156,29 @@ const PartyDetail = () => {
     const [isSendingWithImage, setIsSendingWithImage] = useState(false);
     const hiddenImageRef = useRef(null);
 
+    const [selectedEntryIds, setSelectedEntryIds] = useState([]);
+
+    useEffect(() => {
+        if (isReminderOpen) {
+            setSelectedEntryIds(pendingEntries.map(e => e.id));
+        }
+    }, [isReminderOpen, pendingEntries]);
+
+    const selectedPendingEntries = useMemo(() => 
+        pendingEntries.filter(e => selectedEntryIds.includes(e.id)),
+    [pendingEntries, selectedEntryIds]);
+
+    const totalSelectedPending = useMemo(() =>
+        selectedPendingEntries.reduce((sum, e) => sum + e.remaining, 0),
+    [selectedPendingEntries]);
+
     const generatedMessage = useMemo(() => {
-        const amtStr = totalPending.toLocaleString();
+        const amtStr = totalSelectedPending.toLocaleString();
         
         const isWhatsapp = reminderMethod === 'whatsapp';
-        const PENDING_LIST = pendingEntries.map(e => {
+        const isReceivable = balance > 0;
+        
+        const PENDING_LIST = selectedPendingEntries.map(e => {
             const dateStr = format(new Date(e.date), 'dd MMM yyyy');
             const desc = e.notes || 'Entry';
             const amt = e.remaining.toLocaleString();
@@ -168,13 +186,15 @@ const PartyDetail = () => {
         }).join('\n');
 
         const divider = isWhatsapp ? '------------------------' : '------------------------';
+        const title = isReceivable ? 'Pending Payment Summary:' : 'Pending Repayment Summary:';
+        const signOff = isReceivable ? 'Kindly clear at earliest convenience.' : 'I will clear this at earliest convenience.';
 
         if (isWhatsapp) {
-            return `Hi ${party.name},\n\nPending Payment Summary:\n\n${PENDING_LIST}\n${divider}\n*TOTAL: ₹${amtStr}*\n${divider}\n\nKindly clear at earliest convenience.`;
+            return `Hi ${party.name},\n\n${title}\n\n${PENDING_LIST}\n${divider}\n*TOTAL: ₹${amtStr}*\n${divider}\n\n${signOff}`;
         } else {
-            return `Hi ${party.name},\nPending Payment Summary:\n${PENDING_LIST}\n${divider}\nTOTAL: ₹${amtStr}\n${divider}\n\nKindly clear at earliest convenience.`;
+            return `Hi ${party.name},\n${title}\n${PENDING_LIST}\n${divider}\nTOTAL: ₹${amtStr}\n${divider}\n\n${signOff}`;
         }
-    }, [party.name, totalPending, pendingEntries, reminderMethod]);
+    }, [party.name, totalSelectedPending, selectedPendingEntries, reminderMethod, balance]);
 
     const openReminderModal = () => {
         setIsReminderOpen(true);
@@ -1081,6 +1101,44 @@ const PartyDetail = () => {
                                     </div>
                                 )}
 
+                                {/* Selectable Entries Checklist */}
+                                <div className="bg-slate-50 dark:bg-slate-800/20 rounded-[1.5rem] p-5 border border-slate-100 dark:border-slate-800/80">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <p className="text-[10px] uppercase font-black tracking-widest text-slate-400">
+                                            Select Entries to Send
+                                        </p>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => setSelectedEntryIds(selectedEntryIds.length === pendingEntries.length ? [] : pendingEntries.map(e => e.id))}
+                                            className="text-[10px] uppercase font-black tracking-widest text-indigo-500 hover:text-indigo-400 transition-colors"
+                                        >
+                                            {selectedEntryIds.length === pendingEntries.length ? 'Deselect All' : 'Select All'}
+                                        </button>
+                                    </div>
+                                    <div className="space-y-3 max-h-[160px] overflow-y-auto pr-2 scrollbar-none border-b border-t border-slate-100 dark:border-slate-800/50 py-2">
+                                        {pendingEntries.map(e => (
+                                            <div 
+                                                key={e.id} 
+                                                onClick={() => {
+                                                    setSelectedEntryIds(prev => 
+                                                        prev.includes(e.id) ? prev.filter(id => id !== e.id) : [...prev, e.id]
+                                                    );
+                                                }}
+                                                className="flex items-center gap-3 cursor-pointer group"
+                                            >
+                                                <div className={`w-5 h-5 rounded-[6px] border flex items-center justify-center transition-colors ${selectedEntryIds.includes(e.id) ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 group-hover:border-indigo-500'}`}>
+                                                    {selectedEntryIds.includes(e.id) && <Check className="w-3.5 h-3.5" />}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{e.notes || 'Entry'}</p>
+                                                    <p className="text-[10px] font-medium text-slate-400">{format(new Date(e.date), 'dd MMM yyyy')}</p>
+                                                </div>
+                                                <p className="text-xs font-black text-slate-900 dark:text-white shrink-0">₹{e.remaining.toLocaleString()}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
                                 {/* Message Preview Context */}
                                 <div className="bg-slate-50 dark:bg-slate-800/30 rounded-[1.5rem] p-5 border border-slate-100 dark:border-slate-800/80">
                                     <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-3">
@@ -1137,13 +1195,13 @@ const PartyDetail = () => {
                         
                         <p className="text-sm font-black text-slate-500 uppercase tracking-widest mb-3">Total Outstanding Balance</p>
                         <p className={`text-[80px] leading-none font-black mb-10 tracking-tighter ${(balance > 0) ? 'text-emerald-400' : 'text-rose-400'}`}>
-                            ₹{totalPending.toLocaleString()}
+                            ₹{totalSelectedPending.toLocaleString()}
                         </p>
                         
                         <div className="bg-slate-900/50 rounded-3xl p-6 border border-slate-700/50 text-left">
                            <p className="text-slate-400 font-black uppercase tracking-widest text-sm mb-4">Pending Breakdown</p>
                            <div className="space-y-3">
-                               {pendingEntries.map(e => (
+                               {selectedPendingEntries.map(e => (
                                    <div key={e.id} className="flex justify-between items-center text-slate-300 border-b border-slate-800 pb-2">
                                        <div>
                                             <p className="font-bold">{e.notes || 'Entry'}</p>
