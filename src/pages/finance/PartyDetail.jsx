@@ -151,26 +151,28 @@ const PartyDetail = () => {
     const canRemind = party.phone_number && balance !== 0;
     const totalPending = Math.abs(balance);
     const [reminderMethod, setReminderMethod] = useState(party.preferred_reminder_method || 'whatsapp');
+    const [whatsappMode, setWhatsappMode] = useState('text');
     const fullPhone = `${(party.country_code || '+91').replace('+', '')}${party.phone_number || ''}`;
     const [isSendingWithImage, setIsSendingWithImage] = useState(false);
     const hiddenImageRef = useRef(null);
 
     const generatedMessage = useMemo(() => {
         const amtStr = totalPending.toLocaleString();
-        const dStr = format(new Date(), 'dd MMM yyyy');
         
         const isWhatsapp = reminderMethod === 'whatsapp';
         const PENDING_LIST = pendingEntries.map(e => {
             const dateStr = format(new Date(e.date), 'dd MMM yyyy');
             const desc = e.notes || 'Entry';
             const amt = e.remaining.toLocaleString();
-            return `• ${dateStr} - ${desc} - ₹${amt}`;
+            return isWhatsapp ? `${dateStr} - ${desc} - *₹${amt}*` : `${dateStr} - ${desc} - ₹${amt}`;
         }).join('\n');
 
+        const divider = isWhatsapp ? '------------------------' : '------------------------';
+
         if (isWhatsapp) {
-            return `Hi ${party.name},\n\n*Pending payments:*\n\n${PENDING_LIST}\n\n*TOTAL: ₹${amtStr}*`;
+            return `Hi ${party.name},\n\nPending Payment Summary:\n\n${PENDING_LIST}\n${divider}\n*TOTAL: ₹${amtStr}*\n${divider}\n\nKindly clear at earliest convenience.`;
         } else {
-            return `Hi ${party.name},\nPending payments:\n${PENDING_LIST}\n\nTOTAL: ₹${amtStr}`;
+            return `Hi ${party.name},\nPending Payment Summary:\n${PENDING_LIST}\n${divider}\nTOTAL: ₹${amtStr}\n${divider}\n\nKindly clear at earliest convenience.`;
         }
     }, [party.name, totalPending, pendingEntries, reminderMethod]);
 
@@ -1040,19 +1042,75 @@ const PartyDetail = () => {
                                 </div>
                             </div>
 
-                            {/* Main Content Actions */}
-                            <div className="flex-1 p-7 flex flex-col justify-center space-y-4">
-                                {pendingEntries.length > 4 && (
-                                    <div className="bg-amber-50 dark:bg-amber-500/10 p-3 rounded-lg border border-amber-200 dark:border-amber-500/30 text-center mb-2">
-                                        <p className="text-[11px] font-bold text-amber-700 dark:text-amber-400">Large breakdown. Sending as Image is recommended.</p>
+                            {/* Main Content Areas */}
+                            <div className="flex-1 p-7 flex flex-col space-y-6 overflow-y-auto">
+                                
+                                {/* Step 1: First Selection (Top Level) */}
+                                <div className="grid grid-cols-2 gap-3 p-1 bg-slate-100 dark:bg-slate-800/50 rounded-2xl w-full">
+                                    <button
+                                        type="button"
+                                        onClick={() => setReminderMethod('whatsapp')}
+                                        className={`py-4 rounded-xl flex flex-col items-center justify-center gap-2 transition-all ${reminderMethod === 'whatsapp' ? 'bg-white dark:bg-slate-700 shadow-md text-emerald-500' : 'text-slate-400 hover:text-slate-500 dark:hover:text-slate-300'}`}
+                                    >
+                                        <MessageCircle className="w-6 h-6" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest">WhatsApp</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setReminderMethod('sms')}
+                                        className={`py-4 rounded-xl flex flex-col items-center justify-center gap-2 transition-all ${reminderMethod === 'sms' ? 'bg-white dark:bg-slate-700 shadow-md text-indigo-500' : 'text-slate-400 hover:text-slate-500 dark:hover:text-slate-300'}`}
+                                    >
+                                        <MessageSquare className="w-6 h-6" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest">SMS</span>
+                                    </button>
+                                </div>
+
+                                {/* Step 2: Second Selection (Only for WhatsApp) */}
+                                {reminderMethod === 'whatsapp' && (
+                                    <div className="flex bg-slate-50 dark:bg-slate-800/20 p-1 rounded-xl w-full border border-slate-100 dark:border-slate-800">
+                                        <button
+                                            type="button"
+                                            onClick={() => setWhatsappMode('text')}
+                                            className={`flex-1 py-3 transition-all rounded-lg text-xs font-bold ${whatsappMode === 'text' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400' : 'text-slate-400'}`}
+                                        >Text Only</button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setWhatsappMode('image')}
+                                            className={`flex-1 flex items-center justify-center gap-2 py-3 transition-all rounded-lg text-xs font-bold ${whatsappMode === 'image' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400' : 'text-slate-400'}`}
+                                        ><ImageIcon className="w-3.5 h-3.5"/> Text + Image</button>
                                     </div>
                                 )}
-                                <button type="button" onClick={() => handleShareAttachment('none')} className="w-full py-4.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 text-sm uppercase tracking-wider">
-                                    <MessageSquare className="w-5 h-5" /> Send as Text
-                                </button>
 
-                                <button type="button" onClick={() => handleShareAttachment('image')} disabled={isSendingWithImage} className="w-full py-4.5 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-black rounded-2xl active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 text-sm uppercase tracking-wider hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 border border-slate-200 dark:border-slate-700">
-                                    {isSendingWithImage ? <RotateCcw className="w-5 h-5 animate-spin"/> : <ImageIcon className="w-5 h-5"/>} Send as Image
+                                {/* Message Preview Context */}
+                                <div className="bg-slate-50 dark:bg-slate-800/30 rounded-[1.5rem] p-5 border border-slate-100 dark:border-slate-800/80">
+                                    <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-3">
+                                        Message Preview
+                                    </p>
+                                    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-wrap font-mono min-h-[120px] max-h-[140px] overflow-y-auto">
+                                        {generatedMessage}
+                                    </div>
+                                </div>
+                                
+                                {pendingEntries.length > 4 && reminderMethod === 'whatsapp' && whatsappMode === 'text' && (
+                                    <div className="bg-amber-50 dark:bg-amber-500/10 p-3 rounded-lg border border-amber-200 dark:border-amber-500/30 text-center">
+                                        <p className="text-[11px] font-bold text-amber-700 dark:text-amber-400">Large breakdown. "Text + Image" is recommended.</p>
+                                    </div>
+                                )}
+
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if (reminderMethod === 'whatsapp' && whatsappMode === 'image') {
+                                            handleShareAttachment('image');
+                                        } else {
+                                            handleSendReminderTextOnly();
+                                        }
+                                    }}
+                                    disabled={isSendingWithImage}
+                                    className={`w-full py-5 rounded-2xl active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 text-sm font-black uppercase tracking-wider ${reminderMethod === 'whatsapp' ? 'bg-emerald-500 hover:bg-emerald-400 text-white shadow-emerald-500/30' : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/30'}`}
+                                >
+                                    {isSendingWithImage ? <RotateCcw className="w-5 h-5 animate-spin"/> : <Send className="w-5 h-5" />}
+                                    {isSendingWithImage ? 'Preparing...' : `Send via ${reminderMethod === 'whatsapp' ? 'WhatsApp' : 'SMS'}`}
                                 </button>
                             </div>
                         </motion.div>
