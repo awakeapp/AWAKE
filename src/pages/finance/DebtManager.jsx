@@ -26,6 +26,7 @@ const DebtManager = () => {
     useScrollLock(isAdding);
 
     // Form State
+    const [searchQuery, setSearchQuery] = useState('');
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [countryCode, setCountryCode] = useState('+91');
@@ -209,48 +210,20 @@ const DebtManager = () => {
 
             <div className="px-6 flex-1 flex flex-col space-y-4">
 
-                {/* Debt Overview Summary */}
-                {activeParties.length > 0 && (
-                    <div className="space-y-2">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Debt Overview</p>
-                        <div className="grid grid-cols-3 gap-2">
-                            <div className="bg-emerald-50 dark:bg-emerald-500/10 p-3 rounded-2xl border border-emerald-100 dark:border-emerald-500/20 flex flex-col items-center text-center">
-                                <p className="text-[9px] font-black uppercase tracking-widest text-emerald-600/70 dark:text-emerald-400/70 mb-1">Receivable</p>
-                                <p className="text-sm font-black text-emerald-700 dark:text-emerald-400">₹{totalReceivable.toLocaleString()}</p>
-                            </div>
-                            <div className="bg-red-50 dark:bg-red-500/10 p-3 rounded-2xl border border-red-100 dark:border-red-500/20 flex flex-col items-center text-center">
-                                <p className="text-[9px] font-black uppercase tracking-widest text-red-600/70 dark:text-red-400/70 mb-1">Payable</p>
-                                <p className="text-sm font-black text-red-700 dark:text-red-400">₹{totalPayable.toLocaleString()}</p>
-                            </div>
-                            <div className="bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-col items-center text-center">
-                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Net</p>
-                                <p className={`text-sm font-black ${netPosition >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
-                                    {netPosition >= 0 ? '+' : '-'}₹{Math.abs(netPosition).toLocaleString()}
-                                </p>
-                            </div>
-                        </div>
-                        {overdueCount > 0 && (
-                            <div className="bg-amber-50 dark:bg-amber-500/10 px-4 py-3 rounded-2xl border border-amber-100 dark:border-amber-500/20 flex items-center justify-between">
-                                <p className="text-[11px] font-bold text-amber-700 dark:text-amber-400">Overdue Parties</p>
-                                <p className="text-[11px] font-black text-amber-700 dark:text-amber-400">{overdueCount} · ₹{overdueTotal.toLocaleString()}</p>
-                            </div>
-                        )}
-                    </div>
-                )}
 
                 {/* Search */}
                 <div className="relative">
-                    <input type="text" placeholder="Search parties..." className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500" />
+                    <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search parties..." className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500" />
                     <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                 </div>
 
                 <div className="space-y-3 pb-8">
-                    {partyData.length === 0 ? (
+                    {partyData.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || (p.tag && p.tag.toLowerCase().includes(searchQuery.toLowerCase()))).length === 0 ? (
                         <div className="text-center py-16 px-6">
                             <div className="w-20 h-20 bg-indigo-50 dark:bg-indigo-900/20 rounded-full flex items-center justify-center mx-auto mb-6 text-indigo-300">
                                 <User className="w-10 h-10" />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No parties yet</h3>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No parties found</h3>
                             <p className="text-slate-500 text-sm mb-8 leading-relaxed max-w-xs mx-auto">
                                 Add friends, clients, or businesses you lend to or borrow from.
                             </p>
@@ -259,7 +232,7 @@ const DebtManager = () => {
                             </button>
                         </div>
                     ) : (
-                        partyData.map(party => {
+                        partyData.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || (p.tag && p.tag.toLowerCase().includes(searchQuery.toLowerCase()))).map(party => {
                             const bal = party.balance;
                             const isReceivable = bal > 0;
                             const isPayable = bal < 0;
