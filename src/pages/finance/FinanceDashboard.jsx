@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { Plus, ChevronLeft, ChevronRight, TrendingUp, Undo, Menu } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, TrendingUp, PieChart, Menu } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, isWithinInterval, subMonths, addMonths } from 'date-fns';
 import { useState, useMemo } from 'react';
 import AddTransactionModal from './AddTransactionModal';
+import BudgetSummary from './BudgetSummary';
 import AnalyticsModal from './AnalyticsModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -31,6 +32,7 @@ const FinanceDashboard = () => {
     } = useFinance();
 
     const [isAddOpen, setIsAddOpen] = useState(false);
+    const [isBudgetOpen, setIsBudgetOpen] = useState(false);
     const [editTransactionId, setEditTransactionId] = useState(null);
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [undoToast, setUndoToast] = useState(null); // { id, message }
@@ -173,8 +175,35 @@ const FinanceDashboard = () => {
                 </motion.div>
             </header>
 
-            <div className="px-6 flex-1 flex flex-col space-y-6">
+            <div className="px-6 flex-1 flex flex-col space-y-5">
 
+                {/* Quick Actions — Analytics & Budget */}
+                <div className="grid grid-cols-2 gap-3">
+                    <button
+                        onClick={() => setIsAnalyticsOpen(true)}
+                        className="flex items-center gap-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl px-4 py-3.5 active:scale-[0.97] transition-all shadow-sm"
+                    >
+                        <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center shrink-0">
+                            <PieChart className="w-[18px] h-[18px] text-emerald-500" strokeWidth={2.5} />
+                        </div>
+                        <div className="text-left">
+                            <p className="text-[13px] font-bold text-slate-900 dark:text-white leading-tight">Analytics</p>
+                            <p className="text-[10px] text-slate-400 font-medium">Spending insights</p>
+                        </div>
+                    </button>
+                    <button
+                        onClick={() => setIsBudgetOpen(true)}
+                        className="flex items-center gap-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl px-4 py-3.5 active:scale-[0.97] transition-all shadow-sm"
+                    >
+                        <div className="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center shrink-0">
+                            <TrendingUp className="w-[18px] h-[18px] text-rose-500" strokeWidth={2.5} />
+                        </div>
+                        <div className="text-left">
+                            <p className="text-[13px] font-bold text-slate-900 dark:text-white leading-tight">Budget</p>
+                            <p className="text-[10px] text-slate-400 font-medium">Category limits</p>
+                        </div>
+                    </button>
+                </div>
 
                 {/* Transactions List */}
                 <section className="flex-1">
@@ -243,7 +272,7 @@ const FinanceDashboard = () => {
             </div>
 
             {/* Floating Action Button — sits above Finance bottom nav */}
-            <div className="fixed bottom-[76px] right-6 z-40">
+            <div className="fixed bottom-[88px] right-6 z-40">
                 <button
                     onClick={() => {
                         setEditTransactionId(null);
@@ -268,6 +297,7 @@ const FinanceDashboard = () => {
                 />
             )}
 
+            <BudgetSummary isOpen={isBudgetOpen} onClose={() => setIsBudgetOpen(false)} />
 
             <AnimatePresence>
                 {undoToast && (
