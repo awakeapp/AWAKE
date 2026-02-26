@@ -100,8 +100,8 @@ const MainLayout = ({ children }) => {
                 </main>
             )}
 
-            {/* Bottom Navigation */}
-            <BottomNavigation />
+            {/* Bottom Navigation — hidden on Finance routes (they have their own Finance nav) */}
+            {!location.pathname.startsWith('/finance') && <BottomNavigation />}
 
             {/* Side Menu Drawer */}
             <SideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
