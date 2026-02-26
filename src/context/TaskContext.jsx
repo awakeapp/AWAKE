@@ -177,7 +177,10 @@ export const TaskContextProvider = ({ children }) => {
 
         try {
             // Check duplicate active task
-            if (tasksRef.current.some(t => t.title.toLowerCase() === title.toLowerCase() && t.status === 'pending' && t.date === taskDate)) {
+            if (tasksRef.current.some(t => {
+                const existingTitle = t.title || t.name || '';
+                return existingTitle.toLowerCase() === title.toLowerCase() && t.status === 'pending' && t.date === taskDate;
+            })) {
                 throw new Error("A pending task with this title already exists on this date.");
             }
             // Tasks are now individual documents in the collection
