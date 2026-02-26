@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
 import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, AlertCircle, Award, ArrowLeft } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 
 import { format, startOfMonth, endOfMonth, isWithinInterval, subMonths, addMonths } from 'date-fns';
 
@@ -66,7 +67,7 @@ const MonthlyOverview = () => {
  return (
  <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
  {/* Header */}
- <header className="bg-slate-900 text-white p-6 pb-12 rounded-b-[2.5rem] shadow-2xl shadow-slate-900/20">
+ <header className="sticky top-0 z-30 bg-slate-900 text-white p-6 pb-12 rounded-b-[2.5rem] shadow-2xl shadow-slate-900/20">
  <div className="flex items-center justify-between mb-8">
  <button
  onClick={() => navigate(-1)}
@@ -155,14 +156,13 @@ const MonthlyOverview = () => {
  <div>
  <h3 className="font-bold text-slate-900 dark:text-white mb-4 pl-2">Top Spending</h3>
  <div className="space-y-3">
- {currentStats.topCategories.map(cat => (
+ {currentStats.topCategories.map(cat => {
+     const IconComponent = LucideIcons[cat.icon] || LucideIcons.HelpCircle;
+     return (
  <div key={cat.id} className="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between">
  <div className="flex items-center gap-3">
  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${cat.color ? cat.color + '/20' : 'bg-slate-100'} ${cat.color?.replace('bg-', 'text-') || 'text-slate-500'}`}>
- {cat.icon === 'Utensils' && '🍽️'}
- {cat.icon === 'Bus' && '🚌'}
- {cat.icon === 'ShoppingBag' && '🛍️'}
- {!cat.icon && (cat.name[0])}
+ <IconComponent className="w-5 h-5 opacity-90" />
  </div>
  <div>
  <p className="font-bold text-slate-900 dark:text-white">{cat.name}</p>
@@ -171,7 +171,8 @@ const MonthlyOverview = () => {
  </div>
  <p className="font-bold text-slate-900 dark:text-white">₹{cat.amount.toLocaleString()}</p>
  </div>
- ))}
+ );
+ })}
  {currentStats.topCategories.length === 0 && (
  <p className="text-center text-slate-400 text-sm py-4">No spending data for this month.</p>
  )}

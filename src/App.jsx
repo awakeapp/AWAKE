@@ -56,6 +56,7 @@ const FinanceSettings = lazy(() => import('./pages/finance/FinanceSettings'));
 const FinanceEMI = lazy(() => import('./pages/finance/FinanceEMI'));
 const FinanceMore = lazy(() => import('./pages/finance/FinanceMore'));
 const FinanceUpcoming = lazy(() => import('./pages/finance/FinanceUpcoming'));
+const FinanceWallets = lazy(() => import('./pages/finance/FinanceWallets'));
 
 const VehicleDashboard = lazy(() => import('./pages/vehicle/VehicleDashboard'));
 
@@ -160,6 +161,7 @@ function App() {
                             <Route path="/finance/settings" element={<FinanceSettings />} />
                             <Route path="/finance/emi" element={<FinanceEMI />} />
                             <Route path="/finance/more" element={<FinanceMore />} />
+                            <Route path="/finance/wallets" element={<FinanceWallets />} />
 
                             {/* Vehicle */}
                             <Route path="/vehicle" element={<VehicleDashboard />} />
