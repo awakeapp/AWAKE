@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { ArrowLeft, Plus, MoreVertical, Trash2, RotateCcw, AlertTriangle, Calendar, Lock, CreditCard, ToggleLeft, ToggleRight, Check, ChevronDown, Clock, Bell, MessageCircle, Copy, Send, Wallet, FileText, Image as ImageIcon, Download, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { ArrowLeft, Plus, MoreVertical, Trash2, RotateCcw, AlertTriangle, Calendar, Lock, CreditCard, ToggleLeft, ToggleRight, Check, ChevronDown, Clock, Bell, MessageCircle, MessageSquare, Copy, Send, Wallet, FileText, Image as ImageIcon, Download, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { format, isBefore, isAfter, startOfDay, endOfDay, differenceInDays, addDays } from 'date-fns';
 import JumpDateModal from '../../components/organisms/JumpDateModal';
@@ -1032,77 +1032,96 @@ const PartyDetail = () => {
             {/* ========== Reminder Preview Modal ========== */}
             <AnimatePresence>
                 {isReminderOpen && (
-                    <div className="fixed inset-0 z-50 flex items-end justify-center p-4 pb-24 sm:p-6 sm:items-center">
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsReminderOpen(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+                    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsReminderOpen(false)} className="absolute inset-0 bg-black/50 backdrop-blur-md" />
                         <motion.div
-                            initial={{ y: "100%", opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: "100%", opacity: 0 }} transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                            className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2rem] p-6 shadow-2xl border border-slate-100 dark:border-slate-800 relative z-10 max-h-[85vh] overflow-y-auto"
+                            initial={{ y: "100%", opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: "100%", opacity: 0 }} transition={{ type: "spring", damping: 28, stiffness: 300 }}
+                            className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl border border-white/10 dark:border-slate-800 relative z-10 max-h-[90vh] overflow-hidden flex flex-col"
                         >
-                            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Send Reminder</h3>
-                                <div className="flex bg-slate-100 dark:bg-slate-800/50 rounded-lg p-0.5 gap-0.5">
-                                    <button type="button" onClick={() => setReminderMethod('whatsapp')} className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-md transition-all flex items-center gap-1.5 ${reminderMethod === 'whatsapp' ? 'bg-white dark:bg-slate-700 text-green-600 dark:text-green-400 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}>
-                                        <MessageCircle className="w-3.5 h-3.5" /> WA
-                                    </button>
-                                    <button type="button" onClick={() => setReminderMethod('sms')} className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-md transition-all flex items-center gap-1.5 ${reminderMethod === 'sms' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}>
-                                        <MessageSquare className="w-3.5 h-3.5" /> SMS
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="mb-5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Templates</label>
-                                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                                    {templates.map((tpl, idx) => (
-                                        <button 
-                                            key={tpl.id} 
-                                            onClick={() => handleTemplateChange(idx)}
-                                            className={`whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold transition-all ${selectedTemplateIndex === idx ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700'}`}
-                                        >
-                                            {tpl.label}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="mb-5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Message Text</label>
-                                <textarea
-                                    value={reminderMessage}
-                                    onChange={e => setReminderMessage(e.target.value)}
-                                    rows={5}
-                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-sm text-slate-900 dark:text-white font-medium leading-relaxed outline-none focus:ring-2 focus:ring-indigo-500 resize-none shadow-sm"
-                                />
-                            </div>
-
-                            <div className="flex items-center justify-between bg-indigo-50 dark:bg-indigo-500/10 p-3 rounded-xl border border-indigo-100 dark:border-indigo-500/20 mb-6">
-                                <div className="flex items-center gap-3">
-                                    <FileText className="w-5 h-5 text-indigo-500" />
+                            {/* Header */}
+                            <div className="px-7 pt-7 pb-4 mb-2 shrink-0 border-b border-slate-100 dark:border-slate-800/50">
+                                <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-xs font-bold text-slate-900 dark:text-white">Professional Attachments</p>
-                                        <p className="text-[10px] text-slate-500">Auto-generated with current details</p>
+                                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Send Reminder</h3>
+                                        <p className="text-[11px] text-slate-400 font-medium mt-0.5">{party.name}</p>
+                                    </div>
+                                    <button type="button" onClick={() => setIsReminderOpen(false)} className="w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-full text-slate-400 hover:text-slate-900 dark:hover:text-white active:scale-90 transition-all">
+                                        <Plus className="w-5 h-5 rotate-45" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Scrollable Content */}
+                            <div className="flex-1 overflow-y-auto px-7 py-4 space-y-6 scrollbar-hide">
+                                
+                                {/* Method Select */}
+                                <div>
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Method</label>
+                                    <div className="flex bg-slate-100 dark:bg-slate-800/50 rounded-xl p-1 gap-1">
+                                         <button type="button" onClick={() => setReminderMethod('whatsapp')} className={`flex-1 py-2.5 text-[11px] font-black uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 ${reminderMethod === 'whatsapp' ? 'bg-white dark:bg-slate-700 text-green-600 dark:text-green-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+                                            <MessageCircle className="w-4 h-4" /> WhatsApp
+                                        </button>
+                                        <button type="button" onClick={() => setReminderMethod('sms')} className={`flex-1 py-2.5 text-[11px] font-black uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 ${reminderMethod === 'sms' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+                                            <MessageSquare className="w-4 h-4" /> SMS
+                                        </button>
                                     </div>
                                 </div>
-                                <div className="flex flex-col gap-2 items-end">
-                                   <button disabled={isGeneratingPdf} onClick={generatePDFInvoice} className="text-[10px] uppercase font-bold text-white bg-indigo-600 dark:bg-indigo-500 px-3 py-1.5 rounded-lg hover:bg-indigo-700 active:scale-95 transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50">
-                                       {isGeneratingPdf ? <RotateCcw className="w-3 h-3 animate-spin"/> : <Download className="w-3 h-3" />}
-                                       Download PDF
-                                   </button>
+
+                                <div>
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Templates</label>
+                                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2">
+                                        {templates.map((tpl, idx) => (
+                                            <button 
+                                                key={tpl.id} 
+                                                onClick={() => handleTemplateChange(idx)}
+                                                className={`whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold transition-all ${selectedTemplateIndex === idx ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700'}`}
+                                            >
+                                                {tpl.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Message Text</label>
+                                    <textarea
+                                        value={reminderMessage}
+                                        onChange={e => setReminderMessage(e.target.value)}
+                                        rows={6}
+                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-sm text-slate-900 dark:text-white font-medium leading-relaxed outline-none focus:border-indigo-400/50 transition-all resize-none shadow-sm"
+                                    />
+                                </div>
+
+                                <div className="flex items-center justify-between bg-indigo-50 dark:bg-indigo-500/10 p-4 rounded-2xl border border-indigo-100 dark:border-indigo-500/20">
+                                    <div className="flex items-center gap-3">
+                                        <FileText className="w-6 h-6 text-indigo-500 shrink-0" />
+                                        <div>
+                                            <p className="text-[13px] font-bold text-slate-900 dark:text-white leading-tight">Professional Invoice</p>
+                                            <p className="text-[10px] text-slate-500 mt-0.5">Auto-generated with balance</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col gap-2 items-end">
+                                       <button disabled={isGeneratingPdf} onClick={generatePDFInvoice} className="text-[10px] uppercase font-bold text-white bg-indigo-600 dark:bg-indigo-500 px-3 py-2 rounded-xl hover:bg-indigo-700 active:scale-95 transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50 tracking-wider">
+                                           {isGeneratingPdf ? <RotateCcw className="w-3.5 h-3.5 animate-spin"/> : <Download className="w-3.5 h-3.5" />}
+                                           Download
+                                       </button>
+                                    </div>
                                 </div>
                             </div>
-
-                            <div className="space-y-3">
+                            
+                            {/* Footer Actions */}
+                            <div className="px-7 py-5 border-t border-slate-100 dark:border-slate-800/50 shrink-0 space-y-3">
                                 <div className="flex gap-3">
-                                    <button type="button" onClick={handleCopyMessage} className={`w-14 shrink-0 py-4 font-bold rounded-xl flex items-center justify-center transition-all border ${copied ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 border-emerald-200 dark:border-emerald-500/30' : 'text-slate-500 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                                    <button type="button" onClick={handleCopyMessage} className={`w-[60px] shrink-0 py-4 font-bold rounded-2xl flex items-center justify-center transition-all border ${copied ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 border-emerald-200 dark:border-emerald-500/30' : 'text-slate-500 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
                                         {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
                                     </button>
-                                    <button type="button" onClick={handleSendReminder} className="flex-1 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl shadow-lg shadow-emerald-500/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm">
-                                        <Send className="w-4 h-4" /> Send via {reminderMethod === 'whatsapp' ? 'WhatsApp' : 'SMS'}
+                                    <button type="button" onClick={handleSendReminder} className="flex-1 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-2xl shadow-lg shadow-emerald-500/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wider">
+                                        <Send className="w-4 h-4" /> Send Reminder
                                     </button>
                                 </div>
-                                <button disabled={isSendingWithImage} type="button" onClick={handleShareWithImage} className="w-full py-3.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold rounded-xl border border-indigo-200 dark:border-indigo-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm hover:bg-indigo-100 dark:hover:bg-indigo-500/15 disabled:opacity-50">
+                                <button disabled={isSendingWithImage} type="button" onClick={handleShareWithImage} className="w-full py-3.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold rounded-2xl border border-indigo-200 dark:border-indigo-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-[13px] hover:bg-indigo-100 dark:hover:bg-indigo-500/15 disabled:opacity-50">
                                     {isSendingWithImage ? <RotateCcw className="w-4 h-4 animate-spin"/> : <ImageIcon className="w-4 h-4" />}
-                                    {isSendingWithImage ? 'Generating...' : 'Share with Account Overview'}
+                                    {isSendingWithImage ? 'Generating...' : 'Share with Account Overview Image'}
                                 </button>
                             </div>
                         </motion.div>
