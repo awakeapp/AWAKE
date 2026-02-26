@@ -163,7 +163,7 @@ const TaskDashboard = () => {
  isToday,
  prevDay: () => navigateDate('prev'),
  nextDay: () => navigateDate('next'),
- jumpToToday: (d) => setSelectedDate(d || new Date())
+ jumpToToday: (d) => setSelectedDate(d instanceof Date ? d : new Date())
  }}
  rightNode={
  <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 pl-1">
