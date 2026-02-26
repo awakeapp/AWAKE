@@ -12,6 +12,7 @@ import { VehicleContextProvider } from './context/VehicleContext';
 import { PrayerProvider } from './context/PrayerContext';
 import { RamadanProvider } from './context/RamadanContext';
 import { RAMADAN_MODE } from './lib/featureFlags';
+import { ToastProvider } from './context/ToastContext';
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -114,6 +115,7 @@ function App() {
   }
 
   return (
+    <ToastProvider>
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <AuthContextProvider>
         <ThemeContextProvider>
@@ -197,6 +199,7 @@ function App() {
         </ThemeContextProvider>
       </AuthContextProvider>
     </BrowserRouter>
+    </ToastProvider>
   );
 }
 

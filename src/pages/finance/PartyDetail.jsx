@@ -7,6 +7,7 @@ import { format, isBefore, isAfter, startOfDay, endOfDay, differenceInDays, addD
 import JumpDateModal from '../../components/organisms/JumpDateModal';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useToast } from '../../context/ToastContext';
 
 const TRANSACTION_TYPES = [
     { id: 'you_gave', label: 'You Gave', color: 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400', sign: '+' },
@@ -29,6 +30,7 @@ const PartyDetail = () => {
     const { partyId } = useParams();
     const navigate = useNavigate();
     const context = useFinance();
+    const { showToast } = useToast();
 
     if (!context || !context.debtParties) {
         return (
@@ -446,9 +448,12 @@ const PartyDetail = () => {
     // --- Handlers ---
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!amount || Number(amount) <= 0) return;
+        if (!amount || Number(amount) <= 0) {
+            showToast('Please enter a valid amount', 'error');
+            return;
+        }
         if (!note.trim()) {
-            alert("Please provide a description (What is this for?).");
+            showToast('Please provide a description', 'error');
             return;
         }
 
@@ -459,15 +464,20 @@ const PartyDetail = () => {
             return;
         }
 
-        await addDebtTransaction({
-            party_id: party.id,
-            type: txType,
-            amount: Number(amount),
-            date: new Date(date + 'T12:00:00').toISOString(),
-            due_date: dueDate ? new Date(dueDate + 'T12:00:00').toISOString() : null,
-            notes: note
-        });
-        resetForm();
+        try {
+            await addDebtTransaction({
+                party_id: party.id,
+                type: txType,
+                amount: Number(amount),
+                date: new Date(date + 'T12:00:00').toISOString(),
+                due_date: dueDate ? new Date(dueDate + 'T12:00:00').toISOString() : null,
+                notes: note
+            });
+            showToast('Entry saved', 'success');
+            resetForm();
+        } catch (error) {
+            showToast('Failed to save entry', 'error');
+        }
     };
 
     const handleSettleSubmit = async () => {
@@ -755,7 +765,13 @@ const PartyDetail = () => {
                                                     {dropdownOpen === tx.id && (
                                                         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="absolute right-0 top-full mt-1 w-36 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-100 dark:border-slate-700 overflow-hidden z-20">
                                                             {!locked && (
-                                                                <button onClick={() => { softDeleteDebtTransaction(tx.id); setDropdownOpen(null); }} className="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center gap-2">
+                                                                <button onClick={() => {
+                                                                    if (window.confirm('Delete this entry? This cannot be undone.')) {
+                                                                        softDeleteDebtTransaction(tx.id);
+                                                                        showToast('Entry deleted', 'info');
+                                                                    }
+                                                                    setDropdownOpen(null);
+                                                                }} className="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center gap-2">
                                                                     <Trash2 className="w-4 h-4" /> Delete
                                                                 </button>
                                                             )}

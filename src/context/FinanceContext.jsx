@@ -66,7 +66,9 @@ export const FinanceContextProvider = ({ children }) => {
         setIsLoading(true);
 
         const seedDefaults = async (collectionName, defaults) => {
-            // Seeding logic omitted for brevity in refactor
+            for (const item of defaults) {
+                await FirestoreService.setItem(`users/${user.uid}/${collectionName}`, item.id, item, true);
+            }
         };
 
         const unsubTransactions = FirestoreService.subscribeToCollection(
@@ -140,13 +142,13 @@ export const FinanceContextProvider = ({ children }) => {
         const checkAndSeed = async () => {
             const cats = await FirestoreService.getCollection(`users/${user.uid}/categories`);
             if (cats.length === 0) {
-                await Promise.all(DEFAULT_CATEGORIES.map(c => FirestoreService.addItem(`users/${user.uid}/categories`, c)));
+                await seedDefaults('categories', DEFAULT_CATEGORIES);
             } else if (!cats.some(c => c.type === 'savings')) {
-                await FirestoreService.addItem(`users/${user.uid}/categories`, { id: 'cat_savings', name: 'Savings Allocation', type: 'savings', budget: 0, color: 'bg-teal-500', icon: 'Wallet' });
+                await FirestoreService.setItem(`users/${user.uid}/categories`, 'cat_savings', { id: 'cat_savings', name: 'Savings Allocation', type: 'savings', budget: 0, color: 'bg-teal-500', icon: 'Wallet' }, true);
             }
             const accs = await FirestoreService.getCollection(`users/${user.uid}/accounts`);
             if (accs.length === 0) {
-                await Promise.all(DEFAULT_ACCOUNTS.map(a => FirestoreService.addItem(`users/${user.uid}/accounts`, a)));
+                await seedDefaults('accounts', DEFAULT_ACCOUNTS);
             }
         };
         checkAndSeed();
@@ -343,11 +345,16 @@ export const FinanceContextProvider = ({ children }) => {
     const addTransaction = useCallback(async (tx) => {
         if (!user) return;
 
+        const numAmount = Number(tx.amount);
+        if (!numAmount || isNaN(numAmount) || numAmount <= 0 || numAmount > 9999999) {
+            throw new Error('Invalid amount. Must be between 1 and 99,99,999.');
+        }
+
         const newTx = {
             transactionId: crypto.randomUUID(),
             accountId: tx.accountId,
             type: tx.type,
-            amount: Number(tx.amount),
+            amount: numAmount,
             categoryId: tx.categoryId,
             date: tx.date || new Date().toISOString(),
             note: tx.note || tx.description || '',
@@ -453,9 +460,14 @@ export const FinanceContextProvider = ({ children }) => {
     }, [user, transactions]);
 
     const checkDuplicate = useCallback((newTx) => {
-        // ... existing logic ...
-        return false; // Simplified for now
-    }, []);
+        if (!newTx || !newTx.amount || !newTx.categoryId) return false;
+        const recent = transactions.filter(t => !t.isDeleted && 
+            t.amount === Number(newTx.amount) && 
+            t.categoryId === newTx.categoryId &&
+            Date.now() - (t.createdAt || 0) < 60000
+        );
+        return recent.length > 0;
+    }, [transactions]);
 
     const updateAccount = useCallback(async (id, updates) => {
         if (!user) return;

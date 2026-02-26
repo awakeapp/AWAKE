@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { FirestoreService } from '../../services/firestore-service';
 import JumpDateModal from '../../components/organisms/JumpDateModal';
 import { useScrollLock } from '../../hooks/useScrollLock';
+import { useToast } from '../../context/ToastContext';
 
 const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDelete, initialType = 'expense' }) => {
     useScrollLock(isOpen);
@@ -22,6 +23,8 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
     
     const [datePickerOpen, setDatePickerOpen] = useState(false);
     const [duplicateWarning, setDuplicateWarning] = useState(null);
+    const [validationError, setValidationError] = useState('');
+    const { showToast } = useToast();
 
     useEffect(() => {
         if (isOpen && !editTransactionId) {
@@ -63,7 +66,15 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
         const numAmount = Number(amount);
-        if (!amount || isNaN(numAmount)) return;
+        if (!amount || isNaN(numAmount) || numAmount <= 0) {
+            setValidationError('Please enter a valid amount');
+            return;
+        }
+        if (numAmount > 9999999) {
+            setValidationError('Amount cannot exceed ₹99,99,999');
+            return;
+        }
+        setValidationError('');
 
         const txData = {
             amount: numAmount,
@@ -72,30 +83,42 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
             date: new Date(date).toISOString(),
         };
 
-        if (type === 'transfer') {
-            if (!accountId || !toAccountId || accountId === toAccountId) return;
-            if (editTransactionId) {
-                await editTransaction(editTransactionId, { ...txData, fromAccountId: accountId, toAccountId });
+        try {
+            if (type === 'transfer') {
+                if (!accountId || !toAccountId || accountId === toAccountId) {
+                    setValidationError('Select valid source and destination accounts');
+                    return;
+                }
+                if (editTransactionId) {
+                    await editTransaction(editTransactionId, { ...txData, fromAccountId: accountId, toAccountId });
+                } else {
+                    await addTransfer({ ...txData, fromAccountId: accountId, toAccountId });
+                }
             } else {
-                await addTransfer({ ...txData, fromAccountId: accountId, toAccountId });
+                if (!categoryId || !accountId) {
+                    setValidationError('Please select a category and account');
+                    return;
+                }
+                if (editTransactionId) {
+                    await editTransaction(editTransactionId, { ...txData, categoryId, accountId });
+                } else {
+                    await addTransaction({
+                        ...txData,
+                        categoryId,
+                        accountId,
+                        mode: 'manual'
+                    });
+                }
+                if (user) {
+                    FirestoreService.setItem(`users/${user.uid}/config`, 'ui', { lastUsedAccountId: accountId }, true);
+                }
             }
-        } else {
-            if (!categoryId || !accountId) return;
-            if (editTransactionId) {
-                await editTransaction(editTransactionId, { ...txData, categoryId, accountId });
-            } else {
-                await addTransaction({
-                    ...txData,
-                    categoryId,
-                    accountId,
-                    mode: 'manual'
-                });
-            }
-            if (user) {
-                FirestoreService.setItem(`users/${user.uid}/config`, 'ui', { lastUsedAccountId: accountId }, true);
-            }
+            showToast(editTransactionId ? 'Transaction updated' : 'Transaction recorded', 'success');
+            onClose();
+        } catch (error) {
+            console.error('Transaction failed:', error);
+            showToast(error.message || 'Failed to save. Try again.', 'error');
         }
-        onClose();
     };
 
     const activeAccounts = accounts.filter(a => !a.isArchived);
@@ -173,6 +196,9 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                                         autoFocus
                                     />
                                 </div>
+                                {validationError && (
+                                    <p className="text-rose-500 text-xs font-bold text-center mt-2">{validationError}</p>
+                                )}
                             </div>
                         </div>
 

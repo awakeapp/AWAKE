@@ -3,6 +3,7 @@ import { useFinance } from '../../context/FinanceContext';
 import { X, PieChart, Edit3, Settings2, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useScrollLock } from '../../hooks/useScrollLock';
+import { useToast } from '../../context/ToastContext';
 
 const BudgetSummary = ({ isOpen, onClose }) => {
     const { categories, getBudgetStats, updateCategoryBudget, addCategory } = useFinance();
@@ -12,6 +13,7 @@ const BudgetSummary = ({ isOpen, onClose }) => {
     const [newCatName, setNewCatName] = useState('');
 
     useScrollLock(isOpen);
+    const { showToast } = useToast();
 
     if (!isOpen) return null;
 
@@ -34,10 +36,11 @@ const BudgetSummary = ({ isOpen, onClose }) => {
             for (const catId in editingBudgets) {
                 await updateCategoryBudget(catId, Number(editingBudgets[catId]));
             }
+            showToast('Budgets updated', 'success');
             setIsAllocating(false);
         } catch (error) {
             console.error("Failed to save budgets:", error);
-            alert("Error saving budgets. Please try again.");
+            showToast('Error saving budgets. Please try again.', 'error');
         }
     };
 
@@ -51,6 +54,7 @@ const BudgetSummary = ({ isOpen, onClose }) => {
                 color: 'bg-indigo-500',
                 icon: 'IndianRupee'
             });
+            showToast('Category added', 'success');
             setNewCatName('');
             setIsAddingCategory(false);
         } catch (error) {
