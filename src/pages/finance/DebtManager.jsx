@@ -183,7 +183,7 @@ const DebtManager = () => {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col pt-[env(safe-area-inset-top)]" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5rem)' }}>
             {/* Header */}
-            <header className="px-6 pt-6 pb-4 relative z-10">
+            <header className="sticky top-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl px-6 pt-6 pb-4">
                 <div className="flex items-center justify-between mb-6">
                     <h1 className="text-xl font-bold text-slate-900 dark:text-white">Debts & Lending</h1>
                     <button onClick={() => setIsAdding(true)} className="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full transition-colors -mr-2 shadow-sm shadow-indigo-500/30">

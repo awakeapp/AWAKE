@@ -10,8 +10,7 @@ export function useScrollLock(isLocked = true) {
         if (lockCount === 0) {
             originalOverflow = window.getComputedStyle(document.body).overflow;
             document.body.style.overflow = 'hidden';
-            // Also clamp height to 100% and position fixed on ios to prevent bounce?
-            // Actually, overscroll-behavior: none in index.css usually handles chaining.
+            document.body.style.touchAction = 'none'; // Prevents pinch-zoom and scroll on mobile
         }
         lockCount++;
 
@@ -19,6 +18,7 @@ export function useScrollLock(isLocked = true) {
             lockCount--;
             if (lockCount === 0) {
                 document.body.style.overflow = originalOverflow;
+                document.body.style.touchAction = '';
             }
         };
     }, [isLocked]);

@@ -73,7 +73,7 @@ const FinanceMore = () => {
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5rem)' }}
         >
             {/* Header */}
-            <header className="px-5 pt-6 pb-4">
+            <header className="sticky top-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl px-5 pt-6 pb-4">
                 <div className="flex items-center gap-3 mb-1">
                     <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white -ml-1">
                         <ArrowLeft className="w-5 h-5" />

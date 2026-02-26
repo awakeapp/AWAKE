@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
+import * as LucideIcons from 'lucide-react';
 import { Plus, ChevronLeft, ChevronRight, TrendingUp, PieChart, Menu } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, isWithinInterval, subMonths, addMonths } from 'date-fns';
 import { useState, useMemo } from 'react';
@@ -115,7 +116,7 @@ const FinanceDashboard = () => {
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5rem)' }}
         >
             {/* Header Area */}
-            <header className="px-6 pt-6 pb-4">
+            <header className="sticky top-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl px-6 pt-6 pb-4">
                 <div className="grid grid-cols-3 items-center mb-6">
                     <h1 className="text-xl font-bold text-slate-900 dark:text-white">Finance</h1>
                     
@@ -273,13 +274,13 @@ const FinanceDashboard = () => {
                                     >
                                         <div className="flex items-center gap-4 relative z-10 w-full">
                                             <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl shrink-0 ${cat?.color ? cat.color + '/10' : 'bg-slate-50 dark:bg-slate-800'} ${cat?.color?.replace('bg-', 'text-') || 'text-slate-500'}`}>
-                                                {cat?.icon === 'Utensils' && '🍽️'}
-                                                {cat?.icon === 'Bus' && '🚌'}
-                                                {cat?.icon === 'ShoppingBag' && '🛍️'}
-                                                {cat?.icon === 'Zap' && '⚡'}
-                                                {cat?.icon === 'IndianRupee' && '₹'}
-                                                {cat?.icon === 'Wallet' && '💰'}
-                                                {!['Utensils','Bus','ShoppingBag','Zap','IndianRupee','Wallet'].includes(cat?.icon) && (cat?.name?.[0] || '?')}
+                                                {(() => {
+                                                    if (cat?.icon) {
+                                                        const IconComponent = LucideIcons[cat.icon];
+                                                        if (IconComponent) return <IconComponent className="w-6 h-6 opacity-90" />;
+                                                    }
+                                                    return cat?.name?.[0] || '?';
+                                                })()}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-bold text-slate-900 dark:text-white text-[15px] truncate">{tx.description || tx.note || cat?.name || 'Transaction'}</p>
