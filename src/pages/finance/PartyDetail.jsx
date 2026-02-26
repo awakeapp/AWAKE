@@ -1108,38 +1108,39 @@ const PartyDetail = () => {
                                     />
                                 </div>
 
-                                <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Attachments & Preview</label>
-                                    <div className="flex gap-2">
-                                        <button type="button" onClick={() => handlePreviewAttachment('image')} disabled={isSendingWithImage} className="flex-1 flex items-center justify-center gap-1.5 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 disabled:opacity-50">
-                                            {isSendingWithImage ? <RotateCcw className="w-3.5 h-3.5 animate-spin" /> : <ImageIcon className="w-3.5 h-3.5" />} Preview Image
-                                        </button>
-                                        <button type="button" onClick={() => handlePreviewAttachment('pdf')} disabled={isGeneratingPdf} className="flex-1 flex items-center justify-center gap-1.5 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 disabled:opacity-50">
-                                            {isGeneratingPdf ? <RotateCcw className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />} Preview PDF
-                                        </button>
-                                    </div>
+                                <div className="mt-1 flex items-center justify-end gap-3 px-1">
+                                    <button type="button" onClick={handleCopyMessage} className="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider transition-all p-2 -mr-2">
+                                        {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />} Copy Text
+                                    </button>
                                 </div>
                             </div>
                             
                             {/* Footer Actions */}
-                            <div className="px-7 py-5 border-t border-slate-100 dark:border-slate-800/50 shrink-0 space-y-3 bg-white dark:bg-slate-900">
-                                <div className="flex gap-2 pb-1">
-                                    <button type="button" onClick={() => handleShareAttachment('image')} disabled={isSendingWithImage || isGeneratingPdf} className="flex-1 py-3.5 bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/30 active:scale-[0.98] transition-all flex flex-col items-center justify-center text-[11px] uppercase tracking-wider gap-1 hover:bg-indigo-500">
-                                        <div className="flex items-center gap-1"><ImageIcon className="w-3.5 h-3.5"/> Image</div>
-                                        <span className="opacity-80 text-[8px] tracking-normal font-medium capitalize">Send + Text</span>
+                            <div className="px-7 py-6 border-t border-slate-100 dark:border-slate-800/50 shrink-0 bg-white dark:bg-slate-900 rounded-b-[2.5rem]">
+                                <div className="space-y-4">
+                                    <button type="button" onClick={() => handleShareAttachment('none')} className="w-full py-4.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-2xl shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 text-[13px] uppercase tracking-wider">
+                                        <Send className="w-4 h-4" /> Send Text Only
                                     </button>
-                                    <button type="button" onClick={() => handleShareAttachment('pdf')} disabled={isSendingWithImage || isGeneratingPdf} className="flex-1 py-3.5 bg-emerald-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 active:scale-[0.98] transition-all flex flex-col items-center justify-center text-[11px] uppercase tracking-wider gap-1 hover:bg-emerald-500">
-                                        <div className="flex items-center gap-1"><FileText className="w-3.5 h-3.5"/> PDF</div>
-                                        <span className="opacity-80 text-[8px] tracking-normal font-medium capitalize">Send + Text</span>
-                                    </button>
-                                </div>
-                                <div className="flex justify-between border-t border-slate-100 dark:border-slate-800/50 pt-4 px-1">
-                                    <button type="button" onClick={handleCopyMessage} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 flex items-center gap-1.5 text-xs font-bold transition-colors">
-                                        {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />} Copy Text
-                                    </button>
-                                    <button type="button" onClick={() => handleShareAttachment('none')} className="text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1.5 text-xs font-bold transition-colors">
-                                        <Send className="w-3.5 h-3.5" /> Send Text Only
-                                    </button>
+
+                                    <div className="flex gap-3">
+                                        <div className="flex-1 flex flex-col gap-2.5">
+                                            <button type="button" onClick={() => handleShareAttachment('image')} disabled={isSendingWithImage || isGeneratingPdf} className="w-full py-3.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-bold rounded-xl border border-indigo-200 dark:border-indigo-500/30 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 text-[11px] uppercase tracking-wider hover:bg-indigo-100 dark:hover:bg-indigo-500/30 disabled:opacity-50">
+                                                {isSendingWithImage ? <RotateCcw className="w-3.5 h-3.5 animate-spin"/> : <ImageIcon className="w-3.5 h-3.5"/>} Visual + Text
+                                            </button>
+                                            <button type="button" onClick={() => handlePreviewAttachment('image')} className="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 text-[9px] font-bold uppercase tracking-[0.15em] text-center transition-colors">
+                                                Preview Visual
+                                            </button>
+                                        </div>
+
+                                        <div className="flex-1 flex flex-col gap-2.5">
+                                            <button type="button" onClick={() => handleShareAttachment('pdf')} disabled={isSendingWithImage || isGeneratingPdf} className="w-full py-3.5 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl border border-slate-200 dark:border-slate-700 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 text-[11px] uppercase tracking-wider hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-50">
+                                                {isGeneratingPdf ? <RotateCcw className="w-3.5 h-3.5 animate-spin"/> : <FileText className="w-3.5 h-3.5"/>} Invoice + Text
+                                            </button>
+                                            <button type="button" onClick={() => handlePreviewAttachment('pdf')} className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 text-[9px] font-bold uppercase tracking-[0.15em] text-center transition-colors">
+                                                Preview Invoice
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </motion.div>
