@@ -157,12 +157,22 @@ const MonthlyOverview = () => {
  <h3 className="font-bold text-slate-900 dark:text-white mb-4 pl-2">Top Spending</h3>
  <div className="space-y-3">
  {currentStats.topCategories.map(cat => {
-     const IconComponent = LucideIcons[cat.icon] || LucideIcons.HelpCircle;
+     let iconName = cat.icon;
+     if (!iconName) {
+         if (cat.name === 'Food & Dining') iconName = 'Utensils';
+         else if (cat.name === 'Transport') iconName = 'Bus';
+         else if (cat.name === 'Shopping') iconName = 'ShoppingBag';
+         else if (cat.name === 'Bills & Utilities') iconName = 'Zap';
+         else if (cat.name === 'Salary') iconName = 'IndianRupee';
+         else if (cat.name === 'Savings Allocation') iconName = 'Wallet';
+         else iconName = 'HelpCircle';
+     }
+     const IconComponent = LucideIcons[iconName];
      return (
  <div key={cat.id} className="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between">
  <div className="flex items-center gap-3">
  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${cat.color ? cat.color + '/20' : 'bg-slate-100'} ${cat.color?.replace('bg-', 'text-') || 'text-slate-500'}`}>
- <IconComponent className="w-5 h-5 opacity-90" />
+ {IconComponent ? <IconComponent className="w-5 h-5 opacity-90" /> : cat.name[0]}
  </div>
  <div>
  <p className="font-bold text-slate-900 dark:text-white">{cat.name}</p>

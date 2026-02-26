@@ -331,6 +331,14 @@ const TaskDashboard = () => {
  onReschedule={handleReschedule}
  isVariant="carry_over"
  />
+ <button
+     onClick={() => {
+         pendingTasks.forEach(task => handleReschedule(task.id, 'today'));
+     }}
+     className="w-full mt-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-[13px] font-medium text-slate-500 hover:text-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+ >
+     Move all to Today
+ </button>
  </div>
  </section>
  )}
