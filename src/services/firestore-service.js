@@ -40,8 +40,9 @@ export const FirestoreService = {
 
             const unsubscribe = onSnapshot(q, (snapshot) => {
                 const data = snapshot.docs.map(doc => ({
+                    ...doc.data(),
                     id: doc.id,
-                    ...doc.data()
+                    _firestoreId: doc.id,
                 }));
                 callback(data);
             }, (error) => {

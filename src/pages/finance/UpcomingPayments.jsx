@@ -4,6 +4,7 @@ import { Plus, Trash2, Calendar, Zap, CreditCard, Music, Monitor, Smartphone, Br
 import { format, differenceInDays, isBefore, addMonths } from 'date-fns';
 import { useTranslation } from 'react-i18next'; // Added i18n support
 import { useScrollLock } from '../../hooks/useScrollLock';
+import { useToast } from '../../context/ToastContext';
 
 const ICONS = [
     { icon: Zap, label: 'Utility' },
@@ -28,6 +29,7 @@ const UpcomingPayments = () => {
     const { subscriptions, addSubscription, deleteSubscription, toggleSubscriptionStatus } = useFinance();
     const [isAdding, setIsAdding] = useState(false);
     const { t } = useTranslation(); // Enable translations
+    const { showToast } = useToast();
 
     useScrollLock(isAdding);
 
@@ -48,7 +50,6 @@ const UpcomingPayments = () => {
             return;
         }
 
-        console.log("Saving subscription:", { name, amount, dayNum });
 
         try {
             addSubscription({
@@ -58,13 +59,14 @@ const UpcomingPayments = () => {
                 iconIdx: selectedIconIdx,
                 colorIdx: selectedColorIdx
             });
+            showToast('Subscription added', 'success');
             setIsAdding(false);
             setName('');
             setAmount('');
             setDay('');
         } catch (err) {
             console.error("Failed to save subscription:", err);
-            alert("Failed to save. Please try again.");
+            showToast('Failed to save. Please try again.', 'error');
         }
     };
 
@@ -123,7 +125,7 @@ const UpcomingPayments = () => {
                         return (
                             <div key={sub.id} className="min-w-[160px] max-w-[200px] p-3 rounded-[1.25rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm relative group transition-all hover:border-indigo-500/50 flex flex-col gap-2">
                                 {/* Action Buttons */}
-                                <div className="absolute top-2 right-2 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-lg p-0.5 shadow-sm">
+                                <div className="absolute top-2 right-2 flex gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-lg p-0.5 shadow-sm">
                                     <button
                                         onClick={(e) => { e.stopPropagation(); toggleSubscriptionStatus(sub.id); }}
                                         className="p-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 transition-colors text-slate-500"
@@ -131,7 +133,7 @@ const UpcomingPayments = () => {
                                         {sub.status === 'active' ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
                                     </button>
                                     <button
-                                        onClick={(e) => { e.stopPropagation(); if(confirm('Delete this subscription?')) deleteSubscription(sub.id); }}
+                                        onClick={(e) => { e.stopPropagation(); if(window.confirm('Delete this subscription?')) { deleteSubscription(sub.id); showToast('Subscription deleted', 'info'); } }}
                                         className="p-1.5 bg-rose-50 dark:bg-rose-900/20 rounded-lg hover:bg-rose-100 transition-colors text-rose-500"
                                     >
                                         <Trash2 className="w-3 h-3" />

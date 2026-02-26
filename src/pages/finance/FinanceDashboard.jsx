@@ -13,13 +13,14 @@ import { useTheme } from '../../context/ThemeContext';
 import { useSettings } from '../../context/SettingsContext';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import FinanceBottomNav from '../../components/finance/FinanceBottomNav';
+import { useToast } from '../../context/ToastContext';
 
 const FinanceDashboard = () => {
     const navigate = useNavigate();
     const { isDark } = useTheme();
     const { timeFormat } = useSettings();
     const { user } = useAuthContext();
-    useThemeColor(isDark ? '#0f172a' : '#0f172a'); 
+    useThemeColor(isDark ? '#0f172a' : '#f8fafc');
     const { t } = useTranslation(); 
     const {
         getTotalBalance,
@@ -38,6 +39,7 @@ const FinanceDashboard = () => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [undoToast, setUndoToast] = useState(null); // { id, message }
     const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
+    const { showToast } = useToast();
 
     const monthStats = useMemo(() => {
         const start = startOfMonth(selectedDate);
@@ -81,6 +83,7 @@ const FinanceDashboard = () => {
         e.stopPropagation(); 
         deleteTransaction(id);
         setUndoToast({ id, message: 'Transaction deleted.' });
+        showToast('Transaction deleted', 'info');
         setTimeout(() => setUndoToast(null), 4000);
     };
 
@@ -229,7 +232,10 @@ const FinanceDashboard = () => {
                 <section className="flex-1">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="font-bold text-slate-900 dark:text-white text-lg">{t('finance.transactions', 'Transactions')}</h3>
-                        <button className="text-slate-400 text-sm font-medium hover:text-indigo-500 transition-colors">
+                        <button 
+                            onClick={() => navigate('/finance/monthly')}
+                            className="text-slate-400 text-sm font-medium hover:text-indigo-500 transition-colors"
+                        >
                             View all
                         </button>
                     </div>
@@ -272,7 +278,8 @@ const FinanceDashboard = () => {
                                                 {cat?.icon === 'ShoppingBag' && '🛍️'}
                                                 {cat?.icon === 'Zap' && '⚡'}
                                                 {cat?.icon === 'IndianRupee' && '₹'}
-                                                {!cat?.icon && (cat?.name?.[0] || '?')}
+                                                {cat?.icon === 'Wallet' && '💰'}
+                                                {!['Utensils','Bus','ShoppingBag','Zap','IndianRupee','Wallet'].includes(cat?.icon) && (cat?.name?.[0] || '?')}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-bold text-slate-900 dark:text-white text-[15px] truncate">{tx.description || tx.note || cat?.name || 'Transaction'}</p>

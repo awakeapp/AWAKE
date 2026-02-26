@@ -6,6 +6,7 @@ import { useFinance } from '../../context/FinanceContext';
 import Button from '../atoms/Button';
 
 import { useScrollLock } from '../../hooks/useScrollLock';
+import { useToast } from '../../context/ToastContext';
 
 const FinanceLogModal = ({ isOpen, onClose }) => {
     useScrollLock(isOpen);
@@ -16,6 +17,8 @@ const FinanceLogModal = ({ isOpen, onClose }) => {
     const [categoryId, setCategoryId] = useState('');
     const [accountId, setAccountId] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [validationError, setValidationError] = useState('');
+    const { showToast } = useToast();
     
     // Sort categories alphabetically but keep prominent ones near top
     const expenseCategories = categories.filter(c => c.type === 'expense').sort((a,b) => a.name.localeCompare(b.name));
@@ -31,7 +34,19 @@ const FinanceLogModal = ({ isOpen, onClose }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!amount || !note || !categoryId || !accountId) return;
+        if (!amount || Number(amount) <= 0) {
+            setValidationError('Please enter a valid amount');
+            return;
+        }
+        if (!note.trim()) {
+            setValidationError('Please add a description');
+            return;
+        }
+        if (!categoryId || !accountId) {
+            setValidationError('Please select category and account');
+            return;
+        }
+        setValidationError('');
 
         setIsSubmitting(true);
         try {
@@ -42,10 +57,11 @@ const FinanceLogModal = ({ isOpen, onClose }) => {
                 categoryId,
                 note: note.trim()
             });
+            showToast('Expense saved', 'success');
             onClose();
         } catch (error) {
             console.error("Finance log failed:", error);
-            alert("Failed to save transaction. Please try again.");
+            showToast(error.message || 'Failed to save. Try again.', 'error');
         } finally {
             setIsSubmitting(false);
         }

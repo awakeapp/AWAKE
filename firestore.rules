@@ -14,6 +14,18 @@ service cloud.firestore {
 
       allow read, write: if isOwner(userId);
 
+      // Transactions: validate amount and type
+      match /transactions/{docId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && request.resource.data.amount is number
+          && request.resource.data.amount > 0
+          && request.resource.data.amount <= 9999999
+          && request.resource.data.type in ['income', 'expense', 'savings', 'transfer'];
+        allow delete: if isOwner(userId);
+      }
+
+      // Other subcollections: owner-only with no special validation
       match /{subCollection}/{docId} {
         allow read, write: if isOwner(userId);
       }
