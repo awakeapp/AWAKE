@@ -55,7 +55,13 @@ const FinanceDashboard = () => {
             .filter(t => t.type === 'expense')
             .reduce((sum, t) => sum + Number(t.amount), 0);
 
-        const savings = income - expense;
+        const savings = monthlyTx
+            .filter(t => t.type === 'savings')
+            .reduce((sum, t) => sum + Number(t.amount), 0);
+
+        const netBalance = income - expense;
+        const availableBalance = netBalance - savings;
+        
         const savingsRate = income > 0 ? Math.round((savings / income) * 100) : 0;
 
         return {
@@ -153,19 +159,19 @@ const FinanceDashboard = () => {
 
                         <div className="w-full h-px bg-white/10 mb-6" />
 
-                        <div className="flex items-center justify-center gap-4 w-full mb-6">
-                            <div className="flex items-center gap-1.5 font-bold text-[13px] tracking-tight">
-                                <span className="text-emerald-300">Income</span>
+                        <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-2 w-full mb-6 max-w-[90%] mx-auto">
+                            <div className="flex items-center gap-1.5 font-bold text-[10px] min-[380px]:text-[11px] tracking-tight">
+                                <span className="text-emerald-300 uppercase tracking-wider">Income</span>
                                 <span className="text-white">₹{monthStats.income.toLocaleString()}</span>
                             </div>
-                            <span className="text-white/20 select-none">|</span>
-                            <div className="flex items-center gap-1.5 font-bold text-[13px] tracking-tight">
-                                <span className="text-rose-300">Expense</span>
+                            <span className="text-white/20 select-none text-[10px] hidden min-[360px]:block">|</span>
+                            <div className="flex items-center gap-1.5 font-bold text-[10px] min-[380px]:text-[11px] tracking-tight">
+                                <span className="text-rose-300 uppercase tracking-wider">Expense</span>
                                 <span className="text-white">₹{monthStats.expense.toLocaleString()}</span>
                             </div>
-                            <span className="text-white/20 select-none">|</span>
-                            <div className="flex items-center gap-1.5 font-bold text-[13px] tracking-tight">
-                                <span className="text-slate-300">Recurring</span>
+                            <span className="text-white/20 select-none text-[10px] hidden min-[360px]:block">|</span>
+                            <div className="flex items-center gap-1.5 font-bold text-[10px] min-[380px]:text-[11px] tracking-tight">
+                                <span className="text-slate-300 uppercase tracking-wider">Recurring</span>
                                 <span className="text-white">₹{recurringTotal.toLocaleString()}</span>
                             </div>
                         </div>
@@ -178,9 +184,11 @@ const FinanceDashboard = () => {
                                     setAddType('savings'); 
                                     setIsAddOpen(true); 
                                 }} 
-                                className="px-6 py-2 rounded-full border border-white/20 bg-transparent hover:bg-white/5 active:scale-95 transition-all text-xs font-bold tracking-wider uppercase text-white"
+                                className="px-5 py-2.5 rounded-full border border-white/20 bg-transparent hover:bg-white/10 active:scale-95 transition-all text-[11px] font-black tracking-widest uppercase text-white flex items-center gap-2 shadow-sm"
                             >
-                                Savings
+                                <span>Savings</span>
+                                <div className="w-1 h-1 rounded-full bg-white/30" />
+                                <span className="text-teal-300 tracking-tight">₹{monthStats.savings.toLocaleString()}</span>
                             </button>
                         </div>
                     </div>
