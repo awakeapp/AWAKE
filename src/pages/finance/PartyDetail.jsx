@@ -311,24 +311,25 @@ const PartyDetail = () => {
         }
 
         if (file) {
-            const url = URL.createObjectURL(file);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = file.name;
-            a.click();
-            URL.revokeObjectURL(url);
-
-            const phone = normalizePhone(party.country_code, party.phone_number);
-            const encoded = encodeURIComponent(generatedMessage);
-
-            setTimeout(() => {
-                if (reminderMethod === 'whatsapp') {
-                    window.location.href = `https://wa.me/${phone}?text=${encoded}`;
-                } else {
-                    window.location.href = `sms:${phone}?body=${encoded}`;
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Account Overview',
+                        text: generatedMessage
+                    });
+                } catch (error) {
+                    // user cancelled share or share failed
                 }
-            }, 600);
-            
+            } else {
+                const url = URL.createObjectURL(file);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = file.name;
+                a.click();
+                URL.revokeObjectURL(url);
+                alert("Your device doesn't support direct file sharing. The image has been downloaded instead.");
+            }
         } else {
             handleSendReminderTextOnly();
         }
