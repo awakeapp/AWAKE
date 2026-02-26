@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { ArrowLeft, Plus, MoreVertical, Trash2, RotateCcw, AlertTriangle, Calendar, Lock, CreditCard, ToggleLeft, ToggleRight, Check, ChevronDown, Clock, Bell, MessageCircle, MessageSquare, Copy, Send, Wallet, FileText, Image as ImageIcon, Download, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { ArrowLeft, Plus, MoreVertical, Trash2, Edit2, RotateCcw, AlertTriangle, Calendar, Lock, CreditCard, ToggleLeft, ToggleRight, Check, ChevronDown, Clock, Bell, MessageCircle, MessageSquare, Copy, Send, Wallet, FileText, Image as ImageIcon, Download, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { format, isBefore, isAfter, startOfDay, endOfDay, differenceInDays, addDays } from 'date-fns';
 import JumpDateModal from '../../components/organisms/JumpDateModal';
@@ -51,12 +51,10 @@ const PartyDetail = () => {
         softDeleteDebtTransaction,
         reverseDebtTransaction,
         isEntryLocked,
-        getPendingEntries,
-        addSettlementPayment,
-        getPartyStatus,
         getEntrySettledAmount,
         updateDebtParty,
         addTransaction,
+        editDebtTransaction,
         accounts
     } = context;
 
@@ -137,6 +135,7 @@ const PartyDetail = () => {
     const [datePickerOpen, setDatePickerOpen] = useState(false);
     const [dueDatePickerOpen, setDueDatePickerOpen] = useState(false);
     const [dueDateManuallySet, setDueDateManuallySet] = useState(false);
+    const [editTransactionId, setEditTransactionId] = useState(null);
 
     // --- Settlement states ---
     const [isSettleOpen, setIsSettleOpen] = useState(false);
@@ -465,15 +464,26 @@ const PartyDetail = () => {
         }
 
         try {
-            await addDebtTransaction({
-                party_id: party.id,
-                type: txType,
-                amount: Number(amount),
-                date: new Date(date + 'T12:00:00').toISOString(),
-                due_date: dueDate ? new Date(dueDate + 'T12:00:00').toISOString() : null,
-                notes: note
-            });
-            showToast('Entry saved', 'success');
+            if (editTransactionId) {
+                await editDebtTransaction(editTransactionId, {
+                    type: txType,
+                    amount: Number(amount),
+                    date: new Date(date + 'T12:00:00').toISOString(),
+                    due_date: dueDate ? new Date(dueDate + 'T12:00:00').toISOString() : null,
+                    notes: note
+                });
+                showToast('Entry updated', 'success');
+            } else {
+                await addDebtTransaction({
+                    party_id: party.id,
+                    type: txType,
+                    amount: Number(amount),
+                    date: new Date(date + 'T12:00:00').toISOString(),
+                    due_date: dueDate ? new Date(dueDate + 'T12:00:00').toISOString() : null,
+                    notes: note
+                });
+                showToast('Entry saved', 'success');
+            }
             resetForm();
         } catch (error) {
             showToast('Failed to save entry', 'error');
@@ -533,8 +543,9 @@ const PartyDetail = () => {
         setNote('');
         setDueDate(format(addDays(new Date(), 10), 'yyyy-MM-dd'));
         setDate(format(new Date(), 'yyyy-MM-dd'));
-        setTxType('you_gave');
+        setDueDatePickerOpen(false);
         setDueDateManuallySet(false);
+        setEditTransactionId(null);
     };
 
     const toggleEntrySelection = (entryId, entryRemaining) => {
@@ -561,47 +572,31 @@ const PartyDetail = () => {
                         <h1 className="text-lg font-black text-slate-900 dark:text-white truncate max-w-[180px] tracking-tight">{party.name}</h1>
                         <span className={`text-[8px] font-black uppercase tracking-[0.2em] px-2.5 py-0.5 rounded-full mt-0.5 ${statusBadge.cls}`}>{statusBadge.label}</span>
                     </div>
-                    <button className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white -mr-1">
-                        <MoreVertical className="w-5 h-5" />
-                    </button>
+                    <div className="w-9 h-9 border border-slate-200 dark:border-slate-800 rounded-full flex items-center justify-center -mr-1 shadow-sm">
+                        <span className="font-bold text-slate-700 dark:text-slate-300 text-sm">{party.name?.[0]?.toUpperCase()}</span>
+                    </div>
                 </div>
 
                 {/* Balance Card */}
                 <div className="px-5 pb-4">
-                    <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 dark:from-indigo-600 dark:to-indigo-900 rounded-[1.5rem] p-5 text-white relative overflow-hidden">
-                        <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
-                        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-black/10 rounded-full blur-2xl" />
+                    <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 dark:from-indigo-600 dark:to-indigo-900 rounded-[2rem] p-6 text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/10 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none" />
+                        
                         <div className="relative z-10">
-                            <div className="grid grid-cols-3 gap-3 mb-4">
-                                <div className="text-center">
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-200/80 mb-1 text-center">Net Balance</p>
+                            <p className={`text-4xl font-black tracking-tight text-center mb-6 drop-shadow-md ${balance >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
+                                {balance >= 0 ? '+' : '-'}₹{Math.abs(balance).toLocaleString()}
+                            </p>
+                            
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="bg-white/10 dark:bg-black/20 rounded-2xl p-3 backdrop-blur-md border border-white/10 text-center">
                                     <p className="text-[8px] font-black uppercase tracking-[0.2em] text-indigo-200/70 mb-1">Receivable</p>
-                                    <p className="text-base font-black text-emerald-300">₹{summary.totalReceivable.toLocaleString()}</p>
+                                    <p className="text-sm font-black text-emerald-300">₹{summary.totalReceivable.toLocaleString()}</p>
                                 </div>
-                                <div className="text-center">
+                                <div className="bg-white/10 dark:bg-black/20 rounded-2xl p-3 backdrop-blur-md border border-white/10 text-center">
                                     <p className="text-[8px] font-black uppercase tracking-[0.2em] text-indigo-200/70 mb-1">Payable</p>
-                                    <p className="text-base font-black text-red-300">₹{summary.totalPayable.toLocaleString()}</p>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-[8px] font-black uppercase tracking-[0.2em] text-indigo-200/70 mb-1">Net</p>
-                                    <p className={`text-base font-black ${balance >= 0 ? 'text-emerald-300' : 'text-red-300'}`}>{balance >= 0 ? '+' : '-'}₹{Math.abs(balance).toLocaleString()}</p>
-                                </div>
-                            </div>
-                            <div className="h-px bg-white/10 my-3" />
-                            <div className="grid grid-cols-3 gap-3">
-                                <div className="flex flex-col items-center">
-                                    <Clock className="w-3 h-3 text-indigo-200/60 mb-1" />
-                                    <p className="text-[7px] font-black uppercase tracking-[0.15em] text-indigo-200/50">Overdue</p>
-                                    <p className={`text-[11px] font-bold mt-0.5 ${summary.overdueAmount > 0 ? 'text-red-300' : 'text-white/50'}`}>{summary.overdueAmount > 0 ? `₹${summary.overdueAmount.toLocaleString()}` : '—'}</p>
-                                </div>
-                                <div className="flex flex-col items-center">
-                                    <Calendar className="w-3 h-3 text-indigo-200/60 mb-1" />
-                                    <p className="text-[7px] font-black uppercase tracking-[0.15em] text-indigo-200/50">Last Txn</p>
-                                    <p className="text-[11px] font-bold mt-0.5 text-white/80">{summary.lastTxDate ? format(new Date(summary.lastTxDate), 'dd MMM') : '—'}</p>
-                                </div>
-                                <div className="flex flex-col items-center">
-                                    <Bell className="w-3 h-3 text-indigo-200/60 mb-1" />
-                                    <p className="text-[7px] font-black uppercase tracking-[0.15em] text-indigo-200/50">Reminder</p>
-                                    <p className="text-[11px] font-bold mt-0.5 text-white/80">{summary.lastReminder ? format(new Date(summary.lastReminder), 'dd MMM') : 'Never'}</p>
+                                    <p className="text-sm font-black text-rose-300">₹{summary.totalPayable.toLocaleString()}</p>
                                 </div>
                             </div>
                         </div>
@@ -654,16 +649,6 @@ const PartyDetail = () => {
                             {f}
                         </button>
                     ))}
-                    {/* Date from/to */}
-                    <button onClick={() => setDateFromPickerOpen(true)} className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap border transition-colors ${dateFrom ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 border-indigo-200 dark:border-indigo-500/30' : 'bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800'}`}>
-                        {dateFrom ? format(new Date(dateFrom + 'T00:00:00'), 'dd MMM') : 'From'}
-                    </button>
-                    <button onClick={() => setDateToPickerOpen(true)} className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap border transition-colors ${dateTo ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 border-indigo-200 dark:border-indigo-500/30' : 'bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800'}`}>
-                        {dateTo ? format(new Date(dateTo + 'T00:00:00'), 'dd MMM') : 'To'}
-                    </button>
-                    {(dateFrom || dateTo) && (
-                        <button onClick={() => { setDateFrom(''); setDateTo(''); }} className="px-2 py-1.5 text-xs font-bold text-red-500">✕</button>
-                    )}
                 </div>
 
                 {/* Ledger header */}
@@ -757,30 +742,30 @@ const PartyDetail = () => {
                                             </div>
 
                                             {/* Actions */}
-                                            <div className="relative shrink-0">
-                                                <button onClick={() => setDropdownOpen(dropdownOpen === tx.id ? null : tx.id)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400">
-                                                    <MoreVertical className="w-4 h-4" />
-                                                </button>
-                                                <AnimatePresence>
-                                                    {dropdownOpen === tx.id && (
-                                                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="absolute right-0 top-full mt-1 w-36 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-100 dark:border-slate-700 overflow-hidden z-20">
-                                                            {!locked && (
-                                                                <button onClick={() => {
-                                                                    if (window.confirm('Delete this entry? This cannot be undone.')) {
-                                                                        softDeleteDebtTransaction(tx.id);
-                                                                        showToast('Entry deleted', 'info');
-                                                                    }
-                                                                    setDropdownOpen(null);
-                                                                }} className="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center gap-2">
-                                                                    <Trash2 className="w-4 h-4" /> Delete
-                                                                </button>
-                                                            )}
-                                                            <button onClick={() => { reverseDebtTransaction(tx.id); setDropdownOpen(null); }} className="w-full px-4 py-2.5 text-left text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2">
-                                                                <RotateCcw className="w-4 h-4" /> Reverse
-                                                            </button>
-                                                        </motion.div>
-                                                    )}
-                                                </AnimatePresence>
+                                            <div className="relative shrink-0 flex items-center justify-end gap-1 ml-2">
+                                                {!locked && (
+                                                    <button onClick={() => {
+                                                        setTxType(tx.type);
+                                                        setAmount(String(tx.amount));
+                                                        setDate(format(new Date(tx.date), 'yyyy-MM-dd'));
+                                                        if (tx.due_date) setDueDate(format(new Date(tx.due_date), 'yyyy-MM-dd'));
+                                                        setNote(tx.notes || '');
+                                                        setEditTransactionId(tx.id);
+                                                        setIsAddCardOpen(true);
+                                                    }} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 transition-colors">
+                                                        <Edit2 className="w-4 h-4" />
+                                                    </button>
+                                                )}
+                                                {!locked && (
+                                                    <button onClick={() => {
+                                                        if (window.confirm('Delete this entry? This cannot be undone.')) {
+                                                            softDeleteDebtTransaction(tx.id);
+                                                            showToast('Entry deleted', 'info');
+                                                        }
+                                                    }} className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg text-red-400 hover:text-red-500 transition-colors">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

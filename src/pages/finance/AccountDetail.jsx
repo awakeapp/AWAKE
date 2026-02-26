@@ -52,7 +52,7 @@ const AccountDetail = () => {
  return (
  <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24">
  {/* Header */}
- <div className="bg-slate-900 text-white p-6 pb-12 rounded-b-[2rem] shadow-xl">
+ <div className="sticky top-0 z-30 bg-slate-900 text-white p-6 pb-12 rounded-b-[2rem] shadow-xl">
  <div className="flex items-center justify-between mb-6">
  <div className="flex items-center gap-3">
  <button
