@@ -177,8 +177,16 @@ const Routine = () => {
                         isLocked={isLocked}
                     />
 
-                    {/* Submit / Unlock */}
-                    {isLocked ? (
+                    {/* Submit / Unlock / Summary */}
+                    {isPast ? (
+                        <button
+                            className="w-full py-3.5 text-sm font-semibold rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 shadow-sm flex items-center justify-center gap-2 active:opacity-70 transition-opacity"
+                            onClick={() => setShowSubmitModal(true)}
+                        >
+                            <List className="w-4 h-4 stroke-[1.5]" />
+                            Day Summary
+                        </button>
+                    ) : isLocked ? (
                         <div className="text-center p-6 bg-slate-100 rounded-2xl dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                             <div className="flex flex-col items-center gap-2 mb-4">
                                 <div className="bg-slate-200 p-4 rounded-full dark:bg-slate-800">
@@ -189,7 +197,7 @@ const Routine = () => {
                                     <p className="text-sm text-slate-500 font-normal">This day is completed and read-only.</p>
                                 </div>
                             </div>
-                            {dailyData.locked && !isPast && (
+                            {dailyData.locked && (
                                 <Button
                                     variant="outline"
                                     onClick={() => setShowUnlockModal(true)}

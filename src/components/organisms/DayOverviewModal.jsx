@@ -3,6 +3,8 @@ import Button from '../atoms/Button';
 import { CheckCircle2, AlertCircle, X, Lock, Pizza, Candy, Salad, CheckCircle, Wallet, Smartphone, GlassWater, Activity } from 'lucide-react';
 import { useFinance } from '../../context/FinanceContext';
 import clsx from 'clsx';
+import { useDate } from '../../context/DateContext';
+
 
 import { useScrollLock } from '../../hooks/useScrollLock';
 
@@ -12,6 +14,7 @@ const HABIT_COMPONENTS = {
 
 const DayOverviewModal = ({ isOpen, onClose, data, onConfirm }) => {
     useScrollLock(isOpen);
+    const { isPast } = useDate();
     if (!isOpen) return null;
 
     const totalTasks = data.tasks.length;
@@ -174,15 +177,17 @@ const DayOverviewModal = ({ isOpen, onClose, data, onConfirm }) => {
                         </div>
 
                         {/* Actions */}
-                        <div className="space-y-4">
-                            <Button
-                                onClick={onConfirm}
-                                className="w-full py-4 text-base font-medium rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2 transition-all active:bg-indigo-800"
-                            >
-                                <Lock className="w-4 h-4" />
-                                Lock & Save Day
-                            </Button>
-                        </div>
+                        {!isPast && (
+                            <div className="space-y-4">
+                                <Button
+                                    onClick={onConfirm}
+                                    className="w-full py-4 text-base font-medium rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2 transition-all active:bg-indigo-800"
+                                >
+                                    <Lock className="w-4 h-4" />
+                                    Lock & Save Day
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 </motion.div>
             </div>

@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Edit2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Edit2, Lock } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useDate } from '../../context/DateContext';
 import { cn } from '../../lib/utils';
@@ -54,14 +54,22 @@ const DateHeader = ({ className, showControls = true, overviewText, onEditClick,
                             : "bg-slate-300 dark:bg-slate-600"
                     )} />
                     <div className="flex flex-col items-start min-w-0">
-                        <span className={cn(
-                            "text-xl sm:text-2xl font-black uppercase tracking-wide leading-none transition-colors truncate",
-                            isToday ? "text-indigo-600 dark:text-indigo-400" : "text-slate-800 dark:text-slate-100 group-hover:text-indigo-500"
-                        )}>
-                            {isToday ? 'TODAY' : shortWeekday}
-                        </span>
-                        <span className="text-sm sm:text-base font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1.5 leading-none truncate block">
+                        <div className="flex items-center gap-2">
+                            <span className={cn(
+                                "text-xl sm:text-2xl font-black uppercase tracking-wide leading-none transition-colors truncate",
+                                isToday ? "text-indigo-600 dark:text-indigo-400" : "text-slate-800 dark:text-slate-100 group-hover:text-indigo-500"
+                            )}>
+                                {isToday ? 'TODAY' : shortWeekday}
+                            </span>
+                            {isLocked && <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />}
+                        </div>
+                        <span className="text-sm sm:text-base font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1.5 leading-none truncate flex items-center gap-2">
                             {displayDate}
+                            {isLocked && (
+                                <span className="text-[10px] tracking-widest font-bold bg-slate-200/50 dark:bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded-md">
+                                    LOCKED
+                                </span>
+                            )}
                         </span>
                     </div>
                 </div>

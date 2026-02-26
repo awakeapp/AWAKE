@@ -314,10 +314,8 @@ export const DataContextProvider = ({ children }) => {
     // Derived State
     const isToday = formattedDate === new Date().toISOString().split('T')[0];
 
-    // FIX: Always allow editing routines, even if day is "submitted" or "locked".
-    // The previous logic prevented users from adding tasks after clicking "Complete Day".
-    const isEffectivelyLocked = false;
-    // const isEffectivelyLocked = dailyData.locked || dailyData.submitted;
+    // Lock the day universally if it is in the past (Previous Day Lock System)
+    const isEffectivelyLocked = isPast;
 
     // --- Actions ---
 
