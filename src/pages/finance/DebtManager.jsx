@@ -143,17 +143,21 @@ const DebtManager = () => {
     // Calculate totals over all non-deleted parties
     let totalReceivable = 0;
     let totalPayable = 0;
+    let overdueCount = 0;
+    let overdueTotal = 0;
 
     const partyData = activeParties.map(p => {
         const bal = getPartyBalance(p.id);
         const txs = getPartyTransactions(p.id);
         const lastTxDate = txs.length > 0 ? txs[0].date : p.created_at;
-
+        const status = getPartyStatus(p.id);
         if (bal > 0) totalReceivable += bal;
         else if (bal < 0) totalPayable += Math.abs(bal);
-
+        if (status === 'overdue') { overdueCount++; overdueTotal += Math.abs(bal); }
         return { ...p, balance: bal, lastTxDate };
     }).sort((a, b) => new Date(b.lastTxDate).getTime() - new Date(a.lastTxDate).getTime());
+
+    const netPosition = totalReceivable - totalPayable;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -200,7 +204,38 @@ const DebtManager = () => {
             </header>
 
             <div className="px-6 flex-1 flex flex-col space-y-4">
-                <div className="relative mt-2">
+
+                {/* Debt Overview Summary */}
+                {activeParties.length > 0 && (
+                    <div className="space-y-2">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Debt Overview</p>
+                        <div className="grid grid-cols-3 gap-2">
+                            <div className="bg-emerald-50 dark:bg-emerald-500/10 p-3 rounded-2xl border border-emerald-100 dark:border-emerald-500/20 flex flex-col items-center text-center">
+                                <p className="text-[9px] font-black uppercase tracking-widest text-emerald-600/70 dark:text-emerald-400/70 mb-1">Receivable</p>
+                                <p className="text-sm font-black text-emerald-700 dark:text-emerald-400">₹{totalReceivable.toLocaleString()}</p>
+                            </div>
+                            <div className="bg-red-50 dark:bg-red-500/10 p-3 rounded-2xl border border-red-100 dark:border-red-500/20 flex flex-col items-center text-center">
+                                <p className="text-[9px] font-black uppercase tracking-widest text-red-600/70 dark:text-red-400/70 mb-1">Payable</p>
+                                <p className="text-sm font-black text-red-700 dark:text-red-400">₹{totalPayable.toLocaleString()}</p>
+                            </div>
+                            <div className="bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-col items-center text-center">
+                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Net</p>
+                                <p className={`text-sm font-black ${netPosition >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
+                                    {netPosition >= 0 ? '+' : '-'}₹{Math.abs(netPosition).toLocaleString()}
+                                </p>
+                            </div>
+                        </div>
+                        {overdueCount > 0 && (
+                            <div className="bg-amber-50 dark:bg-amber-500/10 px-4 py-3 rounded-2xl border border-amber-100 dark:border-amber-500/20 flex items-center justify-between">
+                                <p className="text-[11px] font-bold text-amber-700 dark:text-amber-400">Overdue Parties</p>
+                                <p className="text-[11px] font-black text-amber-700 dark:text-amber-400">{overdueCount} · ₹{overdueTotal.toLocaleString()}</p>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Search */}
+                <div className="relative">
                     <input type="text" placeholder="Search parties..." className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500" />
                     <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                 </div>

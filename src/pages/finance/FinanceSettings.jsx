@@ -1,11 +1,9 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Eye, EyeOff, Download, HelpCircle, ChevronRight, FileText, ToggleLeft, ToggleRight, Loader2 } from 'lucide-react';
-import { useFinance } from '../../context/FinanceContext';
-import { useAuthContext } from '../../hooks/useAuthContext';
+import { ArrowLeft, HelpCircle, ChevronRight, FileText } from 'lucide-react';
 import { useThemeColor } from '../../hooks/useThemeColor';
 import { useTheme } from '../../context/ThemeContext';
 import clsx from 'clsx';
+
 
 // Shared Row Component matching iOS style (cloned from Settings.jsx)
 const SettingsRow = ({ icon: Icon, title, subtitle, right, onClick, isLast }) => (
@@ -54,55 +52,6 @@ const FinanceSettings = () => {
     const { isDark } = useTheme();
     useThemeColor(isDark ? '#000000' : '#F2F2F7');
 
-    const { transactions, categories, accounts, subscriptions, debtParties, debtTransactions } = useFinance();
-    const { user } = useAuthContext();
-
-    // Card visibility toggles
-    const [showUpcoming, setShowUpcoming] = useState(true);
-    const [showDebtOverview, setShowDebtOverview] = useState(true);
-    const [showTransactions, setShowTransactions] = useState(true);
-
-    const [isExporting, setIsExporting] = useState(false);
-
-    const handleExportFinance = async () => {
-        setIsExporting(true);
-        try {
-            const data = {
-                exportDate: new Date().toISOString(),
-                user: user?.displayName || 'User',
-                transactions: transactions.filter(t => !t.isDeleted),
-                categories,
-                accounts,
-                subscriptions,
-                debtParties: (debtParties || []).filter(p => !p.is_deleted),
-                debtTransactions: (debtTransactions || []).filter(t => !t.is_deleted),
-            };
-
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Awake_Finance_Export_${new Date().toISOString().slice(0, 10)}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        } catch (e) {
-            console.error(e);
-            alert('Export failed.');
-        } finally {
-            setIsExporting(false);
-        }
-    };
-
-    const ToggleButton = ({ value, onChange }) => (
-        <button onClick={() => onChange(!value)} className="focus:outline-none">
-            {value ? (
-                <ToggleRight className="w-[51px] h-[31px] text-emerald-500" />
-            ) : (
-                <ToggleLeft className="w-[51px] h-[31px] text-slate-300 dark:text-slate-600" />
-            )}
-        </button>
-    );
-
     return (
         <div className="min-h-screen bg-[#F2F2F7] dark:bg-black text-black dark:text-white font-sans pb-12">
             {/* Fixed Header */}
@@ -125,42 +74,7 @@ const FinanceSettings = () => {
                 className="max-w-screen-md mx-auto px-4"
                 style={{ paddingTop: 'calc(56px + env(safe-area-inset-top) + 20px)' }}
             >
-                {/* Dashboard Cards Visibility */}
-                <SettingsGroup title="Dashboard Cards">
-                    <SettingsRow 
-                        icon={Eye} 
-                        title="Upcoming Payments" 
-                        subtitle="Show recurring bills section"
-                        right={<ToggleButton value={showUpcoming} onChange={setShowUpcoming} />}
-                    />
-                    <SettingsRow 
-                        icon={Eye} 
-                        title="Debt Overview" 
-                        subtitle="Show debt summary blocks"
-                        right={<ToggleButton value={showDebtOverview} onChange={setShowDebtOverview} />}
-                    />
-                    <SettingsRow 
-                        icon={Eye} 
-                        title="Transaction List" 
-                        subtitle="Show transaction history"
-                        isLast
-                        right={<ToggleButton value={showTransactions} onChange={setShowTransactions} />}
-                    />
-                </SettingsGroup>
-
-                {/* Data & Export */}
-                <SettingsGroup title="Data & Export">
-                    <SettingsRow 
-                        icon={Download} 
-                        title="Export Finance Data" 
-                        subtitle="Download all finance data as JSON"
-                        isLast
-                        onClick={handleExportFinance}
-                        right={isExporting ? <Loader2 className="w-5 h-5 text-slate-400 animate-spin" /> : undefined}
-                    />
-                </SettingsGroup>
-
-                {/* Help */}
+                {/* Support */}
                 <SettingsGroup title="Support">
                     <SettingsRow 
                         icon={HelpCircle} 
