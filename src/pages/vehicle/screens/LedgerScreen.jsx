@@ -1,4 +1,4 @@
-import { useVehicle } from '../../context/VehicleContext';
+import { useVehicle } from '../../../context/VehicleContext';
 import { format } from 'date-fns';
 import { Fuel, Settings, Landmark, Zap, AlertTriangle, Wallet, TrendingUp, History, Archive, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
