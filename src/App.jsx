@@ -59,6 +59,7 @@ const FinanceUpcoming = lazy(() => import('./pages/finance/FinanceUpcoming'));
 const FinanceWallets = lazy(() => import('./pages/finance/FinanceWallets'));
 
 const VehicleDashboard = lazy(() => import('./pages/vehicle/VehicleDashboard'));
+const VehicleMore = lazy(() => import('./pages/vehicle/VehicleMore'));
 
 // Ramadan pages — lazy loaded only if RAMADAN_MODE flag is true
 const RamadanDashboard = RAMADAN_MODE ? lazy(() => import('./pages/ramadan/RamadanDashboard')) : null;
@@ -165,6 +166,7 @@ function App() {
 
                             {/* Vehicle */}
                             <Route path="/vehicle" element={<VehicleDashboard />} />
+                            <Route path="/vehicle/more" element={<VehicleMore />} />
                           </Route>
 
                           {/* Ramadan — only included when RAMADAN_MODE=true, using RamadanLayout */}

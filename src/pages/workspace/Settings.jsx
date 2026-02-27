@@ -1,136 +1,116 @@
-import { useState } from 'react';
-import { ChevronLeft, Lock, Trash2, Sliders, Bell, Layout } from 'lucide-react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import ToggleSwitch from '../../components/atoms/ToggleSwitch';
-import { motion } from 'framer-motion';
+import { 
+    Trash2, Lock, Layout, Sliders, ArrowLeft, ArrowUpDown, Clock
+} from 'lucide-react';
 import { useTasks } from '../../context/TaskContext';
+import { AppHeader } from '../../components/ui/AppHeader';
+import { SettingsList, SettingsSection, SettingsRow } from '../../components/ui/SettingsList';
+import { AppToggle } from '../../components/ui/AppToggle';
 
-const Settings = () => {
- const navigate = useNavigate();
- const { settings, updateSettings } = useTasks();
+const WorkspaceSettings = () => {
+    const navigate = useNavigate();
+    const { settings, updateSettings } = useTasks();
 
- const toggleSetting = (key) => {
- updateSettings({
- [key]: !settings[key]
- });
- };
+    const toggleSetting = (key) => {
+        updateSettings({
+            [key]: !settings[key]
+        });
+    };
 
- const handleChange = (key, value) => {
- updateSettings({ [key]: value });
- };
+    const handleChange = (key, value) => {
+        updateSettings({ [key]: value });
+    };
 
- return (
- <div className="space-y-6 pb-24">
- {/* Header */}
- <div className="flex items-center gap-3 mb-6">
- <button
- onClick={() => navigate(-1)}
- className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors text-slate-600 dark:text-slate-400 -ml-2 focus:outline-none"
- >
- <ChevronLeft className="w-6 h-6" />
- </button>
- <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">
- Settings
- </h1>
- </div>
+    return (
+        <div className="min-h-screen bg-slate-50 dark:bg-black pb-24">
+            <AppHeader 
+                title="Workspace Settings" 
+                showBack 
+                onBack={() => navigate(-1)}
+            />
 
- {/* Task Management Section */}
- <section className="space-y-4">
- <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider px-1">
- Task Management
- </h2>
- <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+            <div className="pt-[calc(56px+env(safe-area-inset-top))]">
+                <SettingsList>
+                    <SettingsSection title="Task Management">
+                        <SettingsRow 
+                            icon={Trash2}
+                            title="Auto-delete completed"
+                            subtitle="Remove completed tasks after 24h"
+                            rightElement={
+                                <AppToggle 
+                                    checked={settings.autoDeleteCompleted}
+                                    onChange={() => toggleSetting('autoDeleteCompleted')}
+                                />
+                            }
+                        />
+                        <SettingsRow 
+                            icon={Lock}
+                            title="Confirm Deletion"
+                            subtitle="Show confirmation before deleting"
+                            rightElement={
+                                <AppToggle 
+                                    checked={settings.confirmDelete}
+                                    onChange={() => toggleSetting('confirmDelete')}
+                                />
+                            }
+                        />
+                        <SettingsRow 
+                            icon={Layout}
+                            title="Show Completed"
+                            subtitle="Keep completed tasks visible in list"
+                            isLast
+                            rightElement={
+                                <AppToggle 
+                                    checked={settings.showCompletedInList}
+                                    onChange={() => toggleSetting('showCompletedInList')}
+                                />
+                            }
+                        />
+                    </SettingsSection>
 
- {/* Setting Item */}
- <div className="p-4 flex items-center justify-between border-b border-slate-50 dark:border-slate-800 last:border-0">
- <div className="flex items-start gap-3">
- <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-500 rounded-lg">
- <Trash2 className="w-5 h-5" />
- </div>
- <div>
- <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">Auto-delete completed</h3>
- <p className="text-xs text-slate-500 mt-0.5">Remove completed tasks after 24h</p>
- </div>
- </div>
-                    <ToggleSwitch
-                        status={settings.autoDeleteCompleted ? 'checked' : 'unchecked'}
-                        onClick={() => toggleSetting('autoDeleteCompleted')}
-                    />
- </div>
+                    <SettingsSection title="Defaults">
+                        <SettingsRow 
+                            icon={ArrowUpDown}
+                            title="Default Priority"
+                            rightElement={
+                                <select
+                                    value={settings.defaultPriority}
+                                    onChange={e => handleChange('defaultPriority', e.target.value)}
+                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer"
+                                >
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
+                                </select>
+                            }
+                        />
+                        <SettingsRow 
+                            icon={Clock}
+                            title="Default Duration"
+                            isLast
+                            rightElement={
+                                <select
+                                    value={settings.defaultDuration}
+                                    onChange={e => handleChange('defaultDuration', parseInt(e.target.value))}
+                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer"
+                                >
+                                    <option value={15}>15 min</option>
+                                    <option value={30}>30 min</option>
+                                    <option value={45}>45 min</option>
+                                    <option value={60}>1 hour</option>
+                                </select>
+                            }
+                        />
+                    </SettingsSection>
 
- {/* Setting Item */}
- <div className="p-4 flex items-center justify-between border-b border-slate-50 dark:border-slate-800 last:border-0">
- <div className="flex items-start gap-3">
- <div className="p-2 bg-rose-50 dark:bg-rose-900/20 text-rose-500 rounded-lg">
- <Lock className="w-5 h-5" />
- </div>
- <div>
- <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">Confirm Deletion</h3>
- <p className="text-xs text-slate-500 mt-0.5">Show confirmation before deleting</p>
- </div>
- </div>
-                    <ToggleSwitch
-                        status={settings.confirmDelete ? 'checked' : 'unchecked'}
-                        onClick={() => toggleSetting('confirmDelete')}
-                    />
- </div>
-
- {/* Setting Item */}
- <div className="p-4 flex items-center justify-between border-b border-slate-50 dark:border-slate-800 last:border-0">
- <div className="flex items-start gap-3">
- <div className="p-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 rounded-lg">
- <Layout className="w-5 h-5" />
- </div>
- <div>
- <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">Show Completed</h3>
- <p className="text-xs text-slate-500 mt-0.5">Keep completed tasks visible in list</p>
- </div>
- </div>
-                    <ToggleSwitch
-                        status={settings.showCompletedInList ? 'checked' : 'unchecked'}
-                        onClick={() => toggleSetting('showCompletedInList')}
-                    />
- </div>
-
- </div>
- </section>
-
- {/* Defaults Section */}
- <section className="space-y-4">
- <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider px-1">
- Defaults
- </h2>
- <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden divide-y divide-slate-50 dark:divide-slate-800">
- <div className="p-4 flex items-center justify-between">
- <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Default Priority</h3>
- <select
- value={settings.defaultPriority}
- onChange={(e) => handleChange('defaultPriority', e.target.value)}
- className="text-sm bg-slate-50 dark:bg-slate-800 border-none rounded-lg px-3 py-1.5 focus:ring-0 text-slate-700 dark:text-slate-200"
- >
- <option value="Low">Low</option>
- <option value="Medium">Medium</option>
- <option value="High">High</option>
- </select>
- </div>
- <div className="p-4 flex items-center justify-between">
- <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Default Duration</h3>
- <select
- value={settings.defaultDuration}
- onChange={(e) => handleChange('defaultDuration', parseInt(e.target.value))}
- className="text-sm bg-slate-50 dark:bg-slate-800 border-none rounded-lg px-3 py-1.5 focus:ring-0 text-slate-700 dark:text-slate-200"
- >
- <option value={15}>15 min</option>
- <option value={30}>30 min</option>
- <option value={45}>45 min</option>
- <option value={60}>1 hour</option>
- </select>
- </div>
- </div>
- </section>
- </div>
- );
+                    <p className="text-center text-[11px] text-slate-400 dark:text-slate-600 mt-8 font-bold tracking-widest uppercase">
+                        AWAKE Workspace Scoped Settings
+                    </p>
+                </SettingsList>
+            </div>
+        </div>
+    );
 };
 
-export default Settings;
+export default WorkspaceSettings;

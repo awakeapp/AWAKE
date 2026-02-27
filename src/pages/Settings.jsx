@@ -1,185 +1,283 @@
-import { useState, useEffect } from 'react';
-import clsx from 'clsx';
+import React, { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+    User, Moon, Sun, Monitor, Bell, Database, Shield, Info, LogOut, 
+    Trash2, ChevronRight, ArrowLeft, Edit2, KeyRound, Mail, Globe, 
+    Clock, Smartphone, UserPlus, Heart, Handshake, Car
+} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useSettings } from '../context/SettingsContext';
-import { User, Moon, Sun, Clock, ChevronRight, Download, ShieldCheck, HelpCircle, UserPlus, FileText, ArrowLeft, Monitor } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-
-
-// Shared Row Component matching iOS style
-const SettingsRow = ({ icon: Icon, title, subtitle, right, onClick, className, isLast, iconBgClass }) => (
- <div 
- onClick={onClick}
- className={clsx(
- "flex items-center min-h-[44px] sm:min-h-[50px] bg-white dark:bg-[#1C1C1E] active:bg-slate-100 dark:active:bg-[#2C2C2E] transition-colors duration-75 ml-4 pr-4",
- !isLast && "border-b border-slate-200 dark:border-[#38383A]",
- onClick && "cursor-pointer",
- className
- )}
- >
- <div className="flex items-center gap-3.5 py-2.5 flex-1 min-w-0">
- {Icon && (
- <div className="w-[30px] h-[30px] rounded-lg shrink-0 flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
- <Icon strokeWidth={2} className="w-[18px] h-[18px]" />
- </div>
- )}
- <div className="flex-1 min-w-0 flex items-center justify-between">
- <p className="text-[16px] xl:text-[17px] text-black dark:text-white leading-tight truncate">{title}</p>
- {subtitle && <p className="text-[15px] xl:text-[16px] text-slate-500 dark:text-[#8E8E93] ml-2 truncate">{subtitle}</p>}
- </div>
- </div>
- {right ? (
- <div className="shrink-0 ml-2 flex items-center">
- {right}
- </div>
- ) : onClick ? (
- <ChevronRight className="w-5 h-5 text-slate-300 dark:text-[#5C5C5E] ml-2 shrink-0 relative top-[1px]" />
- ) : null}
- </div>
-);
-
-// Shared Group Component
-const SettingsGroup = ({ children, className }) => (
- <div className={clsx("mb-6 sm:mb-8", className)}>
- <div className="bg-white dark:bg-[#1C1C1E] rounded-xl overflow-hidden shadow-sm dark:shadow-none sm:border sm:border-slate-200 sm:dark:border-[#2C2C2E]">
- {children}
- </div>
- </div>
-);
+import { useLogout } from '../hooks/useLogout';
+import { AppHeader } from '../components/ui/AppHeader';
+import { SettingsList, SettingsSection, SettingsRow } from '../components/ui/SettingsList';
+import { AppToggle } from '../components/ui/AppToggle';
+import ConfirmDialog from '../components/organisms/ConfirmDialog';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Settings = () => {
- const { user } = useAuthContext();
- const { themePreference, setThemePreference } = useTheme();
- const { appSettings, updateSetting } = useSettings();
- const { t, i18n } = useTranslation();
- const navigate = useNavigate();
+    const navigate = useNavigate();
+    const { t } = useTranslation();
+    const { user } = useAuthContext();
+    const { themePreference, setThemePreference } = useTheme();
+    const { appSettings, updateSetting } = useSettings();
+    const { logout } = useLogout();
 
- return (
- <div className="pb-12 bg-[#F2F2F7] dark:bg-black min-h-screen text-black dark:text-white font-sans">
- {/* Fixed Sticky Header */}
- <div 
- className="fixed top-0 left-0 right-0 z-40 bg-[#F2F2F7]/80 dark:bg-black/80 backdrop-blur-md border-b border-slate-200 dark:border-white/10 transition-all duration-300"
- style={{ paddingTop: 'env(safe-area-inset-top)' }}
- >
- <div className="max-w-screen-md mx-auto px-4 h-14 flex items-center gap-3">
- <button
- onClick={() => navigate(-1)}
- className="p-2 bg-transparent hover:bg-black/5 dark:bg-transparent dark:hover:bg-white/10 rounded-full transition-colors text-black dark:text-white lg:hidden -ml-2 focus:outline-none"
- >
- <ArrowLeft className="w-6 h-6" />
- </button>
- <h1 className="text-xl font-bold tracking-tight text-black dark:text-white">{t('nav.settings', 'Settings')}</h1>
- </div>
- </div>
+    const [isConfirmSignOutOpen, setIsConfirmSignOutOpen] = useState(false);
+    const [isConfirmResetOpen, setIsConfirmResetOpen] = useState(false);
 
- <div 
- className="max-w-screen-md mx-auto px-4 sm:px-4"
- style={{ paddingTop: 'calc(56px + env(safe-area-inset-top) + 20px)' }}
- >
+    const handleSignOut = async () => {
+        try {
+            await logout();
+            navigate('/');
+        } catch (e) {
+            console.error('Sign out error', e);
+        }
+    };
 
- <div className="px-0 sm:px-0">
- 
+    const handleResetCache = () => {
+        localStorage.clear();
+        window.location.reload();
+    };
 
+    const toggleNotification = (key) => {
+        const current = appSettings.notifications || {};
+        updateSetting('notifications', {
+            ...current,
+            [key]: !current[key]
+        });
+    };
 
- {/* Preferences Group */}
- <SettingsGroup>
- <SettingsRow 
- icon={FileText} 
- iconBgClass="bg-red-500"
- title={t('settings.language', 'Language')} 
- right={
- <div className="relative">
- <select
- value={appSettings.language?.split('-')[0] || 'en'}
- onChange={(e) => updateSetting('language', e.target.value)}
- className="appearance-none bg-slate-100 dark:bg-[#2C2C2E] text-slate-700 dark:text-[#E5E5EA] text-[14px] font-medium rounded-lg px-3 py-1.5 focus:outline-none pr-8 cursor-pointer"
- >
- <option value="en">English</option>
- <option value="ar">العربية</option>
- <option value="kn">ಕನ್ನಡ</option>
- <option value="ml">മലയാളം</option>
- </select>
- <ChevronRight className="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none rotate-90" />
- </div>
- }
- />
- <SettingsRow 
- icon={Clock} 
- iconBgClass="bg-blue-500"
- title="Time Format" 
- isLast
- right={
- <div className="relative">
- <select
- value={appSettings.timeFormat || '12h'}
- onChange={(e) => updateSetting('timeFormat', e.target.value)}
- className="appearance-none bg-slate-100 dark:bg-[#2C2C2E] text-slate-700 dark:text-[#E5E5EA] text-[14px] font-medium rounded-lg px-3 py-1.5 focus:outline-none pr-8 cursor-pointer"
- >
- <option value="12h">12-hour</option>
- <option value="24h">24-hour</option>
- </select>
- <ChevronRight className="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none rotate-90" />
- </div>
- }
- />
- </SettingsGroup>
+    const memberId = `AWK-${user?.uid?.slice(-4).toUpperCase() || 'GUEST'}`;
 
- {/* Appearance Group (iOS Toggle style) */}
- <SettingsGroup>
- <SettingsRow 
- icon={themePreference === 'dark' ? Moon : (themePreference === 'light' ? Sun : Monitor)} 
- iconBgClass={themePreference === 'light' ? "bg-amber-400" : "bg-slate-800 dark:bg-slate-700"}
- title="Theme" 
- isLast
- right={
- <div className="relative">
- <select
- value={themePreference || 'system'}
- onChange={(e) => setThemePreference(e.target.value)}
- className="appearance-none bg-slate-100 dark:bg-[#2C2C2E] text-slate-700 dark:text-[#E5E5EA] text-[14px] font-medium rounded-lg px-3 py-1.5 focus:outline-none pr-8 cursor-pointer"
- >
- <option value="light">Light</option>
- <option value="dark">Dark</option>
- <option value="system">System</option>
- </select>
- <ChevronRight className="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none rotate-90" />
- </div>
- }
- />
- </SettingsGroup>
+    return (
+        <div className="min-h-screen bg-slate-50 dark:bg-black pb-24">
+            <AppHeader 
+                title={t('nav.settings', 'Settings')} 
+                showBack 
+                onBack={() => navigate(-1)}
+            />
 
- {/* Support Group */}
- <SettingsGroup>
- <SettingsRow 
- icon={HelpCircle} 
- iconBgClass="bg-indigo-500"
- title="Help and feedback" 
- onClick={() => navigate('/coming-soon?feature=Help')}
- />
- <SettingsRow 
- icon={UserPlus} 
- iconBgClass="bg-[#34C759]"
- title="Invite a friend" 
- onClick={() => navigate('/coming-soon?feature=Invite')}
- />
- <SettingsRow 
- icon={FileText} 
- iconBgClass="bg-red-500"
- title="Feedback" 
- onClick={() => navigate('/coming-soon?feature=Feedback')}
- />
- </SettingsGroup>
+            <div className="pt-[calc(56px+env(safe-area-inset-top))]">
+                <SettingsList>
+                    {/* Identity Card */}
+                    <div className="px-4 mb-8">
+                        <div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-6 border border-slate-200/50 dark:border-white/5 shadow-sm relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/5 blur-3xl rounded-full translate-x-10 -translate-y-10 group-hover:scale-110 transition-transform duration-700" />
+                            
+                            <div className="flex items-center gap-5 relative z-10">
+                                <div className="w-20 h-20 rounded-[24px] bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-2xl font-bold text-slate-400 dark:text-slate-500 overflow-hidden shrink-0 border border-slate-200 dark:border-white/10 shadow-sm">
+                                    {user?.photoURL ? (
+                                        <img src={user.photoURL} alt={user?.displayName} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span className="uppercase">{user?.displayName?.[0] || 'U'}</span>
+                                    )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <h2 className="text-[20px] font-bold text-slate-900 dark:text-white leading-tight truncate">
+                                        {user?.displayName || 'User'}
+                                    </h2>
+                                    <div className="mt-1 flex flex-col">
+                                        <span className="text-[12px] font-bold text-primary-600 dark:text-primary-400 uppercase tracking-wider">
+                                            {memberId}
+                                        </span>
+                                        <span className="text-[14px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                                            {user?.email}
+                                        </span>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => navigate('/profile')}
+                                    className="w-10 h-10 rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 active:scale-90 transition-all border border-slate-200/50 dark:border-white/5"
+                                >
+                                    <Edit2 className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
- </div>
+                    {/* Appearance */}
+                    <SettingsSection title="Appearance">
+                        <SettingsRow 
+                            icon={themePreference === 'dark' ? Moon : themePreference === 'light' ? Sun : Monitor}
+                            title="Theme"
+                            subtitle={themePreference.charAt(0).toUpperCase() + themePreference.slice(1)}
+                            rightElement={
+                                <select 
+                                    value={themePreference}
+                                    onChange={(e) => setThemePreference(e.target.value)}
+                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <option value="light">Light</option>
+                                    <option value="dark">Dark</option>
+                                    <option value="system">System</option>
+                                </select>
+                            }
+                        />
+                        <SettingsRow 
+                            icon={Globe}
+                            title="Language"
+                            subtitle={appSettings.language === 'en' ? 'English' : appSettings.language === 'ar' ? 'Arabic' : 'Regional'}
+                            rightElement={
+                                <select 
+                                    value={appSettings.language}
+                                    onChange={(e) => updateSetting('language', e.target.value)}
+                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <option value="en">English</option>
+                                    <option value="ar">العربية</option>
+                                    <option value="kn">ಕನ್ನಡ</option>
+                                    <option value="ml">മലയാളಂ</option>
+                                </select>
+                            }
+                        />
+                        <SettingsRow 
+                            icon={Clock}
+                            title="Time Format"
+                            isLast
+                            rightElement={
+                                <select 
+                                    value={appSettings.timeFormat}
+                                    onChange={(e) => updateSetting('timeFormat', e.target.value)}
+                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <option value="12h">12-hour</option>
+                                    <option value="24h">24-hour</option>
+                                </select>
+                            }
+                        />
+                    </SettingsSection>
 
- <p className="text-center text-[12px] text-slate-400 dark:text-[#8E8E93] mt-8 mb-4 tracking-wide font-medium">
- HUMI AWAKE v1.2.0 • Build ID: 88AF2
- </p>
- </div>
- </div>
- );
+                    {/* Notifications */}
+                    <SettingsSection title="Notifications">
+                        <SettingsRow 
+                            icon={Bell}
+                            title="Global Notifications"
+                            subtitle="All alerts and reminders"
+                            rightElement={
+                                <AppToggle 
+                                    checked={appSettings.notifications?.global} 
+                                    onChange={() => toggleNotification('global')}
+                                />
+                            }
+                        />
+                        <SettingsRow 
+                            icon={Heart}
+                            title="Ramadan Alerts"
+                            rightElement={
+                                <AppToggle 
+                                    checked={appSettings.notifications?.ramadan} 
+                                    onChange={() => toggleNotification('ramadan')}
+                                />
+                            }
+                        />
+                        <SettingsRow 
+                            icon={Handshake}
+                            title="Finance Reminders"
+                            rightElement={
+                                <AppToggle 
+                                    checked={appSettings.notifications?.finance} 
+                                    onChange={() => toggleNotification('finance')}
+                                />
+                            }
+                        />
+                        <SettingsRow 
+                            icon={Car}
+                            title="Vehicle Maintenance"
+                            isLast
+                            rightElement={
+                                <AppToggle 
+                                    checked={appSettings.notifications?.vehicle} 
+                                    onChange={() => toggleNotification('vehicle')}
+                                />
+                            }
+                        />
+                    </SettingsSection>
+
+                    {/* Security & Data */}
+                    <SettingsSection title="Security & Data">
+                        <SettingsRow 
+                            icon={KeyRound}
+                            title="Update Password"
+                            onClick={() => navigate('/profile')}
+                        />
+                        <SettingsRow 
+                            icon={Database}
+                            title="Export All Data"
+                            subtitle="JSON summary"
+                            onClick={() => navigate('/profile')}
+                            isLast
+                        />
+                    </SettingsSection>
+
+                    {/* About */}
+                    <SettingsSection title="About">
+                        <SettingsRow 
+                            icon={Info}
+                            title="App Version"
+                            subtitle="v1.2.0"
+                        />
+                        <SettingsRow 
+                            icon={UserPlus}
+                            title="Invite Friends"
+                            onClick={() => navigate('/coming-soon?feature=Invite')}
+                        />
+                        <SettingsRow 
+                            icon={Smartphone}
+                            title="Device Info"
+                            isLast
+                            subtitle={navigator.platform}
+                        />
+                    </SettingsSection>
+
+                    {/* Actions */}
+                    <SettingsSection title="Actions">
+                        <SettingsRow 
+                            icon={Trash2}
+                            title="Reset Local Cache"
+                            isDanger
+                            onClick={() => setIsConfirmResetOpen(true)}
+                        />
+                        <SettingsRow 
+                            icon={LogOut}
+                            title="Sign Out"
+                            isDanger
+                            isLast
+                            onClick={() => setIsConfirmSignOutOpen(true)}
+                        />
+                    </SettingsSection>
+
+                    <p className="text-center text-[12px] text-slate-400 dark:text-slate-600 mt-2 font-medium tracking-tight">
+                        HUMI AWAKE • BUILD 88AF2
+                    </p>
+                </SettingsList>
+            </div>
+
+            <ConfirmDialog 
+                isOpen={isConfirmSignOutOpen}
+                onClose={() => setIsConfirmSignOutOpen(false)}
+                onConfirm={handleSignOut}
+                title="Sign Out"
+                message="Are you sure you want to sign out? You will need to log in again to access your data."
+                confirmText="Sign Out"
+                isDestructive
+            />
+
+            <ConfirmDialog 
+                isOpen={isConfirmResetOpen}
+                onClose={() => setIsConfirmResetOpen(false)}
+                onConfirm={handleResetCache}
+                title="Reset Cache"
+                message="This will clear all local data and reload the app. Your cloud data is safe."
+                confirmText="Reset"
+                isDestructive
+            />
+        </div>
+    );
 };
 
 export default Settings;

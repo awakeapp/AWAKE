@@ -20,7 +20,13 @@ export const SettingsProvider = ({ children }) => {
     const [appSettings, setAppSettings] = useState(() => {
         return {
             language: localStorage.getItem('appLanguage') || 'en',
-            timeFormat: localStorage.getItem('appTimeFormat') || '12h'
+            timeFormat: localStorage.getItem('appTimeFormat') || '12h',
+            notifications: {
+                global: true,
+                ramadan: true,
+                finance: true,
+                vehicle: true
+            }
         }
     });
 

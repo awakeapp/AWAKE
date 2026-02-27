@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useVehicle } from '../../context/VehicleContext';
 import { 
     Home, Wallet, Settings, Landmark, MoreVertical, ChevronDown, 
-    Plus, Car, Download, Archive, Edit2, ShieldAlert, List
+    Plus, Car, Download, Archive, Edit2, ShieldAlert, List, Wrench, MoreHorizontal
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
@@ -220,75 +220,13 @@ const VehicleDashboard = () => {
                     </div>
 
                     {/* Right: More Menu */}
-                    <div className="relative" ref={menuRef}>
+                    <div>
                         <button 
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            onClick={() => navigate('/vehicle/more')}
                             className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-300"
                         >
                             <MoreVertical className="w-5 h-5" />
                         </button>
-                        
-                        <AnimatePresence>
-                            {isMenuOpen && activeVehicle && (
-                                <motion.div 
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.95 }}
-                                    className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden z-50 origin-top-right"
-                                >
-                                    <div className="p-1">
-                                        <button 
-                                            onClick={() => {
-                                                setIsMenuOpen(false);
-                                                setIsManageVehiclesOpen(true);
-                                            }}
-                                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-xl transition-colors text-left"
-                                        >
-                                            <Car className="w-4 h-4 text-slate-400" /> 
-                                            Manage Vehicles
-                                        </button>
-                                        <button 
-                                            onClick={() => {
-                                                setIsMenuOpen(false);
-                                                alert("Insurance Management Module Coming Soon");
-                                            }}
-                                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-xl transition-colors text-left"
-                                        >
-                                            <ShieldAlert className="w-4 h-4 text-emerald-500" /> 
-                                            Insurance Details
-                                        </button>
-                                        <button 
-                                            onClick={() => {
-                                                setIsMenuOpen(false);
-                                                alert("Maintenance Templates Module Coming Soon");
-                                            }}
-                                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-xl transition-colors text-left"
-                                        >
-                                            <Settings className="w-4 h-4 text-blue-500" /> 
-                                            Manage Templates
-                                        </button>
-                                        <button 
-                                            onClick={exportCSV}
-                                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-xl transition-colors text-left"
-                                        >
-                                            <Download className="w-4 h-4 text-indigo-500" /> 
-                                            Export Data (CSV)
-                                        </button>
-                                        <div className="h-px bg-slate-100 dark:bg-slate-700 my-1 mx-2" />
-                                        <button 
-                                            onClick={() => {
-                                                setIsMenuOpen(false);
-                                                setArchiveConfirmId(activeVehicle.id);
-                                            }}
-                                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-xl transition-colors text-left"
-                                        >
-                                            <Archive className="w-4 h-4" /> 
-                                            Archive Vehicle
-                                        </button>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
                     </div>
                 </div>
             </header>
@@ -401,10 +339,10 @@ const VehicleDashboard = () => {
             {/* Internal Bottom Navigation */}
             <AppBottomNav 
                 items={[
-                    { id: 'app-home', icon: Home, label: 'App Home', onClick: () => navigate('/') },
+                    { id: 'app-home', icon: Home, label: 'AWAKE', onClick: () => navigate('/') },
                     { 
                         id: 'service', 
-                        icon: Settings, 
+                        icon: Wrench, 
                         label: 'Service', 
                         isActive: activeTab === 'service', 
                         onClick: () => setActiveTab('service') 
@@ -425,10 +363,10 @@ const VehicleDashboard = () => {
                         onClick: () => setActiveTab('loan') 
                     },
                     { 
-                        id: 'manage', 
-                        icon: List, 
-                        label: 'Manage', 
-                        onClick: () => setIsManageVehiclesOpen(true) 
+                        id: 'more', 
+                        icon: MoreHorizontal, 
+                        label: 'More', 
+                        onClick: () => navigate('/vehicle/more') 
                     }
                 ]} 
             />
