@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { useRamadan } from '../../context/RamadanContext';
 import { usePrayer } from '../../context/PrayerContext';

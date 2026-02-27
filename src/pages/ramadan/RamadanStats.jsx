@@ -6,23 +6,27 @@ import clsx from 'clsx';
 const StatCard = ({ title, icon: Icon, value, target, percent, colorClass = "bg-emerald-500", textClass = "text-emerald-500" }) => {
     const displayPercent = percent > 100 ? 100 : percent;
     return (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-sm">
-            <div className="flex items-center gap-3 mb-4">
-                <div className={clsx("p-2 rounded-xl bg-opacity-10", textClass, colorClass.replace('bg-', 'bg-').replace('500', '500/10'))}>
-                    <Icon className={clsx("w-5 h-5", textClass)} />
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                    <div className={clsx("p-2.5 rounded-xl bg-opacity-10", textClass, colorClass.replace('bg-', 'bg-').replace('500', '500/10'))}>
+                        <Icon className={clsx("w-5 h-5", textClass)} />
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-slate-800 dark:text-slate-200 text-[14px] leading-tight">{title}</h3>
+                        <p className="text-[11px] font-semibold text-slate-400 mt-0.5 uppercase tracking-wider">{Math.round(percent)}% Completed</p>
+                    </div>
                 </div>
-                <h3 className="font-semibold text-black dark:text-white text-[15px]">{title}</h3>
             </div>
             
-            <div className="flex items-end justify-between mb-2">
+            <div className="flex items-end justify-between mb-3 mt-2">
                 <div className="flex items-baseline gap-1">
-                    <span className="text-[28px] font-black tracking-tight text-black dark:text-white tabular-nums leading-none">{value}</span>
-                    {target && <span className="text-[13px] text-slate-500 font-medium">/ {target}</span>}
+                    <span className="text-[32px] font-black tracking-tight text-slate-900 dark:text-white tabular-nums leading-none">{value}</span>
+                    {target && <span className="text-[14px] text-slate-400 font-semibold mb-1">/ {target}</span>}
                 </div>
-                <span className={clsx("text-[13px] font-bold", textClass)}>{Math.round(percent)}%</span>
             </div>
             
-            <div className="w-full bg-slate-100 dark:bg-[#2C2C2E] rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-slate-100 dark:bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
                 <div 
                     className={clsx("h-full rounded-full transition-all duration-1000", colorClass)} 
                     style={{ width: `${displayPercent}%` }}
@@ -108,7 +112,7 @@ const RamadanStats = () => {
                     </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
                 <StatCard 
                     title="Fasting Days" 
                     icon={Sun} 
@@ -128,7 +132,7 @@ const RamadanStats = () => {
                     textClass="text-blue-500"
                 />
                 <StatCard 
-                    title="Taraweeh Completed" 
+                    title="Taraweeh Done" 
                     icon={Moon} 
                     value={totalTaraweeh} 
                     target={currentDay} 

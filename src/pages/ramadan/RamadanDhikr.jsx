@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRamadan } from '../../context/RamadanContext';
+import { usePrayer } from '../../context/PrayerContext';
 import { BookOpen, Target, Settings2, Activity, Check, Plus } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -20,49 +21,65 @@ const CounterCard = ({ title, count, target, onSave, accentClass }) => {
  setTimeout(() => setSaved(false), 1500);
  }
  };
+ 
+ const handleAddOne = () => {
+ const newVal = count + 1;
+ onSave(newVal);
+ // The parent state update will trickle down and fire the useEffect sync,
+ // but we can optimistically update the inputVal right away.
+ setInputVal(String(newVal));
+ };
 
  const progress = target > 0 ? Math.min((count / target) * 100, 100) : 0;
 
  return (
- <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-sm">
- <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3">{title}</h3>
+ <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl p-5 shadow-sm relative overflow-hidden group hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+ <h3 className="text-[12px] font-bold text-slate-500 uppercase tracking-widest mb-4">{title}</h3>
 
- {/* Count display */}
- <div className="flex items-end gap-2 mb-3">
- <span className="text-4xl font-black text-black dark:text-white tabular-nums leading-none tracking-tight">{count}</span>
- {target > 0 && <span className="text-sm font-medium text-slate-400 mb-1">/ {target}</span>}
+ <div className="flex items-end justify-between mb-5">
+ <div className="flex items-baseline gap-2">
+ <span className="text-5xl font-black text-black dark:text-white tabular-nums leading-none tracking-tight">{count}</span>
+ {target > 0 && <span className="text-sm font-semibold text-slate-400">/ {target}</span>}
+ </div>
+ 
+ <button 
+ onClick={handleAddOne}
+ className={clsx(
+ "w-14 h-14 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform text-white",
+ accentClass
+ )}
+ >
+ <Plus className="w-8 h-8" />
+ </button>
  </div>
 
- {/* Progress bar */}
  {target > 0 && (
- <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden mb-4">
+ <div className="w-full bg-slate-100 dark:bg-slate-800/80 rounded-full h-1.5 overflow-hidden mb-5">
  <div
- className={clsx("h-full rounded-full transition-all duration-500", accentClass)}
+ className={clsx("h-full rounded-full transition-all duration-300", accentClass)}
  style={{ width: `${progress}%` }}
  />
  </div>
  )}
 
- {/* Manual input row */}
- <div className="flex flex-wrap items-center gap-2 mt-2">
+ <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-slate-100 dark:border-slate-800/60">
  <input
  type="number"
  min="0"
  value={inputVal}
  onChange={e => setInputVal(e.target.value)}
  onKeyDown={e => e.key === 'Enter' && handleSave()}
- placeholder="Enter count"
- className="flex-1 min-w-0 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-400"
- style={{ touchAction: 'manipulation' }}
+ placeholder="Set value..."
+ className="flex-1 min-w-0 bg-transparent border-b border-transparent focus:border-indigo-400 dark:focus:border-indigo-500 px-1 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 focus:outline-none transition-colors"
  />
  <button
  onClick={handleSave}
  className={clsx(
- "shrink-0 px-4 py-2.5 rounded-lg text-sm font-bold text-white transition-colors duration-75 flex items-center gap-1",
- saved ? "bg-emerald-500" : accentClass
+ "shrink-0 px-3 py-1.5 rounded-md text-xs font-bold text-white transition-all shadow-sm",
+ saved ? "bg-emerald-500" : "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700"
  )}
  >
- {saved ? <><Check className="w-4 h-4" /> Saved</> : "Save"}
+ {saved ? "Saved" : "Set"}
  </button>
  </div>
  </div>
@@ -173,6 +190,7 @@ const QuranGoalWidget = ({ ramadanData, updateQuranGoal, currentDay }) => {
 
 const RamadanDhikr = () => {
  const { loading, error, ramadanData, updateRamadanDay, updateQuranGoal, updateCustomDhikr, hijriDate } = useRamadan();
+ const { serverTodayKey } = usePrayer();
  const [now, setNow] = useState(new Date());
  const [isAddingDhikr, setIsAddingDhikr] = useState(false);
  const [newDhikrName, setNewDhikrName] = useState('');
@@ -200,7 +218,6 @@ const RamadanDhikr = () => {
  );
  }
 
-    const { serverTodayKey } = usePrayer();
     const todayKey = serverTodayKey || now.toLocaleDateString('en-CA');
     const todayData = ramadanData?.days?.[todayKey] || {};
 
