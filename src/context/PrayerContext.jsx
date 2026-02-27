@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import * as locationService from '../services/locationService';
+import * as adhan from 'adhan';
 
 const PrayerContext = createContext();
 
@@ -148,13 +149,18 @@ export const PrayerProvider = ({ children }) => {
                 }
 
                 // B. Determine Settings (defaults already set in state)
-                let currentMethod = settings.method || 2; 
+                let currentMethod = settings.method || 'MuslimWorldLeague'; 
                 let currentMadhab = settings.madhab || 0; 
                 let currentHijriOffset = settings.hijriOffset ?? 0;
-                let currentTimezone = 'Asia/Kolkata'; // Always default to India for this refactor
+                let currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata';
 
-                // C. Fetch AlAdhan API
-                const dateStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+                // C. Local Calculation using adhan library
+                const date = new Date();
+                const year = date.getFullYear();
+                const month = date.getMonth() + 1;
+                const day = date.getDate();
+                const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                
                 const cacheKey = `${STORAGE_KEY_PRAYER}_${dateStr}_${location.lat.toFixed(2)}_${location.lng.toFixed(2)}_${currentMethod}_${currentMadhab}_${currentHijriOffset}`;
                 
                 const cachedData = localStorage.getItem(cacheKey);
@@ -169,60 +175,78 @@ export const PrayerProvider = ({ children }) => {
                 }
 
                 try {
-                    const timestamp = Math.floor(Date.now() / 1000);
-                    // Explicitly pass timezone parameter as requested
-                    const resPrayer = await fetch(
-                        `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${location.lat}&longitude=${location.lng}&method=${currentMethod}&school=${currentMadhab}&adjustment=${currentHijriOffset}&timezone=${currentTimezone}`,
-                        { signal: abortController.signal }
-                    );
+                    const coords = new adhan.Coordinates(location.lat, location.lng);
                     
-                    if (!resPrayer.ok) throw new Error("Failed to fetch timings");
-                    const dataPrayer = await resPrayer.json();
-
-                    if (dataPrayer.code === 200 && !abortController.signal.aborted) {
-                        const hijri = dataPrayer.data.date.hijri;
-                        const cleanHijriMonth = hijri.month.en.replace(/\s/g, '');
-                        let hijriDay = parseInt(hijri.day, 10);
-                        let hijriMonthNumber = hijri.month.number;
-                        let hijriYear = parseInt(hijri.year, 10);
-
-                        // Apply manual hijri offset since AlAdhan API ignores it on this endpoint
-                        if (currentHijriOffset !== 0) {
-                            hijriDay += currentHijriOffset;
-                            if (hijriDay > 30) {
-                                hijriDay -= 30;
-                                hijriMonthNumber += 1;
-                                if (hijriMonthNumber > 12) {
-                                    hijriMonthNumber = 1;
-                                    hijriYear += 1;
-                                }
-                            } else if (hijriDay < 1) {
-                                hijriDay += 30;
-                                hijriMonthNumber -= 1;
-                                if (hijriMonthNumber < 1) {
-                                    hijriMonthNumber = 12;
-                                    hijriYear -= 1;
-                                }
-                            }
-                        }
-                        
-                        const gregorianStr = dataPrayer.data.date.gregorian.date; // e.g. "27-02-2026"
-                        const [gDay, gMonth, gYear] = gregorianStr.split('-');
-                        const serverTodayKey = `${gYear}-${gMonth}-${gDay}`; // "YYYY-MM-DD"
-
-                        const pData = {
-                            dailyTimings: dataPrayer.data.timings,
-                            hijriDate: {
-                                day: hijriDay,
-                                month: hijriMonthNumber,
-                                monthName: cleanHijriMonth,
-                                year: hijriYear,
-                                isRamadan: hijriMonthNumber === 9
-                            },
-                            serverTodayKey,
-                            timezone: dataPrayer.data.meta.timezone || currentTimezone
+                    let methodFn;
+                    if (typeof currentMethod === 'string' && typeof adhan.CalculationMethod[currentMethod] === 'function') {
+                        methodFn = adhan.CalculationMethod[currentMethod]();
+                    } else {
+                        // fallback for old numeric settings
+                        const methodMap = {
+                            1: 'Karachi', 2: 'NorthAmerica', 3: 'MuslimWorldLeague',
+                            4: 'UmmAlQura', 5: 'Egyptian', 8: 'Qatar',
+                            11: 'Singapore', 17: 'Other', 20: 'Other'
                         };
-                        
+                        const methodName = methodMap[currentMethod] || 'MuslimWorldLeague';
+                        methodFn = adhan.CalculationMethod[methodName]();
+                    }
+                    
+                    methodFn.madhab = currentMadhab === 1 ? adhan.Madhab.Hanafi : adhan.Madhab.Shafi;
+                    
+                    const prayerTimes = new adhan.PrayerTimes(coords, date, methodFn);
+                    
+                    // Format times
+                    const formatTime = (d) => {
+                        if (!d) return null;
+                        return d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                    };
+                    
+                    const dailyTimings = {
+                        Fajr: formatTime(prayerTimes.fajr),
+                        Sunrise: formatTime(prayerTimes.sunrise),
+                        Dhuhr: formatTime(prayerTimes.dhuhr),
+                        Asr: formatTime(prayerTimes.asr),
+                        Maghrib: formatTime(prayerTimes.maghrib),
+                        Isha: formatTime(prayerTimes.isha)
+                    };
+
+                    // Hijri Calculation using native Intl API
+                    const targetDate = new Date(date);
+                    if (currentHijriOffset !== 0) {
+                        targetDate.setDate(targetDate.getDate() + currentHijriOffset);
+                    }
+                    
+                    const hijriDtf = new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura', {
+                        day: 'numeric', month: 'numeric', year: 'numeric'
+                    });
+                    const hijriNameDtf = new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura', { month: 'long' });
+                    
+                    const hParts = hijriDtf.formatToParts(targetDate);
+                    const hNameParts = hijriNameDtf.formatToParts(targetDate);
+                    
+                    const getPart = (parts, type) => parts.find(p => p.type === type)?.value;
+                    const hDay = parseInt(getPart(hParts, 'day'), 10) || 1;
+                    const hMonth = parseInt(getPart(hParts, 'month'), 10) || 1;
+                    const hYear = parseInt(getPart(hParts, 'year'), 10) || 1445;
+                    const hMonthName = getPart(hNameParts, 'month') || 'Muharram';
+                    
+                    // Server sync date for Firestore "YYYY-MM-DD"
+                    const serverTodayKey = dateStr;
+
+                    const pData = {
+                        dailyTimings,
+                        hijriDate: {
+                            day: hDay,
+                            month: hMonth,
+                            monthName: hMonthName,
+                            year: hYear,
+                            isRamadan: hMonth === 9
+                        },
+                        serverTodayKey,
+                        timezone: currentTimezone
+                    };
+                    
+                    if (!abortController.signal.aborted) {
                         // Cleanup old caches
                         Object.keys(localStorage).forEach(key => {
                             if (key.startsWith(STORAGE_KEY_PRAYER)) localStorage.removeItem(key);
@@ -234,8 +258,8 @@ export const PrayerProvider = ({ children }) => {
                     }
                 } catch (prayerErr) {
                     if (!abortController.signal.aborted) {
-                        console.error("Prayer API fetch failed:", prayerErr);
-                        setError("Timings unavailable. Please check your connection.");
+                        console.error("Local Adhan API calculation failed:", prayerErr);
+                        setError("Timings unavailable. Please check your settings.");
                     }
                 }
             } catch (err) {

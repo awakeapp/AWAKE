@@ -165,6 +165,7 @@ const RamadanDashboard = () => {
     let countdownStr = '';
     let suhoorTimeStr = '--:--';
     let iftarTimeStr = '--:--';
+    let isSuhoorEndingSoon = false;
 
     if (dailyTimings) {
         const { Fajr, Maghrib } = dailyTimings;
@@ -186,6 +187,7 @@ const RamadanDashboard = () => {
         if (now < fajrTime) {
             nextEvent = 'Suhoor ends in';
             countdownStr = formatDiff(fajrTime - now);
+            isSuhoorEndingSoon = (fajrTime - now) <= 10 * 60 * 1000;
         } else if (now < maghribTime) {
             nextEvent = 'Iftar in';
             countdownStr = formatDiff(maghribTime - now);
@@ -275,13 +277,21 @@ const RamadanDashboard = () => {
             {/* Suhoor and Iftar Highlights */}
             {dailyTimings && (
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center shadow-sm">
-                        <span className="text-slate-500 text-[11px] font-semibold uppercase tracking-wider mb-1.5">Suhoor Ends</span>
-                        <span className="text-black dark:text-white text-[24px] font-bold tracking-tight">{suhoorTimeStr}</span>
+                    <div className={clsx("border rounded-xl p-4 flex flex-col items-center justify-center shadow-sm transition-colors", 
+                        isSuhoorEndingSoon ? "bg-red-50 dark:bg-red-900/20 border-red-500/50" : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+                    )}>
+                        <span className={clsx("text-[11px] font-semibold uppercase tracking-wider mb-1.5", 
+                            isSuhoorEndingSoon ? "text-red-600 dark:text-red-400 animate-pulse" : "text-slate-500"
+                        )}>
+                            Suhoor Ends {isSuhoorEndingSoon && '(Ending!)'}
+                        </span>
+                        <span className={clsx("text-[24px] font-bold tracking-tight",
+                            isSuhoorEndingSoon ? "text-red-600 dark:text-red-400" : "text-black dark:text-white"
+                        )}>{suhoorTimeStr}</span>
                     </div>
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center shadow-sm">
-                        <span className="text-slate-500 text-[11px] font-semibold uppercase tracking-wider mb-1.5">Iftar Time</span>
-                        <span className="text-black dark:text-white text-[24px] font-bold tracking-tight">{iftarTimeStr}</span>
+                    <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-500/30 rounded-xl p-4 flex flex-col items-center justify-center shadow-sm">
+                        <span className="text-emerald-600 dark:text-emerald-400 text-[11px] font-semibold uppercase tracking-wider mb-1.5">Iftar Time</span>
+                        <span className="text-emerald-600 dark:text-emerald-400 text-[24px] font-bold tracking-tight">{iftarTimeStr}</span>
                     </div>
                 </div>
             )}

@@ -38,7 +38,7 @@ const ModeSelector = ({ value, onChange }) => (
     </div>
 );
 
-const PrayerRow = ({ prayerKey, label, time, data, onUpdate, allowMode, allowCount, isLast }) => {
+const PrayerRow = ({ prayerKey, label, time, data, onUpdate, allowMode, allowCount, isLast, isActive }) => {
     const completed = data[prayerKey] || false;
     const mode = data[`${prayerKey}Mode`] || 'jamaah';
     const count = data[`${prayerKey}Count`] || 0;
@@ -47,15 +47,17 @@ const PrayerRow = ({ prayerKey, label, time, data, onUpdate, allowMode, allowCou
         <div 
             onClick={() => onUpdate(prayerKey, !completed)}
             className={clsx(
-            "flex items-center min-h-[56px] justify-between py-2 px-0 transition-colors cursor-pointer select-none",
-            !isLast && "border-b border-slate-100 dark:border-[#38383A]"
+            "flex items-center min-h-[56px] justify-between py-2 transition-colors cursor-pointer select-none",
+            !isLast && !isActive && "border-b border-slate-100 dark:border-[#38383A]",
+            isActive ? "bg-emerald-50 dark:bg-emerald-900/20 -mx-3 px-3 rounded-xl border border-emerald-500/30 my-1 shadow-sm" : "px-0"
         )}>
             <div className="flex items-center justify-between flex-1 min-w-0 gap-2 pr-3">
                 <span className={clsx(
-                    "text-[15px] font-medium leading-tight truncate",
-                    completed ? "text-slate-900 dark:text-white" : "text-slate-500 dark:text-slate-400"
+                    "text-[15px] leading-tight truncate flex items-center gap-2",
+                    isActive ? "font-bold text-emerald-700 dark:text-emerald-400" : (completed ? "font-medium text-slate-900 dark:text-white" : "font-medium text-slate-500 dark:text-slate-400")
                 )}>
                     {label}
+                    {isActive && <span className="text-[9px] uppercase tracking-wider bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded flex-shrink-0">Now</span>}
                 </span>
                 
                 {time && (
@@ -111,9 +113,12 @@ const PrayerTracker = () => {
     
     // Fallback to local date if API hasn't loaded, ensures dynamic updates across midnight
     const [todayKey, setTodayKey] = useState(serverTodayKey || new Date().toLocaleDateString('en-CA'));
+    const [now, setNow] = useState(new Date());
     
     // Update whenever serverKey changes
     useEffect(() => {
+        const timer = setInterval(() => setNow(new Date()), 1000);
+        
         if (serverTodayKey) {
             setTodayKey(serverTodayKey);
         } else {
@@ -121,8 +126,9 @@ const PrayerTracker = () => {
             const interval = setInterval(() => {
                 setTodayKey(new Date().toLocaleDateString('en-CA'));
             }, 60000);
-            return () => clearInterval(interval);
+            return () => { clearInterval(interval); clearInterval(timer); };
         }
+        return () => clearInterval(timer);
     }, [serverTodayKey]);
 
     const todayData = ramadanData?.days?.[todayKey] || {};
@@ -168,6 +174,36 @@ const PrayerTracker = () => {
 
     const allOtherPrayers = [...EXTRA_PRAYERS, ...customPrayers];
 
+    const parseTime = (timeStr) => {
+        if (!timeStr) return null;
+        try {
+            const timePart = timeStr.split(' ')[0];
+            const [hours, mins] = timePart.split(':');
+            const d = new Date(now);
+            d.setHours(parseInt(hours, 10), parseInt(mins, 10), 0, 0);
+            return d;
+        } catch { return null; }
+    };
+
+    let activePrayer = null;
+    if (dailyTimings) {
+        const times = PRAYERS.map(p => ({
+            key: p.key,
+            date: parseTime(dailyTimings[p.label])
+        })).filter(t => t.date);
+
+        times.sort((a,b) => a.date - b.date);
+
+        for (let i = times.length - 1; i >= 0; i--) {
+            if (now >= times[i].date) {
+                activePrayer = times[i].key;
+                break;
+            }
+        }
+        // If it's before Fajr, the active prayer is technically Isha of previous day, but we'll show no active prayer block for today or Isha. 
+        if (!activePrayer && times.length > 0) activePrayer = times[times.length -1].key;
+    }
+
     return (
         <div className="space-y-6">
             {/* 5 Daily Prayers */}
@@ -192,6 +228,7 @@ const PrayerTracker = () => {
                                 allowMode={p.allowMode}
                                 allowCount={false}
                                 isLast={idx === PRAYERS.length - 1}
+                                isActive={activePrayer === p.key}
                             />
                         );
                     })}

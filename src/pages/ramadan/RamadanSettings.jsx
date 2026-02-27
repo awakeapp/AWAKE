@@ -24,15 +24,18 @@ const RamadanSettings = () => {
     }, [calculationMethod, madhab, hijriOffset]);
 
     const ALADHAN_METHODS = [
-        { id: 2, name: 'ISNA' },
-        { id: 1, name: 'Karachi' },
-        { id: 3, name: 'MWL' },
-        { id: 4, name: 'Umm Al-Qura' },
-        { id: 5, name: 'Egyptian' },
-        { id: 8, name: 'Gulf Region' },
-        { id: 11, name: 'MUIS (SG)' },
-        { id: 17, name: 'JAKIM (MY)' },
-        { id: 20, name: 'Kemenag (ID)' },
+        { id: 'NorthAmerica', name: 'ISNA' },
+        { id: 'Karachi', name: 'Karachi' },
+        { id: 'MuslimWorldLeague', name: 'MWL' },
+        { id: 'UmmAlQura', name: 'Umm Al-Qura' },
+        { id: 'Egyptian', name: 'Egyptian' },
+        { id: 'Dubai', name: 'Dubai' },
+        { id: 'Kuwait', name: 'Kuwait' },
+        { id: 'Qatar', name: 'Qatar' },
+        { id: 'Singapore', name: 'MUIS (SG)' },
+        { id: 'Tehran', name: 'Tehran' },
+        { id: 'Turkey', name: 'Turkey' },
+        { id: 'Other', name: 'Other' },
     ];
 
     const MADHABS = [
@@ -64,7 +67,7 @@ const RamadanSettings = () => {
                             rightElement={
                                 <select
                                     value={localSettings.method || ''}
-                                    onChange={(e) => handleChange('method', Number(e.target.value))}
+                                    onChange={(e) => handleChange('method', e.target.value)}
                                     className="appearance-none bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer"
                                 >
                                     {ALADHAN_METHODS.map(m => (
