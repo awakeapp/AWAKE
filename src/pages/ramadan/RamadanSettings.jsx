@@ -110,56 +110,44 @@ const RamadanSettings = () => {
                     
                     {/* General Group */}
                     <SettingsGroup>
-                        <div className="relative">
                             <SettingsRow 
                                 icon={Globe2} 
                                 title="Calculation Method" 
-                                className="pointer-events-none" // Let the select handle clicks
                                 right={
-                                    <div className="flex items-center bg-slate-100 dark:bg-[#2C2C2E] px-3 py-1.5 rounded-lg">
-                                        <span className="text-[15px] text-slate-500 dark:text-[#8E8E93] mr-1.5 font-medium">
-                                            {ALADHAN_METHODS.find(m => m.id === localSettings.method)?.name || 'Select'}
-                                        </span>
-                                        <ChevronRight className="w-4 h-4 text-slate-300 dark:text-[#5C5C5E]" />
+                                    <div className="flex items-center bg-slate-100 dark:bg-[#2C2C2E] rounded-lg relative">
+                                        <select
+                                            value={localSettings.method || ''}
+                                            onChange={(e) => handleChange('method', Number(e.target.value))}
+                                            className="bg-transparent text-[13px] sm:text-[15px] text-slate-600 dark:text-[#8E8E93] font-medium appearance-none outline-none py-1.5 pl-3 pr-8 cursor-pointer relative z-10"
+                                        >
+                                            {ALADHAN_METHODS.map(m => (
+                                                <option key={m.id} value={m.id} className="text-black bg-white dark:bg-slate-800">{m.name}</option>
+                                            ))}
+                                        </select>
+                                        <ChevronRight className="w-4 h-4 text-slate-400 dark:text-[#5C5C5E] absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none z-0" />
                                     </div>
                                 }
                             />
-                            <select
-                                value={localSettings.method || ''}
-                                onChange={(e) => handleChange('method', Number(e.target.value))}
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                            >
-                                {ALADHAN_METHODS.map(m => (
-                                    <option key={m.id} value={m.id}>{m.name}</option>
-                                ))}
-                            </select>
-                        </div>
                         
-                        <div className="relative">
                             <SettingsRow 
                                 icon={BookOpen} 
                                 title="Asr Madhab" 
                                 isLast={true}
-                                className="pointer-events-none" // Let the select handle clicks
                                 right={
-                                    <div className="flex items-center bg-slate-100 dark:bg-[#2C2C2E] px-3 py-1.5 rounded-lg">
-                                        <span className="text-[15px] text-slate-500 dark:text-[#8E8E93] mr-1.5 font-medium">
-                                            {MADHABS.find(m => m.id === localSettings.madhab)?.name || 'Select'}
-                                        </span>
-                                        <ChevronRight className="w-4 h-4 text-slate-300 dark:text-[#5C5C5E]" />
+                                    <div className="flex items-center bg-slate-100 dark:bg-[#2C2C2E] rounded-lg relative">
+                                        <select
+                                            value={localSettings.madhab ?? ''}
+                                            onChange={(e) => handleChange('madhab', Number(e.target.value))}
+                                            className="bg-transparent text-[13px] sm:text-[15px] text-slate-600 dark:text-[#8E8E93] font-medium appearance-none outline-none py-1.5 pl-3 pr-8 cursor-pointer relative z-10"
+                                        >
+                                            {MADHABS.map(m => (
+                                                <option key={m.id} value={m.id} className="text-black bg-white dark:bg-slate-800">{m.name}</option>
+                                            ))}
+                                        </select>
+                                        <ChevronRight className="w-4 h-4 text-slate-400 dark:text-[#5C5C5E] absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none z-0" />
                                     </div>
                                 }
                             />
-                            <select
-                                value={localSettings.madhab ?? ''}
-                                onChange={(e) => handleChange('madhab', Number(e.target.value))}
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                            >
-                                {MADHABS.map(m => (
-                                    <option key={m.id} value={m.id}>{m.name}</option>
-                                ))}
-                            </select>
-                        </div>
                     </SettingsGroup>
 
                     {/* Location Group */}

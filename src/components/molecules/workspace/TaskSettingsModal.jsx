@@ -5,11 +5,14 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useScrollLock } from '../../../hooks/useScrollLock';
+import ConfirmDialog from '../../organisms/ConfirmDialog';
 
 const TaskSettingsModal = ({ isOpen, onClose }) => {
     useScrollLock(isOpen);
     const { settings, updateSettings, clearAllTasks } = useTasks();
     const [view, setView] = useState('main'); // 'main' | 'settings'
+    const [isClearing, setIsClearing] = useState(false);
+    const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
     const navigate = useNavigate();
 
     if (!isOpen) return null;
@@ -28,17 +31,15 @@ const TaskSettingsModal = ({ isOpen, onClose }) => {
     };
 
     const handleClearTasks = async () => {
-        if (window.confirm("Are you sure you want to permanently delete ALL tasks? This action cannot be undone.")) {
-            setIsClearing(true);
-            try {
-                await clearAllTasks();
-                onClose();
-            } catch (error) {
-                console.error("Failed to clear tasks", error);
-                alert("Failed to clear tasks.");
-            } finally {
-                setIsClearing(false);
-            }
+        setIsClearing(true);
+        try {
+            await clearAllTasks();
+            onClose();
+        } catch (error) {
+            console.error("Failed to clear tasks", error);
+            alert("Failed to clear tasks.");
+        } finally {
+            setIsClearing(false);
         }
     };
 
@@ -164,6 +165,20 @@ const TaskSettingsModal = ({ isOpen, onClose }) => {
                                             <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${settings.showCompletedInList ? 'translate-x-6' : 'translate-x-0'}`} />
                                         </button>
                                     </div>
+                                    
+                                    <hr className="border-slate-200 dark:border-slate-800 mx-3" />
+                                    
+                                    <button 
+                                        onClick={() => setClearConfirmOpen(true)}
+                                        disabled={isClearing}
+                                        className="w-full flex items-center justify-between p-3 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded-lg transition-colors disabled:opacity-50"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <Trash2 className="w-4 h-4" />
+                                            <span className="font-bold text-sm">Clear All Task Data</span>
+                                        </div>
+                                        {isClearing ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> : <ChevronRight className="w-4 h-4 opacity-40" />}
+                                    </button>
                                 </div>
                             </section>
                             
@@ -205,6 +220,15 @@ const TaskSettingsModal = ({ isOpen, onClose }) => {
                     </AppButton>
                 </div>
             </div>
+
+            <ConfirmDialog
+                isOpen={clearConfirmOpen}
+                onClose={() => setClearConfirmOpen(false)}
+                onConfirm={handleClearTasks}
+                title="Clear All Task Data?"
+                message="Are you sure you want to permanently delete ALL task history? This action cannot be undone and you will lose all previous records."
+                confirmText="Delete All"
+            />
         </div>
     );
 };
