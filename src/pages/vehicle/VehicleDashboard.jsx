@@ -12,6 +12,7 @@ import LedgerScreen from './screens/LedgerScreen';
 import ServiceScreen from './screens/ServiceScreen';
 import LoanScreen from './screens/LoanScreen';
 import AddVehicleModal from './AddVehicleModal';
+import ManageVehiclesModal from './ManageVehiclesModal';
 import AddLoanModal from './AddLoanModal';
 import PayEMIModal from './PayEMIModal';
 import AmortizationScheduleModal from './AmortizationScheduleModal';
@@ -44,6 +45,7 @@ const VehicleDashboard = () => {
     
     // Modals
     const [isAddOpen, setIsAddOpen] = useState(false);
+    const [isManageVehiclesOpen, setIsManageVehiclesOpen] = useState(false);
     const [editingVehicle, setEditingVehicle] = useState(null);
     const [isAddLoanOpen, setIsAddLoanOpen] = useState(false);
     const [isPayEMIOpen, setIsPayEMIOpen] = useState(false);
@@ -251,18 +253,6 @@ const VehicleDashboard = () => {
                                             </button>
                                         ))}
                                     </div>
-                                    <div className="p-2 border-t border-slate-100 dark:border-slate-700">
-                                        <button
-                                            onClick={() => {
-                                                setIsVehicleSelectorOpen(false);
-                                                setEditingVehicle(null);
-                                                setIsAddOpen(true);
-                                            }}
-                                            className="w-full flex items-center justify-center gap-2 p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50 text-slate-600 dark:text-slate-400 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                                        >
-                                            <Plus className="w-4 h-4" /> Add Vehicle
-                                        </button>
-                                    </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
@@ -289,13 +279,12 @@ const VehicleDashboard = () => {
                                         <button 
                                             onClick={() => {
                                                 setIsMenuOpen(false);
-                                                setEditingVehicle(activeVehicle);
-                                                setIsAddOpen(true);
+                                                setIsManageVehiclesOpen(true);
                                             }}
                                             className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-xl transition-colors text-left"
                                         >
-                                            <Edit2 className="w-4 h-4 text-slate-400" /> 
-                                            Edit Details
+                                            <Car className="w-4 h-4 text-slate-400" /> 
+                                            Manage Vehicles
                                         </button>
                                         <button 
                                             onClick={() => {
@@ -480,6 +469,14 @@ const VehicleDashboard = () => {
                  }}
                  onSave={handleSaveVehicle}
                  editVehicle={editingVehicle}
+             />
+             
+             <ManageVehiclesModal
+                 isOpen={isManageVehiclesOpen}
+                 onClose={() => setIsManageVehiclesOpen(false)}
+                 setEditingVehicle={setEditingVehicle}
+                 setIsAddOpen={setIsAddOpen}
+                 setDeleteConfirmId={setDeleteConfirmId}
              />
              
              <AddLoanModal
