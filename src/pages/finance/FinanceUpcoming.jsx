@@ -12,12 +12,8 @@ const FinanceUpcoming = () => {
     return (
         <PageLayout
             bottomNav={<FinanceBottomNav />}
-            header={
-                <div>
-                    <h1 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">Upcoming</h1>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Subscriptions & bills</p>
-                </div>
-            }
+            title="Upcoming"
+            showBack
         >
             <div>
                 <UpcomingPayments />

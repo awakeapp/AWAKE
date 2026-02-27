@@ -5,7 +5,12 @@ import { format, differenceInDays, isBefore, addMonths } from 'date-fns';
 import { useTranslation } from 'react-i18next'; // Added i18n support
 import { useScrollLock } from '../../hooks/useScrollLock';
 import { useToast } from '../../context/ToastContext';
-import ConfirmDialog from '../../components/organisms/ConfirmDialog';
+import { DeleteConfirmationModal } from '../../components/ui/DeleteConfirmationModal';
+import { ItemMenu } from '../../components/ui/ItemMenu';
+import { SelectionBar } from '../../components/ui/SelectionBar';
+import { useSelection } from '../../hooks/useSelection';
+import { clsx } from 'clsx';
+import { Check } from 'lucide-react';
 
 const ICONS = [
     { icon: Zap, label: 'Utility' },
@@ -29,8 +34,18 @@ const COLORS = [
 const UpcomingPayments = () => {
     const { subscriptions, addSubscription, deleteSubscription, toggleSubscriptionStatus } = useFinance();
     const [isAdding, setIsAdding] = useState(false);
-    const { t } = useTranslation(); // Enable translations
+    const { t } = useTranslation();
     const { showToast } = useToast();
+
+    const {
+        selectedIds,
+        isSelectionMode,
+        toggleSelection,
+        clearSelection,
+        enterSelectionMode,
+        exitSelectionMode,
+        toggleSelectAll
+    } = useSelection(subscriptions.map(s => s.id));
 
     useScrollLock(isAdding);
 
@@ -92,17 +107,46 @@ const UpcomingPayments = () => {
         .filter(s => s.status === 'active')
         .reduce((sum, s) => sum + Number(s.amount), 0);
 
+    const handleBulkDelete = async () => {
+        try {
+            await Promise.all(Array.from(selectedIds).map(id => deleteSubscription(id)));
+            showToast(`Deleted ${selectedIds.size} subscriptions`, 'success');
+            exitSelectionMode();
+        } catch (error) {
+            showToast('Failed to delete some subscriptions', 'error');
+        } finally {
+            setDeleteConfirmId(null);
+        }
+    };
+
     return (
         <div className="space-y-4">
-            <div className="flex items-center justify-between px-2">
-                <h3 className="font-bold text-slate-900 dark:text-white">{t('finance.upcoming_payments', 'Upcoming Payments')}</h3>
-                <button
-                    onClick={() => setIsAdding(true)}
-                    className="text-xs text-indigo-500 font-bold uppercase hover:bg-indigo-50 px-2 py-1 rounded-lg transition-colors"
-                >
-                    {t('finance.add_new', '+ Add New')}
-                </button>
-            </div>
+            {isSelectionMode ? (
+                <SelectionBar 
+                    count={selectedIds.size}
+                    onCancel={exitSelectionMode}
+                    onSelectAll={toggleSelectAll}
+                    isAllSelected={selectedIds.size === subscriptions.length}
+                    actions={(
+                        <button
+                            onClick={() => setDeleteConfirmId('bulk')}
+                            className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors"
+                        >
+                            <Trash2 className="w-5 h-5" />
+                        </button>
+                    )}
+                />
+            ) : (
+                <div className="flex items-center justify-between px-2">
+                    <h3 className="font-bold text-slate-900 dark:text-white">{t('finance.upcoming_payments', 'Upcoming Payments')}</h3>
+                    <button
+                        onClick={() => setIsAdding(true)}
+                        className="text-xs text-indigo-500 font-bold uppercase hover:bg-indigo-50 px-2 py-1 rounded-lg transition-colors"
+                    >
+                        {t('finance.add_new', '+ Add New')}
+                    </button>
+                </div>
+            )}
 
 
 
@@ -123,23 +167,40 @@ const UpcomingPayments = () => {
                     sortedSubs.map(sub => {
                         const Icon = ICONS[sub.iconIdx || 0].icon;
                         const daysLeft = getDaysLeft(sub.nextBillingDate || sub.dueDate);
+                        const isSelected = selectedIds.has(sub.id);
 
                         return (
-                            <div key={sub.id} className="min-w-[170px] max-w-[200px] p-5 rounded-[1.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm relative group transition-all hover:border-indigo-500/50 flex flex-col justify-between min-h-[120px] gap-3">
+                            <div 
+                                key={sub.id} 
+                                onClick={() => isSelectionMode && toggleSelection(sub.id)}
+                                onContextMenu={(e) => { e.preventDefault(); enterSelectionMode(sub.id); }}
+                                className={clsx(
+                                    "min-w-[170px] max-w-[200px] p-5 rounded-[1.5rem] bg-white dark:bg-slate-900 border transition-all relative group flex flex-col justify-between min-h-[120px] gap-3 cursor-pointer",
+                                    isSelected ? "border-indigo-500 ring-2 ring-indigo-500/20" : "border-slate-100 dark:border-slate-800"
+                                )}
+                            >
                                 {/* Action Buttons */}
-                                <div className="absolute top-2 right-2 flex gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-lg p-0.5 shadow-sm">
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); toggleSubscriptionStatus(sub.id); }}
-                                        className="p-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 transition-colors text-slate-500"
-                                    >
-                                        {sub.status === 'active' ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
-                                    </button>
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(sub.id); }}
-                                        className="p-1.5 bg-rose-50 dark:bg-rose-900/20 rounded-lg hover:bg-rose-100 transition-colors text-rose-500"
-                                    >
-                                        <Trash2 className="w-3 h-3" />
-                                    </button>
+                                <div className="absolute top-2 right-2 flex items-center gap-1 z-20">
+                                    {isSelectionMode ? (
+                                        <div className={clsx(
+                                            "w-5 h-5 rounded-full border flex items-center justify-center transition-colors",
+                                            isSelected ? "bg-indigo-600 border-indigo-600" : "border-slate-300 dark:border-slate-700"
+                                        )}>
+                                            {isSelected && <Check className="w-3 h-3 text-white" />}
+                                        </div>
+                                    ) : (
+                                        <ItemMenu 
+                                            onEdit={() => alert("Edit coming soon")}
+                                            onDelete={() => setDeleteConfirmId(sub.id)}
+                                            extraActions={[
+                                                {
+                                                    label: sub.status === 'active' ? 'Pause' : 'Resume',
+                                                    icon: sub.status === 'active' ? Pause : Play,
+                                                    onClick: () => toggleSubscriptionStatus(sub.id)
+                                                }
+                                            ]}
+                                        />
+                                    )}
                                 </div>
 
                                 <div className="flex items-center gap-2.5">
@@ -259,16 +320,16 @@ const UpcomingPayments = () => {
                 )
             }
 
-            <ConfirmDialog
+            <DeleteConfirmationModal
                 isOpen={!!deleteConfirmId}
                 onClose={() => setDeleteConfirmId(null)}
-                onConfirm={() => {
+                onConfirm={deleteConfirmId === 'bulk' ? handleBulkDelete : () => {
                     deleteSubscription(deleteConfirmId);
                     showToast('Subscription deleted', 'info');
+                    setDeleteConfirmId(null);
                 }}
-                title="Delete Subscription?"
-                message="Are you sure you want to delete this subscription? This cannot be undone."
-                confirmText="Delete"
+                title={deleteConfirmId === 'bulk' ? `Delete ${selectedIds.size} Subscriptions?` : "Delete Subscription?"}
+                message={deleteConfirmId === 'bulk' ? "Are you sure you want to delete these subscriptions? This action cannot be undone." : "Are you sure you want to delete this subscription? This cannot be undone."}
             />
         </div >
     );

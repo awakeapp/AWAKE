@@ -1,3 +1,6 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Clock } from 'lucide-react';
 import PageLayout from '../components/layout/PageLayout';
 
 const ComingSoon = () => {
@@ -5,14 +8,8 @@ const ComingSoon = () => {
 
     return (
         <PageLayout
-            header={
-                <div className="flex items-center gap-3">
-                    <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
-                        <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-white" />
-                    </button>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Feature</h1>
-                </div>
-            }
+            title="Feature"
+            showBack
         >
             <div className="flex flex-col items-center justify-center p-6 min-h-[60vh]">
                 <div className="bg-white dark:bg-[#1C1C1E] border border-slate-200 dark:border-[#2C2C2E] rounded-2xl p-8 max-w-sm w-full text-center shadow-sm dark:shadow-none mb-8">

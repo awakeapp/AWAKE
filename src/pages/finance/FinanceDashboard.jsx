@@ -173,25 +173,24 @@ const FinanceDashboard = () => {
                     />
                 </>
             }
-            header={
-                <div className="grid grid-cols-3 items-center">
-                    <h1 className="text-xl font-bold text-slate-900 dark:text-white">Finance</h1>
-                    
-                    <div className="flex items-center justify-self-center gap-1 bg-white dark:bg-slate-900 rounded-full p-1 shadow-sm border border-slate-100 dark:border-slate-800">
-                        <button onClick={() => changeMonth(-1)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+            title={t('finance.title', 'Finance')}
+            rightNode={
+                <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-0.5 bg-slate-50 dark:bg-slate-900 rounded-lg p-1 border border-slate-200 dark:border-slate-800">
+                        <button onClick={() => changeMonth(-1)} className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-md transition-colors">
                             <ChevronLeft className="w-3.5 h-3.5 text-slate-500" />
                         </button>
-                        <span className="text-[10px] font-black uppercase tracking-widest min-w-[70px] text-center text-slate-700 dark:text-slate-200">
-                            {format(selectedDate, 'MMM yyyy')}
+                        <span className="text-[10px] font-black uppercase tracking-widest min-w-[64px] text-center text-slate-700 dark:text-slate-200">
+                            {format(selectedDate, 'MMM yy')}
                         </span>
-                        <button onClick={() => changeMonth(1)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                        <button onClick={() => changeMonth(1)} className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-md transition-colors">
                             <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
                         </button>
                     </div>
 
                     <button 
                         onClick={() => navigate('/finance/more')}
-                        className="p-2 rounded-xl transition-all bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 justify-self-end"
+                        className="p-2 rounded-xl transition-all bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95"
                     >
                         <MoreHorizontal className="w-5 h-5" />
                     </button>
@@ -203,7 +202,7 @@ const FinanceDashboard = () => {
                     {/* Total Balance Card (Reduced Height & Vertical Padding) */}
                     <motion.div 
                         whileTap={{ scale: 0.98 }}
-                        className="bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-800 rounded-[2.5rem] p-6 text-white shadow-2xl shadow-indigo-500/30 relative overflow-hidden mt-2"
+                        className="bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-800 rounded-[2.5rem] p-6 text-white shadow-2xl shadow-indigo-500/30 relative overflow-hidden"
                     >
                         {/* Decorative blobs */}
                         <div className="absolute -top-12 -right-12 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>

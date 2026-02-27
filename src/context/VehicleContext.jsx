@@ -141,7 +141,7 @@ export const VehicleContextProvider = ({ children }) => {
             `users/${user.uid}/ledgerEntries`,
             (data) => { setError(null); setServiceRecords(data); },
             where('vehicleId', '==', activeVehicleId),
-            orderBy('date', 'desc'),
+            orderBy('date', 'asc'),
             limit(recordLimit),
             (err) => {
                 const normalized = normalizeError(err);
@@ -469,6 +469,32 @@ export const VehicleContextProvider = ({ children }) => {
         }
     }, [user, categories, vehicles, addTransaction, updateVehicle]);
 
+    const deleteServiceRecord = useCallback(async (id) => {
+        try {
+            if (!user) return;
+            setError(null);
+            await FirestoreService.deleteItem(`users/${user.uid}/ledgerEntries`, id);
+        } catch (err) {
+            const normalized = normalizeError(err);
+            console.error(normalized);
+            setError(normalized);
+            throw normalized;
+        }
+    }, [user]);
+
+    const updateServiceRecord = useCallback(async (id, updates) => {
+        try {
+            if (!user) return;
+            setError(null);
+            await FirestoreService.updateItem(`users/${user.uid}/ledgerEntries`, id, updates);
+        } catch (err) {
+            const normalized = normalizeError(err);
+            console.error(normalized);
+            setError(normalized);
+            throw normalized;
+        }
+    }, [user]);
+
     const getLatestRecord = useCallback((vehicleId, type) => {
         return serviceRecords
             .filter(r => r.vehicleId === vehicleId && r.type === type)
@@ -763,13 +789,15 @@ export const VehicleContextProvider = ({ children }) => {
         getVehicleRisks,
 
         deleteVehicle,
+        deleteServiceRecord,
+        updateServiceRecord,
         error,
         isLoading, // Expose loading status
         loadMoreServiceRecords
     }), [
         vehicles, followUps, serviceRecords, loans, isLoading,
         addVehicle, updateVehicle, toggleArchiveVehicle, setVehicleActive, getActiveVehicle, deleteVehicle,
-        addFollowUp, deleteFollowUp, completeFollowUp, addServiceRecord, getVehicleStats, getLatestRecord, toggleMaintenanceItem,
+        addFollowUp, deleteFollowUp, completeFollowUp, addServiceRecord, deleteServiceRecord, updateServiceRecord, getVehicleStats, getLatestRecord, toggleMaintenanceItem,
         addLoan, payEMI, getLoanForVehicle, getLoanDetailedStatus, getVehicleRisks,
         loadMoreServiceRecords
     ]);

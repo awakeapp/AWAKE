@@ -9,6 +9,7 @@ import { Clock, ArrowUp, Trash2, Calendar as CalendarIcon, Tag, Info, Check } fr
 import { useSettings } from '../../../context/SettingsContext';
 import JumpDateModal from '../../organisms/JumpDateModal';
 import { format } from 'date-fns';
+import { ItemMenu } from '../../ui/ItemMenu';
 
 const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', onReschedule, onDelete, isRoutine = false, onEdit, isSelectMode = false, isSelected = false, onSelect, onLongPress }) => {
     const displayTitle = task.name || task.title || 'Untitled';
@@ -205,102 +206,43 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                         </div>
                     </div>
                 ) : (
-                <>
-                {!isLocked && !isCompleted && !isRoutine && (
-                    <div className="relative">
-                        <button
-                            onClick={handleToggleDatePicker}
-                            className={clsx(
-                                "p-2 rounded-xl transition-colors duration-150 z-20 relative active:bg-slate-100 dark:active:bg-slate-800",
-                                isDatePickerOpen ? "text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20" : "text-slate-400 hover:text-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-800"
-                            )}
-                            title="Reschedule Task"
+                    <div className="flex items-center gap-1">
+                        <ItemMenu 
+                            onEdit={onEdit ? () => onEdit(task) : null}
+                            onDelete={onDelete ? () => onDelete(task.id) : null}
+                            extraActions={[
+                                !isLocked && !isCompleted && !isRoutine && {
+                                    label: 'Reschedule',
+                                    icon: CalendarIcon,
+                                    onClick: handleToggleDatePicker
+                                },
+                                isCarryOver && {
+                                    label: 'Assign to Today',
+                                    icon: ArrowUp,
+                                    onClick: () => onReschedule && onReschedule(task.id, 'today')
+                                }
+                            ].filter(Boolean)}
+                        />
+                        <div 
+                            className="px-1 py-1 transition-opacity active:opacity-70 duration-150"
+                            onClick={(e) => { e.stopPropagation(); onUpdateStatus(task.id); }}
                         >
-                            <CalendarIcon className="w-4 h-4" />
-                        </button>
-
-                        <AnimatePresence>
-                            {isDatePickerOpen && (
-                                <>
-                                    <div
-                                        className="fixed inset-0 z-[60] bg-transparent"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setActivePopoverId(null);
-                                        }}
-                                    />
-                                    <div className="absolute top-full right-0 mt-2 z-[70]">
-                                        <JumpDateModal
-                                            isOpen={isDatePickerOpen}
-                                            initialDate={task.date ? new Date(task.date) : null}
-                                            onSelect={(date) => {
-                                                if (date) {
-                                                    const formattedDate = format(date, 'yyyy-MM-dd');
-                                                    onReschedule && onReschedule(task.id, formattedDate);
-                                                } else {
-                                                    onReschedule && onReschedule(task.id, null); 
-                                                }
-                                                setActivePopoverId(null);
-                                            }}
-                                            minDate={new Date()}
-                                            onClose={() => setActivePopoverId(null)}
-                                        />
-                                    </div>
-                                </>
-                            )}
-                        </AnimatePresence>
-                    </div>
-                )}
-
-                {!isLocked && !isRoutine && !isCarryOver && onDelete && (
-                    <button
-                        onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
-                        className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
-                        title="Delete"
-                    >
-                        <Trash2 className="w-4 h-4" />
-                    </button>
-                )}
-
-                {isCarryOver ? (
-                    <div className="flex items-center gap-1.5">
-                        <button
-                            onClick={(e) => { e.stopPropagation(); onReschedule && onReschedule(task.id, 'today'); }}
-                            className="p-2 text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 rounded-xl transition-colors active:bg-indigo-200 dark:active:bg-indigo-900/60 duration-150"
-                            title="Assign to Today"
-                        >
-                            <ArrowUp className="w-4 h-4" />
-                        </button>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); onDelete && onDelete(task.id); }}
-                            className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors active:bg-red-100 dark:active:bg-red-900/40 duration-150"
-                            title="Remove"
-                        >
-                            <Trash2 className="w-4 h-4" />
-                        </button>
-                    </div>
-                ) : (
-                    <div className="px-1 py-1 transition-opacity active:opacity-70 duration-150">
-                        {isRoutine ? (
-                            <ToggleSwitch
-                                status={isCompleted ? 'checked' : task.status || 'unchecked'}
-                                onClick={(e) => { e.stopPropagation(); onUpdateStatus(task.id); }}
-                                disabled={isLocked}
-                            />
-                        ) : (
-                            <div 
-                                className="scale-90 opacity-90 transition-all hover:scale-100 hover:opacity-100"
-                                onClick={(e) => { e.stopPropagation(); onUpdateStatus(task.id); }}
-                            >
-                                <ThreeStateCheckbox
+                            {isRoutine ? (
+                                <ToggleSwitch
                                     status={isCompleted ? 'checked' : task.status || 'unchecked'}
                                     disabled={isLocked}
                                 />
-                            </div>
-                        )}
+                            ) : (
+                                <div className="scale-90 opacity-90 transition-all hover:scale-100 hover:opacity-100">
+                                    <ThreeStateCheckbox
+                                        status={isCompleted ? 'checked' : task.status || 'unchecked'}
+                                        disabled={isLocked}
+                                    />
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
-                </>)}
             </div>
         </motion.div>
     );

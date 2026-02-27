@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
     User, Moon, Sun, Monitor, Bell, Database, Shield, Info, LogOut, 
     Trash2, ChevronRight, ArrowLeft, Edit2, KeyRound, Mail, Globe, 
-    Clock, Smartphone, UserPlus, Heart, Handshake, Car
+    Clock, Smartphone, UserPlus, Heart, Handshake, Car, Download
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuthContext } from '../hooks/useAuthContext';
@@ -27,6 +27,10 @@ const Settings = () => {
 
     const [isConfirmSignOutOpen, setIsConfirmSignOutOpen] = useState(false);
     const [isConfirmResetOpen, setIsConfirmResetOpen] = useState(false);
+    const [isInstallGuideOpen, setIsInstallGuideOpen] = useState(false);
+
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
     const handleSignOut = async () => {
         try {
@@ -54,14 +58,8 @@ const Settings = () => {
 
     return (
         <PageLayout
-            header={
-                <div className="flex items-center gap-3">
-                    <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
-                        <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-white" />
-                    </button>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">{t('nav.settings', 'Settings')}</h1>
-                </div>
-            }
+            title={t('nav.settings', 'Settings')}
+            showBack
             renderFloating={
                 <>
                     <ConfirmDialog 
@@ -83,6 +81,68 @@ const Settings = () => {
                         confirmText="Reset"
                         isDestructive
                     />
+
+                    {/* PWA Install Guide */}
+                    <AnimatePresence>
+                        {isInstallGuideOpen && (
+                            <div className="fixed inset-0 z-[100] flex items-end justify-center">
+                                <motion.div 
+                                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                    onClick={() => setIsInstallGuideOpen(false)}
+                                    className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                                />
+                                <motion.div 
+                                    initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+                                    transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                                    className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-t-[32px] p-8 shadow-2xl z-10 border-t border-white/5"
+                                >
+                                    <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-4">Install AWAKE</h3>
+                                    <div className="space-y-6">
+                                        <div className="flex gap-4">
+                                            <div className="w-12 h-12 bg-indigo-500 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/30">
+                                                <Smartphone className="w-6 h-6 text-white" />
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-slate-900 dark:text-white">Full Screen Mode</p>
+                                                <p className="text-sm text-slate-500">Run AWAKE as a standalone app without the browser bar.</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-100 dark:border-white/5">
+                                            <p className="font-black text-[10px] uppercase tracking-widest text-slate-400 mb-3">How to Install</p>
+                                            {isIOS ? (
+                                                <ol className="text-sm text-slate-600 dark:text-slate-300 space-y-3 font-medium">
+                                                    <li className="flex gap-3">
+                                                        <span className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] shrink-0">1</span>
+                                                        <span>Tap the <strong className="text-indigo-500">Share</strong> button in Safari.</span>
+                                                    </li>
+                                                    <li className="flex gap-3">
+                                                        <span className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] shrink-0">2</span>
+                                                        <span>Select <strong className="text-indigo-500">Add to Home Screen</strong>.</span>
+                                                    </li>
+                                                </ol>
+                                            ) : (
+                                                <ol className="text-sm text-slate-600 dark:text-slate-300 space-y-3 font-medium">
+                                                    <li className="flex gap-3">
+                                                        <span className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] shrink-0">1</span>
+                                                        <span>Tap the <strong className="text-indigo-500">Three Dots</strong> in Chrome.</span>
+                                                    </li>
+                                                    <li className="flex gap-3">
+                                                        <span className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] shrink-0">2</span>
+                                                        <span>Select <strong className="text-indigo-500">Install App</strong>.</span>
+                                                    </li>
+                                                </ol>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={() => setIsInstallGuideOpen(false)}
+                                        className="w-full mt-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black text-sm uppercase tracking-widest active:scale-95 transition-all"
+                                    > Got it </button>
+                                </motion.div>
+                            </div>
+                        )}
+                    </AnimatePresence>
                 </>
             }
         >
@@ -241,16 +301,28 @@ const Settings = () => {
                     </SettingsSection>
 
                     {/* About */}
-                    <SettingsSection title="About">
+                    <SettingsSection title="Mobile App">
+                        <SettingsRow 
+                            icon={Smartphone}
+                            title="PWA Status"
+                            subtitle={isStandalone ? 'Running as standalone App' : 'Running in browser'}
+                            rightElement={
+                                isStandalone ? (
+                                    <span className="text-[10px] font-black text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">Standlone</span>
+                                ) : (
+                                    <button 
+                                        onClick={() => setIsInstallGuideOpen(true)}
+                                        className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-3 py-1.5 rounded-xl border border-indigo-500/20 active:scale-95 transition-all"
+                                    >
+                                        Install Now
+                                    </button>
+                                )
+                            }
+                        />
                         <SettingsRow 
                             icon={Info}
                             title="App Version"
-                            subtitle="v1.2.0"
-                        />
-                        <SettingsRow 
-                            icon={UserPlus}
-                            title="Invite Friends"
-                            onClick={() => navigate('/coming-soon?feature=Invite')}
+                            subtitle="v1.3.0 (Stable)"
                         />
                         <SettingsRow 
                             icon={Smartphone}

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useVehicle } from '../../context/VehicleContext';
 import { 
     Home, Wallet, Settings, Landmark, MoreVertical, ChevronDown, 
-    Plus, Car, Download, Archive, Edit2, ShieldAlert, List, Wrench, MoreHorizontal
+    Plus, Car, Download, Archive, Edit2, ShieldAlert, List, Wrench, MoreHorizontal, Trash2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
@@ -17,9 +17,12 @@ import AddLoanModal from './AddLoanModal';
 import PayEMIModal from './PayEMIModal';
 import AmortizationScheduleModal from './AmortizationScheduleModal';
 import PrepaymentCalculatorModal from './PrepaymentCalculatorModal';
-import ConfirmDialog from '../../components/organisms/ConfirmDialog';
+import { DeleteConfirmationModal } from '../../components/ui/DeleteConfirmationModal';
 import { AppBottomNav } from '../../components/ui/AppBottomNav';
 import PageLayout from '../../components/layout/PageLayout';
+import { useSelection } from '../../hooks/useSelection';
+import { SelectionBar } from '../../components/ui/SelectionBar';
+import { useToast } from '../../context/ToastContext';
 
 const VehicleDashboard = () => {
     const navigate = useNavigate();
@@ -37,8 +40,10 @@ const VehicleDashboard = () => {
         getLoanDetailedStatus,
         addLoan,
         payEMI,
-        deleteVehicle
+        deleteVehicle,
+        deleteServiceRecord
     } = useVehicle();
+    const { showToast } = useToast();
 
     const [activeTab, setActiveTab] = useState('dashboard');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -55,6 +60,17 @@ const VehicleDashboard = () => {
     const [isPrepaymentOpen, setIsPrepaymentOpen] = useState(false);
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
     const [archiveConfirmId, setArchiveConfirmId] = useState(null);
+    const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+    
+    const {
+        selectedIds,
+        isSelectionMode,
+        toggleSelection,
+        clearSelection,
+        enterSelectionMode,
+        exitSelectionMode,
+        toggleSelectAll
+    } = useSelection(combinedHistory.map(h => h.id));
     
     const [historyFilter, setHistoryFilter] = useState('All');
     
@@ -139,6 +155,20 @@ const VehicleDashboard = () => {
     const handleRecordPayment = (loanId, paymentData) => {
         payEMI(loanId, paymentData);
         setIsPayEMIOpen(false);
+    };
+
+    const handleBulkDelete = async () => {
+        setIsBulkDeleting(true);
+        try {
+            await Promise.all(Array.from(selectedIds).map(id => deleteServiceRecord(id)));
+            showToast(`Deleted ${selectedIds.size} entries`, 'success');
+            exitSelectionMode();
+        } catch (error) {
+            showToast('Failed to delete some entries', 'error');
+        } finally {
+            setIsBulkDeleting(false);
+            setDeleteConfirmId(null);
+        }
     };
 
     const getIcon = (type) => Car;
@@ -237,40 +267,64 @@ const VehicleDashboard = () => {
                     <AmortizationScheduleModal isOpen={isAmortizationOpen} onClose={() => setIsAmortizationOpen(false)} loan={activeLoan} />
                     <PrepaymentCalculatorModal isOpen={isPrepaymentOpen} onClose={() => setIsPrepaymentOpen(false)} loan={activeLoan} onSavePayment={handleRecordPayment} />
                     
-                    <ConfirmDialog isOpen={!!deleteConfirmId} onClose={() => setDeleteConfirmId(null)} onConfirm={() => { deleteVehicle(deleteConfirmId); setDeleteConfirmId(null); }} title="Delete Vehicle?" message="Are you sure you want to permanently delete this vehicle? All related data will be lost." confirmText="Delete" />
-                    <ConfirmDialog isOpen={!!archiveConfirmId} onClose={() => setArchiveConfirmId(null)} onConfirm={() => { toggleArchiveVehicle(archiveConfirmId); setArchiveConfirmId(null); }} title="Archive Vehicle?" message="Are you sure you want to archive this vehicle? It will be hidden from the main view." confirmText="Archive" />
+                    <DeleteConfirmationModal 
+                        isOpen={!!deleteConfirmId} 
+                        onClose={() => setDeleteConfirmId(null)} 
+                        onConfirm={deleteConfirmId === 'bulk' ? handleBulkDelete : () => { deleteVehicle(deleteConfirmId); setDeleteConfirmId(null); }} 
+                        title={deleteConfirmId === 'bulk' ? `Delete ${selectedIds.size} Entries?` : "Delete Vehicle?"} 
+                        message={deleteConfirmId === 'bulk' ? "Are you sure you want to delete these records? This action cannot be undone." : "Are you sure you want to permanently delete this vehicle? All related data will be lost."} 
+                    />
+                    <DeleteConfirmationModal 
+                        isOpen={!!archiveConfirmId} 
+                        onClose={() => setArchiveConfirmId(null)} 
+                        onConfirm={() => { toggleArchiveVehicle(archiveConfirmId); setArchiveConfirmId(null); }} 
+                        title="Archive Vehicle?" 
+                        message="Are you sure you want to archive this vehicle? It will be hidden from the main view." 
+                        confirmLabel="Archive"
+                    />
                 </>
             }
-            header={
-                <div className="flex items-center justify-between">
-                    {/* Left: Vehicle Selector */}
+            title={isSelectionMode ? undefined : "Fleet Management"}
+            headerNode={isSelectionMode ? (
+                <SelectionBar 
+                    count={selectedIds.size}
+                    onCancel={exitSelectionMode}
+                    onSelectAll={toggleSelectAll}
+                    isAllSelected={selectedIds.size === combinedHistory.length}
+                    actions={(
+                        <button
+                            onClick={() => setDeleteConfirmId('bulk')}
+                            className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors"
+                        >
+                            <Trash2 className="w-5 h-5" />
+                        </button>
+                    )}
+                />
+            ) : undefined}
+            rightNode={isSelectionMode ? null : (
+                <div className="flex items-center gap-1.5">
+                    {/* Vehicle Switcher */}
                     <div className="relative" ref={selectorRef}>
                         <button 
                             onClick={() => setIsVehicleSelectorOpen(!isVehicleSelectorOpen)}
-                            className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                            className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-sm"
                         >
-                            <div className="flex flex-col text-left">
-                                <span className="font-bold text-slate-900 dark:text-white text-sm leading-tight max-w-[120px] truncate">
-                                    {activeVehicle ? activeVehicle.name : 'Select Vehicle'}
-                                </span>
-                                {activeVehicle && (
-                                    <span className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">
-                                        {Number(activeVehicle.odometer || 0).toLocaleString()} km
-                                    </span>
-                                )}
-                            </div>
-                            <ChevronDown className="w-4 h-4 text-slate-500" />
+                            <span className="font-bold text-slate-800 dark:text-slate-200 text-[11px] leading-tight max-w-[80px] truncate uppercase tracking-tight">
+                                {activeVehicle ? activeVehicle.name : 'Select'}
+                            </span>
+                            <ChevronDown className="w-3 h-3 text-slate-500" />
                         </button>
                         
                         <AnimatePresence>
                             {isVehicleSelectorOpen && (
                                 <motion.div 
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 10 }}
-                                    className="absolute left-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden z-50"
+                                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                    className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden z-50 origin-top-right"
                                 >
                                     <div className="p-2 space-y-1">
+                                        <div className="px-3 py-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Switch Vehicle</div>
                                         {sortedVehicles.filter(v => !v.isArchived).map(vehicle => (
                                             <button
                                                 key={vehicle.id}
@@ -278,12 +332,14 @@ const VehicleDashboard = () => {
                                                     setVehicleActive(vehicle.id);
                                                     setIsVehicleSelectorOpen(false);
                                                 }}
-                                                className={`w-full flex items-center gap-3 p-2 rounded-xl transition-colors ${vehicle.isActive ? 'bg-indigo-50 dark:bg-indigo-900/30' : 'hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
+                                                className={`w-full flex items-center gap-3 p-2 rounded-xl transition-colors ${vehicle.isActive ? 'bg-indigo-50 dark:bg-indigo-900/30' : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}
                                             >
-                                                <Car className={`w-5 h-5 ${vehicle.isActive ? 'text-indigo-600' : 'text-slate-400'}`} />
+                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${vehicle.isActive ? "bg-indigo-500 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-400"}`}>
+                                                    <Car className="w-4 h-4" />
+                                                </div>
                                                 <div className="flex-1 text-left">
-                                                    <p className={`text-sm font-bold ${vehicle.isActive ? 'text-indigo-900 dark:text-indigo-100' : 'text-slate-700 dark:text-slate-200'}`}>{vehicle.name}</p>
-                                                    <p className="text-[10px] text-slate-500">{vehicle.brandModel}</p>
+                                                    <p className={`text-xs font-bold ${vehicle.isActive ? 'text-indigo-900 dark:text-indigo-100' : 'text-slate-700 dark:text-slate-200'}`}>{vehicle.name}</p>
+                                                    <p className="text-[10px] text-slate-500 truncate">{vehicle.brandModel}</p>
                                                 </div>
                                             </button>
                                         ))}
@@ -293,17 +349,14 @@ const VehicleDashboard = () => {
                         </AnimatePresence>
                     </div>
 
-                    {/* Right: More Menu */}
-                    <div>
-                        <button 
-                            onClick={() => navigate('/vehicle/more')}
-                            className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 transition-all shadow-sm"
-                        >
-                            <MoreHorizontal className="w-5 h-5" />
-                        </button>
-                    </div>
+                    <button 
+                        onClick={() => navigate('/vehicle/more')}
+                        className="p-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 transition-all shadow-sm"
+                    >
+                        <MoreHorizontal className="w-5 h-5" />
+                    </button>
                 </div>
-            }
+            )}
         >
             <div>
                 {activeVehicle ? (
@@ -352,6 +405,10 @@ const VehicleDashboard = () => {
                                     setVehicleActive={setVehicleActive}
                                     setDeleteConfirmId={setDeleteConfirmId}
                                     toggleArchiveVehicle={toggleArchiveVehicle}
+                                    isSelectionMode={isSelectionMode}
+                                    selectedIds={selectedIds}
+                                    toggleSelection={toggleSelection}
+                                    enterSelectionMode={enterSelectionMode}
                                 />
                             </div>
                             

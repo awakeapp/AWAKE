@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import { useData } from '../../context/DataContext';
 import { getIconComponent } from '../../utils/iconInference';
 import HabitManagerDialog from './HabitManagerDialog'; // Forced update v3
-import ConfirmDialog from './ConfirmDialog';
+import { DeleteConfirmationModal } from '../ui/DeleteConfirmationModal';
 
 const HabitToggle = ({ id, icon, label, value, onChange, onDelete, disabled, isEditing }) => {
     // Dynamic Icon Resolution
@@ -245,13 +245,15 @@ const DailyHabits = ({ habits, onUpdateHabit, isLocked }) => {
                 onAdd={handleAdd}
             />
 
-            <ConfirmDialog
+            <DeleteConfirmationModal
                 isOpen={!!deleteConfirmId}
                 onClose={() => setDeleteConfirmId(null)}
-                onConfirm={() => deleteHabit(deleteConfirmId)}
+                onConfirm={() => {
+                    deleteHabit(deleteConfirmId);
+                    setDeleteConfirmId(null);
+                }}
                 title="Delete Habit?"
                 message="Are you sure you want to delete this habit? It will be removed from your tracking options."
-                confirmText="Delete"
             />
         </section>
     );

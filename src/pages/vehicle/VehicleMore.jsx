@@ -220,14 +220,8 @@ const VehicleMore = () => {
 
     return (
         <PageLayout
-            header={
-                <div className="flex items-center gap-3">
-                    <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
-                        <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-white" />
-                    </button>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Vehicle More</h1>
-                </div>
-            }
+            title="Vehicle Settings"
+            showBack
         >
             <SettingsList>
                 <SettingsSection title="Management">

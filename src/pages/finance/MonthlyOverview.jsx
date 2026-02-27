@@ -67,44 +67,30 @@ const MonthlyOverview = () => {
 
   return (
     <PageLayout
-      headerBgClass="bg-slate-900 text-white shadow-2xl shadow-slate-900/20"
-      headerBorderClass="border-none"
-      headerPadClass="p-0"
-      header={
-        <div className="w-full">
-          <div className="px-6 py-4 flex items-center justify-between">
-            <button
-              onClick={() => navigate(-1)}
-              className="p-2 bg-transparent hover:bg-white/20 rounded-full transition-colors text-white -ml-2 focus:outline-none"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            
-            <div className="flex items-center gap-2 bg-white/10 rounded-full p-1 border border-white/5">
-              <button onClick={() => changeMonth(-1)} className="p-1 px-1.5 hover:bg-white/10 rounded-full transition-colors">
-                <ChevronLeft className="w-3.5 h-3.5 text-slate-300" />
-              </button>
-              <span className="text-[10px] font-black uppercase tracking-widest min-w-[70px] text-center">
-                {format(selectedDate, 'MMM yyyy')}
-              </span>
-              <button onClick={() => changeMonth(1)} className="p-1 px-1.5 hover:bg-white/10 rounded-full transition-colors">
-                <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-              </button>
-            </div>
-            
-            <div className="w-9" />
-          </div>
-
-          <div className="text-center px-6 pb-6 pt-2">
-            <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.2em] mb-1">Net Savings</p>
-            <h2 className={`text-4xl font-black tracking-tightest leading-tight ${currentStats.savings >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-              {currentStats.savings >= 0 ? '+' : ''}₹{currentStats.savings.toLocaleString()}
-            </h2>
-          </div>
+      title="Monthly Overview"
+      showBack
+      rightNode={
+        <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-900 rounded-lg p-1 border border-slate-200 dark:border-slate-800">
+          <button onClick={() => changeMonth(-1)} className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-md transition-colors">
+            <ChevronLeft className="w-3.5 h-3.5 text-slate-500" />
+          </button>
+          <span className="text-[10px] font-black uppercase tracking-widest min-w-[64px] text-center text-slate-700 dark:text-slate-200">
+            {format(selectedDate, 'MMM yy')}
+          </span>
+          <button onClick={() => changeMonth(1)} className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-md transition-colors">
+            <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
+          </button>
         </div>
       }
     >
       <div className="space-y-6">
+          {/* Net Savings Summary */}
+          <div className="text-center py-6 bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
+            <p className="text-slate-400 dark:text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Net Savings</p>
+            <h2 className={`text-4xl font-black tracking-tightest leading-tight ${currentStats.savings >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+              {currentStats.savings >= 0 ? '+' : ''}₹{currentStats.savings.toLocaleString()}
+            </h2>
+          </div>
           {/* Summary Cards */}
           <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
             <div className="space-y-4">

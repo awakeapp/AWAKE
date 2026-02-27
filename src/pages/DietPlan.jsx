@@ -73,23 +73,15 @@ const DietPlan = () => {
 
  return (
  <PageLayout
- header={
- <div className="flex items-center gap-3">
- <button
- onClick={() => {
- if (step === 'plan') {
- setStep('input');
- } else {
- navigate(-1);
- }
- }}
- className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors text-slate-700 dark:text-slate-300 -ml-2 focus:outline-none"
- >
- <ArrowLeft className="w-6 h-6" />
- </button>
- <h1 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">Diet Plan Manager</h1>
- </div>
- }
+  title="Diet Manager"
+  showBack
+  onBack={() => {
+   if (step === 'plan') {
+    setStep('input');
+   } else {
+    navigate(-1);
+   }
+  }}
  >
  <main className="pb-8">
  <AnimatePresence mode="wait">

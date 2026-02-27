@@ -5,7 +5,7 @@ import Button from '../atoms/Button';
 import { useData } from '../../context/DataContext';
 import { inferIcon, getIconComponent } from '../../utils/iconInference';
 import { useScrollLock } from '../../hooks/useScrollLock';
-import ConfirmDialog from './ConfirmDialog';
+import { DeleteConfirmationModal } from '../ui/DeleteConfirmationModal';
 
 const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
     useScrollLock(isOpen);
@@ -302,15 +302,15 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
                 </motion.div>
             </div>
 
-            <ConfirmDialog
+            <DeleteConfirmationModal
                 isOpen={!!deleteConfirmId}
                 onClose={() => setDeleteConfirmId(null)}
                 onConfirm={() => {
                     handleDelete(deleteConfirmId);
+                    setDeleteConfirmId(null);
                 }}
                 title="Delete Routine Task?"
-                message="Are you sure you want to remove this task from your routine?"
-                confirmText="Remove"
+                message="Are you sure you want to remove this task from your routine? This will affect future days."
             />
         </AnimatePresence>
     );

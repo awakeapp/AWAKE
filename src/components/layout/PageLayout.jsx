@@ -1,40 +1,65 @@
 import React from 'react';
 import clsx from 'clsx';
+import { AppHeader } from '../ui/AppHeader';
 
 const PageLayout = ({
-    header,
+    // Header Props
+    header, // Custom header node (replaces title system if provided)
+    title,
+    leftNode,
+    rightNode,
+    showBack = false,
+    onBack,
+    
+    // Page Props
     children,
     bottomNav,
-    bgClass = "bg-slate-50 dark:bg-slate-950",
-    headerBgClass = "bg-slate-50/80 dark:bg-slate-950/80",
-    headerBorderClass = "border-b border-slate-200/50 dark:border-slate-800/50",
-    headerPadClass = "px-4 pt-3 pb-3",
-    contentPadClass = "px-4 pt-4 pb-8 flex flex-col gap-6",
+    bgClass = "bg-white dark:bg-slate-950",
+    contentPadClass = "px-4 pb-8 flex flex-col gap-6",
     renderFloating
 }) => {
+    // Header height is 60px. Gap is 16px. Total = 76px.
+    const hasHeader = header || title;
+
     return (
         <div 
             className={clsx("min-h-screen flex flex-col relative", bgClass)}
-            style={bottomNav ? { paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5rem)' } : {}}
+            style={bottomNav ? { paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.5rem)' } : {}}
         >
-            {/* 1. Unified Sticky Header */}
-            {header && (
-                <header 
-                    className={clsx(
-                        "sticky top-0 z-30 w-full backdrop-blur-xl shrink-0 overflow-hidden",
-                        headerBgClass,
-                        headerBorderClass
-                    )}
-                    style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
-                >
-                    <div className={clsx("max-w-screen-md mx-auto", headerPadClass)}>
-                        {header}
-                    </div>
-                </header>
+            {/* 1. Standardized Fixed Header */}
+            {hasHeader && (
+                header ? (
+                    <header 
+                        className="fixed top-0 left-0 right-0 z-[100] w-full bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800"
+                        style={{ 
+                            paddingTop: 'env(safe-area-inset-top, 0px)',
+                            height: 'calc(60px + env(safe-area-inset-top, 0px))'
+                        }}
+                    >
+                        <div className="max-w-screen-md mx-auto px-4 h-full flex items-center">
+                            {header}
+                        </div>
+                    </header>
+                ) : (
+                    <AppHeader 
+                        title={title}
+                        leftNode={leftNode}
+                        rightNode={rightNode}
+                        showBack={showBack}
+                        onBack={onBack}
+                    />
+                )
             )}
 
-            {/* 2. Unified Content Area: strict 16px (pt-4) padding-top */}
-            <main className={clsx("flex-1 w-full max-w-screen-md mx-auto relative", contentPadClass)}>
+            {/* 2. Content Area: handles top spacing for fixed header */}
+            <main 
+                className={clsx("flex-1 w-full max-w-screen-md mx-auto relative", contentPadClass)}
+                style={{
+                    paddingTop: hasHeader 
+                        ? 'calc(76px + env(safe-area-inset-top, 0px))' // 60px header + 16px gap
+                        : 'calc(16px + env(safe-area-inset-top, 0px))' // No header, just 16px gap from top
+                }}
+            >
                 {children}
             </main>
 

@@ -1,11 +1,17 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { User, Plus, MoreVertical, Search, CheckCircle, UserPlus, Phone, X } from 'lucide-react';
+import { User, Plus, MoreVertical, Search, CheckCircle, UserPlus, Phone, X, Trash2, Check, Archive } from 'lucide-react';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import { motion, AnimatePresence } from 'framer-motion';
 import FinanceBottomNav from '../../components/finance/FinanceBottomNav';
 import PageLayout from '../../components/layout/PageLayout';
+import { useSelection } from '../../hooks/useSelection';
+import { SelectionBar } from '../../components/ui/SelectionBar';
+import { ItemMenu } from '../../components/ui/ItemMenu';
+import { DeleteConfirmationModal } from '../../components/ui/DeleteConfirmationModal';
+import { useToast } from '../../context/ToastContext';
+import { clsx } from 'clsx';
 
 const DebtManager = () => {
     const navigate = useNavigate();
@@ -22,9 +28,20 @@ const DebtManager = () => {
         );
     }
 
-    const { debtParties, addDebtParty, getPartyBalance, getPartyTransactions, getPartyStatus } = context;
+    const { debtParties, addDebtParty, deleteDebtParty, getPartyBalance, getPartyTransactions, getPartyStatus } = context;
     const [isAdding, setIsAdding] = useState(false);
+    const { showToast } = useToast();
     useScrollLock(isAdding);
+
+    const {
+        selectedIds,
+        isSelectionMode,
+        toggleSelection,
+        clearSelection,
+        enterSelectionMode,
+        exitSelectionMode,
+        toggleSelectAll
+    } = useSelection(debtParties.map(p => p.id));
 
     // Form State
     const [searchQuery, setSearchQuery] = useState('');
@@ -38,6 +55,9 @@ const DebtManager = () => {
     const [isPhonePickerOpen, setIsPhonePickerOpen] = useState(false);
     const [contactError, setContactError] = useState('');
     const vcfInputRef = React.useRef(null);
+
+    const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+    const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
     const contactPickerSupported = typeof navigator !== 'undefined' && 'contacts' in navigator && 'ContactsManager' in window;
 
@@ -181,6 +201,20 @@ const DebtManager = () => {
         setCreditLimit('');
     };
 
+    const handleBulkDelete = async () => {
+        setIsBulkDeleting(true);
+        try {
+            await Promise.all(Array.from(selectedIds).map(id => deleteDebtParty(id)));
+            showToast(`Deleted ${selectedIds.size} parties`, 'success');
+            exitSelectionMode();
+        } catch (error) {
+            showToast('Failed to delete some parties', 'error');
+        } finally {
+            setIsBulkDeleting(false);
+            setDeleteConfirmId(null);
+        }
+    };
+
     return (
         <PageLayout
             bottomNav={<FinanceBottomNav />}
@@ -291,33 +325,59 @@ const DebtManager = () => {
                     </AnimatePresence>
                 </>
             }
-            header={
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Debts & Lending</h1>
-                        <button onClick={() => setIsAdding(true)} className="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full transition-colors -mr-2 shadow-sm shadow-indigo-500/30">
-                            <Plus className="w-5 h-5" />
+            title={isSelectionMode ? undefined : "Debts & Lending"}
+            headerNode={isSelectionMode ? (
+                <SelectionBar 
+                    count={selectedIds.size}
+                    onCancel={exitSelectionMode}
+                    onSelectAll={toggleSelectAll}
+                    isAllSelected={selectedIds.size === debtParties.length}
+                    actions={(
+                        <button
+                            onClick={() => setDeleteConfirmId('bulk')}
+                            className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors"
+                        >
+                            <Trash2 className="w-5 h-5" />
                         </button>
+                    )}
+                />
+            ) : undefined}
+            showBack={!isSelectionMode}
+            rightNode={isSelectionMode ? null : (
+                <button 
+                    onClick={() => setIsAdding(true)} 
+                    className="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full transition-colors shadow-sm shadow-indigo-500/30 active:scale-95"
+                >
+                    <Plus className="w-5 h-5" />
+                </button>
+            )}
+        >
+            <div className="space-y-4">
+                {/* Summary Section */}
+                <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-emerald-50 text-emerald-900 dark:bg-emerald-500/10 dark:text-emerald-100 p-4 rounded-[1.5rem] shadow-sm border border-emerald-100 dark:border-emerald-500/20">
+                        <p className="text-[9px] font-black uppercase tracking-[0.15em] opacity-60 mb-1">To Get</p>
+                        <h2 className="text-xl font-black">₹{totalReceivable.toLocaleString()}</h2>
                     </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-emerald-50 text-emerald-900 dark:bg-emerald-500/10 dark:text-emerald-100 p-4 rounded-[1.5rem] shadow-sm border border-emerald-100 dark:border-emerald-500/20">
-                            <p className="text-[9px] font-black uppercase tracking-[0.15em] opacity-60 mb-1">To Get</p>
-                            <h2 className="text-xl font-black">₹{totalReceivable.toLocaleString()}</h2>
-                        </div>
-                        <div className="bg-red-50 text-red-900 dark:bg-red-500/10 dark:text-red-100 p-4 rounded-[1.5rem] shadow-sm border border-red-100 dark:border-red-500/20">
-                            <p className="text-[9px] font-black uppercase tracking-[0.15em] opacity-60 mb-1">To Pay</p>
-                            <h2 className="text-xl font-black">₹{totalPayable.toLocaleString()}</h2>
-                        </div>
-                    </div>
-
-                    <div className="relative">
-                        <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search parties..." className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-sm font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 shadow-sm" />
-                        <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <div className="bg-red-50 text-red-900 dark:bg-red-500/10 dark:text-red-100 p-4 rounded-[1.5rem] shadow-sm border border-red-100 dark:border-red-500/20">
+                        <p className="text-[9px] font-black uppercase tracking-[0.15em] opacity-60 mb-1">To Pay</p>
+                        <h2 className="text-xl font-black">₹{totalPayable.toLocaleString()}</h2>
                     </div>
                 </div>
-            }
-        >
+
+                {/* Search Bar: max 12px bottom margin handled by container gap or specific margin */}
+                <div className="relative mb-3">
+                    <input 
+                        type="text" 
+                        value={searchQuery} 
+                        onChange={(e) => setSearchQuery(e.target.value)} 
+                        placeholder="Search parties..." 
+                        className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-sm font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 shadow-sm" 
+                    />
+                    <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                </div>
+            </div>
+
             <div className="space-y-3">
                         {partyData.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || (p.tag && p.tag.toLowerCase().includes(searchQuery.toLowerCase()))).length === 0 ? (
                             <div className="text-center py-16 px-6">
@@ -350,16 +410,30 @@ const DebtManager = () => {
                                         key={party.id} 
                                         initial={{ opacity: 0, y: 10 }} 
                                         animate={{ opacity: 1, y: 0 }} 
-                                        whileTap={{ scale: 0.98 }}
-                                        className={`bg-white dark:bg-slate-900 p-5 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col gap-4 relative overflow-hidden transition-all group`}
+                                        onClick={() => isSelectionMode && toggleSelection(party.id)}
+                                        onContextMenu={(e) => { e.preventDefault(); enterSelectionMode(party.id); }}
+                                        className={clsx(
+                                            "bg-white dark:bg-slate-900 p-5 rounded-3xl shadow-sm border transition-all flex flex-col gap-4 relative overflow-hidden group cursor-pointer",
+                                            selectedIds.has(party.id) ? "border-indigo-500 ring-2 ring-indigo-500/20" : "border-slate-100 dark:border-slate-800"
+                                        )}
                                     >
                                         <div className={`absolute top-0 right-0 w-32 h-32 -mr-16 -mt-16 blur-3xl opacity-[0.03] pointer-events-none rounded-full ${isSettled ? 'bg-slate-400' : isReceivable ? 'bg-emerald-500' : 'bg-red-500'}`} />
 
                                         <div className="flex items-start justify-between gap-4">
                                             <div className="flex-1 min-w-0">
-                                                <h4 className="text-lg font-black text-slate-900 dark:text-white capitalize truncate leading-tight tracking-tight">
-                                                    {party.name}
-                                                </h4>
+                                                <div className="flex items-center gap-3">
+                                                    {isSelectionMode && (
+                                                        <div className={clsx(
+                                                            "w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-colors",
+                                                            selectedIds.has(party.id) ? "bg-indigo-600 border-indigo-600" : "border-slate-300 dark:border-slate-700"
+                                                        )}>
+                                                            {selectedIds.has(party.id) && <Check className="w-3 h-3 text-white" />}
+                                                        </div>
+                                                    )}
+                                                    <h4 className="text-lg font-black text-slate-900 dark:text-white capitalize truncate leading-tight tracking-tight">
+                                                        {party.name}
+                                                    </h4>
+                                                </div>
                                                 <div className="flex items-center gap-2 mt-1.5 overflow-hidden">
                                                     <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider whitespace-nowrap">
                                                         {new Date(party.lastTxDate).toLocaleDateString([], { month: 'short', day: 'numeric' })}
@@ -377,7 +451,13 @@ const DebtManager = () => {
                                                 </div>
                                             </div>
 
-                                            <div className="text-right shrink-0">
+                                            <div className="text-right shrink-0 flex flex-col items-end gap-2">
+                                                {!isSelectionMode && (
+                                                    <ItemMenu 
+                                                        onEdit={() => navigate(`/finance/debts/${party.id}`)}
+                                                        onDelete={() => setDeleteConfirmId(party.id)}
+                                                    />
+                                                )}
                                                 {isSettled ? (
                                                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2.5 py-1 bg-slate-50 dark:bg-slate-800 rounded-lg">Settled</span>
                                                 ) : (
@@ -412,6 +492,18 @@ const DebtManager = () => {
                             })
                         )}
                     </div>
+                    
+                    <DeleteConfirmationModal
+                        isOpen={!!deleteConfirmId}
+                        onClose={() => setDeleteConfirmId(null)}
+                        onConfirm={deleteConfirmId === 'bulk' ? handleBulkDelete : () => {
+                            deleteDebtParty(deleteConfirmId);
+                            setDeleteConfirmId(null);
+                            showToast('Party deleted', 'success');
+                        }}
+                        title={deleteConfirmId === 'bulk' ? `Delete ${selectedIds.size} Parties?` : "Delete Party?"}
+                        message={deleteConfirmId === 'bulk' ? "Are you sure you want to delete these parties? All transaction history will be lost." : "Are you sure you want to delete this party? All related transaction history will be lost."}
+                    />
         </PageLayout>
     );
 };

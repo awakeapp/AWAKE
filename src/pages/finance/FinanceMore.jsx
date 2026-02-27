@@ -49,14 +49,8 @@ const FinanceMore = () => {
     return (
         <PageLayout
             bottomNav={<FinanceBottomNav />}
-            header={
-                <div className="flex items-center gap-3">
-                    <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white -ml-2">
-                        <ArrowLeft className="w-6 h-6" />
-                    </button>
-                    <h1 className="text-xl font-bold text-slate-900 dark:text-white">Finance More</h1>
-                </div>
-            }
+            title="Finance More"
+            showBack
         >
             <SettingsList>
                 <SettingsSection title="Tools">

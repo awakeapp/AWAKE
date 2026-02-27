@@ -37,24 +37,15 @@ const History = () => {
 
   return (
     <PageLayout
-        header={
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => navigate(-1)}
-                  className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors text-slate-700 dark:text-slate-300 -ml-2 focus:outline-none"
-                >
-                  <ArrowLeft className="w-6 h-6" />
-                </button>
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Report History</h2>
-              </div>
-              <button
+        title="History"
+        showBack
+        rightNode={
+            <button
                 onClick={() => setShowJumpModal(true)}
-                className="p-2 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-indigo-600 rounded-full transition-colors dark:bg-slate-800 dark:hover:bg-slate-700 dark:active:bg-slate-600 dark:text-indigo-400"
-              >
+                className="p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-indigo-600 dark:text-indigo-400 rounded-xl transition-all shadow-sm active:scale-95"
+            >
                 <CalendarIcon className="w-5 h-5" />
-              </button>
-            </div>
+            </button>
         }
         renderFloating={
             <JumpDateModal

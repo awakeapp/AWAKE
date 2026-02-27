@@ -1,10 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, PieChart, TrendingUp, TrendingDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { useScrollLock } from '../../hooks/useScrollLock';
 
 const AnalyticsModal = ({ isOpen, onClose, monthStats, categories, selectedDate }) => {
+    const navigate = useNavigate();
     useScrollLock(isOpen);
     const { income, expense, transactions } = monthStats || { income: 0, expense: 0, transactions: [] };
 
@@ -124,6 +126,19 @@ const AnalyticsModal = ({ isOpen, onClose, monthStats, categories, selectedDate 
                                     <p className="text-sm font-bold text-slate-500">No expenses this month</p>
                                 </div>
                             )}
+                        </div>
+
+                        {/* Full Report Link */}
+                        <div className="mt-10">
+                            <button 
+                                onClick={() => {
+                                    onClose();
+                                    navigate('/analytics');
+                                }}
+                                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[1.25rem] font-black text-sm uppercase tracking-widest shadow-xl shadow-indigo-600/20 active:scale-95 transition-all"
+                            >
+                                Detailed Analytics Report
+                            </button>
                         </div>
                     </motion.div>
                 </div>

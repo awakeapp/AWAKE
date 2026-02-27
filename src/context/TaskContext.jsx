@@ -60,12 +60,10 @@ export const TaskContextProvider = ({ children }) => {
             `users/${user.uid}/tasks`,
             (data) => {
                 setActiveTasks(data);
-                // We consider app "loaded" when active tasks arrive
                 setIsLoading(false);
             },
             where('status', '==', 'pending'),
-            // Removed orderBy('createdAt', 'desc') to prevent missing composite index crashing the listener. 
-            // The tasks are re-sorted client-side below.
+            orderBy('createdAt', 'asc'),
             limit(1000)
         );
 
@@ -76,7 +74,7 @@ export const TaskContextProvider = ({ children }) => {
                 setCompletedTasks(data);
             },
             where('status', '==', 'completed'),
-            // Removed orderBy('createdAt', 'desc') to prevent missing composite index crashing the listener.
+            orderBy('createdAt', 'asc'),
             limit(completedLimit)
         );
 

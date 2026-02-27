@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Car, Plus, Settings, Archive, CheckCircle, Trash2 } from 'lucide-react';
 import { useVehicle } from '../../context/VehicleContext';
+import { ItemMenu } from '../../components/ui/ItemMenu';
 
 const ManageVehiclesModal = ({ isOpen, onClose, setEditingVehicle, setIsAddOpen, setDeleteConfirmId }) => {
     const { vehicles, setVehicleActive, toggleArchiveVehicle } = useVehicle();
@@ -67,32 +68,25 @@ const ManageVehiclesModal = ({ isOpen, onClose, setEditingVehicle, setIsAddOpen,
                                     </div>
                                 </div>
 
-                                <div className="mt-4 pt-3 border-t border-slate-50 dark:border-slate-800 flex justify-end gap-2">
-                                    <button
-                                        onClick={() => {
+                                <div className="mt-4 pt-3 border-t border-slate-50 dark:border-slate-800 flex justify-end">
+                                    <ItemMenu 
+                                        onEdit={() => {
                                             setEditingVehicle(vehicle);
                                             setIsAddOpen(true);
                                             onClose();
                                         }}
-                                        className="text-slate-500 hover:text-indigo-600 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-1 transition-colors"
-                                    >
-                                        <Settings className="w-3 h-3" /> Edit
-                                    </button>
-                                    <button
-                                        onClick={() => toggleArchiveVehicle(vehicle.id)}
-                                        className="text-slate-500 hover:text-slate-700 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-1 transition-colors"
-                                    >
-                                        <Archive className="w-3 h-3" /> {vehicle.isArchived ? 'Unarchive' : 'Archive'}
-                                    </button>
-                                    <button
-                                        onClick={() => {
+                                        onDelete={() => {
                                             setDeleteConfirmId(vehicle.id);
                                             onClose();
                                         }}
-                                        className="text-red-400 hover:text-red-600 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-1 transition-colors"
-                                    >
-                                        <Trash2 className="w-3 h-3" /> Delete
-                                    </button>
+                                        extraActions={[
+                                            { 
+                                                label: vehicle.isArchived ? 'Unarchive' : 'Archive', 
+                                                icon: Archive, 
+                                                onClick: () => toggleArchiveVehicle(vehicle.id) 
+                                            }
+                                        ]}
+                                    />
                                 </div>
                             </div>
                         ))}

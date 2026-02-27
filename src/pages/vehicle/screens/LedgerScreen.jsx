@@ -1,9 +1,29 @@
 import { useVehicle } from '../../../context/VehicleContext';
 import { format } from 'date-fns';
-import { Fuel, Settings, Landmark, Zap, AlertTriangle, Wallet, TrendingUp, History, Archive, CheckCircle } from 'lucide-react';
+import { Fuel, Settings, Landmark, Zap, AlertTriangle, Wallet, TrendingUp, History, Archive, CheckCircle, Check, MoreVertical } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ItemMenu } from '../../../components/ui/ItemMenu';
+import { clsx } from 'clsx';
+import { useRef } from 'react';
 
-const LedgerScreen = ({ activeVehicle, trendData, maxTrendCost, stats, combinedHistory, historyFilter, setHistoryFilter, onAddEntry, sortedVehicles, showArchived, getIcon, setVehicleActive, setDeleteConfirmId, toggleArchiveVehicle }) => {
+const LedgerScreen = ({ 
+    activeVehicle, trendData, maxTrendCost, stats, combinedHistory, historyFilter, setHistoryFilter, onAddEntry, sortedVehicles, showArchived, getIcon, setVehicleActive, setDeleteConfirmId, toggleArchiveVehicle,
+    isSelectionMode, selectedIds, toggleSelection, enterSelectionMode
+}) => {
+    const longPressTimer = useRef(null);
+
+    const handlePointerDown = (id) => {
+        longPressTimer.current = setTimeout(() => {
+            enterSelectionMode(id);
+        }, 600);
+    };
+
+    const handlePointerUpOrLeave = () => {
+        if (longPressTimer.current) {
+            clearTimeout(longPressTimer.current);
+            longPressTimer.current = null;
+        }
+    };
     
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -90,30 +110,63 @@ const LedgerScreen = ({ activeVehicle, trendData, maxTrendCost, stats, combinedH
                             <p className="text-slate-400 text-sm">No transaction records found.</p>
                         </div>
                     ) : (
-                        combinedHistory.map((record, index) => (
-                            <div key={record.id || index} className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-start justify-between group hover:border-indigo-200 transition-colors">
-                                <div>
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <h5 className="font-bold text-slate-900 dark:text-white text-sm capitalize">{record.type}</h5>
-                                        {record.financeTxId && <div className="w-2 h-2 rounded-full bg-emerald-500" title="Synced with Finance"></div>}
+                        combinedHistory.map((record, index) => {
+                            const isSelected = selectedIds.has(record.id);
+                            return (
+                                <div 
+                                    key={record.id || index} 
+                                    onClick={() => isSelectionMode && toggleSelection(record.id)}
+                                    onMouseDown={() => handlePointerDown(record.id)}
+                                    onMouseUp={handlePointerUpOrLeave}
+                                    onMouseLeave={handlePointerUpOrLeave}
+                                    onTouchStart={() => handlePointerDown(record.id)}
+                                    onTouchEnd={handlePointerUpOrLeave}
+                                    className={clsx(
+                                        "bg-white dark:bg-slate-900 p-4 rounded-xl border transition-all flex items-start justify-between group cursor-pointer",
+                                        isSelected ? "border-indigo-500 ring-1 ring-indigo-500 bg-indigo-50/10" : "border-slate-100 dark:border-slate-800"
+                                    )}
+                                >
+                                    <div className="flex items-start gap-3">
+                                        {isSelectionMode && (
+                                            <div className={clsx(
+                                                "w-5 h-5 rounded-full border flex items-center justify-center mt-1 transition-colors",
+                                                isSelected ? "bg-indigo-600 border-indigo-600" : "border-slate-300 dark:border-slate-700"
+                                            )}>
+                                                {isSelected && <Check className="w-3 h-3 text-white" />}
+                                            </div>
+                                        )}
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <h5 className="font-bold text-slate-900 dark:text-white text-sm capitalize">{record.type}</h5>
+                                                {record.financeTxId && <div className="w-2 h-2 rounded-full bg-emerald-500" title="Synced with Finance"></div>}
+                                            </div>
+                                            <p className="text-xs text-slate-400">{format(new Date(record.date), 'MMM d, yyyy')}</p>
+                                            {record.notes && (
+                                                <p className="text-xs text-slate-500 mt-2 line-clamp-2">{record.notes}</p>
+                                            )}
+                                        </div>
                                     </div>
-                                    <p className="text-xs text-slate-400">{format(new Date(record.date), 'MMM d, yyyy')}</p>
-                                    {record.notes && (
-                                        <p className="text-xs text-slate-500 mt-2 line-clamp-2">{record.notes}</p>
-                                    )}
+                                    <div className="flex items-start gap-3">
+                                        <div className="text-right">
+                                            {record.amount > 0 && (
+                                                <span className="block font-bold text-slate-900 dark:text-white text-sm">₹{Number(record.amount).toLocaleString()}</span>
+                                            )}
+                                            {record.odometer && (
+                                                <span className="block text-[10px] text-slate-400 mt-1 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-lg inline-block">
+                                                    {Number(record.odometer).toLocaleString()} km
+                                                </span>
+                                            )}
+                                        </div>
+                                        {!isSelectionMode && (
+                                            <ItemMenu 
+                                                onEdit={() => alert("Edit item coming soon")}
+                                                onDelete={() => setDeleteConfirmId(record.id)}
+                                            />
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="text-right">
-                                    {record.amount > 0 && (
-                                        <span className="block font-bold text-slate-900 dark:text-white text-sm">₹{Number(record.amount).toLocaleString()}</span>
-                                    )}
-                                    {record.odometer && (
-                                        <span className="block text-[10px] text-slate-400 mt-1 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-lg inline-block">
-                                            {Number(record.odometer).toLocaleString()} km
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-                        ))
+                            );
+                        })
                     )}
                 </div>
             </section>

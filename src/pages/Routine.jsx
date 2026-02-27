@@ -39,19 +39,18 @@ const Routine = () => {
 
     if (!dailyData || !dailyData.tasks) {
         return (
-            <div className="pb-24 pt-20">
-                <div 
-                    className="fixed top-0 left-0 right-0 z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md pt-3 pb-3 border-b border-slate-200 dark:border-slate-800"
-                    style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
-                >
-                    <div className="max-w-md mx-auto w-full px-4">
-                        <DateHeader className="mb-0" />
+            <PageLayout
+                header={
+                    <div className="w-full flex items-center justify-between">
+                        <div className="h-8 w-32 bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse" />
+                        <div className="h-8 w-20 bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse" />
                     </div>
-                </div>
+                }
+            >
                 <div className="flex items-center justify-center min-h-[40vh]">
                     <Loader2 className="w-8 h-8 animate-spin text-slate-300 dark:text-slate-700" />
                 </div>
-            </div>
+            </PageLayout>
         );
     }
 

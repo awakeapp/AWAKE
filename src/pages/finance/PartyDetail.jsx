@@ -10,8 +10,12 @@ import { StorageService } from '../../services/storageService';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useToast } from '../../context/ToastContext';
-import ConfirmDialog from '../../components/organisms/ConfirmDialog';
+import { DeleteConfirmationModal } from '../../components/ui/DeleteConfirmationModal';
+import { ItemMenu } from '../../components/ui/ItemMenu';
+import { useSelection } from '../../hooks/useSelection';
+import { SelectionBar } from '../../components/ui/SelectionBar';
 import PageLayout from '../../components/layout/PageLayout';
+import clsx from 'clsx';
 
 const TRANSACTION_TYPES = [
     { id: 'you_gave', label: 'You Gave', color: 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400', sign: '+' },
@@ -145,6 +149,19 @@ const PartyDetail = () => {
     const [dueDateManuallySet, setDueDateManuallySet] = useState(false);
     const [editTransactionId, setEditTransactionId] = useState(null);
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+    const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+    const timerRef = useRef(null);
+
+    const {
+        isSelectionMode,
+        selectedIds,
+        toggleSelection,
+        enterSelectionMode,
+        exitSelectionMode,
+        toggleSelectAll,
+        selectedCount,
+        isAllSelected
+    } = useSelection();
 
     // --- Receipt attachment state ---
     const [receiptFile, setReceiptFile] = useState(null); // File object (before upload)
@@ -385,7 +402,7 @@ const PartyDetail = () => {
         return differenceInDays(new Date(), new Date(summary.lastReminder));
     }, [summary.lastReminder]);
 
-    useScrollLock(isAddCardOpen || isSettleOpen || isReminderOpen);
+    useScrollLock(isAddCardOpen || isSettleOpen || isReminderOpen || !!deleteConfirmId || showSubmitConfirm);
 
     // Collapsible notes
     const [expandedNotes, setExpandedNotes] = useState({});
@@ -481,6 +498,10 @@ const PartyDetail = () => {
             return;
         }
 
+        setShowSubmitConfirm(true);
+    };
+
+    const finalSubmit = async () => {
         try {
             // Upload receipt first if one is selected
             let receipt_url = null;
@@ -604,17 +625,68 @@ const PartyDetail = () => {
             headerBorderClass="border-none"
             headerPadClass="p-0"
             header={
-                <div className="px-4 pt-4 pb-5 flex items-center justify-between border-b border-slate-200/30 dark:border-slate-800/30">
-                    <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white -ml-1">
-                        <ArrowLeft className="w-5 h-5" />
-                    </button>
-                    <div className="flex flex-col items-center flex-1 px-4 min-w-0">
-                        <h1 className="text-xl font-black text-slate-900 dark:text-white truncate w-full text-center tracking-tight leading-tight capitalize">{party.name}</h1>
-                    </div>
-                    <div className={`px-3 py-1.5 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-sm shrink-0 ${statusBadge.cls}`}>
-                        {statusBadge.label}
+                <div className="contents">
+                    <SelectionBar 
+                        count={selectedCount}
+                        isAllSelected={isAllSelected}
+                        onCancel={exitSelectionMode}
+                        onSelectAll={() => toggleSelectAll(filteredTransactions.map(tx => tx.id))}
+                        actions={[
+                            {
+                                label: 'Delete',
+                                icon: <Trash2 className="w-5 h-5" />,
+                                onClick: () => setDeleteConfirmId('bulk'),
+                                variant: 'danger'
+                            }
+                        ]}
+                    />
+                    <div className="px-4 pt-4 pb-5 flex items-center justify-between border-b border-slate-200/30 dark:border-slate-800/30">
+                        <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white -ml-1">
+                            <ArrowLeft className="w-5 h-5" />
+                        </button>
+                        <div className="flex flex-col items-center flex-1 px-4 min-w-0">
+                            <h1 className="text-xl font-black text-slate-900 dark:text-white truncate w-full text-center tracking-tight leading-tight capitalize">{party.name}</h1>
+                        </div>
+                        <div className={`px-3 py-1.5 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-sm shrink-0 ${statusBadge.cls}`}>
+                            {statusBadge.label}
+                        </div>
                     </div>
                 </div>
+            }
+            renderFloating={
+                <>
+                    <DeleteConfirmationModal 
+                        isOpen={!!deleteConfirmId}
+                        onClose={() => setDeleteConfirmId(null)}
+                        onConfirm={async () => {
+                            if (deleteConfirmId === 'bulk') {
+                                for (const id of selectedIds) {
+                                    await softDeleteDebtTransaction(id);
+                                }
+                                exitSelectionMode();
+                            } else {
+                                await softDeleteDebtTransaction(deleteConfirmId);
+                            }
+                            setDeleteConfirmId(null);
+                            showToast('Entries removed', 'success');
+                        }}
+                        isFinancial={true}
+                        title={deleteConfirmId === 'bulk' ? `Delete ${selectedCount} Entries?` : "Delete Entry?"}
+                        message="Are you sure you want to remove this ledger entry? This will impact the party balance."
+                    />
+                    <DeleteConfirmationModal 
+                        isOpen={showSubmitConfirm}
+                        onClose={() => setShowSubmitConfirm(false)}
+                        onConfirm={async () => {
+                            await finalSubmit();
+                            setShowSubmitConfirm(false);
+                        }}
+                        isFinancial={true}
+                        title="Confirm Entry?"
+                        message="Are you sure you want to save this financial entry? This will affect your debt balance."
+                        confirmLabel="Save Entry"
+                    />
+                </>
             }
         >
             <div className="space-y-6">
@@ -716,15 +788,33 @@ const PartyDetail = () => {
                             const notesExpanded = expandedNotes[tx.id];
                             const isPositive = tx.type === 'you_gave' || tx.type === 'you_repaid';
 
+                            const isSelected = selectedIds.has(tx.id);
                             return (
-                                <div key={tx.id} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+                                <div 
+                                    key={tx.id} 
+                                    onClick={() => isSelectionMode && toggleSelection(tx.id)}
+                                    onMouseDown={() => handlePointerDown(tx.id)}
+                                    onMouseUp={handlePointerUpOrLeave}
+                                    onMouseLeave={handlePointerUpOrLeave}
+                                    onTouchStart={() => handlePointerDown(tx.id)}
+                                    onTouchEnd={handlePointerUpOrLeave}
+                                    className={clsx(
+                                        "bg-white dark:bg-slate-900 rounded-2xl border transition-all overflow-hidden cursor-pointer",
+                                        isSelected ? "border-indigo-500 ring-2 ring-indigo-500/20 dark:ring-indigo-500/40" : "border-slate-100 dark:border-slate-800"
+                                    )}
+                                >
                                     {/* Main row */}
                                     <div className="p-4">
                                         <div className="flex items-start gap-3">
                                             {/* Type indicator */}
-                                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${typeDef.color}`}>
-                                                {locked ? <Lock className="w-4 h-4" /> : (
-                                                    isPositive ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownLeft className="w-4 h-4" />
+                                            <div className={clsx(
+                                                "w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 transition-colors",
+                                                isSelected ? "bg-indigo-600 text-white" : typeDef.color
+                                            )}>
+                                                {isSelected ? <Check className="w-5 h-5" /> : (
+                                                    locked ? <Lock className="w-4 h-4" /> : (
+                                                        isPositive ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownLeft className="w-4 h-4" />
+                                                    )
                                                 )}
                                             </div>
 
@@ -739,14 +829,29 @@ const PartyDetail = () => {
                                                             {hasSettlements && <span className="bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 px-1 py-px rounded text-[8px] uppercase tracking-wider font-bold">Stl</span>}
                                                         </p>
                                                     </div>
-                                                    <div className="text-right shrink-0 ml-3">
-                                                        <p className={`text-base font-black ${isPositive ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
-                                                            {isPositive ? '+' : '−'}₹{Number(tx.amount).toLocaleString()}
-                                                        </p>
-                                                        {/* Running balance */}
-                                                        <p className={`text-[10px] font-bold mt-0.5 ${runBal >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                                                            Bal: {runBal >= 0 ? '+' : '−'}₹{Math.abs(runBal).toLocaleString()}
-                                                        </p>
+                                                    <div className="text-right shrink-0 ml-3 flex items-center gap-3">
+                                                        <div>
+                                                            <p className={`text-base font-black ${isPositive ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                                                                {isPositive ? '+' : '−'}₹{Number(tx.amount).toLocaleString()}
+                                                            </p>
+                                                            <p className={`text-[10px] font-bold mt-0.5 ${runBal >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                                Bal: {runBal >= 0 ? '+' : '−'}₹{Math.abs(runBal).toLocaleString()}
+                                                            </p>
+                                                        </div>
+                                                        {!isSelectionMode && !locked && (
+                                                            <ItemMenu 
+                                                                onEdit={() => {
+                                                                    setTxType(tx.type);
+                                                                    setAmount(String(tx.amount));
+                                                                    setDate(format(new Date(tx.date), 'yyyy-MM-dd'));
+                                                                    if (tx.due_date) setDueDate(format(new Date(tx.due_date), 'yyyy-MM-dd'));
+                                                                    setNote(tx.notes || '');
+                                                                    setEditTransactionId(tx.id);
+                                                                    setIsAddCardOpen(true);
+                                                                }}
+                                                                onDelete={() => setDeleteConfirmId(tx.id)}
+                                                            />
+                                                        )}
                                                     </div>
                                                 </div>
 
@@ -778,27 +883,6 @@ const PartyDetail = () => {
                                                 )}
                                             </div>
 
-                                            {/* Actions */}
-                                            <div className="relative shrink-0 flex items-center justify-end gap-1 ml-2">
-                                                {!locked && (
-                                                    <button onClick={() => {
-                                                        setTxType(tx.type);
-                                                        setAmount(String(tx.amount));
-                                                        setDate(format(new Date(tx.date), 'yyyy-MM-dd'));
-                                                        if (tx.due_date) setDueDate(format(new Date(tx.due_date), 'yyyy-MM-dd'));
-                                                        setNote(tx.notes || '');
-                                                        setEditTransactionId(tx.id);
-                                                        setIsAddCardOpen(true);
-                                                    }} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 transition-colors">
-                                                        <Edit2 className="w-4 h-4" />
-                                                    </button>
-                                                )}
-                                                {!locked && (
-                                                    <button onClick={() => setDeleteConfirmId(tx.id)} className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg text-red-400 hover:text-red-500 transition-colors">
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                )}
-                                            </div>
                                         </div>
                                     </div>
 
