@@ -118,65 +118,7 @@ const LedgerScreen = ({ activeVehicle, trendData, maxTrendCost, stats, combinedH
                 </div>
             </section>
              
-            {/* Vehicle List (for inactive or archived view) */}
-            {(showArchived || (activeVehicle ? sortedVehicles.length > 1 : true)) && (
-            <div className="space-y-3 mt-4">
-            {sortedVehicles.length === 0 && showArchived ? (
-            <div className="text-center py-8 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
-            <Archive className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-            <p className="text-slate-500 text-sm">No archived vehicles found.</p>
-            </div>
-            ) : (
-            sortedVehicles.filter(v => showArchived ? true : !v.isActive).map(vehicle => {
-            const Icon = getIcon(vehicle.type);
-            return (
-            <motion.div
-            key={vehicle.id}
-            layout
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className={`bg-white dark:bg-slate-900 p-4 rounded-2xl border ${vehicle.isActive ? 'border-indigo-500 ring-1 ring-indigo-500' : 'border-slate-100 dark:border-slate-800'} shadow-sm relative overflow-hidden cursor-pointer hover:shadow-md transition-all`}
-            onClick={() => !showArchived && setVehicleActive(vehicle.id)}
-            >
-            <div className="flex items-center gap-4">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${vehicle.isActive ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
-            <Icon className="w-5 h-5" />
-            </div>
-            <div className="flex-1">
-            <div className="flex items-center justify-between">
-            <h4 className="font-bold text-slate-900 dark:text-white text-sm">{vehicle.name}</h4>
-            {vehicle.isActive && <CheckCircle className="w-4 h-4 text-indigo-500" />}
-            </div>
-            <p className="text-xs text-slate-500">{vehicle.brandModel}</p>
-            </div>
-            </div>
-
-            <div className="mt-3 pt-2 border-t border-slate-50 dark:border-slate-800 flex justify-end gap-2">
-            <button
-            onClick={(e) => {
-            e.stopPropagation();
-            setDeleteConfirmId(vehicle.id);
-            }}
-            className="text-red-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-wider px-2 py-1"
-            >
-            Delete
-            </button>
-            <button
-            onClick={(e) => {
-            e.stopPropagation();
-            toggleArchiveVehicle(vehicle.id);
-            }}
-            className="text-slate-400 hover:text-slate-600 text-[10px] font-bold uppercase tracking-wider px-2 py-1"
-            >
-            {vehicle.isArchived ? 'Unarchive' : 'Archive'}
-            </button>
-            </div>
-            </motion.div>
-            );
-            }))}
-
-            </div>
-            )}
+            {/* Vehicle List removed - moved to Manage Vehicles modal */}
         </div>
     );
 };
