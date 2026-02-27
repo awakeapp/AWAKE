@@ -204,8 +204,8 @@ const DebtManager = () => {
     const handleBulkDelete = async () => {
         setIsBulkDeleting(true);
         try {
-            await Promise.all(Array.from(selectedIds).map(id => deleteDebtParty(id)));
-            showToast(`Deleted ${selectedIds.size} parties`, 'success');
+            await Promise.all(selectedIds.map(id => deleteDebtParty(id)));
+            showToast(`Deleted ${selectedIds.length} parties`, 'success');
             exitSelectionMode();
         } catch (error) {
             showToast('Failed to delete some parties', 'error');
@@ -328,10 +328,10 @@ const DebtManager = () => {
             title={isSelectionMode ? undefined : "Debts & Lending"}
             header={isSelectionMode ? (
                 <SelectionBar 
-                    count={selectedIds.size}
+                    count={selectedIds.length}
                     onCancel={exitSelectionMode}
                     onSelectAll={toggleSelectAll}
-                    isAllSelected={selectedIds.size === debtParties.length}
+                    isAllSelected={selectedIds.length === debtParties.length}
                     actions={(
                         <button
                             onClick={() => setDeleteConfirmId('bulk')}
@@ -414,7 +414,7 @@ const DebtManager = () => {
                                         onContextMenu={(e) => { e.preventDefault(); enterSelectionMode(party.id); }}
                                         className={clsx(
                                             "bg-white dark:bg-slate-900 p-5 rounded-3xl shadow-sm border transition-all flex flex-col gap-4 relative overflow-hidden group cursor-pointer",
-                                            selectedIds.has(party.id) ? "border-indigo-500 ring-2 ring-indigo-500/20" : "border-slate-100 dark:border-slate-800"
+                                            selectedIds.includes(party.id) ? "border-indigo-500 ring-2 ring-indigo-500/20" : "border-slate-100 dark:border-slate-800"
                                         )}
                                     >
                                         <div className={`absolute top-0 right-0 w-32 h-32 -mr-16 -mt-16 blur-3xl opacity-[0.03] pointer-events-none rounded-full ${isSettled ? 'bg-slate-400' : isReceivable ? 'bg-emerald-500' : 'bg-red-500'}`} />
@@ -425,9 +425,9 @@ const DebtManager = () => {
                                                     {isSelectionMode && (
                                                         <div className={clsx(
                                                             "w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-colors",
-                                                            selectedIds.has(party.id) ? "bg-indigo-600 border-indigo-600" : "border-slate-300 dark:border-slate-700"
+                                                            selectedIds.includes(party.id) ? "bg-indigo-600 border-indigo-600" : "border-slate-300 dark:border-slate-700"
                                                         )}>
-                                                            {selectedIds.has(party.id) && <Check className="w-3 h-3 text-white" />}
+                                                            {selectedIds.includes(party.id) && <Check className="w-3 h-3 text-white" />}
                                                         </div>
                                                     )}
                                                     <h4 className="text-lg font-black text-slate-900 dark:text-white capitalize truncate leading-tight tracking-tight">
@@ -501,7 +501,7 @@ const DebtManager = () => {
                             setDeleteConfirmId(null);
                             showToast('Party deleted', 'success');
                         }}
-                        title={deleteConfirmId === 'bulk' ? `Delete ${selectedIds.size} Parties?` : "Delete Party?"}
+                        title={deleteConfirmId === 'bulk' ? `Delete ${selectedIds.length} Parties?` : "Delete Party?"}
                         message={deleteConfirmId === 'bulk' ? "Are you sure you want to delete these parties? All transaction history will be lost." : "Are you sure you want to delete this party? All related transaction history will be lost."}
                     />
         </PageLayout>

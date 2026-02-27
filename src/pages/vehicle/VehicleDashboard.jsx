@@ -62,21 +62,6 @@ const VehicleDashboard = () => {
     const [archiveConfirmId, setArchiveConfirmId] = useState(null);
     const [isBulkDeleting, setIsBulkDeleting] = useState(false);
     
-    const {
-        selectedIds,
-        isSelectionMode,
-        toggleSelection,
-        clearSelection,
-        enterSelectionMode,
-        exitSelectionMode,
-        toggleSelectAll
-    } = useSelection(combinedHistory.map(h => h.id));
-    
-    const [historyFilter, setHistoryFilter] = useState('All');
-    
-    const menuRef = useRef();
-    const selectorRef = useRef();
-    
     const activeVehicle = getActiveVehicle();
     const activeLoan = activeVehicle ? getLoanForVehicle(activeVehicle.id) : null;
     const loanDetail = activeLoan ? getLoanDetailedStatus(activeLoan.id) : null;
@@ -92,13 +77,26 @@ const VehicleDashboard = () => {
     const maxTrendCost = trendData.length ? Math.max(...trendData.map(d => d.cost)) || 1 : 1;
     
     // Ledger Entries already standardize 'EMI', 'fuel', 'service', etc.
+    const [historyFilter, setHistoryFilter] = useState('All');
+    
     let combinedHistory = [...serviceRecords];
-
     if (historyFilter !== 'All') {
         combinedHistory = combinedHistory.filter(h => h.type.toLowerCase() === historyFilter.toLowerCase());
     }
-
     combinedHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    const {
+        selectedIds,
+        isSelectionMode,
+        toggleSelection,
+        clearSelection,
+        enterSelectionMode,
+        exitSelectionMode,
+        toggleSelectAll
+    } = useSelection(combinedHistory.map(h => h.id));
+
+    const menuRef = useRef();
+    const selectorRef = useRef();
 
     // Sort logic
     const visibleVehicles = vehicles;
@@ -160,8 +158,8 @@ const VehicleDashboard = () => {
     const handleBulkDelete = async () => {
         setIsBulkDeleting(true);
         try {
-            await Promise.all(Array.from(selectedIds).map(id => deleteServiceRecord(id)));
-            showToast(`Deleted ${selectedIds.size} entries`, 'success');
+            await Promise.all(selectedIds.map(id => deleteServiceRecord(id)));
+            showToast(`Deleted ${selectedIds.length} entries`, 'success');
             exitSelectionMode();
         } catch (error) {
             showToast('Failed to delete some entries', 'error');
@@ -271,7 +269,7 @@ const VehicleDashboard = () => {
                         isOpen={!!deleteConfirmId} 
                         onClose={() => setDeleteConfirmId(null)} 
                         onConfirm={deleteConfirmId === 'bulk' ? handleBulkDelete : () => { deleteVehicle(deleteConfirmId); setDeleteConfirmId(null); }} 
-                        title={deleteConfirmId === 'bulk' ? `Delete ${selectedIds.size} Entries?` : "Delete Vehicle?"} 
+                        title={deleteConfirmId === 'bulk' ? `Delete ${selectedIds.length} Entries?` : "Delete Vehicle?"} 
                         message={deleteConfirmId === 'bulk' ? "Are you sure you want to delete these records? This action cannot be undone." : "Are you sure you want to permanently delete this vehicle? All related data will be lost."} 
                     />
                     <DeleteConfirmationModal 
@@ -287,10 +285,10 @@ const VehicleDashboard = () => {
             title={isSelectionMode ? undefined : "Fleet Management"}
             header={isSelectionMode ? (
                 <SelectionBar 
-                    count={selectedIds.size}
+                    count={selectedIds.length}
                     onCancel={exitSelectionMode}
                     onSelectAll={toggleSelectAll}
-                    isAllSelected={selectedIds.size === combinedHistory.length}
+                    isAllSelected={selectedIds.length === combinedHistory.length}
                     actions={(
                         <button
                             onClick={() => setDeleteConfirmId('bulk')}

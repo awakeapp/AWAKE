@@ -111,7 +111,7 @@ const LedgerScreen = ({
                         </div>
                     ) : (
                         combinedHistory.map((record, index) => {
-                            const isSelected = selectedIds.has(record.id);
+                            const isSelected = selectedIds.includes(record.id);
                             return (
                                 <div 
                                     key={record.id || index} 
