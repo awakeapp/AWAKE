@@ -1,4 +1,4 @@
-import { useState, useEffect, memo } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { useTasks } from '../../../context/TaskContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import ToggleSwitch from '../../atoms/ToggleSwitch';

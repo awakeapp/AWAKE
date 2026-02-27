@@ -153,6 +153,7 @@ const Routine = () => {
                 </div>
             </div>
 
+            {/* Content offset - matches header height */}
             <div 
                 className="max-w-md mx-auto w-full"
                 style={{ paddingTop: 'calc(72px + env(safe-area-inset-top) + 0px)' }}
