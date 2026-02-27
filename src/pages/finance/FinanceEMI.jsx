@@ -7,6 +7,7 @@ import { useThemeColor } from '../../hooks/useThemeColor';
 import { useTheme } from '../../context/ThemeContext';
 import { FirestoreService } from '../../services/firestore-service';
 import { format, differenceInDays, isBefore } from 'date-fns';
+import PageLayout from '../../components/layout/PageLayout';
 
 const FinanceEMI = () => {
     const navigate = useNavigate();
@@ -67,27 +68,17 @@ const FinanceEMI = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#F2F2F7] dark:bg-black text-black dark:text-white font-sans pb-12">
-            {/* Fixed Header */}
-            <div 
-                className="fixed top-0 left-0 right-0 z-40 bg-[#F2F2F7]/80 dark:bg-black/80 backdrop-blur-md border-b border-slate-200 dark:border-white/10"
-                style={{ paddingTop: 'env(safe-area-inset-top)' }}
-            >
-                <div className="max-w-screen-md mx-auto px-4 pt-4 pb-5 flex items-center gap-3">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="p-2 -ml-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
-                    >
+        <PageLayout
+            header={
+                <div className="flex items-center gap-3">
+                    <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
                         <ArrowLeft className="w-6 h-6" />
                     </button>
-                    <h1 className="text-xl font-bold tracking-tight">EMI Manager</h1>
+                    <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">EMI Manager</h1>
                 </div>
-            </div>
-
-            <div 
-                className="max-w-screen-md mx-auto px-4"
-                style={{ paddingTop: 'calc(76px + env(safe-area-inset-top))' }}
-            >
+            }
+        >
+            <div className="space-y-6">
                 {/* Summary Cards */}
                 <div className="grid grid-cols-2 gap-3 mb-6">
                     <div className="bg-white dark:bg-[#1C1C1E] rounded-2xl p-4 border border-slate-200 dark:border-[#2C2C2E]">
@@ -212,11 +203,8 @@ const FinanceEMI = () => {
                     </div>
                 )}
 
-                <p className="text-center text-[12px] text-slate-400 dark:text-[#8E8E93] mt-8 mb-4 tracking-wide font-medium">
-                    Synced from Vehicle Module • Central EMI Store
-                </p>
             </div>
-        </div>
+        </PageLayout>
     );
 };
 

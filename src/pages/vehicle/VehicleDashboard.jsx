@@ -19,6 +19,7 @@ import AmortizationScheduleModal from './AmortizationScheduleModal';
 import PrepaymentCalculatorModal from './PrepaymentCalculatorModal';
 import ConfirmDialog from '../../components/organisms/ConfirmDialog';
 import { AppBottomNav } from '../../components/ui/AppBottomNav';
+import PageLayout from '../../components/layout/PageLayout';
 
 const VehicleDashboard = () => {
     const navigate = useNavigate();
@@ -164,11 +165,84 @@ const VehicleDashboard = () => {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-2 pb-24">
-            
-            {/* Header */}
-            <header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-                <div className="px-4 pt-4 pb-5 flex items-center justify-between">
+        <PageLayout
+            bottomNav={
+                <AppBottomNav 
+                    items={[
+                        { id: 'app-home', icon: Home, label: 'AWAKE', onClick: () => navigate('/') },
+                        { 
+                            id: 'service', 
+                            icon: Wrench, 
+                            label: 'Service', 
+                            isActive: activeTab === 'service', 
+                            onClick: () => setActiveTab('service') 
+                        },
+                        { 
+                            id: 'dashboard', 
+                            icon: Car, 
+                            label: 'Dashboard', 
+                            isActive: activeTab === 'dashboard', 
+                            onClick: () => setActiveTab('dashboard'), 
+                            isPrimary: true 
+                        },
+                        { 
+                            id: 'loan', 
+                            icon: Landmark, 
+                            label: 'Loan', 
+                            isActive: activeTab === 'loan', 
+                            onClick: () => setActiveTab('loan') 
+                        },
+                        { 
+                            id: 'more', 
+                            icon: MoreHorizontal, 
+                            label: 'More', 
+                            onClick: () => navigate('/vehicle/more') 
+                        }
+                    ]} 
+                />
+            }
+            renderFloating={
+                <>
+                    {/* Contextual FABs */}
+                    {activeTab === 'dashboard' && (
+                        <button
+                            onClick={() => alert("Add Entry: Full ledger entry modal coming soon")}
+                            className="fixed bottom-[80px] right-6 bg-indigo-600 text-white px-5 py-3 rounded-2xl shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
+                        >
+                            <Plus className="w-5 h-5" /> Add Entry
+                        </button>
+                    )}
+                    {activeTab === 'service' && (
+                        <button
+                            onClick={() => alert("Add Reminder Modal Coming Soon")}
+                            className="fixed bottom-[80px] right-6 bg-blue-600 text-white px-5 py-3 rounded-2xl shadow-xl shadow-blue-600/30 flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
+                        >
+                            <Plus className="w-5 h-5" /> Add Reminder
+                        </button>
+                    )}
+                    {activeTab === 'loan' && activeLoan && (
+                        <button
+                            onClick={() => setIsPayEMIOpen(true)}
+                            className="fixed bottom-[80px] right-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-5 py-3 rounded-2xl shadow-xl flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
+                        >
+                            <Plus className="w-5 h-5" /> Record EMI
+                        </button>
+                    )}
+
+                    {/* Modals */}
+                    <AddVehicleModal isOpen={isAddOpen} onClose={() => { setIsAddOpen(false); setEditingVehicle(null); }} onSave={handleSaveVehicle} editVehicle={editingVehicle} />
+                    <ManageVehiclesModal isOpen={isManageVehiclesOpen} onClose={() => setIsManageVehiclesOpen(false)} setEditingVehicle={setEditingVehicle} setIsAddOpen={setIsAddOpen} setDeleteConfirmId={setDeleteConfirmId} />
+                    <AddLoanModal isOpen={isAddLoanOpen} onClose={() => setIsAddLoanOpen(false)} onSave={(data) => { addLoan(data); setIsAddLoanOpen(false); }} vehicle={activeVehicle} />
+                    <PayEMIModal isOpen={isPayEMIOpen} onClose={() => setIsPayEMIOpen(false)} onSave={handleRecordPayment} loan={activeLoan} vehicle={activeVehicle} loanDetail={loanDetail} />
+                    <AmortizationScheduleModal isOpen={isAmortizationOpen} onClose={() => setIsAmortizationOpen(false)} loan={activeLoan} />
+                    <PrepaymentCalculatorModal isOpen={isPrepaymentOpen} onClose={() => setIsPrepaymentOpen(false)} loan={activeLoan} onSavePayment={handleRecordPayment} />
+                    
+                    <ConfirmDialog isOpen={!!deleteConfirmId} onClose={() => setDeleteConfirmId(null)} onConfirm={() => { deleteVehicle(deleteConfirmId); setDeleteConfirmId(null); }} title="Delete Vehicle?" message="Are you sure you want to permanently delete this vehicle? All related data will be lost." confirmText="Delete" />
+                    <ConfirmDialog isOpen={!!archiveConfirmId} onClose={() => setArchiveConfirmId(null)} onConfirm={() => { toggleArchiveVehicle(archiveConfirmId); setArchiveConfirmId(null); }} title="Archive Vehicle?" message="Are you sure you want to archive this vehicle? It will be hidden from the main view." confirmText="Archive" />
+                </>
+            }
+            header={
+                <div className="flex items-center justify-between">
                     {/* Left: Vehicle Selector */}
                     <div className="relative" ref={selectorRef}>
                         <button 
@@ -194,7 +268,7 @@ const VehicleDashboard = () => {
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: 10 }}
-                                    className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden z-50"
+                                    className="absolute left-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden z-50"
                                 >
                                     <div className="p-2 space-y-1">
                                         {sortedVehicles.filter(v => !v.isArchived).map(vehicle => (
@@ -223,15 +297,15 @@ const VehicleDashboard = () => {
                     <div>
                         <button 
                             onClick={() => navigate('/vehicle/more')}
-                            className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 active:scale-95 transition-all shadow-sm"
+                            className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 transition-all shadow-sm"
                         >
                             <MoreHorizontal className="w-5 h-5" />
                         </button>
                     </div>
                 </div>
-            </header>
-
-            <div className="px-4 pt-0 pb-4">
+            }
+        >
+            <div>
                 {activeVehicle ? (
                     <>
                         {/* Quick Stats overview top container for Dashboard ONLY */}
@@ -301,33 +375,6 @@ const VehicleDashboard = () => {
                                 />
                             </div>
                         </main>
-                        
-                        {/* Contextual FABs */}
-                        {activeTab === 'dashboard' && (
-                            <button
-                                onClick={() => alert("Add Entry: Full ledger entry modal coming soon")}
-                                className="fixed bottom-[80px] right-6 bg-indigo-600 text-white px-5 py-3 rounded-2xl shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
-                            >
-                                <Plus className="w-5 h-5" /> Add Entry
-                            </button>
-                        )}
-                        {activeTab === 'service' && (
-                            <button
-                                onClick={() => alert("Add Reminder Modal Coming Soon")}
-                                className="fixed bottom-[80px] right-6 bg-blue-600 text-white px-5 py-3 rounded-2xl shadow-xl shadow-blue-600/30 flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
-                            >
-                                <Plus className="w-5 h-5" /> Add Reminder
-                            </button>
-                        )}
-                        {activeTab === 'loan' && activeLoan && (
-                            <button
-                                onClick={() => setIsPayEMIOpen(true)}
-                                className="fixed bottom-[80px] right-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-5 py-3 rounded-2xl shadow-xl flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
-                            >
-                                <Plus className="w-5 h-5" /> Record EMI
-                            </button>
-                        )}
-
                     </>
                 ) : (
                     <div className="text-center py-12">
@@ -335,114 +382,7 @@ const VehicleDashboard = () => {
                     </div>
                 )}
             </div>
-
-            {/* Internal Bottom Navigation */}
-            <AppBottomNav 
-                items={[
-                    { id: 'app-home', icon: Home, label: 'AWAKE', onClick: () => navigate('/') },
-                    { 
-                        id: 'service', 
-                        icon: Wrench, 
-                        label: 'Service', 
-                        isActive: activeTab === 'service', 
-                        onClick: () => setActiveTab('service') 
-                    },
-                    { 
-                        id: 'dashboard', 
-                        icon: Car, 
-                        label: 'Dashboard', 
-                        isActive: activeTab === 'dashboard', 
-                        onClick: () => setActiveTab('dashboard'), 
-                        isPrimary: true 
-                    },
-                    { 
-                        id: 'loan', 
-                        icon: Landmark, 
-                        label: 'Loan', 
-                        isActive: activeTab === 'loan', 
-                        onClick: () => setActiveTab('loan') 
-                    },
-                    { 
-                        id: 'more', 
-                        icon: MoreHorizontal, 
-                        label: 'More', 
-                        onClick: () => navigate('/vehicle/more') 
-                    }
-                ]} 
-            />
-
-            {/* Modals */}
-             <AddVehicleModal
-                 isOpen={isAddOpen}
-                 onClose={() => {
-                     setIsAddOpen(false);
-                     setEditingVehicle(null);
-                 }}
-                 onSave={handleSaveVehicle}
-                 editVehicle={editingVehicle}
-             />
-             
-             <ManageVehiclesModal
-                 isOpen={isManageVehiclesOpen}
-                 onClose={() => setIsManageVehiclesOpen(false)}
-                 setEditingVehicle={setEditingVehicle}
-                 setIsAddOpen={setIsAddOpen}
-                 setDeleteConfirmId={setDeleteConfirmId}
-             />
-             
-             <AddLoanModal
-                 isOpen={isAddLoanOpen}
-                 onClose={() => setIsAddLoanOpen(false)}
-                 onSave={(data) => { addLoan(data); setIsAddLoanOpen(false); }}
-                 vehicle={activeVehicle}
-             />
-             
-             <PayEMIModal
-                 isOpen={isPayEMIOpen}
-                 onClose={() => setIsPayEMIOpen(false)}
-                 onSave={handleRecordPayment}
-                 loan={activeLoan}
-                 vehicle={activeVehicle}
-                 loanDetail={loanDetail}
-             />
-             
-             <AmortizationScheduleModal
-                 isOpen={isAmortizationOpen}
-                 onClose={() => setIsAmortizationOpen(false)}
-                 loan={activeLoan}
-             />
-             
-             <PrepaymentCalculatorModal
-                 isOpen={isPrepaymentOpen}
-                 onClose={() => setIsPrepaymentOpen(false)}
-                 loan={activeLoan}
-                 onSavePayment={handleRecordPayment}
-             />
-            
-            <ConfirmDialog
-                 isOpen={!!deleteConfirmId}
-                 onClose={() => setDeleteConfirmId(null)}
-                 onConfirm={() => {
-                     deleteVehicle(deleteConfirmId);
-                     setDeleteConfirmId(null);
-                 }}
-                 title="Delete Vehicle?"
-                 message="Are you sure you want to permanently delete this vehicle? All related data will be lost."
-                 confirmText="Delete"
-            />
-            
-            <ConfirmDialog
-                 isOpen={!!archiveConfirmId}
-                 onClose={() => setArchiveConfirmId(null)}
-                 onConfirm={() => {
-                     toggleArchiveVehicle(archiveConfirmId);
-                     setArchiveConfirmId(null);
-                 }}
-                 title="Archive Vehicle?"
-                 message="Are you sure you want to archive this vehicle? It will be hidden from the main view."
-                 confirmText="Archive"
-            />
-        </div>
+        </PageLayout>
     );
 };
 

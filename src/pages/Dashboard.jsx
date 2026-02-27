@@ -13,6 +13,7 @@ import Button from '../components/atoms/Button';
 import { Loader2, Lock, Edit2, List, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
+import PageLayout from '../components/layout/PageLayout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Trophy, Target, Flame } from 'lucide-react';
 import { FirestoreService } from '../services/firestore-service';
@@ -157,17 +158,20 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="pb-32 px-4 pt-[calc(env(safe-area-inset-top)+76px)] space-y-6">
-            {/* Header / Date */}
-            <div 
-                className="fixed left-0 right-0 z-40 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200/20 dark:border-slate-800/20"
-                style={{ top: 'env(safe-area-inset-top)' }}
-            >
-                <div className="max-w-md mx-auto w-full px-4 pt-4 pb-5">
-                    <DateHeader className="mb-0" />
-                </div>
-            </div>
-
+        <PageLayout 
+            bottomNav={true}
+            header={<DateHeader className="mb-0" />}
+            renderFloating={
+                <>
+                    <DayOverviewModal isOpen={showSubmitModal} onClose={() => setShowSubmitModal(false)} data={dailyData} onConfirm={handleConfirmSubmit} />
+                    <TaskManagerModal isOpen={showManagerModal} onClose={() => setShowManagerModal(false)} tasks={dailyData.tasks} />
+                    <UnifiedFeedbackModal isOpen={feedbackModal.isOpen} onClose={() => setFeedbackModal(prev => ({ ...prev, isOpen: false }))} type={feedbackModal.type} category={feedbackModal.category} />
+                    <Suspense fallback={null}>
+                        <UnlockDayModal isOpen={showUnlockModal} onClose={() => setShowUnlockModal(false)} onConfirm={handleUnlock} />
+                    </Suspense>
+                </>
+            }
+        >
             {/* WELCOME & SUMMARY SECTION */}
             <div className="space-y-4">
                 <div className="flex items-end justify-between px-1">
@@ -333,14 +337,7 @@ const Dashboard = () => {
                 )}
             </div>
 
-            {/* Modals */}
-            <DayOverviewModal isOpen={showSubmitModal} onClose={() => setShowSubmitModal(false)} data={dailyData} onConfirm={handleConfirmSubmit} />
-            <TaskManagerModal isOpen={showManagerModal} onClose={() => setShowManagerModal(false)} tasks={dailyData.tasks} />
-            <UnifiedFeedbackModal isOpen={feedbackModal.isOpen} onClose={() => setFeedbackModal(prev => ({ ...prev, isOpen: false }))} type={feedbackModal.type} category={feedbackModal.category} />
-            {/* Unlock Day Modal */}
-            <Suspense fallback={null}>
-                <UnlockDayModal isOpen={showUnlockModal} onClose={() => setShowUnlockModal(false)} onConfirm={handleUnlock} />
-            </Suspense>
+            {/* Modals are rendered via renderFloating */}
 
             {/* Footer Links */}
             <div className="flex justify-center gap-6 opacity-40 pt-8 pb-4">
@@ -348,7 +345,7 @@ const Dashboard = () => {
                 <div className="w-px h-3 bg-slate-300 my-auto"></div>
                 <button onClick={() => navigate('/settings')} className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Settings</button>
             </div>
-        </div>
+        </PageLayout>
     );
 };
 

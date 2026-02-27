@@ -3,6 +3,7 @@ import { useFinance } from '../../context/FinanceContext';
 import { ArrowLeft, Wallet, Plus, Archive } from 'lucide-react';
 import { useState } from 'react';
 import FinanceBottomNav from '../../components/finance/FinanceBottomNav';
+import PageLayout from '../../components/layout/PageLayout';
 
 const FinanceWallets = () => {
     const navigate = useNavigate();
@@ -23,12 +24,9 @@ const FinanceWallets = () => {
     };
 
     return (
-        <div
-            className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col pt-[env(safe-area-inset-top)]"
-            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5rem)' }}
-        >
-            {/* Header */}
-            <header className="sticky top-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl px-4 pt-4 pb-5" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}>
+        <PageLayout
+            bottomNav={<FinanceBottomNav />}
+            header={
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white -ml-1">
@@ -46,9 +44,9 @@ const FinanceWallets = () => {
                         <Plus className="w-4 h-4" /> Add
                     </button>
                 </div>
-            </header>
-
-            <div className="px-4 flex-1 space-y-4 pt-2">
+            }
+        >
+            <div className="space-y-4">
                 {/* Active Accounts */}
                 {activeAccounts.map(acc => {
                     const bal = getAccountBalance ? getAccountBalance(acc.id) : acc.balance;
@@ -120,9 +118,7 @@ const FinanceWallets = () => {
                     </div>
                 )}
             </div>
-
-            <FinanceBottomNav />
-        </div>
+        </PageLayout>
     );
 };
 

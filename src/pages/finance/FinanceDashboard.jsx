@@ -15,6 +15,7 @@ import { useSettings } from '../../context/SettingsContext';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import FinanceBottomNav from '../../components/finance/FinanceBottomNav';
 import { useToast } from '../../context/ToastContext';
+import PageLayout from '../../components/layout/PageLayout';
 
 const FinanceDashboard = () => {
     const navigate = useNavigate();
@@ -111,13 +112,69 @@ const FinanceDashboard = () => {
 
 
     return (
-        <div 
-            className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col relative"
-            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5rem)' }}
-        >
-            {/* Fixed Header Area */}
-            <header className="fixed top-0 left-0 right-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200/30 dark:border-slate-800/30" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-                <div className="px-4 pt-4 pb-5 grid grid-cols-3 items-center">
+        <PageLayout
+            bottomNav={<FinanceBottomNav />}
+            renderFloating={
+                <>
+                    <div className="fixed right-6 z-40" style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 88px)' }}>
+                        <button
+                            onClick={() => {
+                                setEditTransactionId(null);
+                                setAddType('expense');
+                                setIsAddOpen(true);
+                            }}
+                            className="w-14 h-14 bg-indigo-600 text-white rounded-full shadow-xl shadow-indigo-600/30 flex items-center justify-center active:scale-95 transition-transform"
+                        >
+                            <Plus className="w-6 h-6" />
+                        </button>
+                    </div>
+
+                    {isAddOpen && (
+                        <AddTransactionModal
+                            isOpen={true}
+                            onClose={() => setIsAddOpen(false)}
+                            editTransactionId={editTransactionId}
+                            initialType={addType}
+                            onDelete={(id) => {
+                                deleteTransaction(id);
+                                setUndoToast({ id, message: 'Transaction deleted.' });
+                                setTimeout(() => setUndoToast(null), 4000);
+                            }}
+                        />
+                    )}
+
+                    <BudgetSummary isOpen={isBudgetOpen} onClose={() => setIsBudgetOpen(false)} />
+
+                    <AnimatePresence>
+                        {undoToast && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 50 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 50 }}
+                                className="fixed bottom-[80px] left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-4 text-sm font-medium border border-white/10"
+                            >
+                                <span>{undoToast.message}</span>
+                                <button
+                                    onClick={handleUndo}
+                                    className="text-indigo-400 hover:text-indigo-300 font-bold uppercase text-xs"
+                                >
+                                    {t('finance.undo', 'Undo')}
+                                </button>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    <AnalyticsModal
+                        isOpen={isAnalyticsOpen}
+                        onClose={() => setIsAnalyticsOpen(false)}
+                        monthStats={monthStats}
+                        categories={categories}
+                        selectedDate={selectedDate}
+                    />
+                </>
+            }
+            header={
+                <div className="grid grid-cols-3 items-center">
                     <h1 className="text-xl font-bold text-slate-900 dark:text-white">Finance</h1>
                     
                     <div className="flex items-center justify-self-center gap-1 bg-white dark:bg-slate-900 rounded-full p-1 shadow-sm border border-slate-100 dark:border-slate-800">
@@ -139,11 +196,9 @@ const FinanceDashboard = () => {
                         <MoreHorizontal className="w-5 h-5" />
                     </button>
                 </div>
-            </header>
-
-            {/* Scrollable Content Container */}
-            <div className="flex-1 overflow-y-auto" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 76px)' }}>
-                <div className="px-4 flex flex-col space-y-6 pb-8">
+            }
+        >
+            <div className="flex flex-col space-y-6">
                     
                     {/* Total Balance Card (Reduced Height & Vertical Padding) */}
                     <motion.div 
@@ -309,67 +364,7 @@ const FinanceDashboard = () => {
                     </div>
                 </section>
             </div>
-        </div>
-
-            {/* Floating Action Button — sits above Finance bottom nav */}
-            <div className="fixed right-6 z-40" style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 88px)' }}>
-                <button
-                    onClick={() => {
-                        setEditTransactionId(null);
-                        setAddType('expense');
-                        setIsAddOpen(true);
-                    }}
-                    className="w-14 h-14 bg-indigo-600 text-white rounded-full shadow-xl shadow-indigo-600/30 flex items-center justify-center active:scale-95 transition-transform"
-                >
-                    <Plus className="w-6 h-6" />
-                </button>
-            </div>
-
-            {isAddOpen && (
-                <AddTransactionModal
-                    isOpen={true}
-                    onClose={() => setIsAddOpen(false)}
-                    editTransactionId={editTransactionId}
-                    initialType={addType}
-                    onDelete={(id) => {
-                        deleteTransaction(id);
-                        setUndoToast({ id, message: 'Transaction deleted.' });
-                        setTimeout(() => setUndoToast(null), 4000);
-                    }}
-                />
-            )}
-
-            <BudgetSummary isOpen={isBudgetOpen} onClose={() => setIsBudgetOpen(false)} />
-
-            <AnimatePresence>
-                {undoToast && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 50 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 50 }}
-                        className="fixed bottom-[80px] left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-4 text-sm font-medium border border-white/10"
-                    >
-                        <span>{undoToast.message}</span>
-                        <button
-                            onClick={handleUndo}
-                            className="text-indigo-400 hover:text-indigo-300 font-bold uppercase text-xs"
-                        >
-                            {t('finance.undo', 'Undo')}
-                        </button>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            <AnalyticsModal
-                isOpen={isAnalyticsOpen}
-                onClose={() => setIsAnalyticsOpen(false)}
-                monthStats={monthStats}
-                categories={categories}
-                selectedDate={selectedDate}
-            />
-
-            <FinanceBottomNav />
-        </div>
+        </PageLayout>
     );
 };
 

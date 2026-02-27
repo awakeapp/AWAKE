@@ -15,6 +15,7 @@ import EditProfileModal from '../components/organisms/EditProfileModal';
 import ExportModal from '../components/organisms/ExportModal';
 import ReportModal from '../components/organisms/ReportModal';
 import { useToast } from '../context/ToastContext';
+import PageLayout from '../components/layout/PageLayout';
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -73,11 +74,43 @@ const Profile = () => {
     const memberId = `AWK-${user?.uid?.slice(-4).toUpperCase() || 'GUEST'}`;
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-black pb-24">
-            <AppHeader title="Account" showBack onBack={() => navigate(-1)} />
-
-            <div className="pt-[calc(60px+env(safe-area-inset-top))]">
-                <SettingsList>
+        <PageLayout
+            header={
+                <div className="flex items-center gap-3">
+                    <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+                        <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-white" />
+                    </button>
+                    <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Account</h1>
+                </div>
+            }
+            renderFloating={
+                <>
+                    <EditProfileModal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} />
+                    <ExportModal isOpen={isExportOpen} onClose={() => setIsExportOpen(false)} onSuccess={(msg, err) => showToast(msg, err ? 'error' : 'success')} />
+                    <ReportModal isOpen={isReportOpen} onClose={() => setIsReportOpen(false)} onSuccess={(msg, err) => showToast(msg, err ? 'error' : 'success')} />
+                    
+                    <ConfirmDialog 
+                        isOpen={isConfirmSignOutOpen} 
+                        onClose={() => setIsConfirmSignOutOpen(false)} 
+                        onConfirm={handleSignOut} 
+                        title="Sign Out" 
+                        message="End current session?" 
+                        confirmText="Sign Out" 
+                        isDestructive 
+                    />
+                    <ConfirmDialog 
+                        isOpen={isConfirmResetOpen} 
+                        onClose={() => setIsConfirmResetOpen(false)} 
+                        onConfirm={handleResetCache} 
+                        title="Reset Cache" 
+                        message="Clear all local data?" 
+                        confirmText="Reset" 
+                        isDestructive 
+                    />
+                </>
+            }
+        >
+            <SettingsList>
                     {/* Identity */}
                     <SettingsSection title="Identity">
                         <div className="px-5 py-6 flex items-center gap-5">
@@ -182,31 +215,7 @@ const Profile = () => {
                         />
                     </SettingsSection>
                 </SettingsList>
-            </div>
-
-            <EditProfileModal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} />
-            <ExportModal isOpen={isExportOpen} onClose={() => setIsExportOpen(false)} onSuccess={(msg, err) => showToast(msg, err ? 'error' : 'success')} />
-            <ReportModal isOpen={isReportOpen} onClose={() => setIsReportOpen(false)} onSuccess={(msg, err) => showToast(msg, err ? 'error' : 'success')} />
-            
-            <ConfirmDialog 
-                isOpen={isConfirmSignOutOpen} 
-                onClose={() => setIsConfirmSignOutOpen(false)} 
-                onConfirm={handleSignOut} 
-                title="Sign Out" 
-                message="End current session?" 
-                confirmText="Sign Out" 
-                isDestructive 
-            />
-            <ConfirmDialog 
-                isOpen={isConfirmResetOpen} 
-                onClose={() => setIsConfirmResetOpen(false)} 
-                onConfirm={handleResetCache} 
-                title="Reset Cache" 
-                message="Clear all local data?" 
-                confirmText="Reset" 
-                isDestructive 
-            />
-        </div>
+        </PageLayout>
     );
 };
 

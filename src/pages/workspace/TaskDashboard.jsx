@@ -11,6 +11,7 @@ import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 import DateHeader from '../../components/organisms/DateHeader';
 import ConfirmDialog from '../../components/organisms/ConfirmDialog';
+import PageLayout from '../../components/layout/PageLayout';
 
 const TaskDashboard = () => {
     const { t: translate } = useTranslation(); 
@@ -173,16 +174,19 @@ const TaskDashboard = () => {
     const canAddTask = !isLocked && !isPastDate;
 
     return (
-        <div className="pb-24 h-full relative" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 76px)' }}>
-            <div 
-                className="fixed top-0 left-0 right-0 z-40 bg-slate-50/90 dark:bg-[#020617]/90 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 transition-all duration-300"
-                style={{
-                    paddingTop: 'env(safe-area-inset-top)'
-                }}
-            >
-                <div className="max-w-md mx-auto w-full px-4 pt-4 pb-5">
-                    {isSelectMode ? (
-                        <div className="flex items-center justify-between min-h-[72px] py-2 gap-2">
+        <PageLayout
+            bottomNav={true}
+            renderFloating={
+                <>
+                    <AddTaskModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAdd={handleAddTask} initialDate={selectedDateStr} />
+                    <EditTaskModal isOpen={isEditModalOpen} onClose={() => { setIsEditModalOpen(false); setEditingTask(null); }} task={editingTask} />
+                    <TaskSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+                    <ConfirmDialog isOpen={deleteConfirmIds.length > 0} onClose={() => setDeleteConfirmIds([])} onConfirm={executeDelete} title={deleteConfirmIds.length > 1 ? `Delete ${deleteConfirmIds.length} tasks?` : "Delete task?"} message="Are you sure you want to delete this task? This action cannot be undone." confirmText="Delete" />
+                </>
+            }
+            header={
+                isSelectMode ? (
+                    <div className="flex items-center justify-between min-h-[72px] py-2 gap-2">
                             <div className="flex items-center gap-3">
                                 <button
                                     onClick={() => { setIsSelectMode(false); setSelectedTaskIds(new Set()); }}
@@ -317,11 +321,10 @@ const TaskDashboard = () => {
                                 </div>
                             }
                         />
-                    )}
-                </div>
-            </div>
-
-            <div className="space-y-6 max-w-md mx-auto w-full px-4">
+                    )
+            }
+        >
+            <div className="space-y-6">
                 <section>
                     {currentTasks.length > 0 ? (
                         <TaskList
@@ -391,37 +394,7 @@ const TaskDashboard = () => {
                     </section>
                 )}
             </div>
-
-            <AddTaskModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onAdd={handleAddTask}
-                initialDate={selectedDateStr}
-            />
-
-            <EditTaskModal
-                isOpen={isEditModalOpen}
-                onClose={() => {
-                    setIsEditModalOpen(false);
-                    setEditingTask(null);
-                }}
-                task={editingTask}
-            />
-
-            <TaskSettingsModal 
-                isOpen={isSettingsOpen} 
-                onClose={() => setIsSettingsOpen(false)} 
-            />
-
-            <ConfirmDialog
-                isOpen={deleteConfirmIds.length > 0}
-                onClose={() => setDeleteConfirmIds([])}
-                onConfirm={executeDelete}
-                title={deleteConfirmIds.length > 1 ? `Delete ${deleteConfirmIds.length} tasks?` : "Delete task?"}
-                message={deleteConfirmIds.length > 1 ? "Are you sure you want to delete the selected tasks? This action cannot be undone." : "Are you sure you want to delete this task? This action cannot be undone."}
-                confirmText="Delete"
-            />
-        </div>
+        </PageLayout>
     );
 };
 

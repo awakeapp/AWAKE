@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, AlertCircle, Award
 import * as LucideIcons from 'lucide-react';
 
 import { format, startOfMonth, endOfMonth, isWithinInterval, subMonths, addMonths } from 'date-fns';
+import PageLayout from '../../components/layout/PageLayout';
 
 const MonthlyOverview = () => {
   const navigate = useNavigate();
@@ -65,43 +66,45 @@ const MonthlyOverview = () => {
   const expenseDiffPercent = prevStats.expense > 0 ? Math.round((expenseDiff / prevStats.expense) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5rem)' }}>
-      {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 z-30 bg-slate-900 text-white shadow-2xl shadow-slate-900/20" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-        <div className="px-6 py-4 flex items-center justify-between">
-          <button
-            onClick={() => navigate(-1)}
-            className="p-2 bg-transparent hover:bg-white/20 rounded-full transition-colors text-white -ml-2 focus:outline-none"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          
-          <div className="flex items-center gap-2 bg-white/10 rounded-full p-1 border border-white/5">
-            <button onClick={() => changeMonth(-1)} className="p-1 px-1.5 hover:bg-white/10 rounded-full transition-colors">
-              <ChevronLeft className="w-3.5 h-3.5 text-slate-300" />
+    <PageLayout
+      headerBgClass="bg-slate-900 text-white shadow-2xl shadow-slate-900/20"
+      headerBorderClass="border-none"
+      headerPadClass="p-0"
+      header={
+        <div className="w-full">
+          <div className="px-6 py-4 flex items-center justify-between">
+            <button
+              onClick={() => navigate(-1)}
+              className="p-2 bg-transparent hover:bg-white/20 rounded-full transition-colors text-white -ml-2 focus:outline-none"
+            >
+              <ArrowLeft className="w-5 h-5" />
             </button>
-            <span className="text-[10px] font-black uppercase tracking-widest min-w-[70px] text-center">
-              {format(selectedDate, 'MMM yyyy')}
-            </span>
-            <button onClick={() => changeMonth(1)} className="p-1 px-1.5 hover:bg-white/10 rounded-full transition-colors">
-              <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-            </button>
+            
+            <div className="flex items-center gap-2 bg-white/10 rounded-full p-1 border border-white/5">
+              <button onClick={() => changeMonth(-1)} className="p-1 px-1.5 hover:bg-white/10 rounded-full transition-colors">
+                <ChevronLeft className="w-3.5 h-3.5 text-slate-300" />
+              </button>
+              <span className="text-[10px] font-black uppercase tracking-widest min-w-[70px] text-center">
+                {format(selectedDate, 'MMM yyyy')}
+              </span>
+              <button onClick={() => changeMonth(1)} className="p-1 px-1.5 hover:bg-white/10 rounded-full transition-colors">
+                <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
+              </button>
+            </div>
+            
+            <div className="w-9" />
           </div>
-          
-          <div className="w-9" />
-        </div>
 
-        <div className="text-center px-6 pb-6 pt-2">
-          <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.2em] mb-1">Net Savings</p>
-          <h2 className={`text-4xl font-black tracking-tightest leading-tight ${currentStats.savings >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-            {currentStats.savings >= 0 ? '+' : ''}₹{currentStats.savings.toLocaleString()}
-          </h2>
+          <div className="text-center px-6 pb-6 pt-2">
+            <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.2em] mb-1">Net Savings</p>
+            <h2 className={`text-4xl font-black tracking-tightest leading-tight ${currentStats.savings >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+              {currentStats.savings >= 0 ? '+' : ''}₹{currentStats.savings.toLocaleString()}
+            </h2>
+          </div>
         </div>
-      </header>
-
-      {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 160px)' }}>
-        <div className="px-6 flex flex-col space-y-6 pb-8">
+      }
+    >
+      <div className="space-y-6">
           {/* Summary Cards */}
           <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
             <div className="space-y-4">
@@ -192,9 +195,8 @@ const MonthlyOverview = () => {
               )}
             </div>
           </div>
-        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 

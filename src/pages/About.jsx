@@ -2,21 +2,24 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Activity, Github, Twitter, Globe, Heart } from 'lucide-react';
-import { AppHeader } from '../components/ui/AppHeader';
+import PageLayout from '../components/layout/PageLayout';
 
 const About = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
-            {/* Header */}
-            <AppHeader
-                title={t('nav.about_awake')}
-                showBack={true}
-            />
-
-            <div className="pt-[calc(60px+env(safe-area-inset-top))] p-4 max-w-lg mx-auto space-y-8">
+        <PageLayout
+            header={
+                <div className="flex items-center gap-3">
+                    <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+                        <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-white" />
+                    </button>
+                    <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">{t('nav.about_awake')}</h1>
+                </div>
+            }
+        >
+            <div className="space-y-8">
                 {/* Logo & Version */}
                 <div className="flex flex-col items-center justify-center text-center space-y-4">
                     <div className="w-20 h-20 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-center relative overflow-hidden group">
@@ -56,13 +59,12 @@ const About = () => {
                     </div>
                 </div>
 
-                {/* Footer Message */}
                 <div className="text-center flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 pt-8 pb-4">
                      <Heart className="w-5 h-5 text-rose-500 mb-2 animate-pulse" />
                      <p className="text-xs font-medium">Made with focus and dedication.</p>
                 </div>
             </div>
-        </div>
+        </PageLayout>
     );
 };
 

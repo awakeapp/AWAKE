@@ -13,6 +13,7 @@ import { Loader2, ArrowLeft, Lock, Edit2, Plus, List } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
+import PageLayout from '../components/layout/PageLayout';
 
 const Routine = () => {
     const { dailyData, updateTaskStatus, updateHabit, updateAllTasks, isLocked, submitDay, unlockDay } = useData();
@@ -138,29 +139,54 @@ const Routine = () => {
     };
 
     return (
-        <div className="pb-24">
-            <div 
-                className="fixed top-0 left-0 right-0 z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-all duration-300"
-                style={{ paddingTop: 'env(safe-area-inset-top)' }}
-            >
-                <div className="max-w-md mx-auto w-full px-4">
-                    <DateHeader 
-                        className="w-full" 
-                        overviewText={`${dailyData.tasks.filter(t => t.status === 'checked').length}/${dailyData.tasks.length}`}
-                        onEditClick={() => setShowManagerModal(true)}
-                        isLocked={isLocked}
+        <PageLayout
+            header={
+                <DateHeader 
+                    className="w-full" 
+                    overviewText={`${dailyData.tasks.filter(t => t.status === 'checked').length}/${dailyData.tasks.length}`}
+                    onEditClick={() => setShowManagerModal(true)}
+                    isLocked={isLocked}
+                />
+            }
+            renderFloating={
+                <>
+                    {/* Submit Modal */}
+                    <DayOverviewModal
+                        isOpen={showSubmitModal}
+                        onClose={() => setShowSubmitModal(false)}
+                        data={dailyData}
+                        onConfirm={handleConfirmSubmit}
                     />
-                </div>
-            </div>
 
-            {/* Content offset - matches header height */}
-            <div 
-                className="max-w-md mx-auto w-full"
-                style={{ paddingTop: 'calc(72px + env(safe-area-inset-top) + 0px)' }}
-            >
-                <div className="space-y-6">
+                    {/* Task Manager Modal */}
+                    <TaskManagerModal
+                        isOpen={showManagerModal}
+                        onClose={() => setShowManagerModal(false)}
+                        tasks={dailyData.tasks}
+                    />
+
+                    {/* Unified Feedback Modal (Success + Troll) */}
+                    <UnifiedFeedbackModal
+                        isOpen={feedbackModal.isOpen}
+                        onClose={() => setFeedbackModal(prev => ({ ...prev, isOpen: false }))}
+                        type={feedbackModal.type}
+                        category={feedbackModal.category}
+                    />
+
+                    {/* Unlock Day Modal */}
+                    <Suspense fallback={null}>
+                        <UnlockDayModal
+                            isOpen={showUnlockModal}
+                            onClose={() => setShowUnlockModal(false)}
+                            onConfirm={handleUnlock}
+                        />
+                    </Suspense>
+                </>
+            }
+        >
+            <div className="space-y-6">
                 
-                    {/* Categories */}
+                {/* Categories */}
                     {Object.entries(categories).map(([category, tasks]) => (
                         <RoutineCategory
                             key={category}
@@ -218,41 +244,8 @@ const Routine = () => {
                             Today's Overview
                         </button>
                     )}
-                </div>
             </div>
-
-            {/* Submit Modal */}
-            <DayOverviewModal
-                isOpen={showSubmitModal}
-                onClose={() => setShowSubmitModal(false)}
-                data={dailyData}
-                onConfirm={handleConfirmSubmit}
-            />
-
-            {/* Task Manager Modal */}
-            <TaskManagerModal
-                isOpen={showManagerModal}
-                onClose={() => setShowManagerModal(false)}
-                tasks={dailyData.tasks}
-            />
-
-            {/* Unified Feedback Modal (Success + Troll) */}
-            <UnifiedFeedbackModal
-                isOpen={feedbackModal.isOpen}
-                onClose={() => setFeedbackModal(prev => ({ ...prev, isOpen: false }))}
-                type={feedbackModal.type}
-                category={feedbackModal.category}
-            />
-
-            {/* Unlock Day Modal */}
-            <Suspense fallback={null}>
-                <UnlockDayModal
-                    isOpen={showUnlockModal}
-                    onClose={() => setShowUnlockModal(false)}
-                    onConfirm={handleUnlock}
-                />
-            </Suspense>
-        </div>
+        </PageLayout>
     );
 };
 

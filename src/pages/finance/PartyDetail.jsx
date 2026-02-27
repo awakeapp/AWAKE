@@ -9,6 +9,7 @@ import { useScrollLock } from '../../hooks/useScrollLock';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useToast } from '../../context/ToastContext';
 import ConfirmDialog from '../../components/organisms/ConfirmDialog';
+import PageLayout from '../../components/layout/PageLayout';
 
 const TRANSACTION_TYPES = [
     { id: 'you_gave', label: 'You Gave', color: 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400', sign: '+' },
@@ -566,11 +567,12 @@ const PartyDetail = () => {
 
     // --- Render ---
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 6rem)' }}>
-
-            {/* Fixed Top Bar */}
-            <header className="fixed top-0 left-0 right-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200/30 dark:border-slate-800/30" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-                <div className="px-4 pt-4 pb-5 flex items-center justify-between">
+        <PageLayout
+            headerBgClass="bg-slate-50/80 dark:bg-slate-950/80"
+            headerBorderClass="border-none"
+            headerPadClass="p-0"
+            header={
+                <div className="px-4 pt-4 pb-5 flex items-center justify-between border-b border-slate-200/30 dark:border-slate-800/30">
                     <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white -ml-1">
                         <ArrowLeft className="w-5 h-5" />
                     </button>
@@ -581,11 +583,9 @@ const PartyDetail = () => {
                         {statusBadge.label}
                     </div>
                 </div>
-            </header>
-
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 76px)' }}>
-                <div className="px-4 flex flex-col pt-4 pb-8 space-y-6">
+            }
+        >
+            <div className="space-y-6">
 
                     {/* Balance Card (Now inside scroll) */}
                     <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 dark:from-indigo-600 dark:to-indigo-900 rounded-[2.5rem] p-7 text-white shadow-2xl shadow-indigo-500/20 relative overflow-hidden">
@@ -774,9 +774,8 @@ const PartyDetail = () => {
                         })
                     )}
                 </div>
+                {/* --- End Ledger --- */}
             </div>
-        </div>
-
             <ConfirmDialog
                 isOpen={!!deleteConfirmId}
                 onClose={() => setDeleteConfirmId(null)}
@@ -1242,7 +1241,7 @@ const PartyDetail = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </PageLayout>
     );
 };
 

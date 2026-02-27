@@ -27,8 +27,8 @@ const MainLayout = ({ children }) => {
     const hiddenHeaderRoutes = ['/routine', '/history', '/settings', '/finance', '/vehicle', '/diet', '/analytics', '/profile', '/about'];
     const showHeader = !hiddenHeaderRoutes.some(route => location.pathname.startsWith(route));
 
-    // Full-bleed routes: page manages its own layout — no wrapper padding or max-width
-    const fullBleedRoutes = ['/finance', '/vehicle', '/diet', '/analytics', '/profile', '/about'];
+    // Full-bleed routes: page manages its own layout using PageLayout
+    const fullBleedRoutes = ['/routine', '/history', '/settings', '/finance', '/vehicle', '/diet', '/analytics', '/profile', '/about'];
     const isFullBleed = fullBleedRoutes.some(route => location.pathname.startsWith(route));
 
     const { isDark } = useTheme();

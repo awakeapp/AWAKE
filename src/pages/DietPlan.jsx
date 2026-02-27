@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppCard as Card, AppCardContent } from '../components/ui/AppCard';
 import { DB } from '../services/db';
 import { useAuthContext } from '../hooks/useAuthContext';
+import PageLayout from '../components/layout/PageLayout';
 
 const DietPlan = () => {
  const navigate = useNavigate();
@@ -71,12 +72,9 @@ const DietPlan = () => {
  };
 
  return (
- <div className="min-h-screen bg-slate-50 dark:bg-slate-900 pb-20">
- {/* Header */}
- <div 
- className="bg-white dark:bg-slate-800 shadow-sm px-4 pt-4 pb-5 sticky top-0 z-10 flex items-center gap-3 border-b border-slate-100 dark:border-slate-700/50"
- style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}
- >
+ <PageLayout
+ header={
+ <div className="flex items-center gap-3">
  <button
  onClick={() => {
  if (step === 'plan') {
@@ -91,8 +89,9 @@ const DietPlan = () => {
  </button>
  <h1 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">Diet Plan Manager</h1>
  </div>
-
- <main className="p-4 max-w-lg mx-auto">
+ }
+ >
+ <main className="pb-8">
  <AnimatePresence mode="wait">
  {step === 'input' ? (
  <motion.form
@@ -375,7 +374,7 @@ const DietPlan = () => {
  )}
  </AnimatePresence>
  </main>
- </div>
+ </PageLayout>
  );
 };
 

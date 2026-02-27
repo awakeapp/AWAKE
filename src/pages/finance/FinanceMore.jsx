@@ -7,7 +7,7 @@ import {
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useTranslation } from 'react-i18next';
 import FinanceBottomNav from '../../components/finance/FinanceBottomNav';
-import { AppHeader } from '../../components/ui/AppHeader';
+import PageLayout from '../../components/layout/PageLayout';
 import { SettingsList, SettingsSection, SettingsRow } from '../../components/ui/SettingsList';
 
 const FinanceMore = () => {
@@ -47,52 +47,52 @@ const FinanceMore = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-black pb-24">
-            <AppHeader 
-                title="Finance More" 
-                showBack 
-                onBack={() => navigate(-1)}
-            />
+        <PageLayout
+            bottomNav={<FinanceBottomNav />}
+            header={
+                <div className="flex items-center gap-3">
+                    <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white -ml-2">
+                        <ArrowLeft className="w-6 h-6" />
+                    </button>
+                    <h1 className="text-xl font-bold text-slate-900 dark:text-white">Finance More</h1>
+                </div>
+            }
+        >
+            <SettingsList>
+                <SettingsSection title="Tools">
+                    <SettingsRow 
+                        icon={Wallet} 
+                        title="Wallets" 
+                        subtitle={`${activeAccounts.length} active accounts`} 
+                        onClick={() => navigate('/finance/wallets')} 
+                    />
+                    <SettingsRow 
+                        icon={CreditCard} 
+                        title="EMI's" 
+                        subtitle="Loan & repayment tracker" 
+                        onClick={() => navigate('/finance/emi')} 
+                        isLast
+                    />
+                </SettingsSection>
 
-            <div className="pt-[calc(60px+env(safe-area-inset-top))]">
-                <SettingsList>
-                    <SettingsSection title="Tools">
-                        <SettingsRow 
-                            icon={Wallet} 
-                            title="Wallets" 
-                            subtitle={`${activeAccounts.length} active accounts`} 
-                            onClick={() => navigate('/finance/wallets')} 
-                        />
-                        <SettingsRow 
-                            icon={CreditCard} 
-                            title="EMI's" 
-                            subtitle="Loan & repayment tracker" 
-                            onClick={() => navigate('/finance/emi')} 
-                            isLast
-                        />
-                    </SettingsSection>
-
-                    <SettingsSection title="Preferences">
-                        <SettingsRow 
-                            icon={Download} 
-                            title="Export Finance Data" 
-                            subtitle="Download as JSON" 
-                            onClick={handleExportFinance}
-                            rightElement={isExporting ? <Loader2 className="w-5 h-5 text-primary-500 animate-spin" /> : null}
-                        />
-                        <SettingsRow 
-                            icon={Settings} 
-                            title="Finance Settings" 
-                            subtitle="Calculation & display preferences" 
-                            onClick={() => navigate('/finance/settings')} 
-                            isLast
-                        />
-                    </SettingsSection>
-                </SettingsList>
-            </div>
-
-            <FinanceBottomNav />
-        </div>
+                <SettingsSection title="Preferences">
+                    <SettingsRow 
+                        icon={Download} 
+                        title="Export Finance Data" 
+                        subtitle="Download as JSON" 
+                        onClick={handleExportFinance}
+                        rightElement={isExporting ? <Loader2 className="w-5 h-5 text-indigo-500 animate-spin" /> : null}
+                    />
+                    <SettingsRow 
+                        icon={Settings} 
+                        title="Finance Settings" 
+                        subtitle="Calculation & display preferences" 
+                        onClick={() => navigate('/finance/settings')} 
+                        isLast
+                    />
+                </SettingsSection>
+            </SettingsList>
+        </PageLayout>
     );
 };
 

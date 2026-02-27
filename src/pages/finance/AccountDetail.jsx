@@ -4,6 +4,7 @@ import { Archive, ArrowLeft, Edit2, Trash2, Calendar, FileText, TrendingUp, Save
 
 import { useState, useMemo } from 'react';
 import { format } from 'date-fns';
+import PageLayout from '../../components/layout/PageLayout';
 
 const AccountDetail = () => {
     const { id } = useParams();
@@ -49,65 +50,67 @@ const AccountDetail = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5rem)' }}>
-            {/* Fixed Header */}
-            <header className="fixed top-0 left-0 right-0 z-30 bg-slate-900 text-white shadow-xl" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-                <div className="flex items-center justify-between px-4 pt-4 pb-5">
-                    <div className="flex items-center gap-3">
+        <PageLayout
+            headerBgClass="bg-slate-900 text-white shadow-xl"
+            headerBorderClass="border-none"
+            headerPadClass="p-0"
+            header={
+                <div className="w-full">
+                    <div className="flex items-center justify-between px-4 pt-4 pb-5">
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={() => navigate(-1)}
+                                className="p-2 bg-transparent hover:bg-white/10 rounded-full transition-colors text-white -ml-2 focus:outline-none"
+                            >
+                                <ArrowLeft className="w-5 h-5" />
+                            </button>
+                            <h1 className="text-xl font-bold text-white tracking-tight">Account Detail</h1>
+                        </div>
                         <button
-                            onClick={() => navigate(-1)}
-                            className="p-2 bg-transparent hover:bg-white/10 rounded-full transition-colors text-white -ml-2 focus:outline-none"
+                            onClick={handleArchiveClick}
+                            className={`p-2 rounded-xl transition-all duration-300 flex items-center gap-2 ${showArchiveConfirm
+                                ? 'bg-red-500 text-white w-auto px-3'
+                                : account.isArchived
+                                    ? 'bg-orange-500 text-white'
+                                    : 'bg-white/10 hover:bg-white/20'
+                                }`}
                         >
-                            <ArrowLeft className="w-5 h-5" />
+                            <Archive className="w-5 h-5" />
+                            {showArchiveConfirm && <span className="text-xs font-bold whitespace-nowrap">Confirm?</span>}
                         </button>
-                        <h1 className="text-xl font-bold text-white tracking-tight">Account Detail</h1>
                     </div>
-                    <button
-                        onClick={handleArchiveClick}
-                        className={`p-2 rounded-xl transition-all duration-300 flex items-center gap-2 ${showArchiveConfirm
-                            ? 'bg-red-500 text-white w-auto px-3'
-                            : account.isArchived
-                                ? 'bg-orange-500 text-white'
-                                : 'bg-white/10 hover:bg-white/20'
-                            }`}
-                    >
-                        <Archive className="w-5 h-5" />
-                        {showArchiveConfirm && <span className="text-xs font-bold whitespace-nowrap">Confirm?</span>}
-                    </button>
-                </div>
 
-                <div className="text-center px-4 pb-8 pt-2">
-                    {isEditing ? (
-                        <div className="space-y-3 max-w-xs mx-auto">
-                            <input
-                                value={editName}
-                                onChange={e => setEditName(e.target.value)}
-                                className="bg-white/10 border border-white/20 rounded-lg p-2 text-center text-white font-bold w-full"
-                            />
-                            <div className="flex items-center justify-center gap-2">
-                                <span className="text-slate-400 text-xs">Opening: ₹</span>
+                    <div className="text-center px-4 pb-8 pt-2">
+                        {isEditing ? (
+                            <div className="space-y-3 max-w-xs mx-auto">
                                 <input
-                                    type="number"
-                                    value={editBalance}
-                                    onChange={e => setEditBalance(e.target.value)}
-                                    className="bg-white/10 border border-white/20 rounded-lg p-1 text-center text-white w-24"
+                                    value={editName}
+                                    onChange={e => setEditName(e.target.value)}
+                                    className="bg-white/10 border border-white/20 rounded-lg p-2 text-center text-white font-bold w-full"
                                 />
+                                <div className="flex items-center justify-center gap-2">
+                                    <span className="text-slate-400 text-xs">Opening: ₹</span>
+                                    <input
+                                        type="number"
+                                        value={editBalance}
+                                        onChange={e => setEditBalance(e.target.value)}
+                                        className="bg-white/10 border border-white/20 rounded-lg p-1 text-center text-white w-24"
+                                    />
+                                </div>
+                                <button onClick={handleSave} className="bg-emerald-500 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">Save Settings</button>
                             </div>
-                            <button onClick={handleSave} className="bg-emerald-500 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">Save Settings</button>
-                        </div>
-                    ) : (
-                        <div className="space-y-1">
-                            <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.2em] mb-1">{account.name}</p>
-                            <h2 className="text-4xl font-black tracking-tightest leading-tight">₹{account.balance.toLocaleString()}</h2>
-                            <button onClick={handleEdit} className="text-[10px] font-bold text-indigo-300 hover:text-white uppercase tracking-wider mt-2">Edit Account</button>
-                        </div>
-                    )}
+                        ) : (
+                            <div className="space-y-1">
+                                <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.2em] mb-1">{account.name}</p>
+                                <h2 className="text-4xl font-black tracking-tightest leading-tight">₹{account.balance.toLocaleString()}</h2>
+                                <button onClick={handleEdit} className="text-[10px] font-bold text-indigo-300 hover:text-white uppercase tracking-wider mt-2">Edit Account</button>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </header>
-
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 180px)' }}>
-                <div className="px-4 flex flex-col space-y-6 pb-8">
+            }
+        >
+            <div className="space-y-6">
                     <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 shadow-sm border border-slate-100 dark:border-slate-800">
                         <h3 className="font-black text-[10px] uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
                             <History className="w-3.5 h-3.5" />
@@ -166,9 +169,8 @@ const AccountDetail = () => {
                             )}
                         </div>
                     </div>
-                </div>
             </div>
-        </div>
+        </PageLayout>
     );
 };
 
