@@ -27,7 +27,7 @@ const EditTaskModal = ({ isOpen, onClose, task }) => {
  setCategory(task.category || 'Work');
  setPriority(task.priority || 'Medium');
  setStartTime(task.time || '');
- setDate(task.date || new Date().toISOString().split('T')[0]);
+ setDate(task.date || format(new Date(), 'yyyy-MM-dd'));
  }
  }, [isOpen, task]);
 
@@ -202,7 +202,7 @@ const EditTaskModal = ({ isOpen, onClose, task }) => {
  initialDate={date ? new Date(date) : new Date()}
  onSelect={(newDate) => {
  if (newDate) {
- setDate(newDate.toISOString().split('T')[0]);
+ setDate(format(newDate, 'yyyy-MM-dd'));
  } else {
  // Keep previous instead of clearing to null if strict
  // or handle null

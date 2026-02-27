@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { useRamadan } from '../../context/RamadanContext';
 import { usePrayer } from '../../context/PrayerContext';
-import { Plus, Check, Clock, Users, User, ChevronRight } from 'lucide-react';
+import { Plus, Minus, Check, Clock, Users, User, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const PRAYERS = [

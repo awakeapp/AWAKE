@@ -38,7 +38,7 @@ const RoutineCategory = ({ title, tasks, onUpdateStatus, isLocked }) => {
             </div>
 
             {/* Content (Always Visible) */}
-            <div className="overflow-hidden mt-1.5">
+            <div className="mt-1.5">
                 <div className="grid gap-2 px-0 pb-2">
                     {tasks.map((task) => (
                         <TaskItem

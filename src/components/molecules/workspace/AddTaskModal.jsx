@@ -25,7 +25,7 @@ const AddTaskModal = ({ isOpen, onClose, onAdd, initialDate }) => {
  setCategory('Work');
  setPriority('Medium');
  setStartTime('09:00');
- setDate(initialDate || new Date().toISOString().split('T')[0]);
+ setDate(initialDate || format(new Date(), 'yyyy-MM-dd'));
  }
  }, [isOpen, initialDate]);
 
@@ -196,7 +196,7 @@ const AddTaskModal = ({ isOpen, onClose, onAdd, initialDate }) => {
  initialDate={date ? new Date(date) : new Date()}
  onSelect={(newDate) => {
  if (newDate) {
- setDate(newDate.toISOString().split('T')[0]);
+ setDate(format(newDate, 'yyyy-MM-dd'));
  } else {
  setDate(null);
  }
