@@ -1,5 +1,5 @@
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Bar, Cell } from 'recharts';
-import { Card, CardContent } from '../atoms/Card';
+import { AppCard as Card, AppCardContent } from '../ui/AppCard';
 import { TrendingUp, Award, Calendar } from 'lucide-react';
 
 const ProgressCharts = ({ data }) => {

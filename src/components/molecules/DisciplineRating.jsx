@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Card, CardContent } from '../atoms/Card';
+import { AppCard as Card, AppCardContent } from '../ui/AppCard';
 import clsx from 'clsx';
 
 const DisciplineRating = ({ percentage = 0 }) => {

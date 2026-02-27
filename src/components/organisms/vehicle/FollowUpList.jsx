@@ -29,14 +29,14 @@ const FollowUpList = ({ vehicle }) => {
         let isSoon = false;
 
         // Date check
-        if ((f.frequencyType === 'date' || f.frequencyType === 'both') && f.dueDate) {
+        if ((f.interval_type === 'months' || f.interval_type === 'both' || f.frequencyType === 'date' || f.frequencyType === 'both') && f.dueDate) {
             const due = new Date(f.dueDate);
             if (isBefore(due, today)) isOverdue = true;
             else if (differenceInDays(due, today) <= 14) isSoon = true;
         }
 
         // Odometer check
-        if ((f.frequencyType === 'odometer' || f.frequencyType === 'both') && f.dueOdometer) {
+        if ((f.interval_type === 'km' || f.interval_type === 'both' || f.frequencyType === 'odometer' || f.frequencyType === 'both') && f.dueOdometer) {
             const current = Number(vehicle.odometer) || 0;
             const due = Number(f.dueOdometer);
             if (current >= due) isOverdue = true;
@@ -70,18 +70,18 @@ const FollowUpList = ({ vehicle }) => {
             <div className="flex justify-between items-start">
                 <div className="flex items-center gap-2">
                     <span className={`p-1.5 rounded-lg ${urgency === 'overdue' ? 'bg-red-100 text-red-600' : urgency === 'upcoming' ? 'bg-orange-100 text-orange-600' : 'bg-slate-100 text-slate-500'}`}>
-                        {item.frequencyType === 'date' ? <Calendar className="w-4 h-4" /> : <Gauge className="w-4 h-4" />}
+                        {(item.interval_type === 'months' || item.frequencyType === 'date') ? <Calendar className="w-4 h-4" /> : <Gauge className="w-4 h-4" />}
                     </span>
                     <div>
-                        <h4 className="font-bold text-slate-900 dark:text-white text-sm">{item.type}</h4>
+                        <h4 className="font-bold text-slate-900 dark:text-white text-sm">{item.name || item.type}</h4>
                         <div className={`text-[10px] font-semibold flex flex-col ${urgency === 'overdue' ? 'text-red-500' : urgency === 'upcoming' ? 'text-orange-500' : 'text-slate-400'}`}>
-                            {(item.frequencyType === 'date' || item.frequencyType === 'both') && (
+                            {(item.interval_type === 'months' || item.interval_type === 'both' || item.frequencyType === 'date' || item.frequencyType === 'both') && (
                                 <span className="flex items-center gap-1">
                                     <Calendar className="w-2.5 h-2.5" />
                                     {item.dueDate ? `Due ${format(parseISO(item.dueDate), 'MMM d, yyyy')}` : 'No date set'}
                                 </span>
                             )}
-                            {(item.frequencyType === 'odometer' || item.frequencyType === 'both') && (
+                            {(item.interval_type === 'km' || item.interval_type === 'both' || item.frequencyType === 'odometer' || item.frequencyType === 'both') && (
                                 <span className="flex items-center gap-1">
                                     <Gauge className="w-2.5 h-2.5" />
                                     {`Due at ${Number(item.dueOdometer).toLocaleString()} km`}
@@ -96,7 +96,7 @@ const FollowUpList = ({ vehicle }) => {
             <div className="flex justify-between items-end mt-1">
                 <div>
                     {(() => {
-                        const last = getLatestRecord(vehicle.id, item.type);
+                        const last = getLatestRecord(vehicle.id, item.name || item.type);
                         if (last) return (
                             <p className="text-[9px] text-slate-400 font-medium">
                                 Last: {format(parseISO(last.date), 'MMM d, yyyy')} {last.odometer ? `(${Number(last.odometer).toLocaleString()} km)` : ''}
@@ -152,10 +152,10 @@ const FollowUpList = ({ vehicle }) => {
                         </div>
                         <div className="p-4 overflow-y-auto space-y-2">
                             {MAINTENANCE_TEMPLATES.filter(t => !t.applicable || t.applicable.includes(vehicle.type)).map(template => {
-                                const isEnabled = followUps.some(f => f.vehicleId === vehicle.id && f.type === template.type && f.status !== 'completed');
+                                const isEnabled = followUps.some(f => f.vehicleId === vehicle.id && (f.name === template.name || f.type === template.name) && f.status !== 'completed');
                                 return (
                                     <button
-                                        key={template.type}
+                                        key={template.name}
                                         onClick={() => toggleMaintenanceItem(vehicle.id, template)}
                                         className={`w-full p-4 rounded-2xl flex items-center justify-between transition-all border ${isEnabled
                                             ? 'bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800'
@@ -163,12 +163,12 @@ const FollowUpList = ({ vehicle }) => {
                                     >
                                         <div className="text-left">
                                             <p className={`font-bold text-sm ${isEnabled ? 'text-indigo-900 dark:text-indigo-100' : 'text-slate-600 dark:text-slate-400'}`}>
-                                                {template.type}
+                                                {template.name}
                                             </p>
                                             <p className="text-[10px] text-slate-500">
-                                                {template.frequencyType === 'both' ? `Every ${template.frequencyValue} ${template.frequencyUnit} / ${template.odometerValue}km` :
-                                                    template.frequencyType === 'date' ? `Every ${template.frequencyValue} ${template.frequencyUnit}` :
-                                                        template.frequencyType === 'odometer' ? `Every ${template.odometerValue}km` : 'Ad-hoc'}
+                                                {template.interval_type === 'both' ? `Every ${template.interval_months} months / ${template.interval_km}km` :
+                                                    template.interval_type === 'months' ? `Every ${template.interval_months} months` :
+                                                        template.interval_type === 'km' ? `Every ${template.interval_km}km` : 'Ad-hoc'}
                                             </p>
                                         </div>
                                         <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${isEnabled ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300 dark:border-slate-600'}`}>

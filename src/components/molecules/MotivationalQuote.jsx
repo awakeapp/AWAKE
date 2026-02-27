@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Quote } from 'lucide-react';
-import { Card, CardContent } from '../atoms/Card';
+import { AppCard as Card, AppCardContent } from '../ui/AppCard';
 
 const QUOTES = [
     { text: "The most beloved deed to Allah is the most regular and constant even if it were little.", source: "Prophet Muhammad (ﷺ)" },

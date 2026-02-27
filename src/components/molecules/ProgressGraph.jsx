@@ -1,5 +1,5 @@
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '../atoms/Card';
+import { AppCard as Card, AppCardContent, AppCardHeader, AppCardTitle } from '../ui/AppCard';
 import { MoreVertical } from 'lucide-react';
 import { useData } from '../../context/DataContext';
 import { format, parseISO } from 'date-fns';

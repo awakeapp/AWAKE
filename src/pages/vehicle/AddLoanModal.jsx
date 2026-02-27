@@ -61,6 +61,10 @@ const AddLoanModal = ({ isOpen, onClose, onSave, vehicle }) => {
         e.preventDefault();
         onSave({
             ...formData,
+            principal: Number(formData.totalLoanAmount),
+            interest_rate: Number(formData.interestRate),
+            tenure_months: Number(formData.tenureMonths),
+            start_date: formData.startDate,
             emiAmount: calculatedEMI,
             totalPayable: calculatedTotalPayable,
             totalInterest: calculatedTotalInterest,

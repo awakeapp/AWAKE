@@ -4,29 +4,30 @@ import { useFinance } from './FinanceContext';
 import { useGlobalError } from './GlobalErrorContext';
 import { addDays, addMonths, addYears } from 'date-fns';
 import { FirestoreService } from '../services/firestore-service';
-import { orderBy, limit } from 'firebase/firestore';
+import { orderBy, limit, where } from 'firebase/firestore';
 import { normalizeError } from '../utils/error-utils';
+import { VehicleLedgerBackend } from '../services/vehicleLedgerBackend';
 
 const VehicleContext = createContext();
 
 export const MAINTENANCE_TEMPLATES = [
-    { type: 'Oil Change', frequencyValue: 6, frequencyUnit: 'months', frequencyType: 'both', odometerValue: 10000, category: 'mandatory' },
-    { type: 'Engine Oil Filter', frequencyValue: 6, frequencyUnit: 'months', frequencyType: 'both', odometerValue: 10000, category: 'mandatory' },
-    { type: 'Air Filter', frequencyValue: 12, frequencyUnit: 'months', frequencyType: 'both', odometerValue: 20000, category: 'mandatory' },
-    { type: 'Brake Check', frequencyValue: 6, frequencyUnit: 'months', frequencyType: 'both', odometerValue: 10000, category: 'mandatory' },
-    { type: 'Chain Lubrication', frequencyValue: 1, frequencyUnit: 'months', frequencyType: 'both', odometerValue: 500, category: 'optional', applicable: ['bike', 'scooter'] },
-    { type: 'Coolant Check', frequencyValue: 6, frequencyUnit: 'months', frequencyType: 'both', odometerValue: 10000, category: 'mandatory' },
-    { type: 'Battery Health', frequencyValue: 12, frequencyUnit: 'months', frequencyType: 'date', category: 'mandatory' },
-    { type: 'Tyre Pressure', frequencyValue: 1, frequencyUnit: 'months', frequencyType: 'date', category: 'mandatory' },
-    { type: 'Tyre Rotation', frequencyValue: 12, frequencyUnit: 'months', frequencyType: 'both', odometerValue: 10000, category: 'optional' },
-    { type: 'Wheel Alignment', frequencyValue: 12, frequencyUnit: 'months', frequencyType: 'both', odometerValue: 10000, category: 'optional' },
-    { type: 'General Service', frequencyValue: 12, frequencyUnit: 'months', frequencyType: 'both', odometerValue: 10000, category: 'mandatory' },
-    { type: 'Accident Repair', frequencyType: 'none', category: 'optional' }, // Ad-hoc only
-    { type: 'Accessories Maintenance', frequencyValue: 12, frequencyUnit: 'months', frequencyType: 'date', category: 'optional' },
-    { type: 'Insurance Renewal', frequencyValue: 12, frequencyUnit: 'months', frequencyType: 'date', category: 'mandatory' },
-    { type: 'Pollution Certificate', frequencyValue: 6, frequencyUnit: 'months', frequencyType: 'date', category: 'mandatory' },
-    { type: 'Registration Renewal', frequencyValue: 15, frequencyUnit: 'years', frequencyType: 'date', category: 'mandatory' },
-    { type: 'Fitness Certificate', frequencyValue: 1, frequencyUnit: 'years', frequencyType: 'date', category: 'optional', applicable: ['commercial'] }
+    { name: 'Oil Change', interval_months: 6, interval_km: 10000, interval_type: 'both', category: 'mandatory' },
+    { name: 'Engine Oil Filter', interval_months: 6, interval_km: 10000, interval_type: 'both', category: 'mandatory' },
+    { name: 'Air Filter', interval_months: 12, interval_km: 20000, interval_type: 'both', category: 'mandatory' },
+    { name: 'Brake Check', interval_months: 6, interval_km: 10000, interval_type: 'both', category: 'mandatory' },
+    { name: 'Chain Lubrication', interval_months: 1, interval_km: 500, interval_type: 'both', category: 'optional', applicable: ['bike', 'scooter'] },
+    { name: 'Coolant Check', interval_months: 6, interval_km: 10000, interval_type: 'both', category: 'mandatory' },
+    { name: 'Battery Health', interval_months: 12, interval_type: 'months', category: 'mandatory' },
+    { name: 'Tyre Pressure', interval_months: 1, interval_type: 'months', category: 'mandatory' },
+    { name: 'Tyre Rotation', interval_months: 12, interval_km: 10000, interval_type: 'both', category: 'optional' },
+    { name: 'Wheel Alignment', interval_months: 12, interval_km: 10000, interval_type: 'both', category: 'optional' },
+    { name: 'General Service', interval_months: 12, interval_km: 10000, interval_type: 'both', category: 'mandatory' },
+    { name: 'Accident Repair', interval_type: 'none', category: 'optional' }, 
+    { name: 'Accessories Maintenance', interval_months: 12, interval_type: 'months', category: 'optional' },
+    { name: 'Insurance Renewal', interval_months: 12, interval_type: 'months', category: 'mandatory' },
+    { name: 'Pollution Certificate', interval_months: 6, interval_type: 'months', category: 'mandatory' },
+    { name: 'Registration Renewal', interval_months: 180, interval_type: 'months', category: 'mandatory' }, 
+    { name: 'Fitness Certificate', interval_months: 12, interval_type: 'months', category: 'optional', applicable: ['commercial'] }
 ];
 
 export const useVehicle = () => {
@@ -47,6 +48,8 @@ export const VehicleContextProvider = ({ children }) => {
     const [loans, setLoans] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [ledgerStats, setLedgerStats] = useState(null);
+    const [loanStats, setLoanStats] = useState(null);
 
     // Sync local error to global error
     useEffect(() => {
@@ -55,22 +58,40 @@ export const VehicleContextProvider = ({ children }) => {
         }
     }, [error, showError]);
 
-    // --- Persistence: Firestore Subscriptions ---
+    // Deduce Active Vehicle synchronously
+    const activeVehicle = useMemo(() => vehicles.find(v => v.isActive && !v.isArchived) || null, [vehicles]);
+    const activeVehicleId = activeVehicle?.id;
+
+    // --- Fetch Backend Dashboard Stats ---
+    useEffect(() => {
+        if (!user || !activeVehicleId) {
+            setLedgerStats(null);
+            setLoanStats(null);
+            return;
+        }
+        VehicleLedgerBackend.getDashboardStats(user.uid, activeVehicleId).then(setLedgerStats);
+        
+        // Find active loan for this vehicle
+        const activeLoan = loans.find(l => l.vehicleId === activeVehicleId && l.status !== 'closed');
+        if (activeLoan) {
+            VehicleLedgerBackend.getLoanSummary(user.uid, activeVehicleId, activeLoan).then(setLoanStats);
+        } else {
+            setLoanStats(null);
+        }
+    }, [user, activeVehicleId, serviceRecords, loans]); // refresh when records or loans change
+
+    // --- Persistence: Firestore Subscriptions for Vehicles ---
     useEffect(() => {
         if (!authIsReady) return;
 
         if (!user) {
             setVehicles([]);
-            setFollowUps([]);
-            setServiceRecords([]);
-            setLoans([]);
             setIsLoading(false);
             return;
         }
 
         setIsLoading(true);
 
-        // Subscribe to Vehicles
         const unsubVehicles = FirestoreService.subscribeToCollection(
             `users/${user.uid}/vehicles`,
             (data) => {
@@ -87,13 +108,27 @@ export const VehicleContextProvider = ({ children }) => {
             }
         );
 
-        // Subscribe to Followups
+        return () => {
+            unsubVehicles();
+        };
+    }, [user, authIsReady]);
+
+    // --- Persistence: Firestore Subscriptions for isolated activeVehicle data ---
+    useEffect(() => {
+        if (!authIsReady || !user) return;
+
+        if (!activeVehicleId) {
+            setFollowUps([]);
+            setServiceRecords([]);
+            setLoans([]);
+            return;
+        }
+
+        // Subscribe to Followups specific to Active Vehicle
         const unsubFollowups = FirestoreService.subscribeToCollection(
             `users/${user.uid}/followUps`,
-            (data) => {
-                setError(null);
-                setFollowUps(data);
-            },
+            (data) => { setError(null); setFollowUps(data); },
+            where('vehicleId', '==', activeVehicleId),
             (err) => {
                 const normalized = normalizeError(err);
                 console.error(normalized);
@@ -101,13 +136,11 @@ export const VehicleContextProvider = ({ children }) => {
             }
         );
 
-        // Subscribe to Service Records
+        // Subscribe to Ledger Entries specific to Active Vehicle
         const unsubRecords = FirestoreService.subscribeToCollection(
-            `users/${user.uid}/serviceRecords`,
-            (data) => {
-                setError(null);
-                setServiceRecords(data);
-            },
+            `users/${user.uid}/ledgerEntries`,
+            (data) => { setError(null); setServiceRecords(data); },
+            where('vehicleId', '==', activeVehicleId),
             orderBy('date', 'desc'),
             limit(recordLimit),
             (err) => {
@@ -117,13 +150,11 @@ export const VehicleContextProvider = ({ children }) => {
             }
         );
 
-        // Subscribe to Loans
+        // Subscribe to Loans specific to Active Vehicle
         const unsubLoans = FirestoreService.subscribeToCollection(
             `users/${user.uid}/vehicleLoans`,
-            (data) => {
-                setError(null);
-                setLoans(data);
-            },
+            (data) => { setError(null); setLoans(data); },
+            where('vehicleId', '==', activeVehicleId),
             (err) => {
                 const normalized = normalizeError(err);
                 console.error(normalized);
@@ -132,12 +163,11 @@ export const VehicleContextProvider = ({ children }) => {
         );
 
         return () => {
-            unsubVehicles();
             unsubFollowups();
             unsubRecords();
             unsubLoans();
         };
-    }, [user, authIsReady, recordLimit]);
+    }, [user, authIsReady, activeVehicleId, recordLimit]);
 
     // --- Helpers (Firestore Writes) ---
     // Note: We write directly to subcollections.
@@ -176,28 +206,25 @@ export const VehicleContextProvider = ({ children }) => {
             // Seed standard maintenance follow-ups
             const seedFollowUps = MAINTENANCE_TEMPLATES
                 .filter(t => !t.applicable || t.applicable.includes(vehicleData.type))
-                .filter(t => t.frequencyType !== 'none')
+                .filter(t => t.interval_type !== 'none')
                 .map(t => {
                     const baseDate = new Date();
                     let dueDate = null;
-                    if (t.frequencyType === 'date' || t.frequencyType === 'both') {
-                        if (t.frequencyUnit === 'days') dueDate = addDays(baseDate, t.frequencyValue).toISOString();
-                        if (t.frequencyUnit === 'months') dueDate = addMonths(baseDate, t.frequencyValue).toISOString();
-                        if (t.frequencyUnit === 'years') dueDate = addYears(baseDate, t.frequencyValue).toISOString();
+                    if (t.interval_type === 'months' || t.interval_type === 'both') {
+                        dueDate = addMonths(baseDate, t.interval_months).toISOString();
                     }
 
                     let dueOdometer = null;
-                    if (t.frequencyType === 'odometer' || t.frequencyType === 'both') {
-                        dueOdometer = (Number(vehicleData.odometer) || 0) + (t.odometerValue || 0);
+                    if (t.interval_type === 'km' || t.interval_type === 'both') {
+                        dueOdometer = (Number(vehicleData.odometer) || 0) + (t.interval_km || 0);
                     }
 
                     return {
                         vehicleId: vehicleId,
-                        type: t.type,
-                        frequencyType: t.frequencyType,
-                        frequencyValue: t.frequencyValue,
-                        frequencyUnit: t.frequencyUnit,
-                        odometerValue: t.odometerValue,
+                        name: t.name,
+                        interval_type: t.interval_type,
+                        interval_months: t.interval_months || null,
+                        interval_km: t.interval_km || null,
                         dueDate,
                         dueOdometer,
                         isRecurring: true,
@@ -315,11 +342,21 @@ export const VehicleContextProvider = ({ children }) => {
             const vehicle = vehicles.find(v => v.id === followUp.vehicleId);
 
             // 1. Create Service Record
+            let typeMap = 'other';
+            const lowType = (followUp.type || '').toLowerCase();
+            if(lowType.includes('fuel')) typeMap = 'fuel';
+            else if(lowType.includes('insurance')) typeMap = 'insurance';
+            else typeMap = 'service';
+
             let newRecord = {
                 vehicleId: followUp.vehicleId,
                 followUpId: id,
-                type: followUp.type,
-                ...completionDetails
+                type: typeMap,
+                amount: Number(completionDetails.cost || 0),
+                date: completionDetails.date,
+                odometer: Number(completionDetails.odometer || 0),
+                notes: `Follow-up completed: ${followUp.type}`,
+                attachment: completionDetails.attachment || null
             };
 
             // 2. Handle Finance
@@ -343,8 +380,8 @@ export const VehicleContextProvider = ({ children }) => {
                 newRecord.financeTxId = true; // Just flag it was logged
             }
 
-            // Add Service Record
-            await FirestoreService.addItem(`users/${user.uid}/serviceRecords`, newRecord);
+            // Add Service Record to Standardized Ledger
+            await FirestoreService.addItem(`users/${user.uid}/ledgerEntries`, newRecord);
 
             // 3. Update Vehicle Odometer if higher
             if (Number(completionDetails.odometer) > Number(vehicle?.odometer || 0)) {
@@ -359,18 +396,14 @@ export const VehicleContextProvider = ({ children }) => {
                 delete nextFollowUp.id; // clear ID for new insertion
 
                 // Calculate next due
-                if (followUp.frequencyType === 'date' || followUp.frequencyType === 'both') {
+                if (followUp.interval_type === 'months' || followUp.interval_type === 'both') {
                     const baseDate = new Date(completionDetails.date);
-                    let nextDate = baseDate;
-                    if (followUp.frequencyUnit === 'days') nextDate = addDays(baseDate, followUp.frequencyValue);
-                    if (followUp.frequencyUnit === 'months') nextDate = addMonths(baseDate, followUp.frequencyValue);
-                    if (followUp.frequencyUnit === 'years') nextDate = addYears(baseDate, followUp.frequencyValue);
-                    nextFollowUp.dueDate = nextDate.toISOString();
+                    nextFollowUp.dueDate = addMonths(baseDate, followUp.interval_months).toISOString();
                 }
 
-                if (followUp.frequencyType === 'odometer' || followUp.frequencyType === 'both') {
+                if (followUp.interval_type === 'km' || followUp.interval_type === 'both') {
                     const currentOdo = Number(completionDetails.odometer);
-                    nextFollowUp.dueOdometer = currentOdo + Number(followUp.odometerValue || followUp.frequencyValue);
+                    nextFollowUp.dueOdometer = currentOdo + Number(followUp.interval_km || 0);
                 }
 
                 await addFollowUp(nextFollowUp);
@@ -388,7 +421,21 @@ export const VehicleContextProvider = ({ children }) => {
         try {
             if (!user) return;
             setError(null);
-            const newRecord = { ...recordDetails };
+            let typeMap = 'other';
+            const lowType = (recordDetails.type || '').toLowerCase();
+            if(lowType.includes('fuel')) typeMap = 'fuel';
+            else if(lowType.includes('insurance')) typeMap = 'insurance';
+            else typeMap = 'service';
+            
+            let newRecord = {
+                vehicleId: recordDetails.vehicleId,
+                type: typeMap,
+                amount: Number(recordDetails.cost || 0),
+                date: recordDetails.date,
+                odometer: Number(recordDetails.odometer || 0),
+                notes: recordDetails.notes || recordDetails.type,
+                attachment: recordDetails.attachment || null
+            };
 
             // Handle Finance
             if (recordDetails.cost > 0 && recordDetails.accountId) {
@@ -407,7 +454,7 @@ export const VehicleContextProvider = ({ children }) => {
                 newRecord.financeTxId = true;
             }
 
-            await FirestoreService.addItem(`users/${user.uid}/serviceRecords`, newRecord);
+            await FirestoreService.addItem(`users/${user.uid}/ledgerEntries`, newRecord);
 
             // Update Odo
             const vehicle = vehicles.find(v => v.id === recordDetails.vehicleId);
@@ -432,7 +479,7 @@ export const VehicleContextProvider = ({ children }) => {
         try {
             if (!user) return;
             setError(null);
-            const existing = followUps.find(f => f.vehicleId === vehicleId && f.type === template.type && f.status !== 'completed');
+            const existing = followUps.find(f => f.vehicleId === vehicleId && (f.name === template.name || f.type === template.name) && f.status !== 'completed');
             const vehicle = vehicles.find(v => v.id === vehicleId);
 
             if (existing) {
@@ -441,24 +488,21 @@ export const VehicleContextProvider = ({ children }) => {
                 // Add it
                 const baseDate = new Date();
                 let dueDate = null;
-                if (template.frequencyType === 'date' || template.frequencyType === 'both') {
-                    if (template.frequencyUnit === 'days') dueDate = addDays(baseDate, template.frequencyValue).toISOString();
-                    if (template.frequencyUnit === 'months') dueDate = addMonths(baseDate, template.frequencyValue).toISOString();
-                    if (template.frequencyUnit === 'years') dueDate = addYears(baseDate, template.frequencyValue).toISOString();
+                if (template.interval_type === 'months' || template.interval_type === 'both') {
+                    dueDate = addMonths(baseDate, template.interval_months).toISOString();
                 }
 
                 let dueOdometer = null;
-                if (vehicle && (template.frequencyType === 'odometer' || template.frequencyType === 'both')) {
-                    dueOdometer = (Number(vehicle.odometer) || 0) + (template.odometerValue || 0);
+                if (vehicle && (template.interval_type === 'km' || template.interval_type === 'both')) {
+                    dueOdometer = (Number(vehicle.odometer) || 0) + (template.interval_km || 0);
                 }
 
                 const newFollowUp = {
                     vehicleId: vehicleId,
-                    type: template.type,
-                    frequencyType: template.frequencyType,
-                    frequencyValue: template.frequencyValue,
-                    frequencyUnit: template.frequencyUnit,
-                    odometerValue: template.odometerValue,
+                    name: template.name,
+                    interval_type: template.interval_type,
+                    interval_months: template.interval_months || null,
+                    interval_km: template.interval_km || null,
                     dueDate,
                     dueOdometer,
                     isRecurring: true,
@@ -526,6 +570,18 @@ export const VehicleContextProvider = ({ children }) => {
                 await addTransaction(tx);
             }
 
+            // Write Standardized Ledger Entry to Backend
+            let emiRecord = {
+                vehicleId: loan.vehicleId,
+                type: 'emi',
+                amount: Number(payment.amount || 0),
+                date: payment.date,
+                notes: `EMI Payment - ${loan.lender}`,
+            };
+            if(payment.amount > 0) {
+                 await FirestoreService.addItem(`users/${user.uid}/ledgerEntries`, emiRecord);
+            }
+
             // Update Loan Document
             await FirestoreService.updateItem(`users/${user.uid}/vehicleLoans`, loanId, {
                 remainingPrincipal: newRemainingPrincipal,
@@ -546,84 +602,33 @@ export const VehicleContextProvider = ({ children }) => {
 
     // --- Insights & Helpers ---
     const getLoanDetailedStatus = useCallback((loanId) => {
-        const loan = loans.find(l => l.id === loanId);
-        if (!loan) return null;
-
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth();
-        const dueDate = new Date(currentYear, currentMonth, loan.dueDateDay);
-
-        // Find if any EMI payment made this cycle
-        const hasPaidThisMonth = loan.history?.some(p => {
-            const pDate = new Date(p.date);
-            return pDate.getFullYear() === currentYear && pDate.getMonth() === currentMonth && p.type === 'EMI';
-        });
-
-        let nextDueDate = new Date(dueDate);
-        if (hasPaidThisMonth) {
-            nextDueDate.setMonth(nextDueDate.getMonth() + 1);
-        }
-
-        const isOverdue = !hasPaidThisMonth && now > dueDate;
-        const status = isOverdue ? 'overdue' : (hasPaidThisMonth ? 'paid' : 'pending');
-
-        // Interest Balance (Simplified for Flat vs Reducing)
-        let interestBalance = 0;
-        if (loan.interestType === 'reducing') {
-            const monthlyRate = (loan.interestRate / 100) / 12;
-            interestBalance = Math.max(0, loan.remainingPrincipal * monthlyRate);
-        } else {
-            // Flat: Total Interest / Tenure (Rough estimate per month)
-            const totalInterest = loan.totalLoanAmount * (loan.interestRate / 100) * (loan.tenureMonths / 12);
-            interestBalance = totalInterest / loan.tenureMonths;
-        }
-
+        if (!loanStats) return null;
+        
         return {
-            status,
-            dueDate: nextDueDate.toISOString(),
-            isPastDue: isOverdue,
-            interestBalance: Math.round(interestBalance),
-            daysLate: isOverdue ? Math.floor((now - dueDate) / (1000 * 60 * 60 * 24)) : 0
+            status: loanStats.status,
+            dueDate: loanStats.nextInstallmentDate,
+            isPastDue: loanStats.isOverdue,
+            remainingBalance: loanStats.remainingBalance,
+            totalPaid: loanStats.totalPaid,
+            installmentsPaid: loanStats.installmentsPaid,
+            emi: loanStats.emi,
+            daysLate: loanStats.isOverdue ? Math.floor((new Date() - new Date(loanStats.nextInstallmentDate)) / (1000 * 60 * 60 * 24)) : 0
         };
-    }, [loans]);
+    }, [loanStats]);
 
     const getVehicleStats = useCallback((vehicleId) => {
         const vehicle = vehicles.find(v => v.id === vehicleId);
         if (!vehicle) return null;
 
-        const records = serviceRecords.filter(r => r.vehicleId === vehicleId);
         const vFollowUps = followUps.filter(f => f.vehicleId === vehicleId && f.status !== 'completed');
-        const loan = loans.find(l => l.vehicleId === vehicleId && l.status !== 'closed');
-        const loanPayments = loan ? (loan.history || []) : [];
+        
+        // Fetch Aggregates directly from backend states perfectly eliminating frontend calculations bounds
+        const totalSpend = ledgerStats?.totalSpend || 0;
+        const monthSpend = ledgerStats?.monthSpend || 0;
+        const trendData = ledgerStats?.trendData || [];
+        const breakdown = ledgerStats?.breakdown || { fuel: 0, service: 0, emi: 0, insurance: 0 };
 
         const now = new Date();
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(now.getDate() - 30);
-
-        // Breakdown & Financials
-        let totalFuel = 0;
-        let totalService = 0;
-        let totalInsurance = 0;
-
-        records.forEach(r => {
-            const cost = Number(r.cost) || 0;
-            const type = (r.type || '').toLowerCase();
-            if (type.includes('fuel')) totalFuel += cost;
-            else if (type.includes('insurance')) totalInsurance += cost;
-            else totalService += cost;
-        });
-
-        const totalEMI = loanPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
-        const totalSpend = totalFuel + totalService + totalInsurance + totalEMI;
-
-        // Rolling 30 Days (Month Spend)
-        const recentRecords = records.filter(r => new Date(r.date) >= thirtyDaysAgo);
-        const recentLoans = loanPayments.filter(p => new Date(p.date) >= thirtyDaysAgo);
-
-        const monthSpend = recentRecords.reduce((sum, r) => sum + (Number(r.cost) || 0), 0) + 
-                           recentLoans.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
-
         // Approximate ownership duration in months for ownership cost
         const purchaseDate = new Date(vehicle.purchaseDate);
         const monthsOwned = Math.max(1, (now.getFullYear() - purchaseDate.getFullYear()) * 12 + (now.getMonth() - purchaseDate.getMonth()));
@@ -632,13 +637,6 @@ export const VehicleContextProvider = ({ children }) => {
         // Cost per km
         const odometer = Number(vehicle.odometer) || 0;
         const costPerKm = odometer > 0 ? (totalSpend / odometer).toFixed(2) : 0;
-
-        const breakdown = {
-            fuel: totalFuel,
-            service: totalService,
-            emi: totalEMI,
-            insurance: totalInsurance
-        };
 
         // Overdue & Soon calculation
         const alerts = vFollowUps.filter(f => {
@@ -654,8 +652,8 @@ export const VehicleContextProvider = ({ children }) => {
         let healthScore = 100 - (overdueCount * 10);
         if (healthScore < 0) healthScore = 0;
 
-        // Last Service
-        const lastService = records.sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+        // Last Service (Local memory based is fine here since it only demands latest 1 entry, and records cap natively provides it)
+        const lastService = serviceRecords.sort((a, b) => new Date(b.date) - new Date(a.date))[0];
 
         return {
             totalSpend,
@@ -663,12 +661,13 @@ export const VehicleContextProvider = ({ children }) => {
             costPerMonth,
             costPerKm,
             breakdown,
+            trendData,
             overdueCount,
             healthScore,
             lastServiceDate: lastService?.date,
-            lastServiceType: lastService?.type
+            lastServiceType: lastService?.notes || 'Service'
         };
-    }, [vehicles, serviceRecords, followUps, loans]);
+    }, [vehicles, followUps, ledgerStats, serviceRecords]);
 
     const getVehicleRisks = useCallback((vehicleId) => {
         const vehicle = vehicles.find(v => v.id === vehicleId);

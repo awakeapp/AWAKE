@@ -45,7 +45,7 @@ const LedgerScreen = ({ activeVehicle, trendData, maxTrendCost, stats, combinedH
                     <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl p-4 shadow-sm flex items-end justify-between h-32">
                         {trendData.map((data, i) => (
                             <div key={i} className="flex flex-col items-center gap-2 w-full group relative">
-                                <span className="absolute -top-6 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span className="absolute -top-6 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                                     ₹{data.cost > 1000 ? (data.cost / 1000).toFixed(1) + 'k' : data.cost}
                                 </span>
                                 <div className="w-full max-w-[24px] bg-slate-100 dark:bg-slate-800 rounded-t-lg relative flex flex-col justify-end h-16">
@@ -90,21 +90,21 @@ const LedgerScreen = ({ activeVehicle, trendData, maxTrendCost, stats, combinedH
                             <p className="text-slate-400 text-sm">No transaction records found.</p>
                         </div>
                     ) : (
-                        combinedHistory.map(record => (
-                            <div key={record.id} className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-start justify-between group hover:border-indigo-200 transition-colors">
+                        combinedHistory.map((record, index) => (
+                            <div key={record.id || index} className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-start justify-between group hover:border-indigo-200 transition-colors">
                                 <div>
                                     <div className="flex items-center gap-2 mb-1">
-                                        <h5 className="font-bold text-slate-900 dark:text-white text-sm">{record.type}</h5>
+                                        <h5 className="font-bold text-slate-900 dark:text-white text-sm capitalize">{record.type}</h5>
                                         {record.financeTxId && <div className="w-2 h-2 rounded-full bg-emerald-500" title="Synced with Finance"></div>}
                                     </div>
-                                    <p className="text-xs text-slate-400">{format(new Date(record.date), 'MMM d, yyyy')} • {record.category}</p>
+                                    <p className="text-xs text-slate-400">{format(new Date(record.date), 'MMM d, yyyy')}</p>
                                     {record.notes && (
                                         <p className="text-xs text-slate-500 mt-2 line-clamp-2">{record.notes}</p>
                                     )}
                                 </div>
                                 <div className="text-right">
-                                    {record.cost > 0 && (
-                                        <span className="block font-bold text-slate-900 dark:text-white text-sm">₹{Number(record.cost).toLocaleString()}</span>
+                                    {record.amount > 0 && (
+                                        <span className="block font-bold text-slate-900 dark:text-white text-sm">₹{Number(record.amount).toLocaleString()}</span>
                                     )}
                                     {record.odometer && (
                                         <span className="block text-[10px] text-slate-400 mt-1 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-lg inline-block">
@@ -117,8 +117,6 @@ const LedgerScreen = ({ activeVehicle, trendData, maxTrendCost, stats, combinedH
                     )}
                 </div>
             </section>
-             
-            {/* Vehicle List removed - moved to Manage Vehicles modal */}
         </div>
     );
 };

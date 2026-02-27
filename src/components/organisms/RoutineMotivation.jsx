@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
-import { Card, CardContent } from '../atoms/Card';
+import { AppCard as Card, AppCardContent } from '../ui/AppCard';
 
 const ROUTINE_MOTIVATIONS = [
     "Your routine is your armor. Put it on.",

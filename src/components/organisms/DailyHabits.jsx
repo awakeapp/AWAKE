@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, X, Trash2, Edit2, Check, CheckCircle } from 'lucide-react';
-import { Card, CardContent } from '../atoms/Card';
+import { AppCard as Card, AppCardContent } from '../ui/AppCard';
 import clsx from 'clsx';
 import { useData } from '../../context/DataContext';
 import { getIconComponent } from '../../utils/iconInference';

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useResetPassword } from '../hooks/useResetPassword';
 import Button from '../components/atoms/Button';
 import Input from '../components/atoms/Input';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/atoms/Card';
+import { AppCard as Card, AppCardContent, AppCardHeader, AppCardTitle } from '../components/ui/AppCard';
 import { ArrowLeft, KeyRound, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import awakeLogo from '../assets/awake_logo_new.png';

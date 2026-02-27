@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useData } from '../../context/DataContext';
-import { Card, CardContent } from '../atoms/Card';
+import { AppCard as Card, AppCardContent } from '../ui/AppCard';
 import { MoreHorizontal } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 

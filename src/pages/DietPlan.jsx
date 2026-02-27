@@ -4,7 +4,7 @@ import { Utensils, Droplets, Flame, RotateCcw, ChevronDown, ChevronUp, Heart, Al
 import Button from '../components/atoms/Button';
 import { calculateTDEE, generatePlan, RECOMMENDED_FOODS, FOODS_TO_AVOID } from '../utils/dietUtils';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent } from '../components/atoms/Card';
+import { AppCard as Card, AppCardContent } from '../components/ui/AppCard';
 import { DB } from '../services/db';
 import { useAuthContext } from '../hooks/useAuthContext';
 

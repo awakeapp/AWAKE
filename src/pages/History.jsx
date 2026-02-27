@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useData } from '../context/DataContext';
 import { useDate } from '../context/DateContext';
 import { useAuthContext } from '../hooks/useAuthContext';
-import { Card, CardContent } from '../components/atoms/Card';
+import { AppCard as Card, AppCardContent } from '../components/ui/AppCard';
 import JumpDateModal from '../components/organisms/JumpDateModal';
 import { Calendar as CalendarIcon, PieChart, AlertCircle, CheckCircle2, XCircle, TrendingUp } from 'lucide-react';
 import clsx from 'clsx';

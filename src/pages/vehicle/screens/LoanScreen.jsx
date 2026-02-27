@@ -35,7 +35,10 @@ const LoanScreen = ({ activeLoan, activeVehicle, loanDetail, setIsAmortizationOp
                      </div>
                      <div>
                          <h4 className="font-bold text-red-900 dark:text-red-100 text-sm">EMI Overdue</h4>
-                         <p className="text-xs text-red-700 dark:text-red-300 mt-1">Payment is overdue by {loanDetail.daysLate} days.</p>
+                         <p className="text-xs text-red-700 dark:text-red-300 mt-1">
+                             Payment is overdue by {loanDetail.daysLate} days. 
+                             Due date was {format(new Date(loanDetail.dueDate), 'MMM d, yyyy')}.
+                         </p>
                      </div>
                 </div>
             )}
@@ -57,18 +60,18 @@ const LoanScreen = ({ activeLoan, activeVehicle, loanDetail, setIsAmortizationOp
                      <div>
                          <div className="flex justify-between text-xs font-bold mb-2">
                              <span className="text-slate-500">Repayment Progress</span>
-                             <span className="text-indigo-600 dark:text-indigo-400">₹{(activeLoan.totalLoanAmount - activeLoan.remainingPrincipal).toLocaleString()} Paid</span>
+                             <span className="text-indigo-600 dark:text-indigo-400">₹{(loanDetail?.totalPaid || 0).toLocaleString()} Paid</span>
                          </div>
                          <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                              <motion.div
                                  initial={{ width: 0 }}
-                                 animate={{ width: `${((activeLoan.totalLoanAmount - activeLoan.remainingPrincipal) / activeLoan.totalLoanAmount) * 100}%` }}
+                                 animate={{ width: `${((loanDetail?.totalPaid || 0) / (loanDetail?.totalPayable || activeLoan.totalPayable || 1)) * 100}%` }}
                                  className="h-full bg-gradient-to-r from-indigo-500 to-indigo-600"
                              />
                          </div>
                          <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-wide">
-                             <span>Principal</span>
-                             <span>Balance: ₹{activeLoan.remainingPrincipal.toLocaleString()}</span>
+                             <span>Total Payable: ₹{(loanDetail?.totalPayable || activeLoan.totalPayable || 0).toLocaleString()}</span>
+                             <span>Balance: ₹{(loanDetail?.remainingBalance || 0).toLocaleString()}</span>
                          </div>
                      </div>
 
@@ -101,7 +104,7 @@ const LoanScreen = ({ activeLoan, activeVehicle, loanDetail, setIsAmortizationOp
                      <div className="flex items-center justify-between pt-2">
                          <div>
                              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Monthly EMI</p>
-                             <p className="text-lg font-bold text-slate-900 dark:text-white">₹{activeLoan.emiAmount.toLocaleString()}</p>
+                             <p className="text-lg font-bold text-slate-900 dark:text-white">₹{(loanDetail?.emi || activeLoan.emiAmount).toLocaleString()}</p>
                          </div>
                          <button
                              onClick={() => setIsPayEMIOpen(true)}

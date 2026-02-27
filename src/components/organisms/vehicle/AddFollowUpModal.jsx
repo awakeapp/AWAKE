@@ -37,24 +37,27 @@ const AddFollowUpModal = ({ isOpen, onClose, onSave, vehicle }) => {
         if (formData.triggerType === 'odometer' && !formData.odometer) return;
 
         const submission = {
-            type: formData.type === 'Custom' ? formData.customType : formData.type,
+            name: formData.type === 'Custom' ? formData.customType : formData.type,
             vehicleId: vehicle.id,
             status: 'pending',
             isRecurring: formData.isRecurring
         };
 
         if (formData.triggerType === 'date') {
-            submission.frequencyType = 'date';
+            submission.interval_type = 'months';
             submission.dueDate = formData.date;
             if (formData.isRecurring) {
-                submission.frequencyValue = formData.frequencyValue;
-                submission.frequencyUnit = formData.frequencyUnit;
+                // Normalize to months for consistent schema
+                let months = Number(formData.frequencyValue);
+                if (formData.frequencyUnit === 'years') months = months * 12;
+                else if (formData.frequencyUnit === 'days') months = Math.max(1, Math.round(months / 30));
+                submission.interval_months = months;
             }
         } else {
-            submission.frequencyType = 'odometer';
+            submission.interval_type = 'km';
             submission.dueOdometer = formData.odometer;
             if (formData.isRecurring) {
-                submission.frequencyValue = formData.frequencyOdo; // For odometer reuse 'frequencyValue' but context handles logic
+                submission.interval_km = Number(formData.frequencyOdo);
             }
         }
 

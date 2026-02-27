@@ -38,7 +38,7 @@ const VehicleDashboard = () => {
         deleteVehicle
     } = useVehicle();
 
-    const [activeTab, setActiveTab] = useState('ledger');
+    const [activeTab, setActiveTab] = useState('dashboard');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isVehicleSelectorOpen, setIsVehicleSelectorOpen] = useState(false);
     const [showArchived, setShowArchived] = useState(false);
@@ -69,54 +69,15 @@ const VehicleDashboard = () => {
     let nextService = activeFollowUps.find(f => (f.type || '').toLowerCase().includes('service') || (f.type || '').toLowerCase().includes('oil'));
     if (!nextService && activeFollowUps.length > 0) nextService = activeFollowUps[0];
     
-    // Trend Data & History for Ledger
-    const getSixMonthTrend = () => {
-        if (!activeVehicle || !stats) return [];
-        const months = Array.from({ length: 6 }).map((_, i) => {
-            const d = new Date();
-            d.setMonth(d.getMonth() - i);
-            return {
-                label: format(d, 'MMM'),
-                month: d.getMonth(),
-                year: d.getFullYear(),
-                cost: 0
-            };
-        }).reverse();
-
-        const loanPayments = activeLoan ? activeLoan.history || [] : [];
-        const allTxs = [
-            ...serviceRecords.filter(r => r.vehicleId === activeVehicle.id).map(r => ({ date: new Date(r.date), cost: Number(r.cost) || 0 })),
-            ...loanPayments.map(p => ({ date: new Date(p.date), cost: Number(p.amount) || 0 }))
-        ];
-
-        allTxs.forEach(tx => {
-            const bucket = months.find(m => m.month === tx.date.getMonth() && m.year === tx.date.getFullYear());
-            if (bucket) {
-                bucket.cost += tx.cost;
-            }
-        });
-
-        return months;
-    };
-    
-    const trendData = activeVehicle && activeTab === 'ledger' ? getSixMonthTrend() : [];
+    // Trend Data provided by backend
+    const trendData = stats?.trendData || [];
     const maxTrendCost = trendData.length ? Math.max(...trendData.map(d => d.cost)) || 1 : 1;
     
-    const activeVehicleRecords = activeVehicle
-        ? serviceRecords
-            .filter(r => r.vehicleId === activeVehicle.id)
-            .sort((a, b) => new Date(b.date) - new Date(a.date))
-        : [];
-        
-    const loanPaymentsLocal = activeLoan ? activeLoan.history || [] : [];
-        
-    let combinedHistory = [
-        ...activeVehicleRecords.map(r => ({ ...r, category: r.type.toLowerCase().includes('fuel') ? 'Fuel' : r.type.toLowerCase().includes('insurance') ? 'Insurance' : 'Service' })),
-        ...loanPaymentsLocal.map(p => ({ ...p, type: 'EMI', date: p.date, cost: p.amount, category: 'EMI', id: p.id || Math.random().toString() }))
-    ];
+    // Ledger Entries already standardize 'EMI', 'fuel', 'service', etc.
+    let combinedHistory = [...serviceRecords];
 
     if (historyFilter !== 'All') {
-        combinedHistory = combinedHistory.filter(h => h.category === historyFilter);
+        combinedHistory = combinedHistory.filter(h => h.type.toLowerCase() === historyFilter.toLowerCase());
     }
 
     combinedHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -145,12 +106,11 @@ const VehicleDashboard = () => {
     const exportCSV = () => {
         if (!activeVehicle) return;
         setIsMenuOpen(false);
-        const headers = ['Date', 'Type', 'Category', 'Cost', 'Odometer', 'Notes'];
+        const headers = ['Date', 'Type', 'Amount', 'Odometer', 'Notes'];
         const rows = combinedHistory.map(r => [
             format(new Date(r.date), 'yyyy-MM-dd'),
             r.type,
-            r.category,
-            r.cost || 0,
+            r.amount || 0,
             r.odometer || '',
             r.notes ? `"${r.notes.replace(/"/g, '""')}"` : ''
         ].join(','));
@@ -335,8 +295,8 @@ const VehicleDashboard = () => {
             <div className="px-4 py-4">
                 {activeVehicle ? (
                     <>
-                        {/* Quick Stats overview top container for Ledger ONLY */}
-                        {activeTab === 'ledger' && (
+                        {/* Quick Stats overview top container for Dashboard ONLY */}
+                        {activeTab === 'dashboard' && (
                             <div className="bg-gradient-to-br from-slate-900 to-slate-800 dark:from-indigo-900 dark:to-slate-900 rounded-3xl p-5 text-white shadow-xl shadow-slate-900/10 mb-6 relative overflow-hidden">
                                  {/* Alert Badge if Overdue */}
                                  {stats?.overdueCount > 0 && (
@@ -364,7 +324,7 @@ const VehicleDashboard = () => {
                         )}
 
                         <main className="pb-16">
-                            {activeTab === 'ledger' && (
+                            <div className={activeTab === 'dashboard' ? 'block' : 'hidden'}>
                                 <LedgerScreen 
                                     activeVehicle={activeVehicle}
                                     trendData={trendData}
@@ -380,17 +340,17 @@ const VehicleDashboard = () => {
                                     setDeleteConfirmId={setDeleteConfirmId}
                                     toggleArchiveVehicle={toggleArchiveVehicle}
                                 />
-                            )}
+                            </div>
                             
-                            {activeTab === 'service' && (
+                            <div className={activeTab === 'service' ? 'block' : 'hidden'}>
                                 <ServiceScreen 
                                     activeVehicle={activeVehicle}
                                     nextService={nextService}
                                     activeTab={activeTab}
                                 />
-                            )}
+                            </div>
                             
-                            {activeTab === 'loan' && (
+                            <div className={activeTab === 'loan' ? 'block' : 'hidden'}>
                                 <LoanScreen 
                                     activeLoan={activeLoan}
                                     activeVehicle={activeVehicle}
@@ -400,11 +360,11 @@ const VehicleDashboard = () => {
                                     setIsPayEMIOpen={setIsPayEMIOpen}
                                     setIsAddLoanOpen={setIsAddLoanOpen}
                                 />
-                            )}
+                            </div>
                         </main>
                         
                         {/* Contextual FABs */}
-                        {activeTab === 'ledger' && (
+                        {activeTab === 'dashboard' && (
                             <button
                                 onClick={() => alert("Add Entry: Full ledger entry modal coming soon")}
                                 className="fixed bottom-[80px] right-6 bg-indigo-600 text-white px-5 py-3 rounded-2xl shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
@@ -418,6 +378,14 @@ const VehicleDashboard = () => {
                                 className="fixed bottom-[80px] right-6 bg-blue-600 text-white px-5 py-3 rounded-2xl shadow-xl shadow-blue-600/30 flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
                             >
                                 <Plus className="w-5 h-5" /> Add Reminder
+                            </button>
+                        )}
+                        {activeTab === 'loan' && activeLoan && (
+                            <button
+                                onClick={() => setIsPayEMIOpen(true)}
+                                className="fixed bottom-[80px] right-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-5 py-3 rounded-2xl shadow-xl flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
+                            >
+                                <Plus className="w-5 h-5" /> Record EMI
                             </button>
                         )}
 
@@ -434,7 +402,7 @@ const VehicleDashboard = () => {
                 <div className="flex max-w-md mx-auto relative px-2">
                     {[
                         { id: 'home', icon: Home, label: 'App Home', onClick: () => navigate('/') },
-                        { id: 'ledger', icon: Wallet, label: 'Ledger', onClick: () => setActiveTab('ledger') },
+                        { id: 'dashboard', icon: Wallet, label: 'Dashboard', onClick: () => setActiveTab('dashboard') },
                         { id: 'service', icon: Settings, label: 'Service', onClick: () => setActiveTab('service') },
                         { id: 'loan', icon: Landmark, label: 'Loan', onClick: () => setActiveTab('loan') }
                     ].map(tab => {

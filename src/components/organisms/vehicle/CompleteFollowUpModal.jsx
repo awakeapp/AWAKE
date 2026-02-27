@@ -43,7 +43,7 @@ const CompleteFollowUpModal = ({ isOpen, onClose, onComplete, followUp, vehicle 
                             <CheckCircle className="w-5 h-5 text-emerald-500" />
                             Complete Service
                         </h2>
-                        <p className="text-xs text-slate-500 ml-7">{followUp.type}</p>
+                        <p className="text-xs text-slate-500 ml-7">{followUp.name || followUp.type}</p>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-white/50 rounded-full transition-colors">
                         <X className="w-5 h-5 text-slate-500" />
