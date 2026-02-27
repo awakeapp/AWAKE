@@ -1,11 +1,13 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { ArrowLeft, Plus, MoreVertical, Trash2, Edit2, RotateCcw, AlertTriangle, Calendar, Lock, CreditCard, ToggleLeft, ToggleRight, Check, ChevronDown, Clock, Bell, MessageCircle, MessageSquare, Copy, Send, Wallet, FileText, Image as ImageIcon, Download, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { ArrowLeft, Plus, MoreVertical, Trash2, Edit2, RotateCcw, AlertTriangle, Calendar, Lock, CreditCard, ToggleLeft, ToggleRight, Check, ChevronDown, Clock, Bell, MessageCircle, MessageSquare, Copy, Send, Wallet, FileText, Image as ImageIcon, Download, ArrowUpRight, ArrowDownLeft, Paperclip, Loader2, ZoomIn, X as XIcon } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { format, isBefore, isAfter, startOfDay, endOfDay, differenceInDays, addDays } from 'date-fns';
 import JumpDateModal from '../../components/organisms/JumpDateModal';
 import { useScrollLock } from '../../hooks/useScrollLock';
+import { StorageService } from '../../services/storageService';
+import { useAuthContext } from '../../hooks/useAuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useToast } from '../../context/ToastContext';
 import ConfirmDialog from '../../components/organisms/ConfirmDialog';
@@ -33,6 +35,7 @@ const PartyDetail = () => {
     const navigate = useNavigate();
     const context = useFinance();
     const { showToast } = useToast();
+    const { user } = useAuthContext();
 
     if (!context || !context.debtParties) {
         return (
@@ -142,6 +145,13 @@ const PartyDetail = () => {
     const [dueDateManuallySet, setDueDateManuallySet] = useState(false);
     const [editTransactionId, setEditTransactionId] = useState(null);
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+
+    // --- Receipt attachment state ---
+    const [receiptFile, setReceiptFile] = useState(null); // File object (before upload)
+    const [receiptPreview, setReceiptPreview] = useState(null); // local object URL for preview
+    const [isUploadingReceipt, setIsUploadingReceipt] = useState(false);
+    const [receiptLightbox, setReceiptLightbox] = useState(null); // URL to show in fullscreen
+    const receiptInputRef = useRef(null);
 
     // --- Settlement states ---
     const [isSettleOpen, setIsSettleOpen] = useState(false);
@@ -472,13 +482,30 @@ const PartyDetail = () => {
         }
 
         try {
+            // Upload receipt first if one is selected
+            let receipt_url = null;
+            if (receiptFile && user) {
+                setIsUploadingReceipt(true);
+                try {
+                    const txId = editTransactionId || `tx_${Date.now()}`;
+                    const path = `users/${user.uid}/finance/receipts/${txId}.jpg`;
+                    const { url } = await StorageService.uploadImage(receiptFile, path);
+                    receipt_url = url;
+                } catch (e) {
+                    showToast('Receipt upload failed, saving without it.', 'warning');
+                } finally {
+                    setIsUploadingReceipt(false);
+                }
+            }
+
             if (editTransactionId) {
                 await editDebtTransaction(editTransactionId, {
                     type: txType,
                     amount: Number(amount),
                     date: new Date(date + 'T12:00:00').toISOString(),
                     due_date: dueDate ? new Date(dueDate + 'T12:00:00').toISOString() : null,
-                    notes: note
+                    notes: note,
+                    ...(receipt_url && { receipt_url })
                 });
                 showToast('Entry updated', 'success');
             } else {
@@ -488,7 +515,8 @@ const PartyDetail = () => {
                     amount: Number(amount),
                     date: new Date(date + 'T12:00:00').toISOString(),
                     due_date: dueDate ? new Date(dueDate + 'T12:00:00').toISOString() : null,
-                    notes: note
+                    notes: note,
+                    ...(receipt_url && { receipt_url })
                 });
                 showToast('Entry saved', 'success');
             }
@@ -554,6 +582,10 @@ const PartyDetail = () => {
         setDueDatePickerOpen(false);
         setDueDateManuallySet(false);
         setEditTransactionId(null);
+        // Clear receipt
+        setReceiptFile(null);
+        if (receiptPreview) URL.revokeObjectURL(receiptPreview);
+        setReceiptPreview(null);
     };
 
     const toggleEntrySelection = (entryId, entryRemaining) => {
@@ -769,6 +801,22 @@ const PartyDetail = () => {
                                             </div>
                                         </div>
                                     </div>
+
+                                    {/* Receipt thumbnail */}
+                                    {tx.receipt_url && (
+                                        <div
+                                            className="mx-4 mb-3 cursor-pointer relative rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 group"
+                                            onClick={() => setReceiptLightbox(tx.receipt_url)}
+                                        >
+                                            <img src={tx.receipt_url} alt="Receipt" className="w-full h-28 object-cover group-hover:brightness-90 transition-all" />
+                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
+                                                <ZoomIn className="w-5 h-5 text-white" />
+                                            </div>
+                                            <div className="absolute top-1.5 left-1.5 bg-black/50 backdrop-blur-sm text-white text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md flex items-center gap-1">
+                                                <Paperclip className="w-2.5 h-2.5"/> Receipt
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })
@@ -776,6 +824,29 @@ const PartyDetail = () => {
                 </div>
                 {/* --- End Ledger --- */}
             </div>
+            {/* Receipt Lightbox */}
+            <AnimatePresence>
+                {receiptLightbox && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4"
+                        onClick={() => setReceiptLightbox(null)}
+                    >
+                        <button className="absolute top-5 right-5 p-2 bg-white/10 rounded-full text-white" onClick={() => setReceiptLightbox(null)}>
+                            <XIcon className="w-5 h-5" />
+                        </button>
+                        <img
+                            src={receiptLightbox}
+                            alt="Receipt full view"
+                            className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl"
+                            onClick={(e) => e.stopPropagation()}
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             <ConfirmDialog
                 isOpen={!!deleteConfirmId}
                 onClose={() => setDeleteConfirmId(null)}
@@ -884,6 +955,48 @@ const PartyDetail = () => {
                                     <input type="text" value={note} onChange={e => setNote(e.target.value)} placeholder="Enter description..." required
                                         className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-[13px] outline-none focus:border-indigo-400/50 transition-all placeholder:text-slate-400" />
                                 </div>
+
+                                {/* Receipt Attachment */}
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Receipt / Bill</label>
+                                    {receiptPreview ? (
+                                        <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+                                            <img src={receiptPreview} alt="Receipt" className="w-full h-36 object-cover" />
+                                            <div className="absolute inset-0 bg-black/20 flex items-center justify-center gap-3 opacity-0 hover:opacity-100 transition-opacity">
+                                                <button type="button" onClick={() => setReceiptLightbox(receiptPreview)} className="p-2 bg-white/90 rounded-full text-slate-900 shadow">
+                                                    <ZoomIn className="w-4 h-4" />
+                                                </button>
+                                                <button type="button" onClick={() => { setReceiptFile(null); URL.revokeObjectURL(receiptPreview); setReceiptPreview(null); }} className="p-2 bg-white/90 rounded-full text-rose-500 shadow">
+                                                    <XIcon className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                            <div className="absolute top-2 right-2 bg-emerald-500 text-white text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md">Attached</div>
+                                        </div>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            onClick={() => receiptInputRef.current?.click()}
+                                            className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-5 flex flex-col items-center justify-center gap-2 text-slate-400 hover:border-indigo-400/70 hover:text-indigo-500 hover:bg-indigo-50/40 dark:hover:bg-indigo-500/5 transition-all active:scale-[0.98]"
+                                        >
+                                            <Paperclip className="w-5 h-5" />
+                                            <span className="text-[11px] font-black uppercase tracking-widest">Attach Receipt or Bill</span>
+                                            <span className="text-[10px] font-medium text-slate-300 dark:text-slate-600">JPG, PNG — auto compressed</span>
+                                        </button>
+                                    )}
+                                    <input
+                                        ref={receiptInputRef}
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (!file) return;
+                                            setReceiptFile(file);
+                                            const url = URL.createObjectURL(file);
+                                            setReceiptPreview(url);
+                                        }}
+                                    />
+                                </div>
                             </div>
 
                             {/* Footer Actions */}
@@ -894,10 +1007,10 @@ const PartyDetail = () => {
                                     </button>
                                     <button
                                         type="submit"
-                                        disabled={!amount || Number(amount) <= 0}
-                                        className="flex-[2] py-4 bg-indigo-600 disabled:bg-slate-200 dark:disabled:bg-slate-800 disabled:text-slate-400 disabled:shadow-none text-white font-black rounded-2xl shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all text-sm uppercase tracking-wider"
+                                        disabled={!amount || Number(amount) <= 0 || isUploadingReceipt}
+                                        className="flex-[2] py-4 bg-indigo-600 disabled:bg-slate-200 dark:disabled:bg-slate-800 disabled:text-slate-400 disabled:shadow-none text-white font-black rounded-2xl shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all text-sm uppercase tracking-wider flex items-center justify-center gap-2"
                                     >
-                                        {isSettlementType && pendingEntries.length > 0 ? 'Allocate →' : 'Save Entry'}
+                                        {isUploadingReceipt ? <><Loader2 className="w-4 h-4 animate-spin"/> Uploading...</> : isSettlementType && pendingEntries.length > 0 ? 'Allocate →' : 'Save Entry'}
                                     </button>
                                 </div>
                             </div>

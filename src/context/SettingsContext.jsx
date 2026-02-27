@@ -21,6 +21,11 @@ export const SettingsProvider = ({ children }) => {
         return {
             language: localStorage.getItem('appLanguage') || 'en',
             timeFormat: localStorage.getItem('appTimeFormat') || '12h',
+            security: {
+                lockEnabled: localStorage.getItem('appLockEnabled') === 'true',
+                biometricEnabled: localStorage.getItem('appBiometricEnabled') === 'true',
+                lastUnlocked: 0
+            },
             notifications: {
                 global: true,
                 ramadan: true,

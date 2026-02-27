@@ -3,6 +3,7 @@ import { useRamadan } from '../../context/RamadanContext';
 import { useNavigate } from 'react-router-dom';
 import { Activity, BarChart2, CheckCircle2, Moon, Sun, BookOpen, Heart, MoreHorizontal } from 'lucide-react';
 import clsx from 'clsx';
+import PageLayout from '../../components/layout/PageLayout';
 
 const StatCard = ({ title, icon: Icon, value, target, percent, colorClass = "bg-emerald-500", textClass = "text-emerald-500" }) => {
     const displayPercent = percent > 100 ? 100 : percent;
@@ -93,9 +94,9 @@ const RamadanStats = () => {
     const grandTotalDhikr = totalTahlil + totalSalawat + totalIstighfar;
 
     return (
-        <div className="pb-24">
-            <header className="sticky top-0 z-30 bg-slate-50/80 dark:bg-black/80 backdrop-blur-md border-b border-slate-200 dark:border-white/5 -mx-4 px-4" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-                <div className="pt-4 pb-5 flex items-center justify-between">
+        <PageLayout
+            header={
+                <div className="flex items-center justify-between">
                     <h1 className="text-[20px] font-bold tracking-tight text-slate-900 dark:text-white">Stats</h1>
                     <button 
                         onClick={() => navigate('/ramadan/settings')}
@@ -104,8 +105,8 @@ const RamadanStats = () => {
                         <MoreHorizontal className="w-5 h-5" />
                     </button>
                 </div>
-            </header>
-
+            }
+        >
             <div className="space-y-6">
                 {/* Top Level Summary Card */}
                 <div className="bg-indigo-600 dark:bg-indigo-900 rounded-xl sm:rounded-2xl p-6 shadow-md text-white relative overflow-hidden">
@@ -177,7 +178,7 @@ const RamadanStats = () => {
                 />
             </div>
             </div>
-        </div>
+        </PageLayout>
     );
 };
 

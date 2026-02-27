@@ -4,9 +4,9 @@ import {
     Trash2, Lock, Layout, Sliders, ArrowLeft, ArrowUpDown, Clock
 } from 'lucide-react';
 import { useTasks } from '../../context/TaskContext';
-import { AppHeader } from '../../components/ui/AppHeader';
 import { SettingsList, SettingsSection, SettingsRow } from '../../components/ui/SettingsList';
 import { AppToggle } from '../../components/ui/AppToggle';
+import PageLayout from '../../components/layout/PageLayout';
 
 const WorkspaceSettings = () => {
     const navigate = useNavigate();
@@ -23,15 +23,17 @@ const WorkspaceSettings = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-black pb-24">
-            <AppHeader 
-                title="Workspace Settings" 
-                showBack 
-                onBack={() => navigate(-1)}
-            />
-
-            <div className="pt-[calc(60px+env(safe-area-inset-top))]">
-                <SettingsList>
+        <PageLayout
+            header={
+                <div className="flex items-center gap-3">
+                    <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+                        <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-white" />
+                    </button>
+                    <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Workspace Settings</h1>
+                </div>
+            }
+        >
+            <SettingsList>
                     <SettingsSection title="Task Management">
                         <SettingsRow 
                             icon={Trash2}
@@ -108,8 +110,7 @@ const WorkspaceSettings = () => {
                         AWAKE Workspace Scoped Settings
                     </p>
                 </SettingsList>
-            </div>
-        </div>
+        </PageLayout>
     );
 };
 

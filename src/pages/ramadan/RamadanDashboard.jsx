@@ -8,6 +8,7 @@ import NotificationSettings from '../../components/ramadan/NotificationSettings'
 import PrayerTracker from '../../components/ramadan/PrayerTracker';
 import RamadanImageSlider from '../../components/ramadan/RamadanImageSlider';
 import LocationModal from '../../components/ramadan/LocationModal';
+import PageLayout from '../../components/layout/PageLayout';
 
 const FastingTracker = ({ todayKey, ramadanData, updateDay }) => {
     const todayData = ramadanData?.days?.[todayKey] || {};
@@ -208,12 +209,9 @@ const RamadanDashboard = () => {
     const isRamadanActive = hijriDate?.isRamadan;
 
     return (
-        <div className="pb-12">
-            <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
-            
-            {/* Header */}
-            <header className="sticky top-0 z-30 bg-slate-50/80 dark:bg-black/80 backdrop-blur-md border-b border-slate-200 dark:border-white/5 -mx-4 px-4" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-                <div className="pt-4 pb-5 flex items-center justify-between">
+        <PageLayout
+            header={
+                <div className="pt-1 pb-1 flex items-center justify-between">
                     <div>
                         <h1 className="text-[20px] font-bold tracking-tight text-slate-900 dark:text-white">Ramadan Track</h1>
                         {displayName && (
@@ -236,8 +234,9 @@ const RamadanDashboard = () => {
                         <MoreHorizontal className="w-5 h-5" />
                     </button>
                 </div>
-            </header>
-
+            }
+            renderFloating={<LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />}
+        >
             <div className="space-y-6">
 
             {error && !dailyTimings && (
@@ -311,9 +310,8 @@ const RamadanDashboard = () => {
                     Ramadan has not officially started yet according to the calculated Hijri date.
                 </div>
             )}
-            
             </div>
-        </div>
+        </PageLayout>
     );
 };
 

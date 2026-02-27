@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { Calendar, Star, Clock, ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
 import { useParams, useNavigate } from 'react-router-dom';
+import PageLayout from '../../components/layout/PageLayout';
 
 
 const FilteredTaskView = () => {
@@ -41,50 +42,49 @@ const FilteredTaskView = () => {
  const HeaderIcon = header.icon;
 
  return (
- <div className="space-y-6 pb-24 max-w-md mx-auto w-full px-4">
- {/* Header */}
- <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
- <button
- onClick={() => navigate(-1)}
- className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors text-slate-700 dark:text-slate-300 -ml-2 focus:outline-none"
+ <PageLayout
+     header={
+         <div className="flex items-center gap-3">
+             <button
+             onClick={() => navigate(-1)}
+             className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors text-slate-700 dark:text-slate-300 -ml-2 focus:outline-none"
+             >
+             <ArrowLeft className="w-6 h-6" />
+             </button>
+             <div className={`p-2 rounded-lg bg-slate-50 dark:bg-slate-800 ${header.color}`}>
+                 <HeaderIcon className="w-6 h-6" />
+             </div>
+             <div>
+                 <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100 leading-tight">
+                     {header.title}
+                 </h1>
+                 <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+                     {filteredTasks.length} tasks found
+                 </p>
+             </div>
+         </div>
+     }
  >
- <ArrowLeft className="w-6 h-6" />
- </button>
- <div className={`p-2 rounded-lg bg-slate-50 dark:bg-slate-800 ${header.color}`}>
- <HeaderIcon className="w-6 h-6" />
- </div>
- <div>
- <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100 leading-tight">
- {header.title}
- </h1>
- <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
- {filteredTasks.length} tasks found
- </p>
- </div>
- </div>
-
- <div className="space-y-3">
- {filteredTasks.length === 0 ? (
- <div className="text-center py-12 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
- <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
- No tasks found in this view.
- </p>
- </div>
- ) : (
- filteredTasks.map(task => (
- <div key={task.id}>
- {/* Optional Date Header if sorting by date */}
- {/* Simplified List */}
- <TaskItem
- task={task}
- onUpdateStatus={toggleTask} // Mapped to onUpdateStatus to match prop name in TaskItem
- isLocked={false}
- />
- </div>
- ))
- )}
- </div>
- </div>
+  <div className="space-y-3">
+  {filteredTasks.length === 0 ? (
+  <div className="text-center py-12 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
+  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+  No tasks found in this view.
+  </p>
+  </div>
+  ) : (
+  filteredTasks.map(task => (
+  <div key={task.id}>
+  <TaskItem
+  task={task}
+  onUpdateStatus={toggleTask}
+  isLocked={false}
+  />
+  </div>
+  ))
+  )}
+  </div>
+ </PageLayout>
  );
 };
 

@@ -1,9 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { useRamadan } from '../../context/RamadanContext';
-import { usePrayer } from '../../context/PrayerContext';
-import { useNavigate } from 'react-router-dom';
-import { BookOpen, Target, MoreHorizontal, Activity, Check, Plus } from 'lucide-react';
-import clsx from 'clsx';
+import PageLayout from '../../components/layout/PageLayout';
 
 const CounterCard = ({ title, count, target, onSave, accentClass }) => {
  const [inputVal, setInputVal] = useState(String(count));

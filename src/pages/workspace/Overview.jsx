@@ -2,9 +2,8 @@ import { useTasks } from '../../context/TaskContext';
 import { startOfWeek, endOfWeek, eachDayOfInterval, format, isSameDay, subDays } from 'date-fns';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from 'recharts';
 import { CheckCircle2, Circle, Clock, TrendingUp, AlertCircle, ArrowLeft } from 'lucide-react';
-
-
 import { useNavigate } from 'react-router-dom';
+import PageLayout from '../../components/layout/PageLayout';
 
 const Overview = () => {
  const navigate = useNavigate();
@@ -50,25 +49,23 @@ const Overview = () => {
  const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ec4899'];
 
  return (
- <div className="space-y-8 pb-24 max-w-md mx-auto w-full px-4" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 80px)' }}>
- {/* Fixed Header */}
- <div 
- className="fixed top-0 left-0 right-0 z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-transparent"
- style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0px)' }}
+ <PageLayout
+   header={
+     <div className="flex items-center gap-3">
+       <button
+       onClick={() => navigate(-1)}
+       className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors text-slate-700 dark:text-slate-300 -ml-2 focus:outline-none"
+       >
+         <ArrowLeft className="w-6 h-6" />
+       </button>
+       <div>
+         <h1 className="text-2xl font-bold text-slate-900 dark:text-white leading-tight">Overview</h1>
+         <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Your productivity report &amp; discipline tracking</p>
+       </div>
+     </div>
+   }
  >
- <div className="max-w-md mx-auto w-full px-4 h-16 flex items-center gap-3">
- <button
- onClick={() => navigate(-1)}
- className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors text-slate-700 dark:text-slate-300 -ml-2 focus:outline-none"
- >
- <ArrowLeft className="w-6 h-6" />
- </button>
- <div>
- <h1 className="text-2xl font-bold text-slate-900 dark:text-white leading-tight">Overview</h1>
- <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Your productivity report & discipline tracking</p>
- </div>
- </div>
- </div>
+ <div className="space-y-8">
 
  {/* Key Metrics Grid */}
  <div className="grid grid-cols-2 gap-4">
@@ -160,8 +157,8 @@ const Overview = () => {
  ))}
  </div>
  </div>
-
  </div>
+ </PageLayout>
  );
 };
 

@@ -5,8 +5,8 @@ import {
 } from 'lucide-react';
 import { usePrayer } from '../../context/PrayerContext';
 import LocationModal from '../../components/ramadan/LocationModal';
-import { AppHeader } from '../../components/ui/AppHeader';
 import { SettingsList, SettingsSection, SettingsRow } from '../../components/ui/SettingsList';
+import PageLayout from '../../components/layout/PageLayout';
 
 const RamadanSettings = () => {
     const navigate = useNavigate();
@@ -49,17 +49,18 @@ const RamadanSettings = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-black pb-24">
-            <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
-            
-            <AppHeader 
-                title="Ramadan Settings" 
-                showBack 
-                onBack={() => navigate(-1)}
-            />
-
-            <div className="pt-[calc(60px+env(safe-area-inset-top))]">
-                <SettingsList>
+        <PageLayout
+            header={
+                <div className="flex items-center gap-3">
+                    <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+                        <ArrowLeft className="w-6 h-6 text-slate-900 dark:text-white" />
+                    </button>
+                    <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Ramadan Settings</h1>
+                </div>
+            }
+            renderFloating={<LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />}
+        >
+            <SettingsList>
                     <SettingsSection title="Calculation">
                         <SettingsRow 
                             icon={Globe} 
@@ -129,8 +130,7 @@ const RamadanSettings = () => {
                         </div>
                     </SettingsSection>
                 </SettingsList>
-            </div>
-        </div>
+        </PageLayout>
     );
 };
 

@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Circle, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { useTasks } from '../../context/TaskContext';
+import PageLayout from '../../components/layout/PageLayout';
 
 const WorkspaceCalendar = () => {
  const navigate = useNavigate();
@@ -45,29 +46,32 @@ const WorkspaceCalendar = () => {
  };
 
  return (
- <div className="space-y-6 max-w-md mx-auto w-full px-4">
- {/* Header */}
- <div className="flex items-center justify-between mb-4">
- <div className="flex items-center gap-3">
- <button
- onClick={() => navigate(-1)}
- className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors text-slate-700 dark:text-slate-300 -ml-2 focus:outline-none"
+ <PageLayout
+   header={
+     <div className="flex items-center justify-between">
+       <div className="flex items-center gap-3">
+         <button
+         onClick={() => navigate(-1)}
+         className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors text-slate-700 dark:text-slate-300 -ml-2 focus:outline-none"
+         >
+         <ArrowLeft className="w-6 h-6" />
+         </button>
+         <h2 className="text-2xl font-bold text-slate-900 dark:text-white capitalize leading-tight">
+         {format(currentMonth, 'MMMM yyyy')}
+         </h2>
+       </div>
+       <div className="flex items-center gap-2">
+         <button onClick={prevMonth} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+         <ChevronLeft className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+         </button>
+         <button onClick={nextMonth} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+         <ChevronRight className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+         </button>
+       </div>
+     </div>
+   }
  >
- <ArrowLeft className="w-6 h-6" />
- </button>
- <h2 className="text-2xl font-bold text-slate-900 dark:text-white capitalize leading-tight">
- {format(currentMonth, 'MMMM yyyy')}
- </h2>
- </div>
- <div className="flex items-center gap-2">
- <button onClick={prevMonth} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
- <ChevronLeft className="w-5 h-5 text-slate-600 dark:text-slate-400" />
- </button>
- <button onClick={nextMonth} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
- <ChevronRight className="w-5 h-5 text-slate-600 dark:text-slate-400" />
- </button>
- </div>
- </div>
+ <div className="space-y-6">
 
  {/* Calendar Grid */}
  <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
@@ -114,8 +118,9 @@ const WorkspaceCalendar = () => {
  );
  })}
  </div>
+    </div>
  </div>
- </div>
+ </PageLayout>
  );
 };
 
