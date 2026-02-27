@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useVehicle } from '../../context/VehicleContext';
 import { 
     Home, Wallet, Settings, Landmark, MoreVertical, ChevronDown, 
-    Plus, Car, Download, Archive, Edit2, ShieldAlert
+    Plus, Car, Download, Archive, Edit2, ShieldAlert, List
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
@@ -18,6 +18,7 @@ import PayEMIModal from './PayEMIModal';
 import AmortizationScheduleModal from './AmortizationScheduleModal';
 import PrepaymentCalculatorModal from './PrepaymentCalculatorModal';
 import ConfirmDialog from '../../components/organisms/ConfirmDialog';
+import { AppBottomNav } from '../../components/ui/AppBottomNav';
 
 const VehicleDashboard = () => {
     const navigate = useNavigate();
@@ -398,35 +399,39 @@ const VehicleDashboard = () => {
             </div>
 
             {/* Internal Bottom Navigation */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 pb-safe z-40">
-                <div className="flex max-w-md mx-auto relative px-2">
-                    {[
-                        { id: 'home', icon: Home, label: 'App Home', onClick: () => navigate('/') },
-                        { id: 'dashboard', icon: Wallet, label: 'Dashboard', onClick: () => setActiveTab('dashboard') },
-                        { id: 'service', icon: Settings, label: 'Service', onClick: () => setActiveTab('service') },
-                        { id: 'loan', icon: Landmark, label: 'Loan', onClick: () => setActiveTab('loan') }
-                    ].map(tab => {
-                        const Icon = tab.icon;
-                        const isActive = activeTab === tab.id && tab.id !== 'home';
-                        return (
-                            <button
-                                key={tab.id}
-                                onClick={tab.onClick}
-                                className={`flex-1 py-3 flex flex-col items-center justify-center gap-1 transition-colors relative ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
-                            >
-                                <Icon className={`w-5 h-5 ${isActive ? 'fill-current opacity-20' : ''}`} />
-                                <span className="text-[10px] font-bold">{tab.label}</span>
-                                {isActive && (
-                                    <motion.div 
-                                        layoutId="vehicle_nav_indicator"
-                                        className="absolute top-0 left-1/4 right-1/4 h-0.5 bg-indigo-600 rounded-b-full"
-                                    />
-                                )}
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
+            <AppBottomNav 
+                items={[
+                    { id: 'app-home', icon: Home, label: 'App Home', onClick: () => navigate('/') },
+                    { 
+                        id: 'service', 
+                        icon: Settings, 
+                        label: 'Service', 
+                        isActive: activeTab === 'service', 
+                        onClick: () => setActiveTab('service') 
+                    },
+                    { 
+                        id: 'dashboard', 
+                        icon: Car, 
+                        label: 'Dashboard', 
+                        isActive: activeTab === 'dashboard', 
+                        onClick: () => setActiveTab('dashboard'), 
+                        isPrimary: true 
+                    },
+                    { 
+                        id: 'loan', 
+                        icon: Landmark, 
+                        label: 'Loan', 
+                        isActive: activeTab === 'loan', 
+                        onClick: () => setActiveTab('loan') 
+                    },
+                    { 
+                        id: 'manage', 
+                        icon: List, 
+                        label: 'Manage', 
+                        onClick: () => setIsManageVehiclesOpen(true) 
+                    }
+                ]} 
+            />
 
             {/* Modals */}
              <AddVehicleModal
