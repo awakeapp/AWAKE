@@ -11,10 +11,8 @@ import JumpDateModal from '../../organisms/JumpDateModal';
 import { format } from 'date-fns';
 
 const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', onReschedule, onDelete, isRoutine = false, onEdit, isSelectMode = false, isSelected = false, onSelect, onLongPress }) => {
-    // Safely handle missing name/title
     const displayTitle = task.name || task.title || 'Untitled';
 
-    // Determine Icon: Use stored icon if available, otherwise infer from title
     let IconComponent = task.icon
         ? getIconComponent(task.icon)
         : inferIcon(displayTitle).component;
@@ -23,33 +21,15 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
         IconComponent = Tag;
     }
 
-    // Import TaskContext for global popover management
     const { activePopoverId, setActivePopoverId } = useTasks();
     const { timeFormat } = useSettings();
 
-    // Simplified styling
     const isCompleted = task.status === 'completed' || task.status === 'checked';
     const isCarryOver = variant === 'carry_over';
 
     const isDatePickerOpen = activePopoverId === task.id;
     const [showInfo, setShowInfo] = useState(false);
 
-    // Handle closing when clicking outside
-    useEffect(() => {
-        if (!isDatePickerOpen) return;
-        // Logic handled by backdrop
-    }, [isDatePickerOpen]);
-
-    const handleToggleDatePicker = (e) => {
-        e.stopPropagation();
-        if (isDatePickerOpen) {
-            setActivePopoverId(null);
-        } else {
-            setActivePopoverId(task.id);
-        }
-    };
-
-    // Long press logic
     const timerRef = useRef(null);
 
     const handlePointerDown = (e) => {
@@ -73,7 +53,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
             layout
             initial={false}
             animate={{ opacity: isCompleted ? 0.6 : 1 }}
-            transition={{ duration: 0.2 }} // Faster enter/layout
+            transition={{ duration: 0.2 }}
             whileHover={{ y: -2 }}
             onClick={(e) => {
                 if (isSelectMode && onSelect) {
@@ -95,16 +75,13 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                     : isCompleted
                         ? "bg-slate-50/50 dark:bg-slate-900/30 border-transparent shadow-none"
                         : "bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-slate-100 dark:border-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none hover:shadow-[0_20px_40px_rgb(0,0,0,0.06)] hover:border-indigo-100/50 dark:hover:border-indigo-900/30",
-                // CRITICAL FIX: Z-Index boost when active to preventing clipping/overlap by subsequent siblings
                 isDatePickerOpen ? "z-50" : "z-0"
             )}
         >
-            {/* Background Accent Glow (Subtle) */}
             {!isCompleted && !isCarryOver && (
                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-transparent dark:from-indigo-900/5 dark:to-transparent rounded-[1.5rem] -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
             )}
 
-            {/* 1. TIME Section - Redesigned for Premium Feel */}
             {!isCarryOver && task.time && (
                 <div className="shrink-0 flex flex-col items-center justify-center min-w-[50px] py-1 px-1.5 bg-slate-50/50 dark:bg-slate-800/50 rounded-xl border border-slate-100/50 dark:border-slate-700/50">
                     <span className="text-[14px] font-medium text-slate-800 dark:text-slate-100 tabular-nums leading-none tracking-tight">
@@ -120,9 +97,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                 </div>
             )}
 
-            {/* Main Content Area */}
             <div className="flex items-center gap-2.5 sm:gap-3 flex-1 min-w-0">
-                {/* 2. ICON - Styled with depth */}
                 <div className={clsx(
                     "flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center transition-colors duration-200",
                     isSelectMode && isSelected ? "bg-indigo-600 text-white shadow-md ring-2 ring-indigo-500/30 ring-offset-1 dark:ring-offset-slate-900" :
@@ -181,7 +156,6 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                         </span>
                     </div>
 
-                    {/* PRIORITY & CATEGORY DISPLAY */}
                     {!isCarryOver && (
                         <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
                             {task.priority && (
@@ -205,8 +179,6 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                         </div>
                     )}
 
-                    {/* Removed Edit Icon Overlay as requested */}
-
                     {isCarryOver && (
                         <div className="flex items-center gap-2 mt-0.5">
                             <span className="text-[10px] text-orange-500/80 font-bold uppercase tracking-wider">
@@ -217,9 +189,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                 </div>
             </div>
 
-            {/* 4. ACTIONS */}
             <div className="flex-shrink-0 flex items-start mt-1 gap-1.5 sm:gap-2 pl-1" onClick={(e) => isSelectMode && e.stopPropagation()}>
-                {/* Checkbox for Select Mode */}
                 {isSelectMode ? (
                     <div className="px-2 py-2 flex items-center justify-center">
                         <div className={clsx(
@@ -231,7 +201,6 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                     </div>
                 ) : (
                 <>
-                {/* DATE SELECTOR BUTTON */}
                 {!isLocked && !isCompleted && !isRoutine && (
                     <div className="relative">
                         <button
@@ -264,7 +233,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                                                     const formattedDate = format(date, 'yyyy-MM-dd');
                                                     onReschedule && onReschedule(task.id, formattedDate);
                                                 } else {
-                                                    onReschedule && onReschedule(task.id, null); // Allow clearing date
+                                                    onReschedule && onReschedule(task.id, null); 
                                                 }
                                                 setActivePopoverId(null);
                                             }}

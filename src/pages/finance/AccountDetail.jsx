@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
 import { Archive, ArrowLeft, Edit2, Trash2, Calendar, FileText, TrendingUp, Save, Wallet, History, TrendingDown, ArrowRightLeft } from 'lucide-react';
@@ -7,167 +6,170 @@ import { useState, useMemo } from 'react';
 import { format } from 'date-fns';
 
 const AccountDetail = () => {
- const { id } = useParams();
- const navigate = useNavigate();
- const location = useLocation();
- const { accounts, transactions, updateAccount, toggleArchiveAccount, categories } = useFinance();
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { accounts, transactions, updateAccount, toggleArchiveAccount, categories } = useFinance();
 
- const account = accounts.find(a => a.id === id);
- const [isEditing, setIsEditing] = useState(false);
- const [editName, setEditName] = useState('');
- const [editBalance, setEditBalance] = useState('');
+    const account = accounts.find(a => a.id === id);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editName, setEditName] = useState('');
+    const [editBalance, setEditBalance] = useState('');
 
- // Filter transactions for this account
- const accountTx = useMemo(() => {
- if (!account) return [];
- return transactions.filter(t => t.accountId === id || t.fromAccountId === id || t.toAccountId === id)
- .sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
- }, [transactions, id, account]);
+    // Filter transactions for this account
+    const accountTx = useMemo(() => {
+        if (!account) return [];
+        return transactions.filter(t => t.accountId === id || t.fromAccountId === id || t.toAccountId === id)
+            .sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
+    }, [transactions, id, account]);
 
- if (!account) return <div className="p-6 text-center">Account not found</div>;
+    if (!account) return <div className="p-6 text-center">Account not found</div>;
 
- const handleEdit = () => {
- setEditName(account.name);
- setEditBalance(account.openingBalance);
- setIsEditing(true);
- };
+    const handleEdit = () => {
+        setEditName(account.name);
+        setEditBalance(account.openingBalance);
+        setIsEditing(true);
+    };
 
- const handleSave = () => {
- updateAccount(id, { name: editName, openingBalance: Number(editBalance) });
- setIsEditing(false);
- };
+    const handleSave = () => {
+        updateAccount(id, { name: editName, openingBalance: Number(editBalance) });
+        setIsEditing(false);
+    };
 
- const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
+    const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
 
- const handleArchiveClick = () => {
- if (showArchiveConfirm) {
- toggleArchiveAccount(id);
- navigate(-1);
- } else {
- setShowArchiveConfirm(true);
- setTimeout(() => setShowArchiveConfirm(false), 3000); // Reset after 3s if not confirmed
- }
- };
+    const handleArchiveClick = () => {
+        if (showArchiveConfirm) {
+            toggleArchiveAccount(id);
+            navigate(-1);
+        } else {
+            setShowArchiveConfirm(true);
+            setTimeout(() => setShowArchiveConfirm(false), 3000); // Reset after 3s if not confirmed
+        }
+    };
 
- return (
- <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24">
- {/* Header */}
- <div className="sticky top-0 z-30 bg-slate-900 text-white p-6 pb-12 rounded-b-[2rem] shadow-xl">
- <div className="flex items-center justify-between mb-6">
- <div className="flex items-center gap-3">
- <button
- onClick={() => navigate(-1)}
- className="p-2 bg-transparent hover:bg-slate-100 dark:bg-transparent dark:hover:bg-slate-800 rounded-full transition-colors text-white -ml-2 focus:outline-none"
- >
- <ArrowLeft className="w-6 h-6" />
- </button>
- <h1 className="text-xl font-bold text-white leading-tight">Account Detail</h1>
- </div>
- <button
- onClick={handleArchiveClick}
- className={`p-2 rounded-xl transition-all duration-300 flex items-center gap-2 ${showArchiveConfirm
- ? 'bg-red-500 text-white w-auto px-3'
- : account.isArchived
- ? 'bg-orange-500 text-white'
- : 'bg-white/10 hover:bg-white/20'
- }`}
- >
- <Archive className="w-5 h-5" />
- {showArchiveConfirm && <span className="text-xs font-bold whitespace-nowrap">Confirm?</span>}
- </button>
- </div>
+    return (
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5rem)' }}>
+            {/* Fixed Header */}
+            <header className="fixed top-0 left-0 right-0 z-30 bg-slate-900 text-white shadow-xl" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+                <div className="flex items-center justify-between px-6 py-4">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="p-2 bg-transparent hover:bg-white/10 rounded-full transition-colors text-white -ml-2 focus:outline-none"
+                        >
+                            <ArrowLeft className="w-5 h-5" />
+                        </button>
+                        <h1 className="text-xl font-bold text-white tracking-tight">Account Detail</h1>
+                    </div>
+                    <button
+                        onClick={handleArchiveClick}
+                        className={`p-2 rounded-xl transition-all duration-300 flex items-center gap-2 ${showArchiveConfirm
+                            ? 'bg-red-500 text-white w-auto px-3'
+                            : account.isArchived
+                                ? 'bg-orange-500 text-white'
+                                : 'bg-white/10 hover:bg-white/20'
+                            }`}
+                    >
+                        <Archive className="w-5 h-5" />
+                        {showArchiveConfirm && <span className="text-xs font-bold whitespace-nowrap">Confirm?</span>}
+                    </button>
+                </div>
 
- <div className="text-center">
- {isEditing ? (
- <div className="space-y-3 max-w-xs mx-auto">
- <input
- value={editName}
- onChange={e => setEditName(e.target.value)}
- className="bg-white/10 border border-white/20 rounded-lg p-2 text-center text-white font-bold w-full"
- />
- <div className="flex items-center justify-center gap-2">
- <span className="text-slate-400 text-xs">Opening: ₹</span>
- <input
- type="number"
- value={editBalance}
- onChange={e => setEditBalance(e.target.value)}
- className="bg-white/10 border border-white/20 rounded-lg p-1 text-center text-white w-24"
- />
- </div>
- <button onClick={handleSave} className="bg-emerald-500 text-white px-4 py-1 rounded-full text-xs font-bold">Save</button>
- </div>
- ) : (
- <>
- <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">{account.name}</p>
- <h2 className="text-4xl font-bold mb-2">₹{account.balance.toLocaleString()}</h2>
- <button onClick={handleEdit} className="text-xs text-indigo-300 hover:text-white underline">Edit Info</button>
- </>
- )}
- </div>
- </div>
+                <div className="text-center px-6 pb-8 pt-2">
+                    {isEditing ? (
+                        <div className="space-y-3 max-w-xs mx-auto">
+                            <input
+                                value={editName}
+                                onChange={e => setEditName(e.target.value)}
+                                className="bg-white/10 border border-white/20 rounded-lg p-2 text-center text-white font-bold w-full"
+                            />
+                            <div className="flex items-center justify-center gap-2">
+                                <span className="text-slate-400 text-xs">Opening: ₹</span>
+                                <input
+                                    type="number"
+                                    value={editBalance}
+                                    onChange={e => setEditBalance(e.target.value)}
+                                    className="bg-white/10 border border-white/20 rounded-lg p-1 text-center text-white w-24"
+                                />
+                            </div>
+                            <button onClick={handleSave} className="bg-emerald-500 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">Save Settings</button>
+                        </div>
+                    ) : (
+                        <div className="space-y-1">
+                            <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.2em] mb-1">{account.name}</p>
+                            <h2 className="text-4xl font-black tracking-tightest leading-tight">₹{account.balance.toLocaleString()}</h2>
+                            <button onClick={handleEdit} className="text-[10px] font-bold text-indigo-300 hover:text-white uppercase tracking-wider mt-2">Edit Account</button>
+                        </div>
+                    )}
+                </div>
+            </header>
 
- {/* Content */}
- <div className="px-4 -mt-6">
- <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-800">
- <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
- <History className="w-4 h-4 text-slate-400" />
- Transaction History
- </h3>
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 180px)' }}>
+                <div className="px-6 flex flex-col space-y-6 pb-8">
+                    <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+                        <h3 className="font-black text-[10px] uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
+                            <History className="w-3.5 h-3.5" />
+                            Transaction History
+                        </h3>
 
- <div className="space-y-4">
- {accountTx.length === 0 ? (
- <p className="text-center text-slate-400 text-sm py-8">No transactions found.</p>
- ) : (
- accountTx.map(tx => {
- const isTransfer = tx.type === 'transfer';
- // Determine direction relative to THIS account
- let isIncome = false;
- let isExpense = false;
- let displayAmount = Number(tx.amount);
- let label = tx.note;
- let icon = null;
+                        <div className="space-y-5">
+                            {accountTx.length === 0 ? (
+                                <div className="py-12 text-center">
+                                    <p className="text-slate-400 text-sm font-medium">No transactions found.</p>
+                                </div>
+                            ) : (
+                                accountTx.map(tx => {
+                                    const isTransfer = tx.type === 'transfer';
+                                    let isIncome = false;
+                                    let isExpense = false;
+                                    let displayAmount = Number(tx.amount);
+                                    let label = tx.note;
+                                    let icon = null;
 
- if (isTransfer) {
- if (tx.toAccountId === id) {
- isIncome = true;
- label = `Transfer from ${accounts.find(a => a.id === tx.fromAccountId)?.name}`;
- icon = <ArrowRightLeft className="w-4 h-4 text-blue-500" />;
- } else {
- isExpense = true;
- label = `Transfer to ${accounts.find(a => a.id === tx.toAccountId)?.name}`;
- icon = <ArrowRightLeft className="w-4 h-4 text-slate-500" />;
- }
- } else {
- isIncome = tx.type === 'income';
- isExpense = tx.type === 'expense';
- const cat = categories.find(c => c.id === tx.categoryId);
- label = tx.note || cat?.name;
- icon = isIncome ? <TrendingUp className="w-4 h-4 text-emerald-500" /> : <TrendingDown className="w-4 h-4 text-rose-500" />;
- }
+                                    if (isTransfer) {
+                                        if (tx.toAccountId === id) {
+                                            isIncome = true;
+                                            label = `Transfer from ${accounts.find(a => a.id === tx.fromAccountId)?.name}`;
+                                            icon = <ArrowRightLeft className="w-4 h-4 text-blue-500" />;
+                                        } else {
+                                            isExpense = true;
+                                            label = `Transfer to ${accounts.find(a => a.id === tx.toAccountId)?.name}`;
+                                            icon = <ArrowRightLeft className="w-4 h-4 text-slate-500" />;
+                                        }
+                                    } else {
+                                        isIncome = tx.type === 'income';
+                                        isExpense = tx.type === 'expense';
+                                        const cat = categories.find(c => c.id === tx.categoryId);
+                                        label = tx.note || cat?.name || 'Transaction';
+                                        icon = isIncome ? <TrendingUp className="w-4 h-4 text-emerald-500" /> : <TrendingDown className="w-4 h-4 text-rose-500" />;
+                                    }
 
- return (
- <div key={tx.id} className="flex items-center justify-between border-b border-slate-50 dark:border-slate-800 pb-3 last:border-0">
- <div className="flex items-center gap-3">
- <div className="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
- {icon}
- </div>
- <div>
- <p className="font-bold text-sm text-slate-800 dark:text-white">{label}</p>
- <p className="text-xs text-slate-400">{format(new Date(tx.date || tx.createdAt), 'MMM d, yyyy')}</p>
- </div>
- </div>
- <span className={`font-bold ${isIncome ? 'text-emerald-500' : 'text-slate-900 dark:text-white'}`}>
- {isIncome ? '+' : '-'}₹{displayAmount.toLocaleString()}
- </span>
- </div>
- );
- })
- )}
- </div>
- </div>
- </div>
- </div>
- );
+                                    return (
+                                        <div key={tx.id} className="flex items-center justify-between border-b border-slate-50 dark:border-slate-800/50 pb-4 last:border-0 last:pb-0">
+                                            <div className="flex items-center gap-4 flex-1 min-w-0">
+                                                <div className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                                                    {icon}
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="font-bold text-slate-900 dark:text-white text-sm truncate uppercase tracking-tight">{label}</p>
+                                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">{format(new Date(tx.date || tx.createdAt), 'MMM d, yyyy')}</p>
+                                                </div>
+                                            </div>
+                                            <span className={`font-black tracking-tight ${isIncome ? 'text-emerald-500' : 'text-slate-900 dark:text-white'}`}>
+                                                {isIncome ? '+' : '-'}₹{displayAmount.toLocaleString()}
+                                            </span>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 export default AccountDetail;

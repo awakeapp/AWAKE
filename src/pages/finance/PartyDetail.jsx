@@ -564,59 +564,57 @@ const PartyDetail = () => {
 
     // --- Render ---
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 6rem)' }}>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 6rem)' }}>
 
-            {/* ===== STICKY HEADER + SUMMARY ===== */}
-            <header className="sticky top-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl">
-                {/* Top bar */}
-                <div className="px-5 pt-4 pb-3 flex items-center justify-between">
+            {/* Fixed Top Bar */}
+            <header className="fixed top-0 left-0 right-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200/30 dark:border-slate-800/30" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+                <div className="px-5 py-4 flex items-center justify-between">
                     <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white -ml-1">
                         <ArrowLeft className="w-5 h-5" />
                     </button>
-                    <div className="flex flex-col items-center">
-                        <h1 className="text-2xl font-black text-slate-900 dark:text-white truncate max-w-[240px] tracking-tight">{party.name}</h1>
+                    <div className="flex flex-col items-center flex-1 px-4 min-w-0">
+                        <h1 className="text-xl font-black text-slate-900 dark:text-white truncate w-full text-center tracking-tight leading-tight capitalize">{party.name}</h1>
                     </div>
-                    <div className={`px-4 py-1.5 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-sm ${statusBadge.cls}`}>
+                    <div className={`px-3 py-1.5 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-sm shrink-0 ${statusBadge.cls}`}>
                         {statusBadge.label}
                     </div>
                 </div>
+            </header>
 
-                {/* Balance Card */}
-                <div className="px-5 pb-4">
-                    <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 dark:from-indigo-600 dark:to-indigo-900 rounded-[2rem] p-6 text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden">
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 68px)' }}>
+                <div className="px-5 flex flex-col pt-4 pb-8 space-y-6">
+
+                    {/* Balance Card (Now inside scroll) */}
+                    <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 dark:from-indigo-600 dark:to-indigo-900 rounded-[2.5rem] p-7 text-white shadow-2xl shadow-indigo-500/20 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
                         <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/10 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none" />
                         
                         <div className="relative z-10">
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-200/80 mb-1 text-center">Net Balance</p>
-                            <p className={`text-4xl font-black tracking-tight text-center mb-6 drop-shadow-md ${balance >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-200/80 mb-2 text-center">Net Balance</p>
+                            <p className={`text-[44px] font-black tracking-tightest text-center mb-6 leading-none drop-shadow-md ${balance >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
                                 {balance >= 0 ? '+' : '-'}₹{Math.abs(balance).toLocaleString()}
                             </p>
                             
                             <div className="grid grid-cols-2 gap-3">
-                                <div className="bg-white/10 dark:bg-black/20 rounded-2xl p-3 backdrop-blur-md border border-white/10 text-center">
-                                    <p className="text-[8px] font-black uppercase tracking-[0.2em] text-indigo-200/70 mb-1">Receivable</p>
+                                <div className="bg-white/10 dark:bg-black/20 rounded-2xl p-4 backdrop-blur-md border border-white/10 text-center">
+                                    <p className="text-[9px] font-black uppercase tracking-[0.15em] text-indigo-200/70 mb-1">To Get</p>
                                     <p className="text-sm font-black text-emerald-300">₹{summary.totalReceivable.toLocaleString()}</p>
                                 </div>
-                                <div className="bg-white/10 dark:bg-black/20 rounded-2xl p-3 backdrop-blur-md border border-white/10 text-center">
-                                    <p className="text-[8px] font-black uppercase tracking-[0.2em] text-indigo-200/70 mb-1">Payable</p>
+                                <div className="bg-white/10 dark:bg-black/20 rounded-2xl p-4 backdrop-blur-md border border-white/10 text-center">
+                                    <p className="text-[9px] font-black uppercase tracking-[0.15em] text-indigo-200/70 mb-1">To Pay</p>
                                     <p className="text-sm font-black text-rose-300">₹{summary.totalPayable.toLocaleString()}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </header>
-
-            {/* ===== BODY ===== */}
-            <div className="px-6 flex-1 flex flex-col space-y-4 mt-4">
 
                 {/* Quick actions */}
-                <div className="flex gap-2">
+                <div className="grid grid-cols-2 gap-2">
                     {balance !== 0 && (
                         <button
                             onClick={() => { setTxType(isReceivable ? 'you_received' : 'you_repaid'); setIsAddCardOpen(true); }}
-                            className="flex-1 py-3 bg-indigo-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all text-sm"
+                            className="flex-1 py-4 bg-indigo-600 text-white rounded-[1.5rem] font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 shadow-xl shadow-indigo-500/20 active:scale-[0.98] transition-all"
                         >
                             <CreditCard className="w-4 h-4" /> Record Payment
                         </button>
@@ -624,11 +622,11 @@ const PartyDetail = () => {
                     <button
                         onClick={openReminderModal}
                         disabled={!canRemind}
-                        className={`py-3 rounded-2xl font-bold flex items-center justify-center gap-2 text-sm transition-all active:scale-[0.98] ${
+                        className={`py-4 rounded-[1.5rem] font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${
                             balance !== 0 ? 'px-4' : 'flex-1 px-4'
                         } ${
                             canRemind
-                                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                                ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-500/20'
                                 : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
                         }`}
                     >
@@ -636,9 +634,10 @@ const PartyDetail = () => {
                         {balance === 0 ? 'Settled' : !party.phone_number ? 'No Phone' : 'Remind'}
                     </button>
                 </div>
+
                 {lastReminderDaysAgo !== null && (
-                    <p className="text-[11px] text-slate-400 font-medium text-center -mt-1">
-                        Last reminder sent {lastReminderDaysAgo === 0 ? 'today' : `${lastReminderDaysAgo} day${lastReminderDaysAgo === 1 ? '' : 's'} ago`}
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider text-center -mt-1 opacity-70">
+                        {lastReminderDaysAgo === 0 ? 'Reminder sent today' : `Last reminder ${lastReminderDaysAgo}d ago`}
                     </p>
                 )}
 
@@ -774,6 +773,7 @@ const PartyDetail = () => {
                     )}
                 </div>
             </div>
+        </div>
 
             <ConfirmDialog
                 isOpen={!!deleteConfirmId}

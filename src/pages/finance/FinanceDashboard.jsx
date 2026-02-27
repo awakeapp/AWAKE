@@ -112,12 +112,12 @@ const FinanceDashboard = () => {
 
     return (
         <div 
-            className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col pt-[env(safe-area-inset-top)] relative"
+            className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col relative"
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5rem)' }}
         >
-            {/* Header Area */}
-            <header className="fixed top-0 left-0 right-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl px-6 pt-6 pb-4">
-                <div className="grid grid-cols-3 items-center mb-6">
+            {/* Fixed Header Area */}
+            <header className="fixed top-0 left-0 right-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200/30 dark:border-slate-800/30" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+                <div className="px-6 py-4 grid grid-cols-3 items-center">
                     <h1 className="text-xl font-bold text-slate-900 dark:text-white">Finance</h1>
                     
                     <div className="flex items-center justify-self-center gap-1 bg-white dark:bg-slate-900 rounded-full p-1 shadow-sm border border-slate-100 dark:border-slate-800">
@@ -138,68 +138,70 @@ const FinanceDashboard = () => {
                     >
                         <Menu className="w-5 h-5" />
                     </button>
-
                 </div>
-
-                {/* Total Balance Card (Clickable to reveal accounts) */}
-                <motion.div 
-                    whileTap={{ scale: 0.98 }}
-                    className="bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-800 rounded-[2.5rem] p-8 text-white shadow-2xl shadow-indigo-500/30 relative overflow-hidden"
-                >
-                    {/* Decorative blobs */}
-                    <div className="absolute -top-12 -right-12 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
-                    <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-black/10 rounded-full blur-3xl"></div>
-                    
-                    <div className="relative z-10">
-                        <div className="mb-8 w-full flex flex-col items-center">
-                            <div className="space-y-1 flex flex-col items-center">
-                                <p className="text-indigo-100/70 text-[11px] font-black uppercase tracking-[0.2em]">{t('finance.total_balance', 'Total Balance')}</p>
-                                <h2 className="text-[52px] font-black tracking-tightest leading-tight flex items-center justify-center gap-1.5 mt-1">
-                                    <span className="text-3xl opacity-40 font-bold">₹</span>
-                                    <span dir="ltr">{totalBalance.toLocaleString()}</span>
-                                </h2>
-                            </div>
-                        </div>
-
-                        <div className="w-full h-px bg-white/10 mb-6" />
-
-                        <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-2 w-full mb-6 max-w-[90%] mx-auto">
-                            <div className="flex items-center gap-1.5 font-bold text-[10px] min-[380px]:text-[11px] tracking-tight">
-                                <span className="text-emerald-300 uppercase tracking-wider">Income</span>
-                                <span className="text-white">₹{monthStats.income.toLocaleString()}</span>
-                            </div>
-                            <span className="text-white/20 select-none text-[10px] hidden min-[360px]:block">|</span>
-                            <div className="flex items-center gap-1.5 font-bold text-[10px] min-[380px]:text-[11px] tracking-tight">
-                                <span className="text-rose-300 uppercase tracking-wider">Expense</span>
-                                <span className="text-white">₹{monthStats.expense.toLocaleString()}</span>
-                            </div>
-                            <span className="text-white/20 select-none text-[10px] hidden min-[360px]:block">|</span>
-                            <div className="flex items-center gap-1.5 font-bold text-[10px] min-[380px]:text-[11px] tracking-tight">
-                                <span className="text-slate-300 uppercase tracking-wider">Recurring</span>
-                                <span className="text-white">₹{recurringTotal.toLocaleString()}</span>
-                            </div>
-                        </div>
-
-                        <div className="flex justify-center w-full">
-                            <button 
-                                onClick={(e) => { 
-                                    e.stopPropagation(); 
-                                    setEditTransactionId(null); 
-                                    setAddType('savings'); 
-                                    setIsAddOpen(true); 
-                                }} 
-                                className="px-5 py-2.5 rounded-full border border-white/20 bg-transparent hover:bg-white/10 active:scale-95 transition-all text-[11px] font-black tracking-widest uppercase text-white flex items-center gap-2 shadow-sm"
-                            >
-                                <span>Savings</span>
-                                <div className="w-1 h-1 rounded-full bg-white/30" />
-                                <span className="text-teal-300 tracking-tight">₹{monthStats.savings.toLocaleString()}</span>
-                            </button>
-                        </div>
-                    </div>
-                </motion.div>
             </header>
 
-            <div className="px-6 flex-1 flex flex-col space-y-5 pt-80 min-[400px]:pt-[380px]">
+            {/* Scrollable Content Container */}
+            <div className="flex-1 overflow-y-auto" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 64px)' }}>
+                <div className="px-6 flex flex-col space-y-6 pb-8">
+                    
+                    {/* Total Balance Card (Reduced Height & Vertical Padding) */}
+                    <motion.div 
+                        whileTap={{ scale: 0.98 }}
+                        className="bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-800 rounded-[2.5rem] p-6 text-white shadow-2xl shadow-indigo-500/30 relative overflow-hidden mt-2"
+                    >
+                        {/* Decorative blobs */}
+                        <div className="absolute -top-12 -right-12 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+                        <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-black/10 rounded-full blur-3xl"></div>
+                        
+                        <div className="relative z-10">
+                            <div className="mb-4 w-full flex flex-col items-center">
+                                <div className="space-y-1 flex flex-col items-center">
+                                    <p className="text-indigo-100/70 text-[10px] font-black uppercase tracking-[0.2em]">{t('finance.total_balance', 'Total Balance')}</p>
+                                    <h2 className="text-[44px] sm:text-[48px] font-black tracking-tightest leading-tight flex items-center justify-center gap-1.5">
+                                        <span className="text-2xl opacity-40 font-bold">₹</span>
+                                        <span dir="ltr">{totalBalance.toLocaleString()}</span>
+                                    </h2>
+                                </div>
+                            </div>
+
+                            <div className="w-full h-px bg-white/10 mb-5" />
+
+                            <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-2 w-full mb-5 max-w-[90%] mx-auto">
+                                <div className="flex items-center gap-1.5 font-bold text-[10px] min-[380px]:text-[11px] tracking-tight">
+                                    <span className="text-emerald-300 uppercase tracking-wider">Income</span>
+                                    <span className="text-white">₹{monthStats.income.toLocaleString()}</span>
+                                </div>
+                                <span className="text-white/20 select-none text-[10px] hidden min-[360px]:block">|</span>
+                                <div className="flex items-center gap-1.5 font-bold text-[10px] min-[380px]:text-[11px] tracking-tight">
+                                    <span className="text-rose-300 uppercase tracking-wider">Expense</span>
+                                    <span className="text-white">₹{monthStats.expense.toLocaleString()}</span>
+                                </div>
+                                <span className="text-white/20 select-none text-[10px] hidden min-[360px]:block">|</span>
+                                <div className="flex items-center gap-1.5 font-bold text-[10px] min-[380px]:text-[11px] tracking-tight">
+                                    <span className="text-slate-300 uppercase tracking-wider">Recurring</span>
+                                    <span className="text-white">₹{recurringTotal.toLocaleString()}</span>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-center w-full">
+                                <button 
+                                    onClick={(e) => { 
+                                        e.stopPropagation(); 
+                                        setEditTransactionId(null); 
+                                        setAddType('savings'); 
+                                        setIsAddOpen(true); 
+                                    }} 
+                                    className="px-5 py-2 rounded-full border border-white/20 bg-transparent hover:bg-white/10 active:scale-95 transition-all text-[10px] font-black tracking-widest uppercase text-white flex items-center gap-2 shadow-sm"
+                                >
+                                    <span>Savings</span>
+                                    <div className="w-1 h-1 rounded-full bg-white/30" />
+                                    <span className="text-teal-300 tracking-tight">₹{monthStats.savings.toLocaleString()}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+
 
                 {/* Quick Actions — Analytics & Budget */}
                 <div className="grid grid-cols-2 gap-3">
@@ -307,6 +309,7 @@ const FinanceDashboard = () => {
                     </div>
                 </section>
             </div>
+        </div>
 
             {/* Floating Action Button — sits above Finance bottom nav */}
             <div className="fixed right-6 z-40" style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 88px)' }}>

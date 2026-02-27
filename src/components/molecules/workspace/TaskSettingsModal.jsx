@@ -165,7 +165,7 @@ const TaskSettingsModal = ({ isOpen, onClose }) => {
                                             <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${settings.showCompletedInList ? 'translate-x-6' : 'translate-x-0'}`} />
                                         </button>
                                     </div>
-                                    
+
                                     <hr className="border-slate-200 dark:border-slate-800 mx-3" />
                                     
                                     <button 
