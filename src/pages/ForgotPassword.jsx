@@ -34,21 +34,21 @@ const ForgotPassword = () => {
                 className="w-full max-w-md relative z-10"
             >
                 <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-2xl dark:bg-slate-900/80 dark:border-slate-800 rounded-3xl overflow-hidden">
-                    <CardHeader className="space-y-2 text-center pb-6 pt-8">
+                    <AppCardHeader className="space-y-2 text-center pb-6 pt-8">
                         <div className="mx-auto flex justify-center mb-6">
                             <img src={awakeLogo} alt="Awake Logo" className="h-10 w-auto dark:brightness-0 dark:invert" />
                         </div>
-                        <CardTitle className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+                        <AppCardTitle className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
                             {success ? 'Check Your Email' : 'Reset Password'}
-                        </CardTitle>
+                        </AppCardTitle>
                         <p className="text-slate-500 font-medium dark:text-slate-400">
                             {success
                                 ? 'We have sent a password reset link to your email address.'
                                 : 'Enter your email address to receive a reset link.'}
                         </p>
-                    </CardHeader>
+                    </AppCardHeader>
 
-                    <CardContent className="px-8 pb-10">
+                    <AppCardContent className="px-8 pb-10">
                         {success ? (
                             <div className="space-y-6 text-center">
                                 <div className="flex justify-center">
@@ -98,7 +98,7 @@ const ForgotPassword = () => {
                                 </div>
                             </form>
                         )}
-                    </CardContent>
+                    </AppCardContent>
                 </Card>
             </motion.div>
         </div>

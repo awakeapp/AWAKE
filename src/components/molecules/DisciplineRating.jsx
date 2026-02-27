@@ -28,7 +28,7 @@ const DisciplineRating = ({ percentage = 0 }) => {
 
     return (
         <Card className="shadow-sm border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
-            <CardContent className="p-6 flex items-center justify-between">
+            <AppCardContent className="p-6 flex items-center justify-between">
                 <div className="flex flex-col gap-1">
                     <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">Discipline Rating</h3>
                     <p className="text-xs text-slate-500 font-medium">Daily completion score</p>
@@ -74,7 +74,7 @@ const DisciplineRating = ({ percentage = 0 }) => {
                         </span>
                     </div>
                 </div>
-            </CardContent>
+            </AppCardContent>
         </Card>
     );
 };

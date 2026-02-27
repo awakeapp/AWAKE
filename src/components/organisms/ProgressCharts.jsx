@@ -52,7 +52,7 @@ const ProgressCharts = ({ data }) => {
 
             {/* Main Trend Chart */}
             <Card className="border-none shadow-sm overflow-hidden">
-                <CardContent className="p-0">
+                <AppCardContent className="p-0">
                     <div className="p-5 border-b border-slate-50">
                         <h3 className="font-bold text-slate-800 flex items-center gap-2">
                             Performance Trend
@@ -92,7 +92,7 @@ const ProgressCharts = ({ data }) => {
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
-                </CardContent>
+                </AppCardContent>
             </Card>
 
             {/* Habit Breakdown (Placeholder for now, could be BarChart) */}

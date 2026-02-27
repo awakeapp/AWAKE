@@ -85,7 +85,7 @@ const History = () => {
  <div className="absolute top-0 right-0 p-8 opacity-10">
  <PieChart size={120} />
  </div>
- <CardContent className="p-6 relative z-10 flex items-center justify-between">
+ <AppCardContent className="p-6 relative z-10 flex items-center justify-between">
  <div>
  <p className="text-indigo-200 font-medium mb-1">Daily Score</p>
  <div className="text-4xl font-bold tracking-tight flex items-baseline gap-1">
@@ -99,7 +99,7 @@ const History = () => {
  <div className="w-24 h-24 rounded-full border-8 border-white/20 flex items-center justify-center relative">
  <TrendingUp className="w-10 h-10 text-white" />
  </div>
- </CardContent>
+ </AppCardContent>
  </Card>
 
  {/* Stats Grid */}
@@ -123,7 +123,7 @@ const History = () => {
  {/* Violations */}
  {violations.length > 0 && (
  <Card className="border-red-100 bg-red-50/50 dark:bg-red-900/10 dark:border-red-900/30">
- <CardContent className="p-5">
+ <AppCardContent className="p-5">
  <h4 className="font-semibold text-red-800 dark:text-red-200 flex items-center gap-2 mb-3">
  <AlertCircle className="w-5 h-5" />
  Violations Detected
@@ -136,7 +136,7 @@ const History = () => {
  </li>
  ))}
  </ul>
- </CardContent>
+ </AppCardContent>
  </Card>
  )}
 

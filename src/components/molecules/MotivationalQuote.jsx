@@ -24,7 +24,7 @@ const MotivationalQuote = () => {
             <div className="absolute top-0 right-0 p-3 opacity-10">
                 <Quote size={64} />
             </div>
-            <CardContent className="p-5 relative z-10">
+            <AppCardContent className="p-5 relative z-10">
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={quote.text}
@@ -41,7 +41,7 @@ const MotivationalQuote = () => {
                         </p>
                     </motion.div>
                 </AnimatePresence>
-            </CardContent>
+            </AppCardContent>
         </Card>
     );
 };

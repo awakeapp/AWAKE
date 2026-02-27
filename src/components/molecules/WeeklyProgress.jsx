@@ -101,7 +101,7 @@ const WeeklyProgress = () => {
 
     return (
         <Card className="border-none shadow-sm bg-white overflow-visible relative z-10">
-            <CardContent className="p-4">
+            <AppCardContent className="p-4">
                 <div className="flex items-center justify-between mb-4 relative">
                     <div>
                         <h3 className="font-bold text-slate-700 text-sm tracking-wide">{selectedMetric.label}</h3>
@@ -188,7 +188,7 @@ const WeeklyProgress = () => {
                         </p>
                     </div>
                 )}
-            </CardContent>
+            </AppCardContent>
         </Card >
     );
 };

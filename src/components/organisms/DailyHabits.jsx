@@ -189,7 +189,7 @@ const DailyHabits = ({ habits, onUpdateHabit, isLocked }) => {
             </div>
 
             <Card className="border-none shadow-premium dark:bg-slate-950 overflow-visible">
-                <CardContent className="p-4 sm:p-5">
+                <AppCardContent className="p-4 sm:p-5">
 
                     <div className="space-y-1">
                         {habits.map((habit) => (
@@ -236,7 +236,7 @@ const DailyHabits = ({ habits, onUpdateHabit, isLocked }) => {
                             </div>
                         )}
                     </div>
-                </CardContent>
+                </AppCardContent>
             </Card>
 
             <HabitManagerDialog

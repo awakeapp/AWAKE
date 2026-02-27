@@ -27,13 +27,13 @@ const ProgressGraph = () => {
 
     return (
         <Card className="shadow-sm border-slate-100 overflow-hidden">
-            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-                <CardTitle className="text-sm font-semibold text-slate-700">15-Day Discipline</CardTitle>
+            <AppCardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+                <AppCardTitle className="text-sm font-semibold text-slate-700">15-Day Discipline</AppCardTitle>
                 <button className="text-slate-400 hover:text-slate-600">
                     <MoreVertical className="w-4 h-4" />
                 </button>
-            </CardHeader>
-            <CardContent className="p-0 h-48 w-full">
+            </AppCardHeader>
+            <AppCardContent className="p-0 h-48 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={data} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
                         <defs>
@@ -62,7 +62,7 @@ const ProgressGraph = () => {
                         />
                     </AreaChart>
                 </ResponsiveContainer>
-            </CardContent>
+            </AppCardContent>
         </Card>
     );
 };

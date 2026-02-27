@@ -114,7 +114,11 @@ const TaskDashboard = () => {
                 sorted.sort((a, b) => (pOrder[a.priority] || 4) - (pOrder[b.priority] || 4));
                 break;
             case 'date':
-                sorted.sort((a, b) => new Date(a.date) - new Date(b.date));
+                sorted.sort((a, b) => {
+                    const dateA = new Date(a.date);
+                    const dateB = new Date(b.date);
+                    return (isNaN(dateA) ? 0 : dateA.getTime()) - (isNaN(dateB) ? 0 : dateB.getTime());
+                });
                 break;
             case 'time':
                 sorted.sort((a, b) => {
@@ -133,10 +137,11 @@ const TaskDashboard = () => {
 
     // Filter Pending from Previous Days
     const pendingTasks = tasks.filter(taskItem => {
-        return taskItem.status !== 'completed' &&
-               !taskItem.isCompleted &&
-               taskItem.date &&
-               isBefore(startOfDay(new Date(taskItem.date)), startOfDay(selectedDate));
+        if (taskItem.status === 'completed' || taskItem.isCompleted || !taskItem.date) return false;
+        const taskDate = new Date(taskItem.date);
+        if (isNaN(taskDate.getTime())) return false; // Ignore invalid dates to prevent RangeError crashes
+        
+        return isBefore(startOfDay(taskDate), startOfDay(selectedDate));
     });
 
     // Modal State

@@ -263,7 +263,7 @@ const DietPlan = () => {
  {/* Recommendations */}
  <div className="grid grid-cols-1 gap-4">
  <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100">
- <CardContent className="p-4">
+ <AppCardContent className="p-4">
  <h4 className="font-bold text-emerald-800 flex items-center gap-2 mb-3 text-sm uppercase tracking-wide">
  <Heart className="w-4 h-4" />
  Recommended
@@ -276,11 +276,11 @@ const DietPlan = () => {
  </li>
  ))}
  </ul>
- </CardContent>
+ </AppCardContent>
  </Card>
 
  <Card className="bg-red-50 border-red-100">
- <CardContent className="p-4">
+ <AppCardContent className="p-4">
  <h4 className="font-bold text-red-800 flex items-center gap-2 mb-3 text-sm uppercase tracking-wide">
  <AlertCircle className="w-4 h-4" />
  Avoid
@@ -293,7 +293,7 @@ const DietPlan = () => {
  </li>
  ))}
  </ul>
- </CardContent>
+ </AppCardContent>
  </Card>
  </div>
 

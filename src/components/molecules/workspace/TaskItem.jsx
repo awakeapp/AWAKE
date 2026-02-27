@@ -32,6 +32,11 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
 
     const timerRef = useRef(null);
 
+    const handleToggleDatePicker = (e) => {
+        e.stopPropagation();
+        setActivePopoverId(activePopoverId === task.id ? null : task.id);
+    };
+
     const handlePointerDown = (e) => {
         if (isSelectMode) return;
         timerRef.current = setTimeout(() => {

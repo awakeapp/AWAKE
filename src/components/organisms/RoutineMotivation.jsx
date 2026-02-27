@@ -24,14 +24,14 @@ const RoutineMotivation = () => {
 
     return (
         <Card className="bg-gradient-to-br from-purple-500 to-indigo-600 border-none shadow-lg text-white">
-            <CardContent className="p-6 flex flex-col items-center justify-center text-center gap-3">
+            <AppCardContent className="p-6 flex flex-col items-center justify-center text-center gap-3">
                 <div className="bg-white/20 p-2 rounded-full">
                     <Sparkles className="w-5 h-5 text-white" />
                 </div>
                 <p className="text-lg font-medium leading-relaxed max-w-xs mx-auto">
                     &ldquo;{motivation}&rdquo;
                 </p>
-            </CardContent>
+            </AppCardContent>
         </Card>
     );
 };

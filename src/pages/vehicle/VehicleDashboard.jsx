@@ -1,882 +1,541 @@
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useVehicle } from '../../context/VehicleContext';
-import ErrorDisplay from '../../components/molecules/ErrorDisplay';
-import { useData } from '../../context/DataContext';
-import {
- ArrowLeft, Plus, Car, Archive, CheckCircle, Bike, Truck,
- Fuel, Calendar, Gauge, AlertTriangle, TrendingUp, Zap,
- History, Wallet, MoreHorizontal, Bell, Settings, Landmark
+import { 
+    Home, Wallet, Settings, Landmark, MoreVertical, ChevronDown, 
+    Plus, Car, Download, Archive, Edit2, ShieldAlert
 } from 'lucide-react';
-import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { format } from 'date-fns';
+
+import LedgerScreen from './screens/LedgerScreen';
+import ServiceScreen from './screens/ServiceScreen';
+import LoanScreen from './screens/LoanScreen';
 import AddVehicleModal from './AddVehicleModal';
 import AddLoanModal from './AddLoanModal';
 import PayEMIModal from './PayEMIModal';
 import AmortizationScheduleModal from './AmortizationScheduleModal';
 import PrepaymentCalculatorModal from './PrepaymentCalculatorModal';
-import FollowUpList from '../../components/organisms/vehicle/FollowUpList';
-import { motion, AnimatePresence } from 'framer-motion';
-import { format } from 'date-fns';
 import ConfirmDialog from '../../components/organisms/ConfirmDialog';
 
 const VehicleDashboard = () => {
- const navigate = useNavigate();
- const {
- vehicles,
- addVehicle,
- updateVehicle,
- toggleArchiveVehicle,
- setVehicleActive,
- getActiveVehicle,
- serviceRecords,
- followUps,
- getVehicleStats,
- getLoanForVehicle,
- getLoanDetailedStatus,
- addLoan,
- payEMI,
- getVehicleRisks,
- deleteVehicle
- } = useVehicle();
+    const navigate = useNavigate();
+    const {
+        vehicles,
+        addVehicle,
+        updateVehicle,
+        toggleArchiveVehicle,
+        setVehicleActive,
+        getActiveVehicle,
+        serviceRecords,
+        followUps,
+        getVehicleStats,
+        getLoanForVehicle,
+        getLoanDetailedStatus,
+        addLoan,
+        payEMI,
+        deleteVehicle
+    } = useVehicle();
 
- const { addTask } = useData();
-
- const [isAddOpen, setIsAddOpen] = useState(false);
- const [editingVehicle, setEditingVehicle] = useState(null);
- const [showArchived, setShowArchived] = useState(false);
- const [activeTab, setActiveTab] = useState('overview');
- const [isAddLoanOpen, setIsAddLoanOpen] = useState(false);
- const [isPayEMIOpen, setIsPayEMIOpen] = useState(false);
- const [isAmortizationOpen, setIsAmortizationOpen] = useState(false);
- const [isPrepaymentOpen, setIsPrepaymentOpen] = useState(false);
- const [historyFilter, setHistoryFilter] = useState('All');
- const [historySort, setHistorySort] = useState('date_desc');
- const [deleteConfirmId, setDeleteConfirmId] = useState(null);
-
- const activeVehicle = getActiveVehicle();
- const stats = activeVehicle ? getVehicleStats(activeVehicle.id) : null;
- const risks = activeVehicle ? getVehicleRisks(activeVehicle.id) : [];
-
- // Next Service logic
- const activeFollowUps = activeVehicle ? followUps.filter(f => f.vehicleId === activeVehicle.id && f.status !== 'completed') : [];
- let nextService = activeFollowUps.find(f => (f.type || '').toLowerCase().includes('service') || (f.type || '').toLowerCase().includes('oil'));
- if (!nextService && activeFollowUps.length > 0) nextService = activeFollowUps[0];
-
- // 6 Month Trend logic
- const getSixMonthTrend = () => {
-     if (!activeVehicle || !stats) return [];
-     const months = Array.from({ length: 6 }).map((_, i) => {
-         const d = new Date();
-         d.setMonth(d.getMonth() - i);
-         return {
-             label: format(d, 'MMM'),
-             month: d.getMonth(),
-             year: d.getFullYear(),
-             cost: 0
-         };
-     }).reverse();
-
-     const loan = getLoanForVehicle(activeVehicle.id);
-     const loanPayments = loan ? loan.history || [] : [];
-     
-     const allTxs = [
-         ...serviceRecords.filter(r => r.vehicleId === activeVehicle.id).map(r => ({ date: new Date(r.date), cost: Number(r.cost) || 0 })),
-         ...loanPayments.map(p => ({ date: new Date(p.date), cost: Number(p.amount) || 0 }))
-     ];
-
-     allTxs.forEach(tx => {
-         const bucket = months.find(m => m.month === tx.date.getMonth() && m.year === tx.date.getFullYear());
-         if (bucket) {
-             bucket.cost += tx.cost;
-         }
-     });
-
-     return months;
- };
- const trendData = activeVehicle && activeTab === 'overview' ? getSixMonthTrend() : [];
- const maxTrendCost = trendData.length ? Math.max(...trendData.map(d => d.cost)) || 1 : 1;
-
- // Sort logic
- const visibleVehicles = vehicles.filter(v => showArchived ? v.isArchived : !v.isArchived);
- const sortedVehicles = [...visibleVehicles].sort((a, b) => {
- if (a.isActive) return -1;
- if (b.isActive) return 1;
- return 0;
- });
-
- const activeVehicleRecords = activeVehicle
- ? serviceRecords
- .filter(r => r.vehicleId === activeVehicle.id)
- .sort((a, b) => new Date(b.date) - new Date(a.date))
- : [];
-
- // History logic
- const activeLoanLocal = activeVehicle ? getLoanForVehicle(activeVehicle.id) : null;
- const loanPaymentsLocal = activeLoanLocal ? activeLoanLocal.history || [] : [];
-     
- let combinedHistory = [
-     ...activeVehicleRecords.map(r => ({ ...r, category: r.type.toLowerCase().includes('fuel') ? 'Fuel' : r.type.toLowerCase().includes('insurance') ? 'Insurance' : 'Service' })),
-     ...loanPaymentsLocal.map(p => ({ ...p, type: 'EMI', date: p.date, cost: p.amount, category: 'EMI', id: p.id || Math.random().toString() }))
- ];
-
- if (historyFilter !== 'All') {
-     combinedHistory = combinedHistory.filter(h => h.category === historyFilter);
- }
-
- combinedHistory.sort((a, b) => {
-     if (historySort === 'date_desc') return new Date(b.date) - new Date(a.date);
-     if (historySort === 'date_asc') return new Date(a.date) - new Date(b.date);
-     if (historySort === 'cost_desc') return (Number(b.cost)||0) - (Number(a.cost)||0);
-     if (historySort === 'cost_asc') return (Number(a.cost)||0) - (Number(b.cost)||0);
-     return 0;
- });
-
- const groupedHistoryArray = [];
- const groupedHistoryMap = combinedHistory.reduce((acc, curr) => {
-     const monthYear = format(new Date(curr.date), 'MMMM yyyy');
-     if (!acc[monthYear]) acc[monthYear] = { monthYear, records: [], total: 0 };
-     acc[monthYear].records.push(curr);
-     acc[monthYear].total += (Number(curr.cost) || 0);
-     return acc;
- }, {});
-     
- for(const key in groupedHistoryMap) {
-     groupedHistoryArray.push(groupedHistoryMap[key]);
- }
-     
- const exportCSV = () => {
-     if (!activeVehicle) return;
-     const headers = ['Date', 'Type', 'Category', 'Cost', 'Odometer', 'Notes'];
-     const rows = combinedHistory.map(r => [
-         format(new Date(r.date), 'yyyy-MM-dd'),
-         r.type,
-         r.category,
-         r.cost || 0,
-         r.odometer || '',
-         r.notes ? `"${r.notes.replace(/"/g, '""')}"` : ''
-     ].join(','));
-     const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join('\n');
-     const encodedUri = encodeURI(csvContent);
-     const link = document.createElement('a');
-     link.setAttribute('href', encodedUri);
-     link.setAttribute('download', `${activeVehicle.name}_history.csv`);
-     document.body.appendChild(link);
-     link.click();
-     document.body.removeChild(link);
- };
-
- const handleSaveVehicle = (data) => {
- if (editingVehicle) {
- updateVehicle(editingVehicle.id, data);
- } else {
- addVehicle(data);
- }
- };
-
- const handleSaveLoan = (loanData) => {
- addLoan(loanData);
- };
-
- const handleRecordPayment = (loanId, paymentData) => {
- payEMI(loanId, paymentData);
- };
-
- const activeLoan = activeVehicle ? getLoanForVehicle(activeVehicle.id) : null;
- const loanDetail = activeLoan ? getLoanDetailedStatus(activeLoan.id) : null;
-
- const handleAddToRoutine = () => {
- if (!activeVehicle) return;
- addTask({
- name: `Check ${activeVehicle.name} condition`,
- time: '09:00',
- category: 'EARLY MORNING',
- icon: '🚗'
- });
- alert("Added to today's routine!");
- };
-
- const getIcon = (type) => {
- switch (type) {
- case 'bike':
- case 'scooter': return Bike;
- case 'commercial': return Truck;
- default: return Car;
- }
- };
-
- if (vehicles.length === 0) {
- return (
- <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6 flex flex-col items-center justify-center">
- <div className="w-24 h-24 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mb-6">
- <Car className="w-12 h-12 text-indigo-600 dark:text-indigo-400" />
- </div>
- <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Vehicle Management</h1>
- <p className="text-slate-500 dark:text-slate-400 mb-8 text-center max-w-xs">
- Track expenses, maintenance, and reminders for your fleet.
- </p>
- <button
- onClick={() => setIsAddOpen(true)}
- className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold shadow-lg shadow-indigo-500/30 transition-all flex items-center gap-2"
- >
- <Plus className="w-5 h-5" /> Add First Vehicle
- </button>
- <AddVehicleModal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} onSave={handleSaveVehicle} />
- </div>
- );
- }
-
- return (
- <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24">
- {/* Header */}
- <header
- className="bg-white dark:bg-slate-900 sticky top-0 z-20 shadow-sm animate-in slide-in-from-top-4 duration-300"
- style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
- >
- <div className="px-6 pt-4 pb-4 flex items-center justify-between">
- <h1 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">
- {showArchived ? 'Archived Vehicles' : 'Vehicle Dashboard'}
- </h1>
- <button
- onClick={() => setShowArchived(!showArchived)}
- className={`p-2 rounded-full transition-colors ${showArchived ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-slate-100 text-slate-500'}`}
- >
- <Archive className="w-5 h-5" />
- </button>
- </div>
-
- {/* Vehicle Selector / Active Card */}
- {activeVehicle && !showArchived && (
- <div className="px-6 pb-6">
- <div className="bg-gradient-to-br from-slate-900 to-slate-800 dark:from-indigo-900 dark:to-slate-900 rounded-2xl p-4 text-white shadow-xl shadow-slate-900/10 relative overflow-hidden">
- {/* Alert Badge if Overdue */}
- {stats?.overdueCount > 0 && (
- <div className="absolute top-4 right-4 bg-red-500/90 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 animate-pulse">
- <AlertTriangle className="w-3 h-3" />
- {stats.overdueCount} Alerts
- </div>
- )}
-
- <div className="flex justify-between items-start mb-4">
- <div>
- <h2 className="text-xl font-bold mb-0.5">{activeVehicle.name}</h2>
- <p className="text-slate-400 text-xs font-medium">{activeVehicle.brandModel}</p>
- </div>
- <div className="flex flex-col items-end gap-1">
- <div className="p-2 bg-white/10 rounded-xl backdrop-blur-sm">
- {(() => { const Icon = getIcon(activeVehicle.type); return <Icon className="w-5 h-5 text-white" />; })()}
- </div>
- </div>
- </div>
-
- <div className="flex divide-x divide-white/10 bg-white/5 rounded-xl backdrop-blur-sm">
- <div className="flex-1 p-2 text-center">
- <p className="text-[9px] text-slate-400 uppercase font-bold mb-0.5">Health</p>
- <div className="flex items-center justify-center gap-1">
- <div className="w-8 h-1 bg-white/10 rounded-full overflow-hidden">
- <div className={`h-full ${stats?.healthScore > 80 ? 'bg-emerald-400' : stats?.healthScore > 50 ? 'bg-orange-400' : 'bg-red-400'}`} style={{ width: `${stats?.healthScore || 0}%` }}></div>
- </div>
- </div>
- <p className="font-bold text-xs mt-1">{stats?.healthScore || 0}%</p>
- </div>
- <div className="flex-1 p-2 text-center">
- <p className="text-[9px] text-slate-400 uppercase font-bold mb-0.5">Total Cost</p>
- <p className="font-bold text-xs">₹{stats?.totalSpend.toLocaleString()}</p>
- </div>
- <div className="flex-1 p-2 text-center">
- <p className="text-[9px] text-slate-400 uppercase font-bold mb-0.5">Month Cost</p>
- <p className="font-bold text-xs">₹{stats?.monthSpend.toLocaleString()}</p>
- </div>
- </div>
- </div>
-
- {/* Tabs */}
- <div className="flex mt-4 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
- <button
- onClick={() => setActiveTab('overview')}
- className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${activeTab === 'overview' ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-white' : 'text-slate-500'}`}
- >
- Overview
- </button>
- <button
- onClick={() => setActiveTab('history')}
- className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${activeTab === 'history' ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-white' : 'text-slate-500'}`}
- >
- History
- </button>
- <button
- onClick={() => setActiveTab('loans')}
- className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${activeTab === 'loans' ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-white' : 'text-slate-500'}`}
- >
- Loans
- </button>
- </div>
- </div>
- )}
- </header>
-
- <div className="px-6 py-4">
- {activeVehicle && !showArchived ? (
- activeTab === 'overview' ? (
- <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-
- {/* Smart Actions / Routine */}
- <section>
- <div className="flex gap-2">
- <button
- onClick={handleAddToRoutine}
- className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 rounded-xl flex items-center justify-center gap-2 shadow-sm hover:border-indigo-300 transition-colors"
- >
- <Zap className="w-4 h-4 text-orange-500" />
- <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Check Routine</span>
- </button>
- <button
- onClick={() => {
- setEditingVehicle(activeVehicle);
- setIsAddOpen(true);
- }}
- className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 rounded-xl flex items-center justify-center gap-2 shadow-sm hover:border-indigo-300 transition-colors"
- >
- <Settings className="w-4 h-4 text-slate-500" />
- <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Edit Details</span>
- </button>
- </div>
- </section>
-
- {/* Cost Breakdown */}
- {stats?.breakdown && (
- <section className="mt-6 mb-2">
- <h3 className="font-bold text-slate-900 dark:text-white px-1 mb-2 text-sm flex items-center gap-2">
- <Wallet className="w-4 h-4 text-slate-400" />
- Total Cost Breakdown
- </h3>
- <div className="grid grid-cols-4 gap-2">
- {[
- { label: 'Fuel', amount: stats.breakdown.fuel, icon: Fuel, color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/20' },
- { label: 'Service', amount: stats.breakdown.service, icon: Settings, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20' },
- { label: 'EMI', amount: stats.breakdown.emi, icon: Landmark, color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
- { label: 'Insure', amount: stats.breakdown.insurance, icon: Zap, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20' }
- ].map(item => (
- <div key={item.label} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl p-2 text-center shadow-sm flex flex-col items-center justify-between">
- <div className={`w-6 h-6 rounded-full ${item.bg} ${item.color} flex items-center justify-center mb-1`}>
- <item.icon className="w-3 h-3" />
- </div>
- <p className="text-[9px] font-bold text-slate-500 uppercase">{item.label}</p>
- <p className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">
- ₹{item.amount > 1000 ? (item.amount / 1000).toFixed(1) + 'k' : item.amount}
- </p>
- </div>
- ))}
- </div>
- </section>
- )}
-
- {/* 6 Month Trend */}
- {trendData.length > 0 && (
-     <section className="mt-6 mb-2">
-         <h3 className="font-bold text-slate-900 dark:text-white px-1 mb-3 text-sm flex items-center gap-2">
-             <TrendingUp className="w-4 h-4 text-slate-400" />
-             Last 6 Months Trend
-         </h3>
-         <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl p-4 shadow-sm flex items-end justify-between h-32">
-             {trendData.map((data, i) => (
-                 <div key={i} className="flex flex-col items-center gap-2 w-full group relative">
-                     <span className="absolute -top-6 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                         ₹{data.cost > 1000 ? (data.cost/1000).toFixed(1)+'k' : data.cost}
-                     </span>
-                     <div className="w-full max-w-[24px] bg-slate-100 dark:bg-slate-800 rounded-t-lg relative flex flex-col justify-end h-16">
-                         <motion.div 
-                             initial={{height: 0}} 
-                             animate={{height: `${(data.cost / maxTrendCost) * 100}%`}}
-                             className="bg-indigo-500 rounded-t-lg w-full transition-all group-hover:bg-indigo-400"
-                         />
-                     </div>
-                     <p className="text-[9px] font-bold text-slate-400 uppercase">{data.label}</p>
-                 </div>
-             ))}
-         </div>
-     </section>
- )}
-
- {/* Next Service Countdown */}
- {nextService && (
-     <section className="mt-6 mb-2">
-         <h3 className="font-bold text-slate-900 dark:text-white px-1 mb-2 text-sm flex items-center gap-2">
-             <Calendar className="w-4 h-4 text-slate-400" />
-             Next Service
-         </h3>
-         <div className="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-xl border border-indigo-100 dark:border-indigo-800 flex items-center justify-between">
-             <div className="flex items-center gap-3">
-                 <div className="p-2 bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-200 rounded-lg">
-                     <Settings className="w-5 h-5" />
-                 </div>
-                 <div>
-                     <p className="font-bold text-indigo-900 dark:text-indigo-100 text-sm">{nextService.type}</p>
-                     <p className="text-[10px] text-indigo-700 dark:text-indigo-300 mt-0.5 max-w-[180px] break-words">
-                        {nextService.dueDate && `Due: ${format(new Date(nextService.dueDate), 'MMM d, yyyy')} `}
-                        {nextService.dueDate && nextService.dueOdometer && '| '}
-                        {nextService.dueOdometer && `At ${Number(nextService.dueOdometer).toLocaleString()} km`}
-                     </p>
-                 </div>
-             </div>
-             <div className="text-right flex flex-col items-end gap-2">
-                {nextService.dueDate && (
-                    <div>
-                        <p className="font-bold text-indigo-900 dark:text-indigo-100 leading-none">
-                            {Math.max(0, Math.ceil((new Date(nextService.dueDate) - new Date()) / (1000 * 60 * 60 * 24)))}
-                        </p>
-                        <p className="text-[9px] text-indigo-600 dark:text-indigo-400 uppercase font-bold tracking-wider">Days</p>
-                    </div>
-                )}
-                {nextService.dueOdometer && (
-                    <div>
-                        <p className="font-bold text-indigo-900 dark:text-indigo-100 leading-none">
-                            {Math.max(0, Number(nextService.dueOdometer) - Number(activeVehicle.odometer)).toLocaleString()}
-                        </p>
-                        <p className="text-[9px] text-indigo-600 dark:text-indigo-400 uppercase font-bold tracking-wider">km left</p>
-                    </div>
-                )}
-             </div>
-         </div>
-     </section>
- )}
-
- <FollowUpList vehicle={activeVehicle} />
-
- {/* Risk Alerts & Insights */}
- {risks.length > 0 && (
- <section className="space-y-2 mt-6">
- <h3 className="font-bold text-slate-900 dark:text-white px-1 text-sm">Insights & Alerts</h3>
- <div className="grid gap-2">
- {risks.map((risk, index) => (
- <div
- key={index}
- className={`p-3 rounded-xl border flex items-start gap-3 ${risk.type === 'critical' ? 'bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-900' :
- risk.type === 'warning' ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-100 dark:border-orange-900' :
- 'bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-900'
- }`}
- >
- <div className={`p-2 rounded-full ${risk.type === 'critical' ? 'bg-red-100 dark:bg-red-800 text-red-600 dark:text-red-200' :
- risk.type === 'warning' ? 'bg-orange-100 dark:bg-orange-800 text-orange-600 dark:text-orange-200' :
- 'bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-200'
- }`}>
- <AlertTriangle className="w-4 h-4" />
- </div>
- <div className="flex-1">
- <h4 className={`font-bold text-sm leading-tight ${risk.type === 'critical' ? 'text-red-900 dark:text-red-100' :
- risk.type === 'warning' ? 'text-orange-900 dark:text-orange-100' :
- 'text-blue-900 dark:text-blue-100'
- }`}>{risk.title}</h4>
- <p className={`text-[10px] mt-0.5 leading-tight ${risk.type === 'critical' ? 'text-red-700 dark:text-red-300' :
- risk.type === 'warning' ? 'text-orange-700 dark:text-orange-300' :
- 'text-blue-700 dark:text-blue-300'
- }`}>{risk.detail}</p>
- {risk.title.includes('EMI') && risk.type === 'critical' && activeLoan && (
- <button onClick={() => setIsPayEMIOpen(true)} className="mt-2 text-[10px] uppercase tracking-wider font-bold px-3 py-1.5 bg-red-600 text-white rounded-lg shadow-sm hover:bg-red-700 transition-colors">
- Pay EMI Now
- </button>
- )}
- {risk.title.includes('Overdue') && !risk.title.includes('EMI') && (
- <button onClick={() => navigate('/routine')} className="mt-2 text-[10px] uppercase tracking-wider font-bold px-3 py-1.5 border border-current opacity-80 rounded-lg shadow-sm hover:opacity-100 transition-opacity">
- Resolve Now
- </button>
- )}
- </div>
- </div>
- ))}
- </div>
- </section>
- )}
-
- {/* Service Insight */}
- {stats?.lastServiceDate && (
- <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-xl flex items-start gap-3 border border-emerald-100 dark:border-emerald-800">
- <div className="bg-emerald-100 dark:bg-emerald-800 p-2 rounded-full">
- <History className="w-4 h-4 text-emerald-600 dark:text-white" />
- </div>
- <div>
- <h4 className="font-bold text-emerald-900 dark:text-emerald-100 text-sm">Last Service</h4>
- <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1">
- {stats.lastServiceType} on {format(new Date(stats.lastServiceDate), 'MMM d, yyyy')}
- </p>
- </div>
- </div>
- )}
-
- {/* Other Vehicles Header if exists */}
- {vehicles.length > 1 && (
- <h3 className="font-bold text-slate-900 dark:text-white pt-4">Other Vehicles</h3>
- )}
- </div>
- ) : activeTab === 'loans' ? (
- // LOANS TAB
- <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
- <div className="flex items-center justify-between">
- <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
- <Landmark className="w-4 h-4 text-slate-500" />
- Vehicle Financing
- </h3>
- {activeLoan ? (
- <div className="flex gap-2">
- {loanDetail?.status === 'overdue' && (
- <span className="text-[10px] font-bold bg-red-50 text-red-600 px-2 py-1 rounded-full dark:bg-red-900/30 dark:text-red-400 flex items-center gap-1 animate-pulse">
- <AlertTriangle className="w-3 h-3" /> Overdue
- </span>
- )}
- {loanDetail?.status === 'pending' && (
- <span className="text-[10px] font-bold bg-orange-50 text-orange-600 px-2 py-1 rounded-full dark:bg-orange-900/30 dark:text-orange-400">
- Due Soon
- </span>
- )}
- {loanDetail?.status === 'paid' && (
- <span className="text-[10px] font-bold bg-emerald-50 text-emerald-600 px-2 py-1 rounded-full dark:bg-emerald-900/30 dark:text-emerald-400">
- Paid
- </span>
- )}
- </div>
- ) : (
- <span className="text-[10px] font-bold bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full dark:bg-indigo-900/30 dark:text-indigo-400">Available</span>
- )}
- </div>
-
- {activeLoan ? (
- <div className="space-y-4">
- {/* Loan Summary Card */}
- <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800">
- <div className="flex justify-between items-start mb-6">
- <div>
- <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Total Loan Principal</p>
- <h4 className="text-2xl font-bold text-slate-900 dark:text-white">₹{activeLoan.totalLoanAmount.toLocaleString()}</h4>
- <p className="text-xs text-slate-500 mt-1">{activeLoan.lender}</p>
- </div>
- <div className="bg-indigo-50 dark:bg-indigo-900/20 p-3 rounded-2xl">
- <Landmark className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
- </div>
- </div>
-
- <div className="space-y-4">
- <div>
- <div className="flex justify-between text-xs font-bold mb-2">
- <span className="text-slate-500">Repayment Progress</span>
- <span className="text-indigo-600 dark:text-indigo-400">₹{(activeLoan.totalLoanAmount - activeLoan.remainingPrincipal).toLocaleString()} Paid</span>
- </div>
- <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
- <motion.div
- initial={{ width: 0 }}
- animate={{ width: `${((activeLoan.totalLoanAmount - activeLoan.remainingPrincipal) / activeLoan.totalLoanAmount) * 100}%` }}
- className="h-full bg-gradient-to-r from-indigo-500 to-indigo-600"
- />
- </div>
- <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-wide">
- <span>Principal</span>
- <span>Balance: ₹{activeLoan.remainingPrincipal.toLocaleString()}</span>
- </div>
- </div>
-
- <div className="grid grid-cols-2 gap-4 py-4 border-y border-slate-50 dark:border-slate-800">
- <div>
- <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Tenure & Date</p>
- <p className="font-bold text-sm">{activeLoan.tenureMonths} mo • {activeLoan.startDate ? format(new Date(activeLoan.startDate), 'MMM yyyy') : 'N/A'}</p>
- </div>
- <div>
- <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Total Payable & Int</p>
- <p className="font-bold text-sm">₹{(activeLoan.totalPayable || 0).toLocaleString()} <span className="text-slate-400 text-xs font-normal"> / ₹{(activeLoan.totalInterest || 0).toLocaleString()} int</span></p>
- </div>
- </div>
-
- <div className="grid grid-cols-2 gap-3 py-2">
- <button
- onClick={() => setIsAmortizationOpen(true)}
- className="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800 px-4 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 text-xs hover:bg-indigo-100 transition-colors"
- >
- <TrendingUp className="w-3.5 h-3.5" /> Amortization
- </button>
- <button
- onClick={() => setIsPrepaymentOpen(true)}
- className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800 px-4 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 text-xs hover:bg-emerald-100 transition-colors"
- >
- <Wallet className="w-3.5 h-3.5" /> Prepayment
- </button>
- </div>
-
- <div className="flex items-center justify-between pt-2">
- <div>
- <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Monthly EMI</p>
- <p className="text-lg font-bold text-slate-900 dark:text-white">₹{activeLoan.emiAmount.toLocaleString()}</p>
- </div>
- <button
- onClick={() => setIsPayEMIOpen(true)}
- className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-3 rounded-2xl font-bold shadow-lg flex items-center gap-2 hover:scale-[1.02] transition-transform"
- >
- Record EMI
- </button>
- </div>
- </div>
- </div>
-
- {/* History */}
- {activeLoan.history.length > 0 && (
- <div>
- <h4 className="font-bold text-slate-900 dark:text-white mb-3 pl-2 flex items-center gap-2">
- <History className="w-4 h-4 text-slate-400" />
- Recent Payments
- </h4>
- <div className="space-y-3">
- {activeLoan.history.slice().reverse().map(payment => (
- <div key={payment.id} className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center justify-between">
- <div className="flex items-center gap-3">
- <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${payment.type === 'Penalty' ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'}`}>
- <Wallet className="w-5 h-5" />
- </div>
- <div>
- <p className="font-bold text-sm text-slate-900 dark:text-white">{payment.type} Payment</p>
- <p className="text-[10px] text-slate-400 uppercase font-bold">{format(new Date(payment.date), 'MMM d, yyyy')}</p>
- </div>
- </div>
- <div className="text-right">
- <p className="font-bold text-slate-900 dark:text-white text-sm">₹{payment.amount.toLocaleString()}</p>
- <p className="text-[9px] text-slate-400">P: ₹{payment.principal.toLocaleString()} | I: ₹{payment.interest.toLocaleString()}</p>
- </div>
- </div>
- ))}
- </div>
- </div>
- )}
- </div>
- ) : (
- <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 px-6">
- <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
- <Landmark className="w-8 h-8 text-slate-300" />
- </div>
- <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2">No Finance Records</h4>
- <p className="text-slate-500 text-sm mb-8 max-w-xs mx-auto">
- Keep track of your vehicle loans, EMIs, and interest payments in one place.
- </p>
- <button
- onClick={() => setIsAddLoanOpen(true)}
- className="bg-slate-900 dark:bg-indigo-600 text-white px-8 py-3 rounded-2xl font-bold shadow-xl flex items-center gap-2 mx-auto hover:scale-105 transition-transform"
- >
- <Plus className="w-4 h-4" /> Initialize Finance
- </button>
- </div>
- )}
- </div>
- ) : (
- // HISTORY TAB
- <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
- <div className="flex flex-col gap-3">
-    <div className="flex items-center justify-between">
-        <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <History className="w-4 h-4 text-slate-500" />
-            Transaction Log
-        </h3>
-        <button onClick={exportCSV} className="text-xs font-bold bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 px-3 py-1.5 rounded-lg flex items-center gap-1 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors">
-            Export CSV
-        </button>
-    </div>
+    const [activeTab, setActiveTab] = useState('ledger');
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isVehicleSelectorOpen, setIsVehicleSelectorOpen] = useState(false);
+    const [showArchived, setShowArchived] = useState(false);
     
-    <div className="flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar">
-        {['All', 'Fuel', 'Service', 'EMI', 'Insurance'].map(f => (
-            <button 
-                key={f}
-                onClick={() => setHistoryFilter(f)}
-                className={`text-[10px] uppercase tracking-wider font-bold px-3 py-1.5 rounded-full whitespace-nowrap transition-colors ${historyFilter === f ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700'}`}
-            >
-                {f}
-            </button>
-        ))}
-    </div>
-    <div className="flex items-center gap-2">
-        <span className="text-xs text-slate-500 font-bold">Sort:</span>
-        <select 
-            value={historySort} 
-            onChange={e => setHistorySort(e.target.value)}
-            className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-300 border-none p-0 focus:ring-0"
-        >
-            <option value="date_desc">Latest First</option>
-            <option value="date_asc">Oldest First</option>
-            <option value="cost_desc">Highest Cost</option>
-            <option value="cost_asc">Lowest Cost</option>
-        </select>
-    </div>
- </div>
+    // Modals
+    const [isAddOpen, setIsAddOpen] = useState(false);
+    const [editingVehicle, setEditingVehicle] = useState(null);
+    const [isAddLoanOpen, setIsAddLoanOpen] = useState(false);
+    const [isPayEMIOpen, setIsPayEMIOpen] = useState(false);
+    const [isAmortizationOpen, setIsAmortizationOpen] = useState(false);
+    const [isPrepaymentOpen, setIsPrepaymentOpen] = useState(false);
+    const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+    const [archiveConfirmId, setArchiveConfirmId] = useState(null);
+    
+    const [historyFilter, setHistoryFilter] = useState('All');
+    
+    const menuRef = useRef();
+    const selectorRef = useRef();
+    
+    const activeVehicle = getActiveVehicle();
+    const activeLoan = activeVehicle ? getLoanForVehicle(activeVehicle.id) : null;
+    const loanDetail = activeLoan ? getLoanDetailedStatus(activeLoan.id) : null;
+    const stats = activeVehicle ? getVehicleStats(activeVehicle.id) : null;
+    
+    // Next Service logic
+    const activeFollowUps = activeVehicle ? followUps.filter(f => f.vehicleId === activeVehicle.id && f.status !== 'completed') : [];
+    let nextService = activeFollowUps.find(f => (f.type || '').toLowerCase().includes('service') || (f.type || '').toLowerCase().includes('oil'));
+    if (!nextService && activeFollowUps.length > 0) nextService = activeFollowUps[0];
+    
+    // Trend Data & History for Ledger
+    const getSixMonthTrend = () => {
+        if (!activeVehicle || !stats) return [];
+        const months = Array.from({ length: 6 }).map((_, i) => {
+            const d = new Date();
+            d.setMonth(d.getMonth() - i);
+            return {
+                label: format(d, 'MMM'),
+                month: d.getMonth(),
+                year: d.getFullYear(),
+                cost: 0
+            };
+        }).reverse();
 
- {groupedHistoryArray.length === 0 ? (
- <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
- <Wallet className="w-8 h-8 text-slate-300 mx-auto mb-2" />
- <p className="text-slate-400 text-sm">No transaction records found.</p>
- </div>
- ) : (
-     <div className="space-y-6">
-         {groupedHistoryArray.map(group => (
-             <div key={group.monthYear}>
-                 <div className="flex items-center justify-between mb-3 px-1">
-                     <h4 className="font-bold text-slate-600 dark:text-slate-400 text-sm">{group.monthYear}</h4>
-                     <span className="text-xs font-bold text-slate-500">₹{group.total.toLocaleString()}</span>
-                 </div>
-                 <div className="space-y-2">
-                     {group.records.map(record => (
-                         <div key={record.id} className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-start justify-between group hover:border-indigo-200 transition-colors">
-                            <div>
-                                <div className="flex items-center gap-2 mb-1">
-                                    <h5 className="font-bold text-slate-900 dark:text-white text-sm">{record.type}</h5>
-                                    {record.financeTxId && <div className="w-2 h-2 rounded-full bg-emerald-500" title="Synced with Finance"></div>}
-                                </div>
-                                <p className="text-xs text-slate-400">{format(new Date(record.date), 'MMM d, yyyy')} • {record.category}</p>
-                                {record.notes && (
-                                    <p className="text-xs text-slate-500 mt-2 line-clamp-2">{record.notes}</p>
-                                )}
-                            </div>
-                            <div className="text-right">
-                                {record.cost > 0 && (
-                                    <span className="block font-bold text-slate-900 dark:text-white text-sm">₹{Number(record.cost).toLocaleString()}</span>
-                                )}
-                                {record.odometer && (
-                                    <span className="block text-[10px] text-slate-400 mt-1 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-lg inline-block">
-                                        {Number(record.odometer).toLocaleString()} km
+        const loanPayments = activeLoan ? activeLoan.history || [] : [];
+        const allTxs = [
+            ...serviceRecords.filter(r => r.vehicleId === activeVehicle.id).map(r => ({ date: new Date(r.date), cost: Number(r.cost) || 0 })),
+            ...loanPayments.map(p => ({ date: new Date(p.date), cost: Number(p.amount) || 0 }))
+        ];
+
+        allTxs.forEach(tx => {
+            const bucket = months.find(m => m.month === tx.date.getMonth() && m.year === tx.date.getFullYear());
+            if (bucket) {
+                bucket.cost += tx.cost;
+            }
+        });
+
+        return months;
+    };
+    
+    const trendData = activeVehicle && activeTab === 'ledger' ? getSixMonthTrend() : [];
+    const maxTrendCost = trendData.length ? Math.max(...trendData.map(d => d.cost)) || 1 : 1;
+    
+    const activeVehicleRecords = activeVehicle
+        ? serviceRecords
+            .filter(r => r.vehicleId === activeVehicle.id)
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+        : [];
+        
+    const loanPaymentsLocal = activeLoan ? activeLoan.history || [] : [];
+        
+    let combinedHistory = [
+        ...activeVehicleRecords.map(r => ({ ...r, category: r.type.toLowerCase().includes('fuel') ? 'Fuel' : r.type.toLowerCase().includes('insurance') ? 'Insurance' : 'Service' })),
+        ...loanPaymentsLocal.map(p => ({ ...p, type: 'EMI', date: p.date, cost: p.amount, category: 'EMI', id: p.id || Math.random().toString() }))
+    ];
+
+    if (historyFilter !== 'All') {
+        combinedHistory = combinedHistory.filter(h => h.category === historyFilter);
+    }
+
+    combinedHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // Sort logic
+    const visibleVehicles = vehicles;
+    const sortedVehicles = [...visibleVehicles].sort((a, b) => {
+        if (a.isActive) return -1;
+        if (b.isActive) return 1;
+        return 0;
+    });
+    
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setIsMenuOpen(false);
+            }
+            if (selectorRef.current && !selectorRef.current.contains(event.target)) {
+                setIsVehicleSelectorOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const exportCSV = () => {
+        if (!activeVehicle) return;
+        setIsMenuOpen(false);
+        const headers = ['Date', 'Type', 'Category', 'Cost', 'Odometer', 'Notes'];
+        const rows = combinedHistory.map(r => [
+            format(new Date(r.date), 'yyyy-MM-dd'),
+            r.type,
+            r.category,
+            r.cost || 0,
+            r.odometer || '',
+            r.notes ? `"${r.notes.replace(/"/g, '""')}"` : ''
+        ].join(','));
+        const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join('\n');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', `${activeVehicle.name}_ledger.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const handleSaveVehicle = (data) => {
+        if (editingVehicle) {
+            updateVehicle(editingVehicle.id, data);
+        } else {
+            addVehicle(data);
+        }
+        setIsAddOpen(false);
+        setEditingVehicle(null);
+    };
+
+    const handleRecordPayment = (loanId, paymentData) => {
+        payEMI(loanId, paymentData);
+        setIsPayEMIOpen(false);
+    };
+
+    const getIcon = (type) => Car;
+
+    if (vehicles.length === 0) {
+        return (
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6 flex flex-col items-center justify-center">
+                <div className="w-24 h-24 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mb-6">
+                    <Car className="w-12 h-12 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Vehicle Management</h1>
+                <p className="text-slate-500 dark:text-slate-400 mb-8 text-center max-w-xs">
+                    Track expenses, maintenance, and reminders for your fleet.
+                </p>
+                <button
+                    onClick={() => setIsAddOpen(true)}
+                    className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold shadow-lg shadow-indigo-500/30 transition-all flex items-center gap-2"
+                >
+                    <Plus className="w-5 h-5" /> Add First Vehicle
+                </button>
+                <AddVehicleModal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} onSave={handleSaveVehicle} />
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-2 pb-24">
+            
+            {/* Header */}
+            <header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+                <div className="px-4 py-3 flex items-center justify-between">
+                    {/* Left: Vehicle Selector */}
+                    <div className="relative" ref={selectorRef}>
+                        <button 
+                            onClick={() => setIsVehicleSelectorOpen(!isVehicleSelectorOpen)}
+                            className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                        >
+                            <div className="flex flex-col text-left">
+                                <span className="font-bold text-slate-900 dark:text-white text-sm leading-tight max-w-[120px] truncate">
+                                    {activeVehicle ? activeVehicle.name : 'Select Vehicle'}
+                                </span>
+                                {activeVehicle && (
+                                    <span className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">
+                                        {Number(activeVehicle.odometer || 0).toLocaleString()} km
                                     </span>
                                 )}
                             </div>
-                         </div>
-                     ))}
-                 </div>
-             </div>
-         ))}
-     </div>
- )}
- </div>
- )
- ) : null}
+                            <ChevronDown className="w-4 h-4 text-slate-500" />
+                        </button>
+                        
+                        <AnimatePresence>
+                            {isVehicleSelectorOpen && (
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 10 }}
+                                    className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden z-50"
+                                >
+                                    <div className="p-2 space-y-1">
+                                        {sortedVehicles.filter(v => !v.isArchived).map(vehicle => (
+                                            <button
+                                                key={vehicle.id}
+                                                onClick={() => {
+                                                    setVehicleActive(vehicle.id);
+                                                    setIsVehicleSelectorOpen(false);
+                                                }}
+                                                className={`w-full flex items-center gap-3 p-2 rounded-xl transition-colors ${vehicle.isActive ? 'bg-indigo-50 dark:bg-indigo-900/30' : 'hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
+                                            >
+                                                <Car className={`w-5 h-5 ${vehicle.isActive ? 'text-indigo-600' : 'text-slate-400'}`} />
+                                                <div className="flex-1 text-left">
+                                                    <p className={`text-sm font-bold ${vehicle.isActive ? 'text-indigo-900 dark:text-indigo-100' : 'text-slate-700 dark:text-slate-200'}`}>{vehicle.name}</p>
+                                                    <p className="text-[10px] text-slate-500">{vehicle.brandModel}</p>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div className="p-2 border-t border-slate-100 dark:border-slate-700">
+                                        <button
+                                            onClick={() => {
+                                                setIsVehicleSelectorOpen(false);
+                                                setEditingVehicle(null);
+                                                setIsAddOpen(true);
+                                            }}
+                                            className="w-full flex items-center justify-center gap-2 p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50 text-slate-600 dark:text-slate-400 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                        >
+                                            <Plus className="w-4 h-4" /> Add Vehicle
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
 
- {/* Vehicle List (for inactive or archived view) */}
- {(activeTab === 'overview' || showArchived) && (showArchived || (activeVehicle ? vehicles.length > 1 : true)) && (
- <div className="space-y-3 mt-4">
- {sortedVehicles.length === 0 && showArchived ? (
- <div className="text-center py-8 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
- <Archive className="w-8 h-8 text-slate-300 mx-auto mb-2" />
- <p className="text-slate-500 text-sm">No archived vehicles found.</p>
- </div>
- ) : (
- sortedVehicles.filter(v => showArchived ? true : !v.isActive).map(vehicle => {
- const Icon = getIcon(vehicle.type);
- return (
- <motion.div
- key={vehicle.id}
- layout
- initial={{ opacity: 0 }}
- animate={{ opacity: 1 }}
- className={`bg-white dark:bg-slate-900 p-4 rounded-2xl border ${vehicle.isActive ? 'border-indigo-500 ring-1 ring-indigo-500' : 'border-slate-100 dark:border-slate-800'} shadow-sm relative overflow-hidden cursor-pointer hover:shadow-md transition-all`}
- onClick={() => !showArchived && setVehicleActive(vehicle.id)}
- >
- <div className="flex items-center gap-4">
- <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${vehicle.isActive ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
- <Icon className="w-5 h-5" />
- </div>
- <div className="flex-1">
- <div className="flex items-center justify-between">
- <h4 className="font-bold text-slate-900 dark:text-white text-sm">{vehicle.name}</h4>
- {vehicle.isActive && <CheckCircle className="w-4 h-4 text-indigo-500" />}
- </div>
- <p className="text-xs text-slate-500">{vehicle.brandModel}</p>
- </div>
- </div>
+                    {/* Right: More Menu */}
+                    <div className="relative" ref={menuRef}>
+                        <button 
+                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-300"
+                        >
+                            <MoreVertical className="w-5 h-5" />
+                        </button>
+                        
+                        <AnimatePresence>
+                            {isMenuOpen && activeVehicle && (
+                                <motion.div 
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden z-50 origin-top-right"
+                                >
+                                    <div className="p-1">
+                                        <button 
+                                            onClick={() => {
+                                                setIsMenuOpen(false);
+                                                setEditingVehicle(activeVehicle);
+                                                setIsAddOpen(true);
+                                            }}
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-xl transition-colors text-left"
+                                        >
+                                            <Edit2 className="w-4 h-4 text-slate-400" /> 
+                                            Edit Details
+                                        </button>
+                                        <button 
+                                            onClick={() => {
+                                                setIsMenuOpen(false);
+                                                alert("Insurance Management Module Coming Soon");
+                                            }}
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-xl transition-colors text-left"
+                                        >
+                                            <ShieldAlert className="w-4 h-4 text-emerald-500" /> 
+                                            Insurance Details
+                                        </button>
+                                        <button 
+                                            onClick={() => {
+                                                setIsMenuOpen(false);
+                                                alert("Maintenance Templates Module Coming Soon");
+                                            }}
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-xl transition-colors text-left"
+                                        >
+                                            <Settings className="w-4 h-4 text-blue-500" /> 
+                                            Manage Templates
+                                        </button>
+                                        <button 
+                                            onClick={exportCSV}
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-xl transition-colors text-left"
+                                        >
+                                            <Download className="w-4 h-4 text-indigo-500" /> 
+                                            Export Data (CSV)
+                                        </button>
+                                        <div className="h-px bg-slate-100 dark:bg-slate-700 my-1 mx-2" />
+                                        <button 
+                                            onClick={() => {
+                                                setIsMenuOpen(false);
+                                                setArchiveConfirmId(activeVehicle.id);
+                                            }}
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-xl transition-colors text-left"
+                                        >
+                                            <Archive className="w-4 h-4" /> 
+                                            Archive Vehicle
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                </div>
+            </header>
 
- {/* Quick stats for list items */}
- {(() => {
- const vStat = getVehicleStats(vehicle.id);
- if (vStat && vStat.overdueCount > 0) return (
- <div className="mt-2 text-[10px] font-bold text-red-500 flex items-center gap-1">
- <AlertTriangle className="w-3 h-3" /> {vStat.overdueCount} Items Overdue
- </div>
- )
- })()}
+            <div className="px-4 py-4">
+                {activeVehicle ? (
+                    <>
+                        {/* Quick Stats overview top container for Ledger ONLY */}
+                        {activeTab === 'ledger' && (
+                            <div className="bg-gradient-to-br from-slate-900 to-slate-800 dark:from-indigo-900 dark:to-slate-900 rounded-3xl p-5 text-white shadow-xl shadow-slate-900/10 mb-6 relative overflow-hidden">
+                                 {/* Alert Badge if Overdue */}
+                                 {stats?.overdueCount > 0 && (
+                                     <div className="absolute top-4 right-4 bg-red-500/90 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 animate-pulse">
+                                         <ShieldAlert className="w-3 h-3" />
+                                         {stats.overdueCount} Alerts
+                                     </div>
+                                 )}
+                                 
+                                <div className="flex divide-x divide-white/10 mt-2">
+                                     <div className="flex-1 p-2 pl-0 text-left">
+                                         <p className="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider">Month Cost</p>
+                                         <p className="font-bold text-xl">₹{stats?.monthSpend.toLocaleString()}</p>
+                                     </div>
+                                     <div className="flex-1 p-2 text-center">
+                                         <p className="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider">Total Cost</p>
+                                         <p className="font-bold text-xl">₹{stats?.totalSpend.toLocaleString()}</p>
+                                     </div>
+                                     <div className="flex-1 p-2 pr-0 text-right flex flex-col items-end">
+                                         <p className="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider">Cost/Km</p>
+                                         <p className="font-bold text-xl">₹{stats?.costPerKm}</p>
+                                     </div>
+                                </div>
+                            </div>
+                        )}
 
- <div className="mt-3 pt-2 border-t border-slate-50 dark:border-slate-800 flex justify-end gap-2">
- <button
- onClick={(e) => {
- e.stopPropagation();
- setDeleteConfirmId(vehicle.id);
- }}
- className="text-red-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-wider px-2 py-1"
- >
- Delete
- </button>
- <button
- onClick={(e) => {
- e.stopPropagation();
- toggleArchiveVehicle(vehicle.id);
- }}
- className="text-slate-400 hover:text-slate-600 text-[10px] font-bold uppercase tracking-wider px-2 py-1"
- >
- {vehicle.isArchived ? 'Unarchive' : 'Archive'}
- </button>
- </div>
- </motion.div>
- );
- }))}
+                        <main className="pb-16">
+                            {activeTab === 'ledger' && (
+                                <LedgerScreen 
+                                    activeVehicle={activeVehicle}
+                                    trendData={trendData}
+                                    maxTrendCost={maxTrendCost}
+                                    stats={stats}
+                                    combinedHistory={combinedHistory}
+                                    historyFilter={historyFilter}
+                                    setHistoryFilter={setHistoryFilter}
+                                    getIcon={getIcon}
+                                    sortedVehicles={sortedVehicles}
+                                    showArchived={showArchived}
+                                    setVehicleActive={setVehicleActive}
+                                    setDeleteConfirmId={setDeleteConfirmId}
+                                    toggleArchiveVehicle={toggleArchiveVehicle}
+                                />
+                            )}
+                            
+                            {activeTab === 'service' && (
+                                <ServiceScreen 
+                                    activeVehicle={activeVehicle}
+                                    nextService={nextService}
+                                    activeTab={activeTab}
+                                />
+                            )}
+                            
+                            {activeTab === 'loan' && (
+                                <LoanScreen 
+                                    activeLoan={activeLoan}
+                                    activeVehicle={activeVehicle}
+                                    loanDetail={loanDetail}
+                                    setIsAmortizationOpen={setIsAmortizationOpen}
+                                    setIsPrepaymentOpen={setIsPrepaymentOpen}
+                                    setIsPayEMIOpen={setIsPayEMIOpen}
+                                    setIsAddLoanOpen={setIsAddLoanOpen}
+                                />
+                            )}
+                        </main>
+                        
+                        {/* Contextual FABs */}
+                        {activeTab === 'ledger' && (
+                            <button
+                                onClick={() => alert("Add Entry: Full ledger entry modal coming soon")}
+                                className="fixed bottom-[80px] right-6 bg-indigo-600 text-white px-5 py-3 rounded-2xl shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
+                            >
+                                <Plus className="w-5 h-5" /> Add Entry
+                            </button>
+                        )}
+                        {activeTab === 'service' && (
+                            <button
+                                onClick={() => alert("Add Reminder Modal Coming Soon")}
+                                className="fixed bottom-[80px] right-6 bg-blue-600 text-white px-5 py-3 rounded-2xl shadow-xl shadow-blue-600/30 flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
+                            >
+                                <Plus className="w-5 h-5" /> Add Reminder
+                            </button>
+                        )}
 
- </div>
- )}
- </div>
+                    </>
+                ) : (
+                    <div className="text-center py-12">
+                        <p className="text-slate-500">No active vehicle found.</p>
+                    </div>
+                )}
+            </div>
 
- {/* Quick Add FAB */}
- <button
- onClick={() => {
- setEditingVehicle(null);
- setIsAddOpen(true);
- }}
- className="fixed bottom-6 right-6 w-14 h-14 bg-indigo-600 text-white rounded-full shadow-xl shadow-indigo-600/30 flex items-center justify-center hover:scale-105 transition-transform z-40"
- >
- <Plus className="w-6 h-6" />
- </button>
+            {/* Internal Bottom Navigation */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 pb-safe z-40">
+                <div className="flex max-w-md mx-auto relative px-2">
+                    {[
+                        { id: 'home', icon: Home, label: 'App Home', onClick: () => navigate('/') },
+                        { id: 'ledger', icon: Wallet, label: 'Ledger', onClick: () => setActiveTab('ledger') },
+                        { id: 'service', icon: Settings, label: 'Service', onClick: () => setActiveTab('service') },
+                        { id: 'loan', icon: Landmark, label: 'Loan', onClick: () => setActiveTab('loan') }
+                    ].map(tab => {
+                        const Icon = tab.icon;
+                        const isActive = activeTab === tab.id && tab.id !== 'home';
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={tab.onClick}
+                                className={`flex-1 py-3 flex flex-col items-center justify-center gap-1 transition-colors relative ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
+                            >
+                                <Icon className={`w-5 h-5 ${isActive ? 'fill-current opacity-20' : ''}`} />
+                                <span className="text-[10px] font-bold">{tab.label}</span>
+                                {isActive && (
+                                    <motion.div 
+                                        layoutId="vehicle_nav_indicator"
+                                        className="absolute top-0 left-1/4 right-1/4 h-0.5 bg-indigo-600 rounded-b-full"
+                                    />
+                                )}
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
 
- <AddVehicleModal
- isOpen={isAddOpen}
- onClose={() => {
- setIsAddOpen(false);
- setEditingVehicle(null);
- }}
- onSave={handleSaveVehicle}
- editVehicle={editingVehicle}
- />
-
- <AddLoanModal
- isOpen={isAddLoanOpen}
- onClose={() => setIsAddLoanOpen(false)}
- onSave={handleSaveLoan}
- vehicle={activeVehicle}
- />
-
- <PayEMIModal
- isOpen={isPayEMIOpen}
- onClose={() => setIsPayEMIOpen(false)}
- onSave={handleRecordPayment}
- loan={activeLoan}
- vehicle={activeVehicle}
- loanDetail={loanDetail}
- />
-
- <AmortizationScheduleModal
- isOpen={isAmortizationOpen}
- onClose={() => setIsAmortizationOpen(false)}
- loan={activeLoan}
- />
-
- <PrepaymentCalculatorModal
- isOpen={isPrepaymentOpen}
- onClose={() => setIsPrepaymentOpen(false)}
- loan={activeLoan}
- onSavePayment={handleRecordPayment}
- />
-
- <ConfirmDialog
-     isOpen={!!deleteConfirmId}
-     onClose={() => setDeleteConfirmId(null)}
-     onConfirm={() => deleteVehicle(deleteConfirmId)}
-     title="Delete Vehicle?"
-     message="Are you sure you want to permanently delete this vehicle? All related data will be lost."
-     confirmText="Delete"
- />
- </div>
- );
+            {/* Modals */}
+             <AddVehicleModal
+                 isOpen={isAddOpen}
+                 onClose={() => {
+                     setIsAddOpen(false);
+                     setEditingVehicle(null);
+                 }}
+                 onSave={handleSaveVehicle}
+                 editVehicle={editingVehicle}
+             />
+             
+             <AddLoanModal
+                 isOpen={isAddLoanOpen}
+                 onClose={() => setIsAddLoanOpen(false)}
+                 onSave={(data) => { addLoan(data); setIsAddLoanOpen(false); }}
+                 vehicle={activeVehicle}
+             />
+             
+             <PayEMIModal
+                 isOpen={isPayEMIOpen}
+                 onClose={() => setIsPayEMIOpen(false)}
+                 onSave={handleRecordPayment}
+                 loan={activeLoan}
+                 vehicle={activeVehicle}
+                 loanDetail={loanDetail}
+             />
+             
+             <AmortizationScheduleModal
+                 isOpen={isAmortizationOpen}
+                 onClose={() => setIsAmortizationOpen(false)}
+                 loan={activeLoan}
+             />
+             
+             <PrepaymentCalculatorModal
+                 isOpen={isPrepaymentOpen}
+                 onClose={() => setIsPrepaymentOpen(false)}
+                 loan={activeLoan}
+                 onSavePayment={handleRecordPayment}
+             />
+            
+            <ConfirmDialog
+                 isOpen={!!deleteConfirmId}
+                 onClose={() => setDeleteConfirmId(null)}
+                 onConfirm={() => {
+                     deleteVehicle(deleteConfirmId);
+                     setDeleteConfirmId(null);
+                 }}
+                 title="Delete Vehicle?"
+                 message="Are you sure you want to permanently delete this vehicle? All related data will be lost."
+                 confirmText="Delete"
+            />
+            
+            <ConfirmDialog
+                 isOpen={!!archiveConfirmId}
+                 onClose={() => setArchiveConfirmId(null)}
+                 onConfirm={() => {
+                     toggleArchiveVehicle(archiveConfirmId);
+                     setArchiveConfirmId(null);
+                 }}
+                 title="Archive Vehicle?"
+                 message="Are you sure you want to archive this vehicle? It will be hidden from the main view."
+                 confirmText="Archive"
+            />
+        </div>
+    );
 };
 
 export default VehicleDashboard;

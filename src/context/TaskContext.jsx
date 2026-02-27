@@ -64,7 +64,8 @@ export const TaskContextProvider = ({ children }) => {
                 setIsLoading(false);
             },
             where('status', '==', 'pending'),
-            orderBy('createdAt', 'desc'),
+            // Removed orderBy('createdAt', 'desc') to prevent missing composite index crashing the listener. 
+            // The tasks are re-sorted client-side below.
             limit(1000)
         );
 
@@ -75,7 +76,7 @@ export const TaskContextProvider = ({ children }) => {
                 setCompletedTasks(data);
             },
             where('status', '==', 'completed'),
-            orderBy('createdAt', 'desc'),
+            // Removed orderBy('createdAt', 'desc') to prevent missing composite index crashing the listener.
             limit(completedLimit)
         );
 
@@ -308,7 +309,7 @@ export const TaskContextProvider = ({ children }) => {
     const tasks = useMemo(() => {
         const merged = [...activeTasks, ...completedTasks];
         // Re-sort in case strict time order is needed across both lists
-        return merged.sort((a, b) => b.createdAt - a.createdAt);
+        return merged.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
     }, [activeTasks, completedTasks]);
 
     const value = useMemo(() => ({
