@@ -1,7 +1,20 @@
 import TaskItem from '../../molecules/workspace/TaskItem';
 import { ClipboardList } from 'lucide-react';
 
-const TaskList = ({ tasks, onToggle, onDelete, onUpdate, isLocked, isVariant = 'default', onReschedule, onEdit }) => {
+const TaskList = ({ 
+    tasks, 
+    onToggle, 
+    onDelete, 
+    onUpdate, 
+    isLocked, 
+    isVariant = 'default', 
+    onReschedule, 
+    onEdit,
+    isSelectMode,
+    selectedTaskIds,
+    onSelect,
+    onLongPress
+}) => {
 
     if (tasks.length === 0) return null;
 
@@ -17,6 +30,10 @@ const TaskList = ({ tasks, onToggle, onDelete, onUpdate, isLocked, isVariant = '
                     onReschedule={onReschedule}
                     onDelete={onDelete}
                     onEdit={onEdit}
+                    isSelectMode={isSelectMode}
+                    isSelected={selectedTaskIds?.has(task.id)}
+                    onSelect={onSelect}
+                    onLongPress={onLongPress}
                 />
             ))}
         </div>

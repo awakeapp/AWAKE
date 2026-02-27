@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import { useData } from '../../context/DataContext';
 import { getIconComponent } from '../../utils/iconInference';
 import HabitManagerDialog from './HabitManagerDialog'; // Forced update v3
+import ConfirmDialog from './ConfirmDialog';
 
 const HabitToggle = ({ id, icon, label, value, onChange, onDelete, disabled, isEditing }) => {
     // Dynamic Icon Resolution
@@ -147,6 +148,7 @@ const DailyHabits = ({ habits, onUpdateHabit, isLocked }) => {
     const { addHabit, deleteHabit } = useData();
     const [isEditing, setIsEditing] = useState(false);
     const [showModal, setShowModal] = useState(false);
+    const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
     const handleAdd = (name, type, unit, icon) => {
         addHabit(name, type, unit, icon);
@@ -200,7 +202,7 @@ const DailyHabits = ({ habits, onUpdateHabit, isLocked }) => {
                                     value={habit.value}
                                     unit={habit.unit}
                                     onChange={(val) => onUpdateHabit(habit.id, val)}
-                                    onDelete={() => deleteHabit(habit.id)}
+                                    onDelete={() => setDeleteConfirmId(habit.id)}
                                     disabled={isLocked}
                                     isEditing={isEditing}
                                 />
@@ -212,7 +214,7 @@ const DailyHabits = ({ habits, onUpdateHabit, isLocked }) => {
                                     label={habit.label}
                                     value={habit.value}
                                     onChange={(val) => onUpdateHabit(habit.id, val)}
-                                    onDelete={() => deleteHabit(habit.id)}
+                                    onDelete={() => setDeleteConfirmId(habit.id)}
                                     disabled={isLocked}
                                     isEditing={isEditing}
                                 />
@@ -241,6 +243,15 @@ const DailyHabits = ({ habits, onUpdateHabit, isLocked }) => {
                 isOpen={showModal}
                 onClose={() => setShowModal(false)}
                 onAdd={handleAdd}
+            />
+
+            <ConfirmDialog
+                isOpen={!!deleteConfirmId}
+                onClose={() => setDeleteConfirmId(null)}
+                onConfirm={() => deleteHabit(deleteConfirmId)}
+                title="Delete Habit?"
+                message="Are you sure you want to delete this habit? It will be removed from your tracking options."
+                confirmText="Delete"
             />
         </section>
     );

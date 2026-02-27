@@ -5,6 +5,7 @@ import Button from '../atoms/Button';
 import { useData } from '../../context/DataContext';
 import { inferIcon, getIconComponent } from '../../utils/iconInference';
 import { useScrollLock } from '../../hooks/useScrollLock';
+import ConfirmDialog from './ConfirmDialog';
 
 const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
     useScrollLock(isOpen);
@@ -15,6 +16,7 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
     const [newTaskName, setNewTaskName] = useState('');
     const [newTaskTime, setNewTaskTime] = useState('');
     const [newTaskCategory, setNewTaskCategory] = useState('EVE/NIGHT');
+    const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -196,7 +198,7 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
                                     </div>
 
                                     <button
-                                        onClick={() => handleDelete(task.id)}
+                                        onClick={() => setDeleteConfirmId(task.id)}
                                         className="shrink-0 p-1.5 text-slate-300 hover:text-red-500 transition-colors"
                                         aria-label="Delete"
                                     >
@@ -299,6 +301,17 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
                     </div>
                 </motion.div>
             </div>
+
+            <ConfirmDialog
+                isOpen={!!deleteConfirmId}
+                onClose={() => setDeleteConfirmId(null)}
+                onConfirm={() => {
+                    handleDelete(deleteConfirmId);
+                }}
+                title="Delete Routine Task?"
+                message="Are you sure you want to remove this task from your routine?"
+                confirmText="Remove"
+            />
         </AnimatePresence>
     );
 };

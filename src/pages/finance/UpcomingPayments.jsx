@@ -5,6 +5,7 @@ import { format, differenceInDays, isBefore, addMonths } from 'date-fns';
 import { useTranslation } from 'react-i18next'; // Added i18n support
 import { useScrollLock } from '../../hooks/useScrollLock';
 import { useToast } from '../../context/ToastContext';
+import ConfirmDialog from '../../components/organisms/ConfirmDialog';
 
 const ICONS = [
     { icon: Zap, label: 'Utility' },
@@ -39,6 +40,7 @@ const UpcomingPayments = () => {
     const [day, setDay] = useState('');
     const [selectedIconIdx, setSelectedIconIdx] = useState(0);
     const [selectedColorIdx, setSelectedColorIdx] = useState(0);
+    const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -123,7 +125,7 @@ const UpcomingPayments = () => {
                         const daysLeft = getDaysLeft(sub.nextBillingDate || sub.dueDate);
 
                         return (
-                            <div key={sub.id} className="min-w-[160px] max-w-[200px] p-3 rounded-[1.25rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm relative group transition-all hover:border-indigo-500/50 flex flex-col gap-2">
+                            <div key={sub.id} className="min-w-[170px] max-w-[200px] p-5 rounded-[1.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm relative group transition-all hover:border-indigo-500/50 flex flex-col justify-between min-h-[120px] gap-3">
                                 {/* Action Buttons */}
                                 <div className="absolute top-2 right-2 flex gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-lg p-0.5 shadow-sm">
                                     <button
@@ -133,7 +135,7 @@ const UpcomingPayments = () => {
                                         {sub.status === 'active' ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
                                     </button>
                                     <button
-                                        onClick={(e) => { e.stopPropagation(); if(window.confirm('Delete this subscription?')) { deleteSubscription(sub.id); showToast('Subscription deleted', 'info'); } }}
+                                        onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(sub.id); }}
                                         className="p-1.5 bg-rose-50 dark:bg-rose-900/20 rounded-lg hover:bg-rose-100 transition-colors text-rose-500"
                                     >
                                         <Trash2 className="w-3 h-3" />
@@ -256,6 +258,18 @@ const UpcomingPayments = () => {
                     </div>
                 )
             }
+
+            <ConfirmDialog
+                isOpen={!!deleteConfirmId}
+                onClose={() => setDeleteConfirmId(null)}
+                onConfirm={() => {
+                    deleteSubscription(deleteConfirmId);
+                    showToast('Subscription deleted', 'info');
+                }}
+                title="Delete Subscription?"
+                message="Are you sure you want to delete this subscription? This cannot be undone."
+                confirmText="Delete"
+            />
         </div >
     );
 };

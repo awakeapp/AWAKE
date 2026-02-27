@@ -14,13 +14,13 @@ const FinanceUpcoming = () => {
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 5rem)' }}
         >
             {/* Header */}
-            <header className="sticky top-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl px-6 pt-6 pb-4">
+            <header className="fixed top-0 left-0 right-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl px-6 pt-4 pb-4">
                 <h1 className="text-xl font-bold text-slate-900 dark:text-white">Upcoming</h1>
                 <p className="text-xs text-slate-400 font-medium mt-0.5">Subscriptions & recurring bills</p>
             </header>
 
             {/* Content */}
-            <div className="px-6 flex-1">
+            <div className="px-6 flex-1 pt-24">
                 <UpcomingPayments />
             </div>
 

@@ -20,13 +20,13 @@ const EXTRA_PRAYERS = [
 ];
 
 const ModeSelector = ({ value, onChange }) => (
-    <div className="flex bg-slate-100 dark:bg-slate-800/50 rounded-lg p-0.5 gap-0.5">
+    <div className="flex bg-slate-100 dark:bg-slate-800/50 rounded-lg p-0.5 gap-0.5 pointer-events-auto">
         {['jamaah', 'alone'].map(m => (
             <button
                 key={m}
-                onClick={() => onChange(m)}
+                onClick={(e) => { e.stopPropagation(); onChange(m); }}
                 className={clsx(
-                    "px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all capitalize",
+                    "w-[58px] py-1 text-[11px] flex items-center justify-center font-semibold rounded-md transition-colors capitalize",
                     value === m
                         ? "bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400"
                         : "text-slate-500 dark:text-slate-400"
@@ -44,8 +44,10 @@ const PrayerRow = ({ prayerKey, label, time, data, onUpdate, allowMode, allowCou
     const count = data[`${prayerKey}Count`] || 0;
 
     return (
-        <div className={clsx(
-            "flex items-center justify-between py-3 px-0 transition-colors",
+        <div 
+            onClick={() => onUpdate(prayerKey, !completed)}
+            className={clsx(
+            "flex items-center min-h-[56px] justify-between py-2 px-0 transition-colors cursor-pointer select-none",
             !isLast && "border-b border-slate-100 dark:border-[#38383A]"
         )}>
             <div className="flex items-center justify-between flex-1 min-w-0 gap-2 pr-3">
@@ -67,14 +69,14 @@ const PrayerRow = ({ prayerKey, label, time, data, onUpdate, allowMode, allowCou
 
             <div className="flex items-center gap-3 shrink-0">
                 {allowCount && completed && (
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 pointer-events-auto">
                         <button
-                            onClick={() => onUpdate(`${prayerKey}Count`, Math.max(0, count - 1))}
+                            onClick={(e) => { e.stopPropagation(); onUpdate(`${prayerKey}Count`, Math.max(0, count - 1)); }}
                             className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-bold flex items-center justify-center"
                         >−</button>
                         <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 w-5 text-center">{count}</span>
                         <button
-                            onClick={() => onUpdate(`${prayerKey}Count`, count + 1)}
+                            onClick={(e) => { e.stopPropagation(); onUpdate(`${prayerKey}Count`, count + 1); }}
                             className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-bold flex items-center justify-center"
                         >+</button>
                     </div>
@@ -85,9 +87,9 @@ const PrayerRow = ({ prayerKey, label, time, data, onUpdate, allowMode, allowCou
                 
                 {/* iOS Style Toggle positioned after the prayer content */}
                 <button
-                    onClick={() => onUpdate(prayerKey, !completed)}
+                    onClick={(e) => { e.stopPropagation(); onUpdate(prayerKey, !completed); }}
                     className={clsx(
-                        "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
+                        "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none pointer-events-auto",
                         completed ? "bg-indigo-500" : "bg-slate-200 dark:bg-slate-700"
                     )}
                 >

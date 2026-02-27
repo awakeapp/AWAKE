@@ -33,19 +33,19 @@ const CounterCard = ({ title, count, target, onSave, accentClass }) => {
  const progress = target > 0 ? Math.min((count / target) * 100, 100) : 0;
 
  return (
- <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl p-5 shadow-sm relative overflow-hidden group hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
- <h3 className="text-[12px] font-bold text-slate-500 uppercase tracking-widest mb-4">{title}</h3>
+ <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm relative overflow-hidden group hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+ <h3 className="text-[12px] font-bold text-slate-500 uppercase tracking-widest mb-3">{title}</h3>
 
- <div className="flex items-end justify-between mb-5">
- <div className="flex items-baseline gap-2">
- <span className="text-5xl font-black text-black dark:text-white tabular-nums leading-none tracking-tight">{count}</span>
- {target > 0 && <span className="text-sm font-semibold text-slate-400">/ {target}</span>}
+ <div className="flex items-end justify-between mb-4">
+ <div className="flex items-baseline gap-1.5">
+ <span className="text-4xl font-black text-black dark:text-white tabular-nums leading-none tracking-tight">{count}</span>
+ {target > 0 && <span className="text-xs font-semibold text-slate-400 mb-0.5">/ {target}</span>}
  </div>
  
  <button 
  onClick={handleAddOne}
  className={clsx(
- "w-14 h-14 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform text-white",
+ "w-12 h-12 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform text-white",
  accentClass
  )}
  >
@@ -54,7 +54,7 @@ const CounterCard = ({ title, count, target, onSave, accentClass }) => {
  </div>
 
  {target > 0 && (
- <div className="w-full bg-slate-100 dark:bg-slate-800/80 rounded-full h-1.5 overflow-hidden mb-5">
+ <div className="w-full bg-slate-100 dark:bg-slate-800/80 rounded-full h-1.5 overflow-hidden mb-4">
  <div
  className={clsx("h-full rounded-full transition-all duration-300", accentClass)}
  style={{ width: `${progress}%` }}

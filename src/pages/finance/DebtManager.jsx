@@ -186,10 +186,10 @@ const DebtManager = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col pt-[env(safe-area-inset-top)]" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5rem)' }}>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col pt-[env(safe-area-inset-top)] relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5rem)' }}>
             {/* Header */}
-            <header className="sticky top-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl px-6 pt-6 pb-4">
-                <div className="flex items-center justify-between mb-6">
+            <header className="fixed top-0 left-0 right-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl px-6 pt-4 pb-4 space-y-4">
+                <div className="flex items-center justify-between">
                     <h1 className="text-xl font-bold text-slate-900 dark:text-white">Debts & Lending</h1>
                     <button onClick={() => setIsAdding(true)} className="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full transition-colors -mr-2 shadow-sm shadow-indigo-500/30">
                         <Plus className="w-5 h-5" />
@@ -197,25 +197,26 @@ const DebtManager = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-emerald-50 text-emerald-900 dark:bg-emerald-500/10 dark:text-emerald-100 p-5 rounded-[2rem] shadow-sm border border-emerald-100 dark:border-emerald-500/20">
-                        <p className="text-xs font-bold uppercase tracking-widest opacity-80 mb-2">Net Receivable</p>
-                        <h2 className="text-2xl font-black">₹{totalReceivable.toLocaleString()}</h2>
+                    <div className="bg-emerald-50 text-emerald-900 dark:bg-emerald-500/10 dark:text-emerald-100 p-4 rounded-[1.5rem] shadow-sm border border-emerald-100 dark:border-emerald-500/20">
+                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Receivable</p>
+                        <h2 className="text-xl font-black">₹{totalReceivable.toLocaleString()}</h2>
                     </div>
-                    <div className="bg-red-50 text-red-900 dark:bg-red-500/10 dark:text-red-100 p-5 rounded-[2rem] shadow-sm border border-red-100 dark:border-red-500/20">
-                        <p className="text-xs font-bold uppercase tracking-widest opacity-80 mb-2">Net Payable</p>
-                        <h2 className="text-2xl font-black">₹{totalPayable.toLocaleString()}</h2>
+                    <div className="bg-red-50 text-red-900 dark:bg-red-500/10 dark:text-red-100 p-4 rounded-[1.5rem] shadow-sm border border-red-100 dark:border-red-500/20">
+                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Payable</p>
+                        <h2 className="text-xl font-black">₹{totalPayable.toLocaleString()}</h2>
                     </div>
+                </div>
+
+                {/* Search - Moved inside Header to prevent going under it */}
+                <div className="relative">
+                    <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search parties..." className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-3 pl-11 pr-4 text-sm font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 shadow-sm" />
+                    <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                 </div>
             </header>
 
-            <div className="px-6 flex-1 flex flex-col space-y-4">
+            <div className="px-6 flex-1 flex flex-col pt-60 sm:pt-64">
 
 
-                {/* Search */}
-                <div className="relative">
-                    <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search parties..." className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500" />
-                    <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                </div>
 
                 <div className="space-y-3 pb-8">
                     {partyData.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || (p.tag && p.tag.toLowerCase().includes(searchQuery.toLowerCase()))).length === 0 ? (
@@ -252,16 +253,16 @@ const DebtManager = () => {
                                             {party.name[0].toUpperCase()}
                                         </div>
                                         <div>
-                                            <div className="flex items-center gap-2">
-                                                <p className="font-bold text-slate-900 dark:text-white capitalize truncate max-w-[110px] sm:max-w-[170px]">{party.name}</p>
-                                                <span className={`text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full ${badge.cls}`}>{badge.label}</span>
+                                            <div className="flex flex-col">
+                                                <p className="font-black text-lg text-slate-900 dark:text-white capitalize truncate max-w-[140px] sm:max-w-[200px] leading-tight">{party.name}</p>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg ${badge.cls}`}>{badge.label}</span>
+                                                    {party.tag && (
+                                                        <span className="text-[9px] bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-lg uppercase tracking-wider text-slate-500 font-black">{party.tag}</span>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <div className="flex flex-wrap items-center gap-1.5 mt-1">
-                                                {party.tag && (
-                                                    <span className="text-[10px] bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded uppercase tracking-wider text-slate-500 font-bold">{party.tag}</span>
-                                                )}
-                                                <span className="text-xs text-slate-400 font-medium">Updated {new Date(party.lastTxDate).toLocaleDateString()}</span>
-                                            </div>
+                                            <p className="text-[10px] text-slate-400 font-bold mt-1.5 uppercase tracking-wide">Updated {new Date(party.lastTxDate).toLocaleDateString()}</p>
                                         </div>
                                     </div>
 

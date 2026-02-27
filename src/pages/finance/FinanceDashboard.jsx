@@ -112,11 +112,11 @@ const FinanceDashboard = () => {
 
     return (
         <div 
-            className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col pt-[env(safe-area-inset-top)]"
+            className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col pt-[env(safe-area-inset-top)] relative"
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5rem)' }}
         >
             {/* Header Area */}
-            <header className="sticky top-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl px-6 pt-6 pb-4">
+            <header className="fixed top-0 left-0 right-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl px-6 pt-6 pb-4">
                 <div className="grid grid-cols-3 items-center mb-6">
                     <h1 className="text-xl font-bold text-slate-900 dark:text-white">Finance</h1>
                     
@@ -199,7 +199,7 @@ const FinanceDashboard = () => {
                 </motion.div>
             </header>
 
-            <div className="px-6 flex-1 flex flex-col space-y-5">
+            <div className="px-6 flex-1 flex flex-col space-y-5 pt-80 min-[400px]:pt-[380px]">
 
                 {/* Quick Actions — Analytics & Budget */}
                 <div className="grid grid-cols-2 gap-3">

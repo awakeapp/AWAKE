@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Clock, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, AlertCircle, X, MoreHorizontal, ArrowUpDown, ListTodo, Layout, Settings, Edit2 } from 'lucide-react';
+import { Clock, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, AlertCircle, X, MoreHorizontal, ArrowUpDown, ListTodo, Layout, Settings, Edit2, Trash2, CheckSquare } from 'lucide-react';
 import { useTasks } from '../../context/TaskContext';
 import TaskList from '../../components/organisms/workspace/TaskList';
 import AddTaskModal from '../../components/molecules/workspace/AddTaskModal';
@@ -10,6 +10,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 import DateHeader from '../../components/organisms/DateHeader';
+import ConfirmDialog from '../../components/organisms/ConfirmDialog';
 
 const TaskDashboard = () => {
  const { t: translate } = useTranslation(); // Enable translations
@@ -60,6 +61,38 @@ const TaskDashboard = () => {
  const [sortMode, setSortMode] = useState(() => {
  return localStorage.getItem('awake_task_sort') || 'default';
  });
+
+ // Selection and Deletion State
+ const [isSelectMode, setIsSelectMode] = useState(false);
+ const [selectedTaskIds, setSelectedTaskIds] = useState(new Set());
+ const [deleteConfirmIds, setDeleteConfirmIds] = useState([]);
+
+ const handleLongPress = (id) => {
+     setIsSelectMode(true);
+     setSelectedTaskIds(new Set([id]));
+ };
+
+ const handleSelect = (id) => {
+     const next = new Set(selectedTaskIds);
+     if (next.has(id)) {
+         next.delete(id);
+         if (next.size === 0) setIsSelectMode(false);
+     } else {
+         next.add(id);
+     }
+     setSelectedTaskIds(next);
+ };
+
+ const executeDelete = async () => {
+     try {
+         const promises = deleteConfirmIds.map(id => deleteTask(id));
+         await Promise.all(promises);
+         setSelectedTaskIds(new Set());
+         setIsSelectMode(false);
+     } catch (err) {
+         console.error("Failed to delete tasks:", err);
+     }
+ };
 
  const handleSortChange = (mode) => {
  setSortMode(mode);
@@ -146,7 +179,7 @@ const TaskDashboard = () => {
  const [isPickerOpen, setIsPickerOpen] = useState(false);
 
  return (
- <div className="pb-24 h-full relative" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 92px)' }}>
+ <div className="pb-24 h-full relative" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 84px)' }}>
  {/* ── FIXED TODO HEADER BAR ── */}
  <div 
  className="fixed top-0 left-0 right-0 z-40 bg-slate-50/90 dark:bg-[#020617]/90 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 transition-all duration-300"
@@ -156,6 +189,27 @@ const TaskDashboard = () => {
  }}
  >
  <div className="max-w-md mx-auto w-full px-4">
+ {isSelectMode ? (
+     <div className="flex items-center justify-between min-h-[72px] py-2 gap-2">
+         <div className="flex items-center gap-3">
+             <button
+                 onClick={() => { setIsSelectMode(false); setSelectedTaskIds(new Set()); }}
+                 className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+             >
+                 <X className="w-6 h-6" />
+             </button>
+             <span className="text-xl font-black uppercase tracking-wide text-slate-900 dark:text-white">
+                 {selectedTaskIds.size} Selected
+             </span>
+         </div>
+         <button
+             onClick={() => setDeleteConfirmIds(Array.from(selectedTaskIds))}
+             className="flex items-center justify-center p-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all font-bold tracking-wide uppercase text-sm"
+         >
+             <Trash2 className="w-5 h-5 mr-1" /> Delete
+         </button>
+     </div>
+ ) : (
  <DateHeader 
  allowFuture={true}
  dateStateOverride={{
@@ -274,7 +328,7 @@ const TaskDashboard = () => {
  </div>
  </div>
  }
- />
+ />)}
  </div>
  </div>
 
@@ -286,7 +340,7 @@ const TaskDashboard = () => {
  <TaskList
  tasks={currentTasks}
  onToggle={toggleTask}
- onDelete={deleteTask}
+ onDelete={(id) => setDeleteConfirmIds([id])}
  onUpdate={updateTask}
  onEdit={(task) => {
  setEditingTask(task);
@@ -294,6 +348,10 @@ const TaskDashboard = () => {
  }}
  isLocked={isLocked}
  onReschedule={handleReschedule}
+ isSelectMode={isSelectMode}
+ selectedTaskIds={selectedTaskIds}
+ onSelect={handleSelect}
+ onLongPress={handleLongPress}
  />
  ) : (
  <div className="text-center py-12 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
@@ -321,7 +379,7 @@ const TaskDashboard = () => {
  <TaskList
  tasks={pendingTasks}
  onToggle={toggleTask}
- onDelete={deleteTask}
+ onDelete={(id) => setDeleteConfirmIds([id])}
  onUpdate={updateTask}
  onEdit={(task) => {
  setEditingTask(task);
@@ -330,6 +388,10 @@ const TaskDashboard = () => {
  isLocked={false}
  onReschedule={handleReschedule}
  isVariant="carry_over"
+ isSelectMode={isSelectMode}
+ selectedTaskIds={selectedTaskIds}
+ onSelect={handleSelect}
+ onLongPress={handleLongPress}
  />
  <button
      onClick={() => {
@@ -364,6 +426,15 @@ const TaskDashboard = () => {
  <TaskSettingsModal 
  isOpen={isSettingsOpen} 
  onClose={() => setIsSettingsOpen(false)} 
+ />
+
+ <ConfirmDialog
+     isOpen={deleteConfirmIds.length > 0}
+     onClose={() => setDeleteConfirmIds([])}
+     onConfirm={executeDelete}
+     title={deleteConfirmIds.length > 1 ? `Delete ${deleteConfirmIds.length} tasks?` : "Delete task?"}
+     message={deleteConfirmIds.length > 1 ? "Are you sure you want to delete the selected tasks? This action cannot be undone." : "Are you sure you want to delete this task? This action cannot be undone."}
+     confirmText="Delete"
  />
  </div>
  );

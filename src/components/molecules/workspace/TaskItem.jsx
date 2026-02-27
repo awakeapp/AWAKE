@@ -5,12 +5,12 @@ import ToggleSwitch from '../../atoms/ToggleSwitch';
 import ThreeStateCheckbox from '../../atoms/ThreeStateCheckbox';
 import { inferIcon, getIconComponent } from '../../../utils/iconInference';
 import clsx from 'clsx';
-import { Clock, ArrowUp, Trash2, Calendar as CalendarIcon, Tag, Info, Edit2 } from 'lucide-react';
+import { Clock, ArrowUp, Trash2, Calendar as CalendarIcon, Tag, Info, Check } from 'lucide-react';
 import { useSettings } from '../../../context/SettingsContext';
 import JumpDateModal from '../../organisms/JumpDateModal';
 import { format } from 'date-fns';
 
-const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', onReschedule, onDelete, isRoutine = false, onEdit }) => {
+const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', onReschedule, onDelete, isRoutine = false, onEdit, isSelectMode = false, isSelected = false, onSelect, onLongPress }) => {
     // Safely handle missing name/title
     const displayTitle = task.name || task.title || 'Untitled';
 
@@ -49,6 +49,25 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
         }
     };
 
+    // Long press logic
+    const timerRef = useRef(null);
+
+    const handlePointerDown = (e) => {
+        if (isSelectMode) return;
+        timerRef.current = setTimeout(() => {
+            if (onLongPress) {
+                if (navigator.vibrate) navigator.vibrate(50);
+                onLongPress(task.id);
+            }
+        }, 500);
+    };
+
+    const handlePointerUpOrLeave = () => {
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+        }
+    };
+
     return (
         <motion.div
             layout
@@ -56,8 +75,21 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
             animate={{ opacity: isCompleted ? 0.6 : 1 }}
             transition={{ duration: 0.2 }} // Faster enter/layout
             whileHover={{ y: -2 }}
+            onClick={(e) => {
+                if (isSelectMode && onSelect) {
+                    onSelect(task.id);
+                } else if (onEdit && !isCarryOver) {
+                    onEdit(task);
+                }
+            }}
+            onMouseDown={handlePointerDown}
+            onMouseUp={handlePointerUpOrLeave}
+            onMouseLeave={handlePointerUpOrLeave}
+            onTouchStart={handlePointerDown}
+            onTouchEnd={handlePointerUpOrLeave}
             className={clsx(
-                "group relative flex items-center gap-2.5 sm:gap-3 p-2.5 rounded-2xl border transition-all duration-200", 
+                "group relative flex items-center gap-2.5 sm:gap-3 p-2.5 rounded-2xl border transition-all duration-200 cursor-pointer active:scale-[0.98]", 
+                isSelected ? "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800" :
                 isCarryOver
                     ? "bg-orange-50/40 dark:bg-orange-950/20 border-orange-100/50 dark:border-orange-900/30"
                     : isCompleted
@@ -93,22 +125,17 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                 {/* 2. ICON - Styled with depth */}
                 <div className={clsx(
                     "flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center transition-colors duration-200",
+                    isSelectMode && isSelected ? "bg-indigo-600 text-white shadow-md ring-2 ring-indigo-500/30 ring-offset-1 dark:ring-offset-slate-900" :
                     isCarryOver
                         ? "bg-orange-100 dark:bg-orange-900/30 text-orange-500 shadow-sm"
                         : isCompleted
                             ? "bg-slate-100 dark:bg-slate-800 text-slate-400"
                             : "bg-indigo-50/80 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 shadow-sm"
                 )}>
-                    <IconComponent className="w-4 h-4 sm:w-5 sm:h-5" />
+                    {isSelectMode && isSelected ? <Check className="w-5 h-5" strokeWidth={3} /> : <IconComponent className="w-4 h-4 sm:w-5 sm:h-5" />}
                 </div>
 
-                <div 
-                    className="flex flex-col flex-1 min-w-0 cursor-pointer active:opacity-60 transition-opacity"
-                    onClick={(e) => {
-                        // Prevent edit if clicking on the description info icon (handled by its own button)
-                        if (onEdit && !isCarryOver) onEdit(task);
-                    }}
-                >
+                <div className="flex flex-col flex-1 min-w-0 transition-opacity">
                     <div className="flex items-start gap-2 w-full">
                         {task.description && (
                             <div className="relative">
@@ -178,12 +205,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                         </div>
                     )}
 
-                    {/* Edit Icon Overlay */}
-                    {!isCarryOver && onEdit && (
-                        <div className="absolute inset-y-0 right-10 flex items-center pr-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                           <Edit2 className="w-4 h-4 text-slate-300 dark:text-slate-600" />
-                        </div>
-                    )}
+                    {/* Removed Edit Icon Overlay as requested */}
 
                     {isCarryOver && (
                         <div className="flex items-center gap-2 mt-0.5">
@@ -196,15 +218,27 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
             </div>
 
             {/* 4. ACTIONS */}
-            <div className="flex-shrink-0 flex items-start mt-1 gap-1.5 sm:gap-2 pl-1">
+            <div className="flex-shrink-0 flex items-start mt-1 gap-1.5 sm:gap-2 pl-1" onClick={(e) => isSelectMode && e.stopPropagation()}>
+                {/* Checkbox for Select Mode */}
+                {isSelectMode ? (
+                    <div className="px-2 py-2 flex items-center justify-center">
+                        <div className={clsx(
+                            "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all",
+                            isSelected ? "border-indigo-600 bg-indigo-600 dark:border-indigo-500 dark:bg-indigo-500" : "border-slate-300 dark:border-slate-600"
+                        )}>
+                            {isSelected && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
+                        </div>
+                    </div>
+                ) : (
+                <>
                 {/* DATE SELECTOR BUTTON */}
                 {!isLocked && !isCompleted && !isRoutine && (
                     <div className="relative">
                         <button
                             onClick={handleToggleDatePicker}
                             className={clsx(
-                                "p-1.5 rounded-lg transition-colors duration-150 z-20 relative active:bg-slate-100 dark:active:bg-slate-800",
-                                isDatePickerOpen ? "text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20" : "text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                                "p-2 rounded-xl transition-colors duration-150 z-20 relative active:bg-slate-100 dark:active:bg-slate-800",
+                                isDatePickerOpen ? "text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20" : "text-slate-400 hover:text-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-800"
                             )}
                             title="Reschedule Task"
                         >
@@ -244,17 +278,27 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                     </div>
                 )}
 
+                {!isLocked && !isRoutine && !isCarryOver && onDelete && (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
+                        className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                        title="Delete"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                    </button>
+                )}
+
                 {isCarryOver ? (
                     <div className="flex items-center gap-1.5">
                         <button
-                            onClick={() => onReschedule && onReschedule(task.id, 'today')}
+                            onClick={(e) => { e.stopPropagation(); onReschedule && onReschedule(task.id, 'today'); }}
                             className="p-2 text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 rounded-xl transition-colors active:bg-indigo-200 dark:active:bg-indigo-900/60 duration-150"
                             title="Assign to Today"
                         >
                             <ArrowUp className="w-4 h-4" />
                         </button>
                         <button
-                            onClick={() => onDelete && onDelete(task.id)}
+                            onClick={(e) => { e.stopPropagation(); onDelete && onDelete(task.id); }}
                             className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors active:bg-red-100 dark:active:bg-red-900/40 duration-150"
                             title="Remove"
                         >
@@ -266,20 +310,23 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                         {isRoutine ? (
                             <ToggleSwitch
                                 status={isCompleted ? 'checked' : task.status || 'unchecked'}
-                                onClick={() => onUpdateStatus(task.id)}
+                                onClick={(e) => { e.stopPropagation(); onUpdateStatus(task.id); }}
                                 disabled={isLocked}
                             />
                         ) : (
-                            <div className="scale-90 opacity-90 transition-all hover:scale-100 hover:opacity-100">
+                            <div 
+                                className="scale-90 opacity-90 transition-all hover:scale-100 hover:opacity-100"
+                                onClick={(e) => { e.stopPropagation(); onUpdateStatus(task.id); }}
+                            >
                                 <ThreeStateCheckbox
                                     status={isCompleted ? 'checked' : task.status || 'unchecked'}
-                                    onClick={() => onUpdateStatus(task.id)}
                                     disabled={isLocked}
                                 />
                             </div>
                         )}
                     </div>
                 )}
+                </>)}
             </div>
         </motion.div>
     );

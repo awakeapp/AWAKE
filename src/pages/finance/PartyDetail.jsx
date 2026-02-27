@@ -8,6 +8,7 @@ import JumpDateModal from '../../components/organisms/JumpDateModal';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useToast } from '../../context/ToastContext';
+import ConfirmDialog from '../../components/organisms/ConfirmDialog';
 
 const TRANSACTION_TYPES = [
     { id: 'you_gave', label: 'You Gave', color: 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400', sign: '+' },
@@ -139,6 +140,7 @@ const PartyDetail = () => {
     const [dueDatePickerOpen, setDueDatePickerOpen] = useState(false);
     const [dueDateManuallySet, setDueDateManuallySet] = useState(false);
     const [editTransactionId, setEditTransactionId] = useState(null);
+    const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
     // --- Settlement states ---
     const [isSettleOpen, setIsSettleOpen] = useState(false);
@@ -572,11 +574,10 @@ const PartyDetail = () => {
                         <ArrowLeft className="w-5 h-5" />
                     </button>
                     <div className="flex flex-col items-center">
-                        <h1 className="text-lg font-black text-slate-900 dark:text-white truncate max-w-[180px] tracking-tight">{party.name}</h1>
-                        <span className={`text-[8px] font-black uppercase tracking-[0.2em] px-2.5 py-0.5 rounded-full mt-0.5 ${statusBadge.cls}`}>{statusBadge.label}</span>
+                        <h1 className="text-2xl font-black text-slate-900 dark:text-white truncate max-w-[240px] tracking-tight">{party.name}</h1>
                     </div>
-                    <div className="w-9 h-9 border border-slate-200 dark:border-slate-800 rounded-full flex items-center justify-center -mr-1 shadow-sm">
-                        <span className="font-bold text-slate-700 dark:text-slate-300 text-sm">{party.name?.[0]?.toUpperCase()}</span>
+                    <div className={`px-4 py-1.5 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-sm ${statusBadge.cls}`}>
+                        {statusBadge.label}
                     </div>
                 </div>
 
@@ -760,12 +761,7 @@ const PartyDetail = () => {
                                                     </button>
                                                 )}
                                                 {!locked && (
-                                                    <button onClick={() => {
-                                                        if (window.confirm('Delete this entry? This cannot be undone.')) {
-                                                            softDeleteDebtTransaction(tx.id);
-                                                            showToast('Entry deleted', 'info');
-                                                        }
-                                                    }} className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg text-red-400 hover:text-red-500 transition-colors">
+                                                    <button onClick={() => setDeleteConfirmId(tx.id)} className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg text-red-400 hover:text-red-500 transition-colors">
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
                                                 )}
@@ -778,6 +774,18 @@ const PartyDetail = () => {
                     )}
                 </div>
             </div>
+
+            <ConfirmDialog
+                isOpen={!!deleteConfirmId}
+                onClose={() => setDeleteConfirmId(null)}
+                onConfirm={() => {
+                    softDeleteDebtTransaction(deleteConfirmId);
+                    showToast('Entry deleted', 'info');
+                }}
+                title="Delete Entry?"
+                message="Are you sure you want to delete this entry? This action cannot be undone."
+                confirmText="Delete"
+            />
 
             {/* ========== New Entry Modal ========== */}
             <AnimatePresence>

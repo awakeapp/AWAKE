@@ -8,6 +8,7 @@ import { FirestoreService } from '../../services/firestore-service';
 import JumpDateModal from '../../components/organisms/JumpDateModal';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import { useToast } from '../../context/ToastContext';
+import ConfirmDialog from '../../components/organisms/ConfirmDialog';
 
 const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDelete, initialType = 'expense' }) => {
     useScrollLock(isOpen);
@@ -24,6 +25,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
     const [datePickerOpen, setDatePickerOpen] = useState(false);
     const [duplicateWarning, setDuplicateWarning] = useState(null);
     const [validationError, setValidationError] = useState('');
+    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const { showToast } = useToast();
 
     useEffect(() => {
@@ -305,12 +307,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                                 {editTransactionId && (
                                     <button
                                         type="button"
-                                        onClick={() => {
-                                            if (window.confirm('Erase this record from history?')) {
-                                                onDelete ? onDelete(editTransactionId) : deleteTransaction(editTransactionId);
-                                                onClose();
-                                            }
-                                        }}
+                                        onClick={() => setDeleteConfirmOpen(true)}
                                         className="w-16 h-16 bg-rose-50 dark:bg-rose-900/10 text-rose-500 rounded-2xl flex items-center justify-center active:scale-95 transition-all"
                                     ><Trash className="w-6 h-6" /></button>
                                 )}
@@ -325,6 +322,18 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                     </motion.div>
                 </div>
             )}
+
+            <ConfirmDialog
+                isOpen={deleteConfirmOpen}
+                onClose={() => setDeleteConfirmOpen(false)}
+                onConfirm={() => {
+                    onDelete ? onDelete(editTransactionId) : deleteTransaction(editTransactionId);
+                    onClose();
+                }}
+                title="Delete Transaction?"
+                message="Are you sure you want to erase this record from history? This action cannot be undone."
+                confirmText="Erase"
+            />
         </AnimatePresence>
     );
 };

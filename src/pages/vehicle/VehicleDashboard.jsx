@@ -16,6 +16,7 @@ import PrepaymentCalculatorModal from './PrepaymentCalculatorModal';
 import FollowUpList from '../../components/organisms/vehicle/FollowUpList';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
+import ConfirmDialog from '../../components/organisms/ConfirmDialog';
 
 const VehicleDashboard = () => {
  const navigate = useNavigate();
@@ -49,6 +50,7 @@ const VehicleDashboard = () => {
  const [isPrepaymentOpen, setIsPrepaymentOpen] = useState(false);
  const [historyFilter, setHistoryFilter] = useState('All');
  const [historySort, setHistorySort] = useState('date_desc');
+ const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
  const activeVehicle = getActiveVehicle();
  const stats = activeVehicle ? getVehicleStats(activeVehicle.id) : null;
@@ -791,9 +793,7 @@ const VehicleDashboard = () => {
  <button
  onClick={(e) => {
  e.stopPropagation();
- if (window.confirm('Are you sure you want to permanently delete this vehicle?')) {
- deleteVehicle(vehicle.id);
- }
+ setDeleteConfirmId(vehicle.id);
  }}
  className="text-red-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-wider px-2 py-1"
  >
@@ -865,6 +865,15 @@ const VehicleDashboard = () => {
  onClose={() => setIsPrepaymentOpen(false)}
  loan={activeLoan}
  onSavePayment={handleRecordPayment}
+ />
+
+ <ConfirmDialog
+     isOpen={!!deleteConfirmId}
+     onClose={() => setDeleteConfirmId(null)}
+     onConfirm={() => deleteVehicle(deleteConfirmId)}
+     title="Delete Vehicle?"
+     message="Are you sure you want to permanently delete this vehicle? All related data will be lost."
+     confirmText="Delete"
  />
  </div>
  );
