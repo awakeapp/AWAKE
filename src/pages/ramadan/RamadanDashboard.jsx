@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRamadan } from '../../context/RamadanContext';
 import { usePrayer } from '../../context/PrayerContext';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, Circle, Edit3, Settings, MapPin } from 'lucide-react';
+import { CheckCircle2, Circle, Edit3, MoreHorizontal, MapPin } from 'lucide-react';
 import clsx from 'clsx';
 import NotificationSettings from '../../components/ramadan/NotificationSettings';
 import PrayerTracker from '../../components/ramadan/PrayerTracker';
@@ -209,40 +209,31 @@ const RamadanDashboard = () => {
         <div className="pb-12">
             <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
             
-            <header className="flex flex-col mb-6 pt-4">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-[28px] font-bold tracking-tight text-black dark:text-white">Ramadan Track</h1>
-                    <button 
-                        onClick={() => navigate('/ramadan/settings')}
-                        className="p-2 -mr-2 text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors"
-                    >
-                        <Settings className="w-6 h-6" />
-                    </button>
-                </div>
-                {displayName && (
-                    <div className="mt-1 flex items-center justify-between">
-                        <div 
-                            onClick={() => setIsLocationModalOpen(true)}
-                            className="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"
-                        >
-                            <MapPin className="w-4 h-4 text-emerald-500 shrink-0" />
-                            <div className="flex flex-col min-w-0">
-                                <span className="text-[14px] font-bold text-slate-900 dark:text-white leading-none">
+            {/* Header */}
+            <header className="sticky top-0 z-30 bg-slate-50/80 dark:bg-black/80 backdrop-blur-md border-b border-slate-200 dark:border-white/5 -mx-4 px-4 mb-6" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+                <div className="py-3 flex items-center justify-between">
+                    <div>
+                        <h1 className="text-[20px] font-bold tracking-tight text-slate-900 dark:text-white">Ramadan Track</h1>
+                        {displayName && (
+                            <div 
+                                onClick={() => setIsLocationModalOpen(true)}
+                                className="flex items-center gap-1 cursor-pointer"
+                            >
+                                <MapPin className="w-3 h-3 text-emerald-500 shrink-0" />
+                                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate max-w-[120px]">
                                     {displayName.split(',')[0]}
                                 </span>
-                                <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-[150px]">
-                                    {displayName.split(',').slice(1).join(',').trim()}
-                                </span>
                             </div>
-                        </div>
-                        <button 
-                            onClick={() => setIsLocationModalOpen(true)}
-                            className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest ml-4 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 px-2 py-1 rounded-md"
-                        >
-                            Change
-                        </button>
+                        )}
                     </div>
-                )}
+                    
+                    <button 
+                        onClick={() => navigate('/ramadan/settings')}
+                        className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 active:scale-95 transition-all shadow-sm"
+                    >
+                        <MoreHorizontal className="w-5 h-5" />
+                    </button>
+                </div>
             </header>
 
             <div className="space-y-6">

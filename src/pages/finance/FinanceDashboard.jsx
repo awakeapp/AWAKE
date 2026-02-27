@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
 import * as LucideIcons from 'lucide-react';
-import { Plus, ChevronLeft, ChevronRight, TrendingUp, PieChart, Menu } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, TrendingUp, PieChart, MoreHorizontal } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, isWithinInterval, subMonths, addMonths } from 'date-fns';
 import { useState, useMemo } from 'react';
 import AddTransactionModal from './AddTransactionModal';
@@ -136,7 +136,7 @@ const FinanceDashboard = () => {
                         onClick={() => navigate('/finance/more')}
                         className="p-2 rounded-xl transition-all bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 justify-self-end"
                     >
-                        <Menu className="w-5 h-5" />
+                        <MoreHorizontal className="w-5 h-5" />
                     </button>
                 </div>
             </header>

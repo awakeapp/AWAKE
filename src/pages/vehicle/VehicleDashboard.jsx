@@ -223,9 +223,9 @@ const VehicleDashboard = () => {
                     <div>
                         <button 
                             onClick={() => navigate('/vehicle/more')}
-                            className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-300"
+                            className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 active:scale-95 transition-all shadow-sm"
                         >
-                            <MoreVertical className="w-5 h-5" />
+                            <MoreHorizontal className="w-5 h-5" />
                         </button>
                     </div>
                 </div>
