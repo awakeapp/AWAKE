@@ -1,7 +1,8 @@
 /**
  * exportUtils.js
- * Generates and triggers CSV file downloads for the Data Export feature.
+ * Generates and triggers CSV/XLSX file downloads for the Data Export feature.
  */
+import * as XLSX from 'xlsx';
 
 // ─────────────── helpers ───────────────
 
@@ -31,21 +32,34 @@ function buildCSV(headers, keys, rows) {
 }
 
 /**
- * Triggers a browser download for a CSV string.
- * @param {string} csv       - CSV content
- * @param {string} filename  - Download filename (without extension)
+ * Triggers a browser download for a CSV or XLSX file.
+ * @param {string|Object[]} data - Content or rows
+ * @param {string} filename      - Download filename
+ * @param {string} format        - 'csv' or 'xlsx'
+ * @param {string[]} headers     - For CSV matching
+ * @param {string[]} keys        - For CSV matching
  */
-function downloadCSV(csv, filename) {
-    // UTF-8 BOM so Excel opens without encoding issues
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `${filename}_${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+function downloadFile(data, filename, format = 'csv', headers = [], keys = []) {
+    const timestamp = new Date().toISOString().slice(0, 10);
+    const finalFilename = `${filename}_${timestamp}`;
+
+    if (format === 'xlsx') {
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+        XLSX.writeFile(workbook, `${finalFilename}.xlsx`);
+    } else {
+        const csv = buildCSV(headers, keys, data);
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `${finalFilename}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
 }
 
 // ─────────────── exporters ───────────────
@@ -55,106 +69,82 @@ function downloadCSV(csv, filename) {
  * Each row = one task from one day.
  * @param {Function} getAllHistory  - from DataContext
  */
-export async function exportRoutineData(getAllHistory) {
+export async function exportRoutineData(getAllHistory, format = 'csv') {
     const history = await getAllHistory();
-
     const rows = [];
     for (const day of history) {
         for (const task of (day.data?.tasks || [])) {
             rows.push({
-                date: day.data?.date || day.date || '',
-                taskName: task.name || '',
-                category: task.category || '',
-                time: task.time || '',
-                status: task.status || '',
+                Date: day.data?.date || day.date || '',
+                'Task Name': task.name || '',
+                Category: task.category || '',
+                Time: task.time || '',
+                Status: task.status || '',
             });
         }
     }
 
-    if (rows.length === 0) {
-        throw new Error('No routine data found to export.');
-    }
+    if (rows.length === 0) throw new Error('No routine data found to export.');
 
     const headers = ['Date', 'Task Name', 'Category', 'Scheduled Time', 'Status'];
-    const keys = ['date', 'taskName', 'category', 'time', 'status'];
-    downloadCSV(buildCSV(headers, keys, rows), 'routine_export');
+    const keys = ['Date', 'Task Name', 'Category', 'Time', 'Status'];
+    downloadFile(rows, 'routine_export', format, headers, keys);
 }
 
-/**
- * Exports To-Do workspace tasks.
- * @param {Object[]} tasks  - from TaskContext
- */
-export function exportTodoData(tasks) {
-    if (!tasks || tasks.length === 0) {
-        throw new Error('No Todo tasks found to export.');
-    }
+export function exportTodoData(tasks, format = 'csv') {
+    if (!tasks || tasks.length === 0) throw new Error('No Todo tasks found to export.');
 
     const rows = tasks.map(t => ({
-        title: t.title || '',
-        status: t.status || '',
-        priority: t.priority || '',
-        category: t.category || '',
-        date: t.date || '',
-        dueDate: t.dueDate || '',
-        description: t.description || '',
-        estimatedTime: t.estimatedTime ? `${t.estimatedTime} min` : '',
+        Title: t.title || '',
+        Status: t.status || '',
+        Priority: t.priority || '',
+        Category: t.category || '',
+        Date: t.date || '',
+        'Due Date': t.dueDate || '',
+        Description: t.description || '',
+        'Est Time': t.estimatedTime ? `${t.estimatedTime} min` : '',
     }));
 
-    const headers = ['Title', 'Status', 'Priority', 'Category', 'Date', 'Due Date', 'Description', 'Estimated Time'];
-    const keys = ['title', 'status', 'priority', 'category', 'date', 'dueDate', 'description', 'estimatedTime'];
-    downloadCSV(buildCSV(headers, keys, rows), 'todo_export');
+    const headers = ['Title', 'Status', 'Priority', 'Category', 'Date', 'Due Date', 'Description', 'Est Time'];
+    const keys = ['Title', 'Status', 'Priority', 'Category', 'Date', 'Due Date', 'Description', 'Est Time'];
+    downloadFile(rows, 'todo_export', format, headers, keys);
 }
 
-/**
- * Exports all Finance transactions with category name lookup.
- * @param {Object[]} transactions  - from FinanceContext
- * @param {Object[]} categories    - from FinanceContext
- * @param {Object[]} accounts      - from FinanceContext
- */
-export function exportFinanceData(transactions, categories, accounts) {
-    if (!transactions || transactions.length === 0) {
-        throw new Error('No financial transactions found to export.');
-    }
+export function exportFinanceData(transactions, categories, accounts, format = 'csv') {
+    if (!transactions || transactions.length === 0) throw new Error('No transactions found.');
 
     const catMap = Object.fromEntries(categories.map(c => [c.id, c.name]));
     const accMap = Object.fromEntries(accounts.map(a => [a.id, a.name]));
 
     const rows = transactions.map(t => ({
-        date: t.date ? new Date(t.date).toLocaleDateString('en-CA') : '',
-        type: t.type || '',
-        amount: t.amount || 0,
-        category: catMap[t.categoryId] || t.categoryId || '',
-        account: accMap[t.accountId] || t.accountId || '',
-        description: t.description || t.note || '',
+        Date: t.date ? new Date(t.date).toLocaleDateString('en-CA') : '',
+        Type: t.type || '',
+        Amount: t.amount || 0,
+        Category: catMap[t.categoryId] || t.categoryId || '',
+        Account: accMap[t.accountId] || t.accountId || '',
+        Description: t.description || t.note || '',
     }));
 
-    const headers = ['Date', 'Type', 'Amount (₹)', 'Category', 'Account', 'Description'];
-    const keys = ['date', 'type', 'amount', 'category', 'account', 'description'];
-    downloadCSV(buildCSV(headers, keys, rows), 'finance_export');
+    const headers = ['Date', 'Type', 'Amount', 'Category', 'Account', 'Description'];
+    const keys = ['Date', 'Type', 'Amount', 'Category', 'Account', 'Description'];
+    downloadFile(rows, 'finance_export', format, headers, keys);
 }
 
-/**
- * Exports Vehicle service records with vehicle name lookup.
- * @param {Object[]} serviceRecords  - from VehicleContext
- * @param {Object[]} vehicles        - from VehicleContext
- */
-export function exportVehicleData(serviceRecords, vehicles) {
-    if (!serviceRecords || serviceRecords.length === 0) {
-        throw new Error('No vehicle service records found to export.');
-    }
+export function exportVehicleData(serviceRecords, vehicles, format = 'csv') {
+    if (!serviceRecords || serviceRecords.length === 0) throw new Error('No vehicle records found.');
 
-    const vehicleMap = Object.fromEntries(vehicles.map(v => [v.id, v.name || v.registrationNumber || v.id]));
+    const vehicleMap = Object.fromEntries(vehicles.map(v => [v.id, v.name || v.id]));
 
     const rows = serviceRecords.map(r => ({
-        date: r.date ? new Date(r.date).toLocaleDateString('en-CA') : '',
-        vehicle: vehicleMap[r.vehicleId] || r.vehicleId || '',
-        serviceType: r.type || '',
-        odometer: r.odometer ? `${r.odometer} km` : '',
-        cost: r.cost ? `₹${r.cost}` : '₹0',
-        notes: r.notes || r.description || '',
+        Date: r.date ? new Date(r.date).toLocaleDateString('en-CA') : '',
+        Vehicle: vehicleMap[r.vehicleId] || r.vehicleId || '',
+        'Service Type': r.type || '',
+        Odometer: r.odometer ? `${r.odometer} km` : '',
+        Cost: r.cost ? `₹${r.cost}` : '₹0',
+        Notes: r.notes || r.description || '',
     }));
 
     const headers = ['Date', 'Vehicle', 'Service Type', 'Odometer', 'Cost', 'Notes'];
-    const keys = ['date', 'vehicle', 'serviceType', 'odometer', 'cost', 'notes'];
-    downloadCSV(buildCSV(headers, keys, rows), 'vehicle_export');
+    const keys = ['Date', 'Vehicle', 'Service Type', 'Odometer', 'Cost', 'Notes'];
+    downloadFile(rows, 'vehicle_export', format, headers, keys);
 }

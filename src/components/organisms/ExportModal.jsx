@@ -114,10 +114,10 @@ const ExportModal = ({ isOpen, onClose, onSuccess }) => {
         try {
             // For now, export the data using existing export functions
             switch (selectedModule) {
-                case 'routine': await exportRoutineData(getAllHistory); break;
-                case 'tasks': exportTodoData(tasks); break;
-                case 'finance': exportFinanceData(transactions, categories, accounts); break;
-                case 'vehicle': exportVehicleData(serviceRecords, vehicles); break;
+                case 'routine': await exportRoutineData(getAllHistory, format); break;
+                case 'tasks': exportTodoData(tasks, format); break;
+                case 'finance': exportFinanceData(transactions, categories, accounts, format); break;
+                case 'vehicle': exportVehicleData(serviceRecords, vehicles, format); break;
             }
             onSuccess?.(`${MODULES.find(m => m.key === selectedModule)?.label} data exported successfully!`);
             setTimeout(() => {

@@ -23,6 +23,7 @@ import WorkspaceLayout from './components/templates/WorkspaceLayout';
 import GlobalErrorBanner from './components/system/GlobalErrorBanner';
 import OnboardingModal from './components/system/OnboardingModal';
 import WelcomeSequence from './components/molecules/WelcomeSequence';
+import SecurityShield from './components/system/SecurityShield';
 
 // Firebase services
 import { trackScreenView } from './lib/analytics';
@@ -132,8 +133,9 @@ function App() {
                       <VehicleContextProvider>
                         <AnalyticsTracker />
                         <GlobalErrorBanner />
-                      <OnboardingModal />
-                      <Suspense fallback={<FullPageLoader />}>
+                        <OnboardingModal />
+                        <SecurityShield>
+                        <Suspense fallback={<FullPageLoader />}>
                         <Routes>
                           {/* Public Routes */}
                           <Route path="/login" element={<Login />} />
@@ -192,6 +194,7 @@ function App() {
                           <Route path="*" element={<Navigate to="/" replace />} />
                         </Routes>
                       </Suspense>
+                      </SecurityShield>
                     </VehicleContextProvider>
                   </FinanceContextProvider>
                 </TaskContextProvider>

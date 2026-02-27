@@ -2,8 +2,10 @@ import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
     User, Mail, ShieldCheck, KeyRound, Download, FileText, 
-    Trash2, LogOut, Edit2, Check, X, AlertTriangle, ArrowLeft 
+    Trash2, LogOut, Edit2, Check, X, AlertTriangle, ArrowLeft,
+    Fingerprint, Shield, ToggleLeft, ToggleRight
 } from 'lucide-react';
+import { useSettings } from '../context/SettingsContext';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useLogout } from '../hooks/useLogout';
 import { auth } from '../lib/firebase';
@@ -22,6 +24,9 @@ const Profile = () => {
     const { user } = useAuthContext();
     const { logout } = useLogout();
     const { showToast } = useToast();
+    const { appSettings, updateSetting } = useSettings();
+
+    const security = appSettings?.security || { lockEnabled: false, biometricEnabled: false };
 
     // Modals
     const [isEditOpen, setIsEditOpen] = useState(false);
@@ -176,9 +181,37 @@ const Profile = () => {
                             icon={Mail} 
                             title="Email Address"
                             subtitle={user?.email}
-                            isLast
                             rightElement={<span className="text-[11px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md">VERIFIED</span>}
                         />
+
+                        {/* App Lock */}
+                        <SettingsRow
+                            icon={Shield}
+                            title="App Lock"
+                            subtitle="Lock AWAKE when minimized"
+                            onClick={() => updateSetting('security', { ...security, lockEnabled: !security.lockEnabled })}
+                            rightElement={
+                                security.lockEnabled 
+                                ? <ToggleRight className="w-9 h-9 text-indigo-500" /> 
+                                : <ToggleLeft className="w-9 h-9 text-slate-300 dark:text-slate-600" />
+                            }
+                        />
+
+                        {/* Biometric */}
+                        {security.lockEnabled && (
+                            <SettingsRow
+                                icon={Fingerprint}
+                                title="Biometric Unlock"
+                                subtitle="Use FaceID or Fingerprint"
+                                isLast
+                                onClick={() => updateSetting('security', { ...security, biometricEnabled: !security.biometricEnabled })}
+                                rightElement={
+                                    security.biometricEnabled 
+                                    ? <ToggleRight className="w-9 h-9 text-indigo-500" /> 
+                                    : <ToggleLeft className="w-9 h-9 text-slate-300 dark:text-slate-600" />
+                                }
+                            />
+                        )}
                     </SettingsSection>
 
                     {/* Data */}

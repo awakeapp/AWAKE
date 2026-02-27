@@ -79,7 +79,7 @@ const WorkspaceSettings = () => {
                                 <select
                                     value={settings.defaultPriority}
                                     onChange={e => handleChange('defaultPriority', e.target.value)}
-                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer"
+                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer max-w-[120px]"
                                 >
                                     <option value="Low">Low</option>
                                     <option value="Medium">Medium</option>

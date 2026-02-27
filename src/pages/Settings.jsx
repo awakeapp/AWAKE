@@ -133,7 +133,7 @@ const Settings = () => {
                                 <select 
                                     value={themePreference}
                                     onChange={(e) => setThemePreference(e.target.value)}
-                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer"
+                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer max-w-[120px]"
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <option value="light">Light</option>

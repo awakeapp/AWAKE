@@ -21,13 +21,13 @@ const PageLayout = ({
             {header && (
                 <header 
                     className={clsx(
-                        "sticky top-0 z-30 w-full backdrop-blur-xl",
+                        "sticky top-0 z-30 w-full backdrop-blur-xl shrink-0 overflow-hidden",
                         headerBgClass,
                         headerBorderClass
                     )}
                     style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
                 >
-                    <div className={headerPadClass}>
+                    <div className={clsx("max-w-screen-md mx-auto", headerPadClass)}>
                         {header}
                     </div>
                 </header>

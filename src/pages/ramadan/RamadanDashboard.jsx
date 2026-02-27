@@ -158,8 +158,41 @@ const RamadanDashboard = () => {
         return () => clearInterval(timer);
     }, []);
 
+    const renderHeader = (
+        <div className="flex items-center justify-between">
+            <div>
+                <h1 className="text-[20px] font-bold tracking-tight text-slate-900 dark:text-white leading-none">Ramadan Track</h1>
+                {displayName && (
+                    <div 
+                        onClick={() => setIsLocationModalOpen(true)}
+                        className="flex items-center gap-1 mt-1 cursor-pointer"
+                    >
+                        <MapPin className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                        <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate max-w-[140px]">
+                            {displayName.split(',')[0]}
+                        </span>
+                    </div>
+                )}
+            </div>
+            
+            <button 
+                onClick={() => navigate('/ramadan/settings')}
+                className="p-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 active:scale-95 transition-all shadow-sm"
+            >
+                <MoreHorizontal className="w-5 h-5" />
+            </button>
+        </div>
+    );
+
     if (loading && !dailyTimings) {
-        return <div className="p-4 text-center mt-16 text-slate-500 animate-pulse">Initializing Ramadan Engine...</div>;
+        return (
+            <PageLayout header={renderHeader}>
+                <div className="flex-1 flex flex-col items-center justify-center py-20 opacity-50">
+                    <div className="w-12 h-12 rounded-full border-4 border-slate-200 border-t-emerald-500 animate-spin mb-4" />
+                    <p className="text-sm font-bold text-slate-500 tracking-wide">INITIALIZING ENGINE...</p>
+                </div>
+            </PageLayout>
+        );
     }
 
     let nextEvent = '';
@@ -210,31 +243,7 @@ const RamadanDashboard = () => {
 
     return (
         <PageLayout
-            header={
-                <div className="pt-1 pb-1 flex items-center justify-between">
-                    <div>
-                        <h1 className="text-[20px] font-bold tracking-tight text-slate-900 dark:text-white">Ramadan Track</h1>
-                        {displayName && (
-                            <div 
-                                onClick={() => setIsLocationModalOpen(true)}
-                                className="flex items-center gap-1 cursor-pointer"
-                            >
-                                <MapPin className="w-3 h-3 text-emerald-500 shrink-0" />
-                                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate max-w-[120px]">
-                                    {displayName.split(',')[0]}
-                                </span>
-                            </div>
-                        )}
-                    </div>
-                    
-                    <button 
-                        onClick={() => navigate('/ramadan/settings')}
-                        className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 active:scale-95 transition-all shadow-sm"
-                    >
-                        <MoreHorizontal className="w-5 h-5" />
-                    </button>
-                </div>
-            }
+            header={renderHeader}
             renderFloating={<LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />}
         >
             <div className="space-y-6">

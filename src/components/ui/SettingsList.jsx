@@ -82,7 +82,7 @@ export const SettingsRow = ({
 };
 
 export const SettingsList = ({ children, className }) => (
-    <div className={cn("max-w-screen-md mx-auto px-4 py-6", className)}>
+    <div className={cn("py-4 sm:py-6", className)}>
         {children}
     </div>
 );

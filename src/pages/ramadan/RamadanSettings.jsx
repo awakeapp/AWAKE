@@ -69,7 +69,7 @@ const RamadanSettings = () => {
                                 <select
                                     value={localSettings.method || ''}
                                     onChange={(e) => handleChange('method', e.target.value)}
-                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer"
+                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer max-w-[140px]"
                                 >
                                     {ALADHAN_METHODS.map(m => (
                                         <option key={m.id} value={m.id}>{m.name}</option>
@@ -85,7 +85,7 @@ const RamadanSettings = () => {
                                 <select
                                     value={localSettings.madhab ?? ''}
                                     onChange={(e) => handleChange('madhab', Number(e.target.value))}
-                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer"
+                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer max-w-[140px]"
                                 >
                                     {MADHABS.map(m => (
                                         <option key={m.id} value={m.id}>{m.name}</option>

@@ -1,3 +1,9 @@
+import React, { useState, useEffect } from 'react';
+import { useRamadan } from '../../context/RamadanContext';
+import { usePrayer } from '../../context/PrayerContext';
+import { useNavigate } from 'react-router-dom';
+import { BookOpen, Target, MoreHorizontal, Activity, Check, Plus } from 'lucide-react';
+import clsx from 'clsx';
 import PageLayout from '../../components/layout/PageLayout';
 
 const CounterCard = ({ title, count, target, onSave, accentClass }) => {
@@ -238,19 +244,20 @@ const RamadanDhikr = () => {
  setIsAddingDhikr(false);
  };
 
- return (
- <div className="pb-24">
- <header className="sticky top-0 z-30 bg-slate-50/80 dark:bg-black/80 backdrop-blur-md border-b border-slate-200 dark:border-white/5 -mx-4 px-4" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
- <div className="pt-4 pb-5 flex items-center justify-between">
- <h1 className="text-[20px] font-bold tracking-tight text-slate-900 dark:text-white">Dhikr</h1>
- <button 
- onClick={() => navigate('/ramadan/settings')}
- className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 active:scale-95 transition-all shadow-sm"
- >
- <MoreHorizontal className="w-5 h-5" />
- </button>
- </div>
- </header>
+    return (
+        <PageLayout
+            header={
+                <div className="flex items-center justify-between">
+                    <h1 className="text-[20px] font-bold tracking-tight text-slate-900 dark:text-white">Dhikr</h1>
+                    <button 
+                        onClick={() => navigate('/ramadan/settings')}
+                        className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 active:scale-95 transition-all shadow-sm"
+                    >
+                        <MoreHorizontal className="w-5 h-5" />
+                    </button>
+                </div>
+            }
+        >
 
  <div className="space-y-6">
  <QuranGoalWidget 
@@ -355,11 +362,11 @@ const RamadanDhikr = () => {
  onSave={(val) => handleSave('quranJuz', val)}
  accentClass="bg-emerald-600"
  />
- </div>
- </div>
- </div>
- </div>
- );
+                </div>
+                </div>
+            </div>
+        </PageLayout>
+    );
 };
 
 export default RamadanDhikr;
