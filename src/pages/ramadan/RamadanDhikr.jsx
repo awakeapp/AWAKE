@@ -243,13 +243,13 @@ const RamadanDhikr = () => {
 
  return (
  <div className="pb-24 pt-2 sm:pt-4">
- <header className="px-4 sm:px-0 flex items-center justify-between mb-6">
+ <header className="flex items-center justify-between mb-6">
  <div>
  <h1 className="text-[28px] font-bold tracking-tight text-black dark:text-white">Dhikr</h1>
  </div>
  </header>
 
- <div className="px-4 sm:px-0 space-y-6">
+ <div className="space-y-6">
  <QuranGoalWidget 
  ramadanData={ramadanData} 
  updateQuranGoal={updateQuranGoal} 

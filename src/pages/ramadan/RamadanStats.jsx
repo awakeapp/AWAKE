@@ -92,13 +92,13 @@ const RamadanStats = () => {
 
     return (
         <div className="pb-24 pt-2 sm:pt-4">
-            <header className="px-4 sm:px-0 flex items-center justify-between mb-6">
+            <header className="flex items-center justify-between mb-6">
                 <div>
                     <h1 className="text-[28px] font-bold tracking-tight text-black dark:text-white">Stats</h1>
                 </div>
             </header>
 
-            <div className="px-4 sm:px-0 space-y-6">
+            <div className="space-y-6">
                 {/* Top Level Summary Card */}
                 <div className="bg-indigo-600 dark:bg-indigo-900 rounded-xl sm:rounded-2xl p-6 shadow-md text-white relative overflow-hidden">
                     <div className="relative z-10 flex items-center justify-between">
