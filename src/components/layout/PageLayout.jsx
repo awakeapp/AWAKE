@@ -56,8 +56,8 @@ const PageLayout = ({
                 className={clsx("flex-1 w-full max-w-screen-md mx-auto relative", contentPadClass)}
                 style={{
                     paddingTop: hasHeader 
-                        ? 'calc(76px + env(safe-area-inset-top, 0px))' // 60px header + 16px gap
-                        : 'calc(16px + env(safe-area-inset-top, 0px))' // No header, just 16px gap from top
+                        ? 'calc(60px + env(safe-area-inset-top, 0px))' // 60px header
+                        : 'calc(0px + env(safe-area-inset-top, 0px))' // No header
                 }}
             >
                 {children}

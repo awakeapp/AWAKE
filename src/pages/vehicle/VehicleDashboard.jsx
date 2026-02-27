@@ -285,7 +285,7 @@ const VehicleDashboard = () => {
                 </>
             }
             title={isSelectionMode ? undefined : "Fleet Management"}
-            headerNode={isSelectionMode ? (
+            header={isSelectionMode ? (
                 <SelectionBar 
                     count={selectedIds.size}
                     onCancel={exitSelectionMode}

@@ -10,15 +10,7 @@ const FinanceUpcoming = () => {
     useThemeColor(isDark ? '#0f172a' : '#f8fafc');
 
     return (
-        <PageLayout
-            bottomNav={<FinanceBottomNav />}
-            title="Upcoming"
-            showBack
-        >
-            <div>
-                <UpcomingPayments />
-            </div>
-        </PageLayout>
+        <UpcomingPayments />
     );
 };
 

@@ -326,7 +326,7 @@ const DebtManager = () => {
                 </>
             }
             title={isSelectionMode ? undefined : "Debts & Lending"}
-            headerNode={isSelectionMode ? (
+            header={isSelectionMode ? (
                 <SelectionBar 
                     count={selectedIds.size}
                     onCancel={exitSelectionMode}

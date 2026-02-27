@@ -11,6 +11,8 @@ import { SelectionBar } from '../../components/ui/SelectionBar';
 import { useSelection } from '../../hooks/useSelection';
 import { clsx } from 'clsx';
 import { Check } from 'lucide-react';
+import PageLayout from '../../components/layout/PageLayout';
+import FinanceBottomNav from '../../components/finance/FinanceBottomNav';
 
 const ICONS = [
     { icon: Zap, label: 'Utility' },
@@ -120,8 +122,10 @@ const UpcomingPayments = () => {
     };
 
     return (
-        <div className="space-y-4">
-            {isSelectionMode ? (
+        <PageLayout
+            bottomNav={<FinanceBottomNav />}
+            title={isSelectionMode ? undefined : t('finance.upcoming', 'Upcoming')}
+            header={isSelectionMode ? (
                 <SelectionBar 
                     count={selectedIds.size}
                     onCancel={exitSelectionMode}
@@ -136,17 +140,18 @@ const UpcomingPayments = () => {
                         </button>
                     )}
                 />
-            ) : (
-                <div className="flex items-center justify-between px-2">
-                    <h3 className="font-bold text-slate-900 dark:text-white">{t('finance.upcoming_payments', 'Upcoming Payments')}</h3>
-                    <button
-                        onClick={() => setIsAdding(true)}
-                        className="text-xs text-indigo-500 font-bold uppercase hover:bg-indigo-50 px-2 py-1 rounded-lg transition-colors"
-                    >
-                        {t('finance.add_new', '+ Add New')}
-                    </button>
-                </div>
+            ) : undefined}
+            showBack={!isSelectionMode}
+            rightNode={isSelectionMode ? null : (
+                <button
+                    onClick={() => setIsAdding(true)}
+                    className="text-xs text-indigo-500 font-bold uppercase hover:bg-indigo-50 px-2 py-1 rounded-lg transition-colors"
+                >
+                    {t('finance.add_new', '+ Add New')}
+                </button>
             )}
+        >
+            <div className="space-y-4">
 
 
 
@@ -331,7 +336,8 @@ const UpcomingPayments = () => {
                 title={deleteConfirmId === 'bulk' ? `Delete ${selectedIds.size} Subscriptions?` : "Delete Subscription?"}
                 message={deleteConfirmId === 'bulk' ? "Are you sure you want to delete these subscriptions? This action cannot be undone." : "Are you sure you want to delete this subscription? This cannot be undone."}
             />
-        </div >
+        </div>
+        </PageLayout>
     );
 };
 
