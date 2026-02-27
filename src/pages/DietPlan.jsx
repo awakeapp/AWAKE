@@ -74,7 +74,7 @@ const DietPlan = () => {
  <div className="min-h-screen bg-slate-50 dark:bg-slate-900 pb-20">
  {/* Header */}
  <div 
- className="bg-white dark:bg-slate-800 shadow-sm p-4 sticky top-0 z-10 flex items-center gap-3"
+ className="bg-white dark:bg-slate-800 shadow-sm px-4 pt-4 pb-5 sticky top-0 z-10 flex items-center gap-3 border-b border-slate-100 dark:border-slate-700/50"
  style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}
  >
  <button

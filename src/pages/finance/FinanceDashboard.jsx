@@ -117,7 +117,7 @@ const FinanceDashboard = () => {
         >
             {/* Fixed Header Area */}
             <header className="fixed top-0 left-0 right-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200/30 dark:border-slate-800/30" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-                <div className="px-6 py-4 grid grid-cols-3 items-center">
+                <div className="px-4 pt-4 pb-5 grid grid-cols-3 items-center">
                     <h1 className="text-xl font-bold text-slate-900 dark:text-white">Finance</h1>
                     
                     <div className="flex items-center justify-self-center gap-1 bg-white dark:bg-slate-900 rounded-full p-1 shadow-sm border border-slate-100 dark:border-slate-800">
@@ -142,8 +142,8 @@ const FinanceDashboard = () => {
             </header>
 
             {/* Scrollable Content Container */}
-            <div className="flex-1 overflow-y-auto" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 64px)' }}>
-                <div className="px-6 flex flex-col space-y-6 pb-8">
+            <div className="flex-1 overflow-y-auto" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 76px)' }}>
+                <div className="px-4 flex flex-col space-y-6 pb-8">
                     
                     {/* Total Balance Card (Reduced Height & Vertical Padding) */}
                     <motion.div 

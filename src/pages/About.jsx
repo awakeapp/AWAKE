@@ -16,7 +16,7 @@ const About = () => {
                 showBack={true}
             />
 
-            <div className="p-6 max-w-lg mx-auto space-y-8 mt-4">
+            <div className="pt-[calc(60px+env(safe-area-inset-top))] p-4 max-w-lg mx-auto space-y-8">
                 {/* Logo & Version */}
                 <div className="flex flex-col items-center justify-center text-center space-y-4">
                     <div className="w-20 h-20 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-center relative overflow-hidden group">

@@ -63,7 +63,7 @@ const History = () => {
       {/* Main Content Area */}
       <div 
         className="max-w-md mx-auto w-full px-4 space-y-6"
-        style={{ paddingTop: 'calc(56px + env(safe-area-inset-top) + 24px)' }}
+        style={{ paddingTop: 'calc(60px + env(safe-area-inset-top) + 24px)' }}
       >
 
  {/* Selected Date Report */}

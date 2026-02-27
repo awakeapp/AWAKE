@@ -63,5 +63,14 @@ export const SHADOW = {
   xl: '0 20px 40px rgba(0,0,0,0.06)',
 };
 
-// ── Spacing (reference — Tailwind handles the actual scale) ─
+// ── Spacing Tokens ────────────────────────────────────────
+// Use these tokens for all margins/paddings to maintain vertical rhythm.
+export const SPACING = {
+  xs: '8px',   // 8px
+  sm: '12px',  // 12px
+  md: '16px',  // 16px
+  lg: '20px',  // 20px
+  xl: '24px',  // 24px
+};
+
 export const SPACING_BASE = 8; // 8px base grid

@@ -210,8 +210,8 @@ const RamadanDashboard = () => {
             <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
             
             {/* Header */}
-            <header className="sticky top-0 z-30 bg-slate-50/80 dark:bg-black/80 backdrop-blur-md border-b border-slate-200 dark:border-white/5 -mx-4 px-4 mb-6" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-                <div className="py-3 flex items-center justify-between">
+            <header className="sticky top-0 z-30 bg-slate-50/80 dark:bg-black/80 backdrop-blur-md border-b border-slate-200 dark:border-white/5 -mx-4 px-4" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+                <div className="pt-4 pb-5 flex items-center justify-between">
                     <div>
                         <h1 className="text-[20px] font-bold tracking-tight text-slate-900 dark:text-white">Ramadan Track</h1>
                         {displayName && (

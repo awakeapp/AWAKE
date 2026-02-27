@@ -1,6 +1,7 @@
 import React from 'react';
 import { useRamadan } from '../../context/RamadanContext';
-import { Activity, BarChart2, CheckCircle2, Moon, Sun, BookOpen, Heart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Activity, BarChart2, CheckCircle2, Moon, Sun, BookOpen, Heart, MoreHorizontal } from 'lucide-react';
 import clsx from 'clsx';
 
 const StatCard = ({ title, icon: Icon, value, target, percent, colorClass = "bg-emerald-500", textClass = "text-emerald-500" }) => {
@@ -37,6 +38,7 @@ const StatCard = ({ title, icon: Icon, value, target, percent, colorClass = "bg-
 };
 
 const RamadanStats = () => {
+    const navigate = useNavigate();
     const { loading, error, ramadanData, hijriDate } = useRamadan();
 
     if (loading) return <div className="p-4 text-center mt-16 text-slate-500 animate-pulse">Loading Stats...</div>;
@@ -91,10 +93,16 @@ const RamadanStats = () => {
     const grandTotalDhikr = totalTahlil + totalSalawat + totalIstighfar;
 
     return (
-        <div className="pb-24 pt-2 sm:pt-4">
-            <header className="flex items-center justify-between mb-6">
-                <div>
-                    <h1 className="text-[28px] font-bold tracking-tight text-black dark:text-white">Stats</h1>
+        <div className="pb-24">
+            <header className="sticky top-0 z-30 bg-slate-50/80 dark:bg-black/80 backdrop-blur-md border-b border-slate-200 dark:border-white/5 -mx-4 px-4" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+                <div className="pt-4 pb-5 flex items-center justify-between">
+                    <h1 className="text-[20px] font-bold tracking-tight text-slate-900 dark:text-white">Stats</h1>
+                    <button 
+                        onClick={() => navigate('/ramadan/settings')}
+                        className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 active:scale-95 transition-all shadow-sm"
+                    >
+                        <MoreHorizontal className="w-5 h-5" />
+                    </button>
                 </div>
             </header>
 

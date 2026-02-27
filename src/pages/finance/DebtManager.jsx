@@ -183,7 +183,7 @@ const DebtManager = () => {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5rem)' }}>
             <header className="fixed top-0 left-0 right-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200/30 dark:border-slate-800/30" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-                <div className="px-6 py-4 space-y-4">
+                <div className="px-4 pt-4 pb-5 space-y-4">
                     <div className="flex items-center justify-between">
                         <h1 className="text-xl font-bold text-slate-900 dark:text-white">Debts & Lending</h1>
                         <button onClick={() => setIsAdding(true)} className="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full transition-colors -mr-2 shadow-sm shadow-indigo-500/30">
@@ -209,8 +209,8 @@ const DebtManager = () => {
                 </div>
             </header>
 
-            <div className="flex-1 overflow-y-auto" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 190px)' }}>
-                <div className="px-6 flex flex-col pt-4">
+            <div className="flex-1 overflow-y-auto" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 200px)' }}>
+                <div className="px-4 flex flex-col pt-4">
                     <div className="space-y-3 pb-8">
                         {partyData.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || (p.tag && p.tag.toLowerCase().includes(searchQuery.toLowerCase()))).length === 0 ? (
                             <div className="text-center py-16 px-6">

@@ -73,7 +73,7 @@ const FinanceEMI = () => {
                 className="fixed top-0 left-0 right-0 z-40 bg-[#F2F2F7]/80 dark:bg-black/80 backdrop-blur-md border-b border-slate-200 dark:border-white/10"
                 style={{ paddingTop: 'env(safe-area-inset-top)' }}
             >
-                <div className="max-w-screen-md mx-auto px-4 h-14 flex items-center gap-3">
+                <div className="max-w-screen-md mx-auto px-4 pt-4 pb-5 flex items-center gap-3">
                     <button
                         onClick={() => navigate(-1)}
                         className="p-2 -ml-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
@@ -86,7 +86,7 @@ const FinanceEMI = () => {
 
             <div 
                 className="max-w-screen-md mx-auto px-4"
-                style={{ paddingTop: 'calc(56px + env(safe-area-inset-top) + 20px)' }}
+                style={{ paddingTop: 'calc(76px + env(safe-area-inset-top))' }}
             >
                 {/* Summary Cards */}
                 <div className="grid grid-cols-2 gap-3 mb-6">

@@ -18,7 +18,7 @@ const FinanceSettings = () => {
                 onBack={() => navigate(-1)}
             />
 
-            <div className="pt-[calc(56px+env(safe-area-inset-top))]">
+            <div className="pt-[calc(60px+env(safe-area-inset-top))]">
                 <SettingsList>
                     <SettingsSection title="Module Support">
                         <SettingsRow 

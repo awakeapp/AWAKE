@@ -168,7 +168,7 @@ const VehicleDashboard = () => {
             
             {/* Header */}
             <header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-                <div className="px-4 py-3 flex items-center justify-between">
+                <div className="px-4 pt-4 pb-5 flex items-center justify-between">
                     {/* Left: Vehicle Selector */}
                     <div className="relative" ref={selectorRef}>
                         <button 
@@ -231,7 +231,7 @@ const VehicleDashboard = () => {
                 </div>
             </header>
 
-            <div className="px-4 py-4">
+            <div className="px-4 pt-0 pb-4">
                 {activeVehicle ? (
                     <>
                         {/* Quick Stats overview top container for Dashboard ONLY */}

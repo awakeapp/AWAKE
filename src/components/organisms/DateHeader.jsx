@@ -22,7 +22,7 @@ const DateHeader = ({ className, showControls = true, overviewText, onEditClick,
     }).format(currentDate);
 
     return (
-        <div className={cn("relative flex items-center justify-between transition-all duration-150 min-h-[72px] py-2 gap-2", className)}>
+        <div className={cn("relative flex items-center justify-between transition-all duration-150 gap-2", className)}>
             <JumpDateModal
                 isOpen={isJumpModalOpen}
                 onClose={() => setIsJumpModalOpen(false)}

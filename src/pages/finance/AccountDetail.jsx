@@ -52,7 +52,7 @@ const AccountDetail = () => {
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5rem)' }}>
             {/* Fixed Header */}
             <header className="fixed top-0 left-0 right-0 z-30 bg-slate-900 text-white shadow-xl" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-                <div className="flex items-center justify-between px-6 py-4">
+                <div className="flex items-center justify-between px-4 pt-4 pb-5">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => navigate(-1)}
@@ -76,7 +76,7 @@ const AccountDetail = () => {
                     </button>
                 </div>
 
-                <div className="text-center px-6 pb-8 pt-2">
+                <div className="text-center px-4 pb-8 pt-2">
                     {isEditing ? (
                         <div className="space-y-3 max-w-xs mx-auto">
                             <input
@@ -107,7 +107,7 @@ const AccountDetail = () => {
 
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 180px)' }}>
-                <div className="px-6 flex flex-col space-y-6 pb-8">
+                <div className="px-4 flex flex-col space-y-6 pb-8">
                     <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 shadow-sm border border-slate-100 dark:border-slate-800">
                         <h3 className="font-black text-[10px] uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
                             <History className="w-3.5 h-3.5" />

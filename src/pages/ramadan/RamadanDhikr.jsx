@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useRamadan } from '../../context/RamadanContext';
 import { usePrayer } from '../../context/PrayerContext';
-import { BookOpen, Target, Settings2, Activity, Check, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { BookOpen, Target, MoreHorizontal, Activity, Check, Plus } from 'lucide-react';
 import clsx from 'clsx';
 
 const CounterCard = ({ title, count, target, onSave, accentClass }) => {
@@ -167,7 +168,7 @@ const QuranGoalWidget = ({ ramadanData, updateQuranGoal, currentDay }) => {
  </div>
  </div>
  <button onClick={() => setIsEditing(true)} className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white transition-colors">
- <Settings2 className="w-4 h-4" />
+ <Activity className="w-4 h-4" />
  </button>
  </div>
 
@@ -189,7 +190,8 @@ const QuranGoalWidget = ({ ramadanData, updateQuranGoal, currentDay }) => {
 };
 
 const RamadanDhikr = () => {
- const { loading, error, ramadanData, updateRamadanDay, updateQuranGoal, updateCustomDhikr, hijriDate } = useRamadan();
+    const navigate = useNavigate();
+    const { loading, error, ramadanData, updateRamadanDay, updateQuranGoal, updateCustomDhikr, hijriDate } = useRamadan();
  const { serverTodayKey } = usePrayer();
  const [now, setNow] = useState(new Date());
  const [isAddingDhikr, setIsAddingDhikr] = useState(false);
@@ -242,10 +244,16 @@ const RamadanDhikr = () => {
  };
 
  return (
- <div className="pb-24 pt-2 sm:pt-4">
- <header className="flex items-center justify-between mb-6">
- <div>
- <h1 className="text-[28px] font-bold tracking-tight text-black dark:text-white">Dhikr</h1>
+ <div className="pb-24">
+ <header className="sticky top-0 z-30 bg-slate-50/80 dark:bg-black/80 backdrop-blur-md border-b border-slate-200 dark:border-white/5 -mx-4 px-4" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+ <div className="pt-4 pb-5 flex items-center justify-between">
+ <h1 className="text-[20px] font-bold tracking-tight text-slate-900 dark:text-white">Dhikr</h1>
+ <button 
+ onClick={() => navigate('/ramadan/settings')}
+ className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 active:scale-95 transition-all shadow-sm"
+ >
+ <MoreHorizontal className="w-5 h-5" />
+ </button>
  </div>
  </header>
 

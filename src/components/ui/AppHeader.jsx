@@ -46,7 +46,7 @@ export function AppHeader({
  )}
  style={{
  paddingTop: 'env(safe-area-inset-top)',
- height: 'calc(56px + env(safe-area-inset-top))'
+ height: 'calc(60px + env(safe-area-inset-top))'
  }}
  >
  {/* Left Action Area */}

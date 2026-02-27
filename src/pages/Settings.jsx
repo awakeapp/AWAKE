@@ -59,7 +59,7 @@ const Settings = () => {
                 onBack={() => navigate(-1)}
             />
 
-            <div className="pt-[calc(56px+env(safe-area-inset-top))]">
+            <div className="pt-[calc(60px+env(safe-area-inset-top))]">
                 <SettingsList>
                     {/* Identity Card */}
                     <div className="px-4 mb-8">

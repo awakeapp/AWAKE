@@ -262,6 +262,8 @@ const PartyDetail = () => {
         return doc.output('blob');
     };
 
+    const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
     const handlePreviewAttachment = async (type) => {
         let blob;
         if (type === 'pdf') {
@@ -568,7 +570,7 @@ const PartyDetail = () => {
 
             {/* Fixed Top Bar */}
             <header className="fixed top-0 left-0 right-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200/30 dark:border-slate-800/30" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-                <div className="px-5 py-4 flex items-center justify-between">
+                <div className="px-4 pt-4 pb-5 flex items-center justify-between">
                     <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white -ml-1">
                         <ArrowLeft className="w-5 h-5" />
                     </button>
@@ -582,8 +584,8 @@ const PartyDetail = () => {
             </header>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 68px)' }}>
-                <div className="px-5 flex flex-col pt-4 pb-8 space-y-6">
+            <div className="flex-1 overflow-y-auto" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 76px)' }}>
+                <div className="px-4 flex flex-col pt-4 pb-8 space-y-6">
 
                     {/* Balance Card (Now inside scroll) */}
                     <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 dark:from-indigo-600 dark:to-indigo-900 rounded-[2.5rem] p-7 text-white shadow-2xl shadow-indigo-500/20 relative overflow-hidden">
@@ -1098,19 +1100,24 @@ const PartyDetail = () => {
                                     </button>
                                 </div>
 
-                                {/* Step 2: Second Selection (Only for WhatsApp) */}
+                                {/* Step 2: Third Selection (Modes) */}
                                 {reminderMethod === 'whatsapp' && (
-                                    <div className="flex bg-slate-50 dark:bg-slate-800/20 p-1 rounded-xl w-full border border-slate-100 dark:border-slate-800">
+                                    <div className="flex bg-slate-50 dark:bg-slate-800/20 p-1 rounded-xl w-full border border-slate-100 dark:border-slate-800 overflow-hidden">
                                         <button
                                             type="button"
                                             onClick={() => setWhatsappMode('text')}
-                                            className={`flex-1 py-3 transition-all rounded-lg text-xs font-bold ${whatsappMode === 'text' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400' : 'text-slate-400'}`}
-                                        >Text Only</button>
+                                            className={`flex-1 py-3 transition-all rounded-lg text-xs font-bold ${whatsappMode === 'text' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 shadow-sm' : 'text-slate-400'}`}
+                                        >Text</button>
                                         <button
                                             type="button"
                                             onClick={() => setWhatsappMode('image')}
-                                            className={`flex-1 flex items-center justify-center gap-2 py-3 transition-all rounded-lg text-xs font-bold ${whatsappMode === 'image' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400' : 'text-slate-400'}`}
-                                        ><ImageIcon className="w-3.5 h-3.5"/> Text + Image</button>
+                                            className={`flex-1 flex items-center justify-center gap-1.5 py-3 transition-all rounded-lg text-xs font-bold ${whatsappMode === 'image' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 shadow-sm' : 'text-slate-400'}`}
+                                        ><ImageIcon className="w-3.5 h-3.5"/> Image</button>
+                                         <button
+                                            type="button"
+                                            onClick={() => setWhatsappMode('pdf')}
+                                            className={`flex-1 flex items-center justify-center gap-1.5 py-3 transition-all rounded-lg text-xs font-bold ${whatsappMode === 'pdf' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 shadow-sm' : 'text-slate-400'}`}
+                                        ><FileText className="w-3.5 h-3.5"/> PDF</button>
                                     </div>
                                 )}
 

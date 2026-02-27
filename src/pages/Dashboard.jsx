@@ -157,10 +157,13 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="pb-32 px-4 pt-[156px] space-y-6">
+        <div className="pb-32 px-4 pt-[calc(env(safe-area-inset-top)+76px)] space-y-6">
             {/* Header / Date */}
-            <div className="fixed top-[56px] left-0 right-0 z-40 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-transparent">
-                <div className="max-w-md mx-auto w-full px-4 pt-2 pb-3">
+            <div 
+                className="fixed left-0 right-0 z-40 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200/20 dark:border-slate-800/20"
+                style={{ top: 'env(safe-area-inset-top)' }}
+            >
+                <div className="max-w-md mx-auto w-full px-4 pt-4 pb-5">
                     <DateHeader className="mb-0" />
                 </div>
             </div>

@@ -15,15 +15,15 @@ const FinanceUpcoming = () => {
         >
             {/* Header */}
             <header className="fixed top-0 left-0 right-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200/30 dark:border-slate-800/30" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-                <div className="px-6 py-4">
-                    <h1 className="text-xl font-bold text-slate-900 dark:text-white">Upcoming</h1>
-                    <p className="text-xs text-slate-400 font-medium mt-0.5">Subscriptions & recurring bills</p>
+                <div className="px-4 pt-4 pb-5">
+                    <h1 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">Upcoming</h1>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Subscriptions & bills</p>
                 </div>
             </header>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 72px)' }}>
-                <div className="px-6 pt-4">
+            <div className="flex-1 overflow-y-auto" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 76px)' }}>
+                <div className="px-4 pt-4">
                     <UpcomingPayments />
                 </div>
             </div>

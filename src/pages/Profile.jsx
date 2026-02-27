@@ -76,7 +76,7 @@ const Profile = () => {
         <div className="min-h-screen bg-slate-50 dark:bg-black pb-24">
             <AppHeader title="Account" showBack onBack={() => navigate(-1)} />
 
-            <div className="pt-[calc(56px+env(safe-area-inset-top))]">
+            <div className="pt-[calc(60px+env(safe-area-inset-top))]">
                 <SettingsList>
                     {/* Identity */}
                     <SettingsSection title="Identity">
