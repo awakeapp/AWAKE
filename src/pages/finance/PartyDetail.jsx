@@ -253,16 +253,13 @@ const PartyDetail = () => {
         if (isReceivable && financeConfig?.upiId) {
             let baseUrl = window.location.origin;
             if (import.meta.env.BASE_URL && import.meta.env.BASE_URL !== '/') {
-                baseUrl += import.meta.env.BASE_URL;
+                baseUrl += import.meta.env.BASE_URL.replace(/\/$/, '');
             }
-            // Create a clean URL pointing to /pay
-            const payPath = baseUrl.replace(/\/$/, '') + '/pay';
-            const payUrl = new URL(payPath);
-            payUrl.searchParams.set('upi', btoa(encodeURIComponent(financeConfig.upiId)));
-            payUrl.searchParams.set('am', btoa(encodeURIComponent(totalSelectedPending.toString())));
-            payUrl.searchParams.set('pn', btoa(encodeURIComponent(user?.name || 'AWAKE User')));
-            
-            message += `\n\nPay instantly via UPI:\n${payUrl.toString()}`;
+            const payUrl = new URL(baseUrl + '/pay');
+            payUrl.searchParams.set('upi', financeConfig.upiId);
+            payUrl.searchParams.set('am', totalSelectedPending.toString());
+            payUrl.searchParams.set('pn', user?.name || 'AWAKE User');
+            message += `\n\n💳 Pay instantly via UPI:\n${payUrl.toString()}`;
         }
         
         return message;
