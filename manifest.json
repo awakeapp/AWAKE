@@ -1,6 +1,7 @@
 {
     "short_name": "AWAKE",
-    "name": "HUMI AWAKE",
+    "name": "AWAKE | Personal Engine",
+    "description": "Premium personal management for routines, finance, and vehicles.",
     "icons": [
         {
             "src": "app-icon.png",
@@ -15,6 +16,6 @@
     ],
     "start_url": "/AWAKE/",
     "display": "standalone",
-    "theme_color": "#ffffff",
-    "background_color": "#ffffff"
+    "theme_color": "#020617",
+    "background_color": "#020617"
 }
