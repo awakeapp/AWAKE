@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
 import awakeLogo from '../../assets/awake_logo_new.png';
+import Pressable from './Pressable';
 
 const Button = React.forwardRef(({ 
  children, 
@@ -11,14 +12,15 @@ const Button = React.forwardRef(({
  disabled, 
  ...props 
 }, ref) => {
- // Base styles: WhatsApp style flat UI, no scale bouncing
- const baseStyles = "inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-white active:bg-slate-100/10";
+ // Base styles
+ const baseStyles = "inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus:outline-none disabled:opacity-50 disabled:pointer-events-none";
 
  const variants = {
- primary: "bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-600 shadow-sm",
- secondary: "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 focus:ring-slate-500",
- ghost: "bg-transparent text-slate-700 hover:bg-slate-100 focus:ring-slate-500",
- danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-600",
+ primary: "bg-primary-600 text-white hover:bg-primary-700 shadow-sm",
+ secondary: "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50",
+ ghost: "bg-transparent text-slate-700 hover:bg-slate-100",
+ danger: "bg-red-600 text-white hover:bg-red-700",
+ outline: "bg-transparent text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800"
  };
 
  const sizes = {
@@ -27,18 +29,13 @@ const Button = React.forwardRef(({
  lg: "h-11 px-8 rounded-md"
  }
 
- // Determine specific scale behavior
- // If it's a link or specialized button, we might want different behavior.
- // However, is now in baseStyles for instant CSS feedback.
- // Framer motion 'whileTap' is JS based and might be slightly delayed.
- // Let's keep framer motion for smooth spring release but CSS for instant press.
-
- // Note: Removed framer-motion whileTap since we're using CSS active states for colors only
  return (
- <button
+ <Pressable
  ref={ref}
- className={cn(baseStyles, variants[variant], sizes[size], className)}
+ as="button"
+ scaleDown={0.96}
  disabled={disabled || isLoading}
+ className={cn(baseStyles, variants[variant], sizes[size], className)}
  {...props}
  >
  {isLoading ? (
@@ -56,7 +53,7 @@ const Button = React.forwardRef(({
  ) : (
  children
  )}
- </button>
+ </Pressable>
  );
 });
 

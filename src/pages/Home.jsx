@@ -202,12 +202,13 @@ const Home = () => {
                             )}>
                                 {routineProgress === 100 ? <Trophy className="w-5 h-5" /> : <Target className="w-5 h-5" />}
                             </div>
-                            <button
+                            <Pressable
                                 onClick={(e) => { e.stopPropagation(); navigate('/routine'); }}
-                                className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:bg-slate-300 dark:active:bg-slate-600 text-slate-600 dark:text-slate-300 rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
+                                scaleDown={0.9}
+                                className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
                             >
                                 View
-                            </button>
+                            </Pressable>
                         </div>
                         <div className="relative z-10 pt-2">
                             <div className="text-[19px] font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
@@ -229,12 +230,13 @@ const Home = () => {
                             <div className="p-2 bg-blue-50 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400 rounded-xl shadow-sm">
                                 <List className="w-5 h-5" />
                             </div>
-                            <button
+                            <Pressable
                                 onClick={(e) => { e.stopPropagation(); setIsTaskModalOpen(true); }}
-                                className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
+                                scaleDown={0.9}
+                                className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
                             >
                                 + Task
-                            </button>
+                            </Pressable>
                         </div>
                         <div className="relative z-10 pt-2">
                             <div className="text-[19px] font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
@@ -256,12 +258,13 @@ const Home = () => {
                             <div className="p-2 bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10 dark:text-emerald-400 rounded-xl shadow-sm">
                                 <IndianRupee className="w-5 h-5" />
                             </div>
-                            <button
+                            <Pressable
                                 onClick={(e) => { e.stopPropagation(); setIsFinanceModalOpen(true); }}
-                                className="bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
+                                scaleDown={0.9}
+                                className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
                             >
                                 + Log
-                            </button>
+                            </Pressable>
                         </div>
                         <div className="relative z-10 pt-2">
                             <div className="text-[19px] font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
@@ -283,12 +286,13 @@ const Home = () => {
                             <div className="p-2 bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-400 rounded-xl shadow-sm">
                                 <Fuel className="w-5 h-5" />
                             </div>
-                            <button
+                            <Pressable
                                 onClick={(e) => { e.stopPropagation(); setIsFuelModalOpen(true); }}
-                                className="bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
+                                scaleDown={0.9}
+                                className="bg-orange-500 hover:bg-orange-600 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
                             >
                                 + Fuel
-                            </button>
+                            </Pressable>
                         </div>
                         <div className="relative z-10 pt-2">
                             <div className="text-[19px] font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">

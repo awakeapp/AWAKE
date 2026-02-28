@@ -58,6 +58,7 @@ const FinanceEMI = lazy(() => import('./pages/finance/FinanceEMI'));
 const FinanceMore = lazy(() => import('./pages/finance/FinanceMore'));
 const FinanceUpcoming = lazy(() => import('./pages/finance/FinanceUpcoming'));
 const FinanceWallets = lazy(() => import('./pages/finance/FinanceWallets'));
+const PayPortal = lazy(() => import('./pages/finance/PayPortal'));
 
 const VehicleDashboard = lazy(() => import('./pages/vehicle/VehicleDashboard'));
 const VehicleMore = lazy(() => import('./pages/vehicle/VehicleMore'));
@@ -140,6 +141,7 @@ function App() {
                           {/* Public Routes */}
                           <Route path="/login" element={<Login />} />
                           <Route path="/forgot-password" element={<ForgotPassword />} />
+                          <Route path="/pay" element={<PayPortal />} />
 
                           {/* Protected Routes */}
                           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>

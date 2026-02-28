@@ -118,7 +118,8 @@ const FullScreenCounter = ({ dhikr, onSave, onClose }) => {
             </div>
 
             <div className="flex-1 flex flex-col items-center justify-center relative w-full pt-10">
-                <motion.button
+                <Pressable
+                    as={motion.div}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleIncrement}
                     className="relative w-48 h-48 rounded-full bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 flex flex-col items-center justify-center focus:outline-none shadow-[0_0_60px_rgba(99,102,241,0.05)] dark:shadow-[0_0_60px_rgba(99,102,241,0.1)] group select-none transition-transform mb-8"
@@ -145,7 +146,7 @@ const FullScreenCounter = ({ dhikr, onSave, onClose }) => {
                             <Plus className="w-8 h-8" />
                         </div>
                     </div>
-                </motion.button>
+                </Pressable>
                 
                 <div className="flex flex-col items-center text-center">
                     <span className="text-[80px] font-black tracking-tighter leading-none tabular-nums text-slate-900 dark:text-white">
@@ -169,27 +170,29 @@ const FullScreenCounter = ({ dhikr, onSave, onClose }) => {
             <div className="pb-8 z-10 min-h-[60px]">
                 <AnimatePresence mode="wait">
                     {!showResetConfirm ? (
-                        <motion.button
+                        <Pressable
                             key="reset-btn"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={handleReset}
+                            scaleDown={0.96}
                             className="px-6 py-3 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-[#8E8E93] text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-white/10 transition-colors"
                         >
                             Reset Counter
-                        </motion.button>
+                        </Pressable>
                     ) : (
-                        <motion.button
+                        <Pressable
                             key="confirm-btn"
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
                             onClick={handleReset}
+                            scaleDown={0.96}
                             className="px-6 py-3 rounded-2xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-500 border border-rose-200 dark:border-rose-500/30 text-[10px] font-black uppercase tracking-widest shadow-sm"
                         >
                             Tap to Confirm
-                        </motion.button>
+                        </Pressable>
                     )}
                 </AnimatePresence>
             </div>
@@ -246,18 +249,20 @@ const QuranGoalWidget = ({ ramadanData, updateQuranGoal, currentDay }) => {
                 </div>
                 
                 <div className="flex gap-2 mb-4 bg-slate-50 dark:bg-slate-800 p-1 rounded-xl">
-                    <button 
+                    <Pressable 
                         onClick={() => { setGoalType('pages'); setGoalValue(604); }}
+                        scaleDown={0.96}
                         className={clsx("flex-1 py-2 text-xs font-bold uppercase rounded-lg transition-all", goalType === 'pages' ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm" : "text-slate-500 dark:text-slate-400")}
                     >
                         Pages
-                    </button>
-                    <button 
+                    </Pressable>
+                    <Pressable 
                         onClick={() => { setGoalType('juz'); setGoalValue(30); }}
+                        scaleDown={0.96}
                         className={clsx("flex-1 py-2 text-xs font-bold uppercase rounded-lg transition-all", goalType === 'juz' ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm" : "text-slate-500 dark:text-slate-400")}
                     >
                         Juz
-                    </button>
+                    </Pressable>
                 </div>
                 
                 <div className="flex gap-2">
@@ -301,12 +306,13 @@ const QuranGoalWidget = ({ ramadanData, updateQuranGoal, currentDay }) => {
                         </div>
                     </div>
                 </div>
-                <button 
+                <Pressable 
                     onClick={() => setIsEditing(true)} 
-                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 dark:bg-white/5 text-slate-400 dark:text-[#8E8E93] hover:text-slate-600 dark:hover:text-white transition-all active:scale-90"
+                    scaleDown={0.9}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 dark:bg-white/5 text-slate-400 dark:text-[#8E8E93] hover:text-slate-600 dark:hover:text-white transition-all"
                 >
                     <MoreHorizontal className="w-4 h-4" />
-                </button>
+                </Pressable>
             </div>
 
             <div className="relative z-10 space-y-3">
@@ -518,13 +524,13 @@ const RamadanDhikr = () => {
                                 </div>
                             </motion.div>
                         ) : (
-                            <motion.button 
-                                whileTap={{ scale: 0.98 }}
+                        <Pressable 
                                 onClick={() => setIsAddingDhikr(true)} 
+                                scaleDown={0.98}
                                 className="w-full py-4 border border-dashed border-slate-300 dark:border-slate-700 rounded-2xl text-slate-500 dark:text-slate-400 font-semibold text-sm hover:border-indigo-500 hover:text-indigo-600 transition-all flex justify-center items-center gap-2 bg-slate-50/50 dark:bg-slate-900/50"
                             >
                                 <Plus className="w-4 h-4" /> Add Dhikr Note
-                            </motion.button>
+                            </Pressable>
                         )}
                     </AnimatePresence>
                 </div>

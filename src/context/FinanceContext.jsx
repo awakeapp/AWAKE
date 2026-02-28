@@ -43,6 +43,7 @@ export const FinanceContextProvider = ({ children }) => {
     const [debtTransactions, setDebtTransactions] = useState([]);
     const [subscriptions, setSubscriptions] = useState([]);
     const [recurringRules, setRecurringRules] = useState([]);
+    const [financeConfig, setFinanceConfig] = useState({});
     const [isLoading, setIsLoading] = useState(true);
 
     // --- Persistence: Firestore Subscriptions ---
@@ -59,6 +60,7 @@ export const FinanceContextProvider = ({ children }) => {
             setDebtTransactions([]);
             setSubscriptions([]);
             setRecurringRules([]);
+            setFinanceConfig({});
             setIsLoading(false);
             return;
         }
@@ -123,6 +125,12 @@ export const FinanceContextProvider = ({ children }) => {
             (data) => setRecurringRules(data)
         );
 
+        const unsubConfig = FirestoreService.subscribeToDocument(
+            `users/${user.uid}/financeConfig`,
+            'main',
+            (data) => setFinanceConfig(data || {})
+        );
+
         return () => {
             unsubTransactions();
             unsubCategories();
@@ -133,6 +141,7 @@ export const FinanceContextProvider = ({ children }) => {
             unsubDebtTransactions();
             unsubSubs();
             unsubRules();
+            unsubConfig();
         };
     }, [user, authIsReady, txLimit]);
 
@@ -615,6 +624,10 @@ export const FinanceContextProvider = ({ children }) => {
         await FirestoreService.deleteItem(`users/${user.uid}/subscriptions`, id);
     }, [user]);
 
+    const updateFinanceConfig = useCallback(async (updates) => {
+        if (!user) return;
+        await FirestoreService.setItem(`users/${user.uid}/financeConfig`, 'main', updates, true);
+    }, [user]);
 
     const ENTRY_LOCK_DAYS = 30;
 
@@ -887,9 +900,11 @@ export const FinanceContextProvider = ({ children }) => {
         addSettlementPayment,
         getPartyStatus,
         isLoading,
-        loadMoreTransactions
+        loadMoreTransactions,
+        financeConfig,
+        updateFinanceConfig
     }), [
-        transactions, categories, accounts, savingsGoals, debts, debtParties, debtTransactions, subscriptions, recurringRules, isLoading,
+        transactions, categories, accounts, savingsGoals, debts, debtParties, debtTransactions, subscriptions, recurringRules, isLoading, financeConfig,
         addTransaction, addTransfer, deleteTransaction, editTransaction, restoreTransaction, checkDuplicate,
         getAccountBalance, getTotalBalance, getMonthlySpend, getCategorySpend, updateCategoryBudget, addCategory,
         addDebt, addDebtPayment, settleDebt, addSubscription, updateSubscription, toggleSubscriptionStatus, deleteSubscription,
@@ -897,7 +912,7 @@ export const FinanceContextProvider = ({ children }) => {
         addDebtParty, updateDebtParty, softDeleteDebtParty, addDebtTransaction, editDebtTransaction,
         softDeleteDebtTransaction, reverseDebtTransaction, getPartyTransactions, getPartyBalance, isEntryLocked,
         getEntrySettledAmount, getPendingEntries, addSettlementPayment, getPartyStatus,
-        loadMoreTransactions
+        loadMoreTransactions, updateFinanceConfig
     ]);
 
     return (

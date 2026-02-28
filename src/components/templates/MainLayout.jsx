@@ -44,7 +44,9 @@ const MainLayout = ({ children }) => {
         <div
             className={`min-h-screen bg-slate-50 font-sans text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors`}
             style={{ 
-                paddingTop: showHeader ? 'calc(56px + env(safe-area-inset-top))' : 'env(safe-area-inset-top)',
+                // Full-bleed pages (Finance, Vehicle, etc.) use PageLayout which handles safe-area itself.
+                // Home/non-full-bleed pages use the global AppHeader (60px + safe-area-inset-top).
+                paddingTop: isFullBleed ? '0px' : showHeader ? 'calc(60px + env(safe-area-inset-top))' : 'env(safe-area-inset-top)',
                 paddingBottom: isFullBleed ? '0' : 'calc(5rem + env(safe-area-inset-bottom))'
             }}
         >

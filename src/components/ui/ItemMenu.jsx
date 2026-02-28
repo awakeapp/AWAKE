@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MoreVertical, Edit2, Trash2, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ActionButton from '../atoms/ActionButton';
+import Pressable from '../atoms/Pressable';
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -72,7 +73,7 @@ export function ItemMenu({
               {actions.map((action, idx) => {
                 const Icon = action.icon;
                 return (
-                  <button
+                  <Pressable
                     key={idx}
                     onClick={(e) => {
                       e.preventDefault();
@@ -80,6 +81,7 @@ export function ItemMenu({
                       setIsOpen(false);
                       action.onClick();
                     }}
+                    scaleDown={0.98}
                     className={cn(
                       "flex items-center gap-3 px-3 py-2.5 w-full text-left text-sm font-semibold rounded-xl transition-colors",
                       action.variant === 'danger'
@@ -89,7 +91,7 @@ export function ItemMenu({
                   >
                     {Icon && <Icon className="w-4 h-4" />}
                     <span>{action.label}</span>
-                  </button>
+                  </Pressable>
                 );
               })}
             </div>

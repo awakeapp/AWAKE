@@ -12,15 +12,19 @@ import clsx from 'clsx';
  * @param {boolean} block - Whether the element should display as a block (full width).
  * @param {number} scaleDown - How much to scale down on tap (default 0.96).
  */
-const Pressable = ({ 
+const Pressable = React.forwardRef(({ 
     onClick, 
     className, 
     disabled = false, 
     block = false,
     scaleDown = 0.96,
+    as = 'div',
     children,
     ...props
-}) => {
+}, ref) => {
+    
+    // Create the motion component dynamically
+    const Component = typeof as === 'string' ? motion[as] : as;
     
     const handleClick = (e) => {
         if (disabled) return;
@@ -36,7 +40,8 @@ const Pressable = ({
     };
 
     return (
-        <motion.div
+        <Component
+            ref={ref}
             whileTap={!disabled ? { scale: scaleDown, y: 1 } : {}}
             whileHover={!disabled ? { scale: 1.01, y: -0.5 } : {}}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
@@ -50,8 +55,8 @@ const Pressable = ({
             {...props}
         >
             {children}
-        </motion.div>
+        </Component>
     );
-};
+});
 
 export default Pressable;

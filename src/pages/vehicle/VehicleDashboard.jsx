@@ -17,6 +17,7 @@ import AddLoanModal from './AddLoanModal';
 import PayEMIModal from './PayEMIModal';
 import AmortizationScheduleModal from './AmortizationScheduleModal';
 import PrepaymentCalculatorModal from './PrepaymentCalculatorModal';
+import Pressable from '../../components/atoms/Pressable';
 import { DeleteConfirmationModal } from '../../components/ui/DeleteConfirmationModal';
 import { AppBottomNav } from '../../components/ui/AppBottomNav';
 import PageLayout from '../../components/layout/PageLayout';
@@ -181,12 +182,13 @@ const VehicleDashboard = () => {
                 <p className="text-slate-500 dark:text-slate-400 mb-8 text-center max-w-xs">
                     Track expenses, maintenance, and reminders for your fleet.
                 </p>
-                <button
+                <Pressable
                     onClick={() => setIsAddOpen(true)}
+                    scaleDown={0.96}
                     className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold shadow-lg shadow-indigo-500/30 transition-all flex items-center gap-2"
                 >
                     <Plus className="w-5 h-5" /> Add First Vehicle
-                </button>
+                </Pressable>
                 <AddVehicleModal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} onSave={handleSaveVehicle} />
             </div>
         );
@@ -233,31 +235,34 @@ const VehicleDashboard = () => {
                 <>
                     {/* Contextual FABs */}
                     {activeTab === 'dashboard' && (
-                        <button
+                        <Pressable
                             onClick={() => alert("Add Entry: Full ledger entry modal coming soon")}
+                            scaleDown={0.96}
                             className="fixed right-6 bg-indigo-600 text-white px-5 py-3 rounded-2xl shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
                             style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)' }}
                         >
                             <Plus className="w-5 h-5" /> Add Entry
-                        </button>
+                        </Pressable>
                     )}
                     {activeTab === 'service' && (
-                        <button
+                        <Pressable
                             onClick={() => alert("Add Reminder Modal Coming Soon")}
+                            scaleDown={0.96}
                             className="fixed right-6 bg-blue-600 text-white px-5 py-3 rounded-2xl shadow-xl shadow-blue-600/30 flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
                             style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)' }}
                         >
                             <Plus className="w-5 h-5" /> Add Reminder
-                        </button>
+                        </Pressable>
                     )}
                     {activeTab === 'loan' && activeLoan && (
-                        <button
+                        <Pressable
                             onClick={() => setIsPayEMIOpen(true)}
+                            scaleDown={0.96}
                             className="fixed right-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-5 py-3 rounded-2xl shadow-xl flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
                             style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)' }}
                         >
                             <Plus className="w-5 h-5" /> Record EMI
-                        </button>
+                        </Pressable>
                     )}
 
                     {/* Modals */}
@@ -306,15 +311,16 @@ const VehicleDashboard = () => {
                 <div className="flex items-center">
                     {/* Vehicle Switcher */}
                     <div className="relative" ref={selectorRef}>
-                        <button 
+                        <Pressable 
                             onClick={() => setIsVehicleSelectorOpen(!isVehicleSelectorOpen)}
+                            scaleDown={0.96}
                             className="flex items-center gap-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-full hover:bg-white dark:hover:bg-slate-800 transition-colors shadow-sm"
                         >
                             <span className="font-bold text-slate-800 dark:text-slate-200 text-[11px] leading-tight max-w-[80px] truncate uppercase tracking-tight">
                                 {activeVehicle ? activeVehicle.name : 'Select'}
                             </span>
                             <ChevronDown className="w-3 h-3 text-slate-500" />
-                        </button>
+                        </Pressable>
                         
                         <AnimatePresence>
                             {isVehicleSelectorOpen && (
@@ -327,12 +333,13 @@ const VehicleDashboard = () => {
                                     <div className="p-2 space-y-1">
                                         <div className="px-3 py-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Switch Vehicle</div>
                                         {sortedVehicles.filter(v => !v.isArchived).map(vehicle => (
-                                            <button
+                                            <Pressable
                                                 key={vehicle.id}
                                                 onClick={() => {
                                                     setVehicleActive(vehicle.id);
                                                     setIsVehicleSelectorOpen(false);
                                                 }}
+                                                scaleDown={0.98}
                                                 className={`w-full flex items-center gap-3 p-2 rounded-xl transition-colors ${vehicle.isActive ? 'bg-indigo-50 dark:bg-indigo-900/30' : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}
                                             >
                                                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${vehicle.isActive ? "bg-indigo-500 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-400"}`}>
@@ -342,7 +349,7 @@ const VehicleDashboard = () => {
                                                     <p className={`text-xs font-bold ${vehicle.isActive ? 'text-indigo-900 dark:text-indigo-100' : 'text-slate-700 dark:text-slate-200'}`}>{vehicle.name}</p>
                                                     <p className="text-[10px] text-slate-500 truncate">{vehicle.brandModel}</p>
                                                 </div>
-                                            </button>
+                                            </Pressable>
                                         ))}
                                     </div>
                                 </motion.div>
