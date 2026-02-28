@@ -5,6 +5,7 @@ import Input from '../atoms/Input';
 import { LockOpen, X } from 'lucide-react';
 
 import { useScrollLock } from '../../hooks/useScrollLock';
+import Pressable from '../atoms/Pressable';
 
 const UnlockDayModal = ({ isOpen, onClose, onConfirm }) => {
     useScrollLock(isOpen);
@@ -35,9 +36,9 @@ const UnlockDayModal = ({ isOpen, onClose, onConfirm }) => {
                     <div className="p-6">
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-xl font-bold text-slate-900 dark:text-white">Unlock Day</h2>
-                            <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-full dark:hover:bg-slate-800">
+                            <Pressable onClick={onClose} scaleDown={0.9} className="p-1 hover:bg-slate-100 rounded-full dark:hover:bg-slate-800">
                                 <X className="w-5 h-5 text-slate-500" />
-                            </button>
+                            </Pressable>
                         </div>
 
                         <div className="flex flex-col items-center justify-center py-4 mb-2">
@@ -63,20 +64,23 @@ const UnlockDayModal = ({ isOpen, onClose, onConfirm }) => {
                                 {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
                             </div>
 
-                            <div className="flex flex-col gap-2">
-                                <Button
-                                    type="submit"
-                                    className="w-full"
+                            <div className="flex flex-col gap-3 mt-4">
+                                <Pressable
+                                    onClick={handleSubmit}
+                                    scaleDown={0.96}
+                                    block
+                                    className="w-full py-3 text-sm font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/20 flex items-center justify-center transition-all"
                                 >
                                     Unlock Day
-                                </Button>
-                                <button
-                                    type="button"
+                                </Pressable>
+                                <Pressable
                                     onClick={onClose}
-                                    className="w-full py-2 text-sm font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                                    scaleDown={0.96}
+                                    block
+                                    className="w-full py-2.5 text-sm font-medium rounded-xl text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 border border-transparent hover:bg-slate-50 dark:hover:bg-white/[0.02] flex items-center justify-center transition-all"
                                 >
                                     Cancel
-                                </button>
+                                </Pressable>
                             </div>
                         </form>
                     </div>

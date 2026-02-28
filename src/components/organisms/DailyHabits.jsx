@@ -7,6 +7,7 @@ import { useData } from '../../context/DataContext';
 import { getIconComponent } from '../../utils/iconInference';
 import HabitManagerDialog from './HabitManagerDialog'; // Forced update v3
 import { DeleteConfirmationModal } from '../ui/DeleteConfirmationModal';
+import Pressable from '../atoms/Pressable';
 
 const HabitToggle = ({ id, icon, label, value, onChange, onDelete, disabled, isEditing }) => {
     // Dynamic Icon Resolution
@@ -159,8 +160,9 @@ const DailyHabits = ({ habits, onUpdateHabit, isLocked }) => {
             <div className="flex items-center justify-between mb-3 px-1">
                 <div className="flex items-center gap-2">
                     {!isLocked && (
-                        <button
+                        <Pressable
                             onClick={() => setIsEditing(!isEditing)}
+                            scaleDown={0.9}
                             className={clsx(
                                 "p-1 rounded-full transition-colors",
                                 isEditing ? "bg-indigo-600 text-white" : "text-slate-400 hover:text-indigo-600"
@@ -168,23 +170,24 @@ const DailyHabits = ({ habits, onUpdateHabit, isLocked }) => {
                             title={isEditing ? "Finish Editing" : "Manage Habits"}
                         >
                             {isEditing ? <Check className="w-3.5 h-3.5" /> : <Edit2 className="w-3.5 h-3.5" />}
-                        </button>
+                        </Pressable>
                     )}
                     <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.1em] dark:text-slate-500">
                         Daily Habits
                     </h3>
                 </div>
                 {!isLocked && (
-                    <button
+                    <Pressable
                         onClick={() => {
                             setShowModal(true);
                             setIsEditing(false);
                         }}
+                        scaleDown={0.9}
                         className="p-1 text-slate-400 hover:text-indigo-600 transition-colors"
                         title="Add Habit"
                     >
                         <Plus className="w-5 h-5" />
-                    </button>
+                    </Pressable>
                 )}
             </div>
 
@@ -222,17 +225,18 @@ const DailyHabits = ({ habits, onUpdateHabit, isLocked }) => {
                         ))}
 
                         {habits.length === 0 && (
-                            <div className="py-8 text-center bg-slate-50/50 dark:bg-slate-900/30 rounded-2xl border-2 border-dashed border-slate-100 dark:border-slate-800">
+                            <div className="py-8 text-center bg-slate-50/50 dark:bg-slate-900/30 rounded-2xl border-2 border-dashed border-slate-100 dark:border-slate-800 flex flex-col items-center">
                                 <span className="block text-slate-400 text-xs mb-2">No habits tracked yet</span>
-                                <button
+                                <Pressable
                                     onClick={() => {
                                         setShowModal(true);
                                         setIsEditing(false);
                                     }}
-                                    className="text-indigo-500 font-semibold text-xs hover:underline"
+                                    scaleDown={0.94}
+                                    className="text-indigo-500 font-semibold text-xs py-1 px-3 rounded hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
                                 >
                                     + Add New Habit
-                                </button>
+                                </Pressable>
                             </div>
                         )}
                     </div>

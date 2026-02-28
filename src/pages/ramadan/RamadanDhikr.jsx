@@ -8,18 +8,23 @@ import { motion, AnimatePresence } from 'framer-motion';
 import PageLayout from '../../components/layout/PageLayout';
 
 import ActionButton from '../../components/atoms/ActionButton';
+import Pressable from '../../components/atoms/Pressable';
 
 const DhikrListItem = ({ title, count, target, onClick, accentClass, bgTint = "bg-indigo-500/10", delay = 0 }) => {
     const progress = target > 0 ? Math.min((count / target) * 100, 100) : 0;
 
     return (
-        <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay }}
+        <Pressable 
             onClick={onClick}
-            className="group relative bg-white dark:bg-[#1C1C1E] border border-slate-100 dark:border-white/5 rounded-[2rem] p-5 shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden flex items-center justify-between"
+            block
+            scaleDown={0.96}
         >
+            <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay }}
+                className="group relative bg-white dark:bg-[#1C1C1E] border border-slate-100 dark:border-white/5 rounded-[2rem] p-5 shadow-sm hover:shadow-md transition-all overflow-hidden flex items-center justify-between"
+            >
             <div className="flex items-center gap-4">
                 <div className={clsx("p-3 rounded-2xl", bgTint)}>
                     <Hash className={clsx("w-5 h-5", accentClass.replace('bg-', 'text-'))} />
@@ -61,7 +66,8 @@ const DhikrListItem = ({ title, count, target, onClick, accentClass, bgTint = "b
                     )}
                 </div>
             )}
-        </motion.div>
+            </motion.div>
+        </Pressable>
     );
 };
 

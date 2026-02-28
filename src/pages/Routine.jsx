@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageLayout from '../components/layout/PageLayout';
+import Pressable from '../components/atoms/Pressable';
 
 const Routine = () => {
     const { dailyData, updateTaskStatus, updateHabit, updateAllTasks, isLocked, submitDay, unlockDay } = useData();
@@ -205,13 +206,15 @@ const Routine = () => {
 
                     {/* Submit / Unlock / Summary */}
                     {isPast ? (
-                        <button
-                            className="w-full py-3.5 text-sm font-semibold rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 shadow-sm flex items-center justify-center gap-2 active:opacity-70 transition-opacity"
+                        <Pressable
+                            scaleDown={0.96}
+                            block
+                            className="w-full py-3.5 text-sm font-semibold rounded-[20px] bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 shadow-sm flex items-center justify-center gap-2"
                             onClick={() => setShowSubmitModal(true)}
                         >
                             <List className="w-4 h-4 stroke-[1.5]" />
                             Day Summary
-                        </button>
+                        </Pressable>
                     ) : isLocked ? (
                         <div className="text-center p-6 bg-slate-100 rounded-2xl dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                             <div className="flex flex-col items-center gap-2 mb-4">
@@ -235,13 +238,15 @@ const Routine = () => {
                             )}
                         </div>
                     ) : (
-                        <button
-                            className="w-full py-3.5 text-sm font-semibold rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 shadow-sm ring-1 ring-slate-900/5 flex items-center justify-center gap-2 active:opacity-70 transition-opacity"
+                        <Pressable
+                            scaleDown={0.96}
+                            block
+                            className="w-full py-3.5 text-sm font-semibold rounded-[20px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 shadow-sm ring-1 ring-slate-900/5 flex items-center justify-center gap-2"
                             onClick={() => setShowSubmitModal(true)}
                         >
                             <List className="w-4 h-4 stroke-[1.5]" />
                             Today's Overview
-                        </button>
+                        </Pressable>
                     )}
             </div>
         </PageLayout>

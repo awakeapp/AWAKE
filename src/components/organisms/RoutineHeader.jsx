@@ -5,6 +5,7 @@ import { useData } from '../../context/DataContext';
 import { cn } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
 import JumpDateModal from './JumpDateModal';
+import Pressable from '../atoms/Pressable';
 
 const RoutineHeader = ({ onEditClick, isLocked }) => {
  const { t, i18n } = useTranslation();
@@ -53,47 +54,54 @@ const RoutineHeader = ({ onEditClick, isLocked }) => {
 
  {/* Controls */}
  <div className="flex items-center gap-1.5 shrink-0">
- <button
+ <Pressable
  onClick={prevDay}
- className="w-9 h-9 flex items-center justify-center rounded text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors active:bg-slate-200 dark:active:bg-slate-700"
+ scaleDown={0.9}
+ className="w-9 h-9 flex items-center justify-center rounded text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
  >
  <ChevronLeft className="w-5 h-5" />
- </button>
+ </Pressable>
 
- <button
+ <Pressable
  onClick={() => {
  if (isToday) setIsJumpModalOpen(true);
  else jumpToToday();
  }}
+ scaleDown={0.94}
  className={cn(
- "px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] rounded transition-opacity ",
+ "px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] rounded transition-opacity flex items-center justify-center min-w-[70px]",
  isToday
  ? "text-slate-500 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
  : "text-white bg-indigo-600 hover:bg-indigo-500 shadow-sm shadow-indigo-500/20"
  )}
  >
  {isToday ? t('date.jump_caps', 'JUMP') : t('date.today', 'TODAY')}
- </button>
+ </Pressable>
 
- <button
+ <Pressable
  onClick={nextDay}
  disabled={isToday}
- className="w-9 h-9 flex items-center justify-center rounded text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors active:bg-slate-200 dark:active:bg-slate-700 disabled:opacity-20 disabled:cursor-default"
+ scaleDown={0.9}
+ className={cn(
+ "w-9 h-9 flex items-center justify-center rounded text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors",
+ isToday && "opacity-20 pointer-events-none"
+ )}
  >
  <ChevronRight className="w-5 h-5" />
- </button>
+ </Pressable>
 
  {/* Edit button (pen icon) */}
  {!isLocked && onEditClick && (
  <>
  <div className="w-px h-6 bg-slate-200 dark:bg-slate-700/50 mx-1 shrink-0" />
- <button
+ <Pressable
  onClick={onEditClick}
+ scaleDown={0.9}
  className="w-9 h-9 flex items-center justify-center rounded text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
  title="Edit routines"
  >
  <Edit2 className="w-4 h-4" />
- </button>
+ </Pressable>
  </>
  )}
  </div>
@@ -124,12 +132,13 @@ const RoutineHeader = ({ onEditClick, isLocked }) => {
  VIEWING PAST DATE: {displayDate}
  </span>
  </div>
- <button
+ <Pressable
  onClick={jumpToToday}
- className="bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-800 transition-opacity font-semibold uppercase tracking-wide px-3 py-1.5 rounded-lg "
+ scaleDown={0.96}
+ className="bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-800 transition-opacity font-semibold uppercase tracking-wide px-3 py-1.5 rounded-lg flex items-center justify-center"
  >
  RETURN TO TODAY
- </button>
+ </Pressable>
  </div>
  )}
  </div>
