@@ -385,7 +385,7 @@ const TaskDashboard = () => {
                             </h3>
                             <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800"></div>
                         </div>
-                        <div className="opacity-80">
+                        <div className="relative">
                             <TaskList
                                 tasks={pendingTasks}
                                 onToggle={toggleTask}

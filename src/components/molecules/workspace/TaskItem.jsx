@@ -59,6 +59,10 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
     return (
         <Pressable
             layout
+            style={{ 
+                zIndex: (isMenuOpen || isDatePickerOpen || showInfo) ? 150 : 0, 
+                position: 'relative' 
+            }}
             initial={false}
             animate={{ opacity: isCompleted ? 0.6 : 1 }}
             onClick={(e) => {
