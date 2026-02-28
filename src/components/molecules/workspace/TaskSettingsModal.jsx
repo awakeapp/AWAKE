@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { useScrollLock } from '../../../hooks/useScrollLock';
 import ConfirmDialog from '../../organisms/ConfirmDialog';
+import Pressable from '../../atoms/Pressable';
 
 const TaskSettingsModal = ({ isOpen, onClose }) => {
     useScrollLock(isOpen);
@@ -51,9 +52,13 @@ const TaskSettingsModal = ({ isOpen, onClose }) => {
                 <div className="p-6 pb-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-20">
                     <div className="flex items-center gap-3">
                         {view === 'settings' ? (
-                            <button onClick={() => setView('main')} className="p-1 -ml-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors mr-1 cursor-pointer">
+                            <Pressable 
+                                onClick={() => setView('main')} 
+                                scaleDown={0.9}
+                                className="p-1 -ml-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors mr-1 cursor-pointer"
+                            >
                                 <ArrowLeft className="w-5 h-5 text-slate-500" />
-                            </button>
+                            </Pressable>
                         ) : (
                             <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                                 <SlidersHorizontal className="w-4 h-4 text-slate-600 dark:text-slate-300" />
@@ -63,56 +68,80 @@ const TaskSettingsModal = ({ isOpen, onClose }) => {
                             {view === 'settings' ? 'Task Settings' : 'More Options'}
                         </h2>
                     </div>
-                    <button onClick={handleClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                    <Pressable 
+                        onClick={handleClose} 
+                        scaleDown={0.9}
+                        className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                    >
                         <X className="w-5 h-5 text-slate-500" />
-                    </button>
+                    </Pressable>
                 </div>
 
                 <div className="p-0 overflow-y-auto space-y-6 flex-1 py-4">
                     
                     {view === 'main' ? (
                         <div className="px-4 space-y-2">
-                            <button onClick={() => { navigate('/workspace/filter/all'); handleClose(); }} className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded flex items-center justify-between border border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-sm">
+                            <Pressable 
+                                onClick={() => { navigate('/workspace/filter/all'); handleClose(); }} 
+                                scaleDown={0.98}
+                                className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded flex items-center justify-between border border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-sm"
+                            >
                                 <div className="flex items-center gap-3">
                                     <ListTodo className="w-5 h-5 text-indigo-500" />
                                     <span className="font-bold text-slate-700 dark:text-slate-200">Active Tasks</span>
                                 </div>
                                 <ChevronRight className="w-5 h-5 text-slate-300" />
-                            </button>
+                            </Pressable>
                             
-                            <button onClick={() => { navigate('/workspace/calendar'); handleClose(); }} className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded flex items-center justify-between border border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-sm">
+                            <Pressable 
+                                onClick={() => { navigate('/workspace/calendar'); handleClose(); }} 
+                                scaleDown={0.98}
+                                className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded flex items-center justify-between border border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-sm"
+                            >
                                 <div className="flex items-center gap-3">
                                     <Calendar className="w-5 h-5 text-blue-500" />
                                     <span className="font-bold text-slate-700 dark:text-slate-200">Calendar View</span>
                                 </div>
                                 <ChevronRight className="w-5 h-5 text-slate-300" />
-                            </button>
+                            </Pressable>
                             
-                            <button onClick={() => { navigate('/workspace/overview'); handleClose(); }} className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded flex items-center justify-between border border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-sm">
+                            <Pressable 
+                                onClick={() => { navigate('/workspace/overview'); handleClose(); }} 
+                                scaleDown={0.98}
+                                className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded flex items-center justify-between border border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-sm"
+                            >
                                 <div className="flex items-center gap-3">
                                     <Layout className="w-5 h-5 text-purple-500" />
                                     <span className="font-bold text-slate-700 dark:text-slate-200">Weekly Overview</span>
                                 </div>
                                 <ChevronRight className="w-5 h-5 text-slate-300" />
-                            </button>
+                            </Pressable>
                             
-                            <button onClick={() => { navigate('/workspace/recent'); handleClose(); }} className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded flex items-center justify-between border border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-sm">
+                            <Pressable 
+                                onClick={() => { navigate('/workspace/recent'); handleClose(); }} 
+                                scaleDown={0.98}
+                                className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded flex items-center justify-between border border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-sm"
+                            >
                                 <div className="flex items-center gap-3">
                                     <Clock className="w-5 h-5 text-emerald-500" />
                                     <span className="font-bold text-slate-700 dark:text-slate-200">Recent Tasks</span>
                                 </div>
                                 <ChevronRight className="w-5 h-5 text-slate-300" />
-                            </button>
+                            </Pressable>
 
                             <div className="h-4"></div>
 
-                            <button onClick={() => setView('settings')} className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded flex items-center justify-between border border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-sm">
+                            <Pressable 
+                                onClick={() => setView('settings')} 
+                                scaleDown={0.98}
+                                className="w-full p-4 bg-slate-50 dark:bg-slate-800/50 rounded flex items-center justify-between border border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-sm"
+                            >
                                 <div className="flex items-center gap-3">
                                     <Settings className="w-5 h-5 text-slate-500" />
                                     <span className="font-bold text-slate-700 dark:text-slate-200">Task Settings</span>
                                 </div>
                                 <ChevronRight className="w-5 h-5 text-slate-300" />
-                            </button>
+                            </Pressable>
                         </div>
                     ) : (
                         <div className="px-6 space-y-8">
@@ -168,9 +197,10 @@ const TaskSettingsModal = ({ isOpen, onClose }) => {
 
                                     <hr className="border-slate-200 dark:border-slate-800 mx-3" />
                                     
-                                    <button 
+                                    <Pressable 
                                         onClick={() => setClearConfirmOpen(true)}
                                         disabled={isClearing}
+                                        scaleDown={0.98}
                                         className="w-full flex items-center justify-between p-3 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded-lg transition-colors disabled:opacity-50"
                                     >
                                         <div className="flex items-center gap-3">
@@ -178,7 +208,7 @@ const TaskSettingsModal = ({ isOpen, onClose }) => {
                                             <span className="font-bold text-sm">Clear All Task Data</span>
                                         </div>
                                         {isClearing ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> : <ChevronRight className="w-4 h-4 opacity-40" />}
-                                    </button>
+                                    </Pressable>
                                 </div>
                             </section>
                             

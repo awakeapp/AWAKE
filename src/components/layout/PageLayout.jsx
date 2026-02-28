@@ -15,10 +15,10 @@ const PageLayout = ({
     children,
     bottomNav,
     bgClass = "bg-white dark:bg-slate-950",
-    contentPadClass = "px-4 pb-8 flex flex-col gap-6",
+    contentPadClass = "px-4 pb-8 pt-1 flex flex-col gap-5",
     renderFloating
 }) => {
-    // Header height is 60px. Gap is 16px. Total = 76px.
+    // Header height is 60px
     const hasHeader = header || title;
 
     return (
@@ -53,10 +53,10 @@ const PageLayout = ({
 
             {/* 2. Content Area: handles top spacing for fixed header */}
             <main 
-                className={clsx("flex-1 w-full relative", contentPadClass)}
+                className={clsx("flex-1 w-full relative [&>*:first-child]:mt-0", contentPadClass)}
                 style={{
                     paddingTop: hasHeader 
-                        ? 'calc(60px + env(safe-area-inset-top, 0px))' // 60px header
+                        ? 'calc(60px + env(safe-area-inset-top, 0px))' // 60px header exactly
                         : 'calc(0px + env(safe-area-inset-top, 0px))' // No header
                 }}
             >
