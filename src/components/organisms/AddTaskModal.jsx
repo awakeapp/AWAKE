@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Clock, Type } from 'lucide-react';
+import ActionButton from '../atoms/ActionButton';
 
 import { useScrollLock } from '../../hooks/useScrollLock';
 
@@ -51,12 +52,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave }) => {
                     {/* Header - Compact & Clean */}
                     <div className="px-6 pt-5 pb-2 flex items-center justify-between">
                         <h3 className="text-slate-900 dark:text-white font-medium text-base tracking-tight">Add New Task</h3>
-                        <button
-                            onClick={onClose}
-                            className="p-1.5 -mr-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
-                        >
-                            <X className="w-5 h-5 stroke-[1.5]" />
-                        </button>
+                        <ActionButton variant="exit" onClick={onClose} size="sm" />
                     </div>
 
                     {/* Body */}
@@ -107,19 +103,22 @@ const AddTaskModal = ({ isOpen, onClose, onSave }) => {
 
                         {/* Action Buttons - Quiet & Confident */}
                         <div className="pt-4 flex items-center gap-3">
-                            <button
+                            <ActionButton
+                                variant="back"
                                 onClick={onClose}
-                                className="flex-1 py-3.5 text-sm font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
-                            >
-                                Cancel
-                            </button>
-                            <button
+                                label="Cancel"
+                                iconOnly={false}
+                                className="flex-1 py-3.5 bg-transparent border-none text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                            />
+                            <ActionButton
+                                variant="primary"
                                 onClick={handleSave}
                                 disabled={!name.trim() || !time}
-                                className="flex-[2] py-3.5 rounded-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-medium shadow-lg shadow-indigo-200 dark:shadow-none disabled:opacity-50 disabled:shadow-none transition-all transform active:scale-[0.98]"
-                            >
-                                Save Task
-                            </button>
+                                label="Save Task"
+                                iconOnly={false}
+                                className="flex-[2] py-3.5"
+                                fullWidth
+                            />
                         </div>
                     </div>
                 </motion.div>

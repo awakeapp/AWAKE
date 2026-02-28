@@ -1,5 +1,5 @@
-import React from 'react';
 import { X, CheckSquare, Square, Trash2, MoreHorizontal } from 'lucide-react';
+import ActionButton from '../atoms/ActionButton';
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -30,29 +30,33 @@ export function SelectionBar({
       }}
     >
       <div className="flex items-center gap-3">
-        <button
+        <ActionButton
+          variant="exit"
           onClick={onCancel}
-          className="p-2 -ml-2 rounded-xl hover:bg-white/10 transition-colors active:scale-95"
-        >
-          <X className="w-6 h-6" />
-        </button>
+          className="p-2 -ml-2 bg-transparent text-white hover:bg-white/10"
+          size="sm"
+        />
         <span className="text-lg font-semibold">{count} Selected</span>
       </div>
 
       <div className="flex items-center gap-1">
-        <button
+        <ActionButton
+          variant="ghost"
           onClick={onSelectAll}
-          className="p-2 rounded-xl hover:bg-white/10 transition-colors active:scale-95 flex items-center gap-2"
+          label={isAllSelected ? 'Deselect All' : 'Select All'}
+          iconOnly={false}
+          className="bg-transparent text-white hover:bg-white/10"
+          size="sm"
         >
           {isAllSelected ? (
-            <CheckSquare className="w-6 h-6" />
+            <CheckSquare className="w-5 h-5 mr-2" />
           ) : (
-            <Square className="w-6 h-6" />
+            <Square className="w-5 h-5 mr-2" />
           )}
           <span className="hidden sm:inline text-sm font-medium">
             {isAllSelected ? 'Deselect All' : 'Select All'}
           </span>
-        </button>
+        </ActionButton>
 
         <div className="h-6 w-px bg-white/20 mx-2" />
 

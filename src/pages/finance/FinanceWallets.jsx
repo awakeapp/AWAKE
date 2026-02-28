@@ -8,6 +8,7 @@ import { DeleteConfirmationModal } from '../../components/ui/DeleteConfirmationM
 import { useSelection } from '../../hooks/useSelection';
 import { SelectionBar } from '../../components/ui/SelectionBar';
 import { ArrowLeft, Wallet, Plus, Trash2, Archive as ArchiveIcon } from 'lucide-react';
+import ActionButton from '../../components/atoms/ActionButton';
 import clsx from 'clsx';
 
 const FinanceWallets = () => {
@@ -85,20 +86,25 @@ const FinanceWallets = () => {
                     />
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white -ml-1">
-                                <ArrowLeft className="w-5 h-5" />
-                            </button>
+                            <ActionButton 
+                                variant="back"
+                                onClick={() => navigate(-1)} 
+                                className="p-2 bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-900 dark:text-white -ml-1"
+                            />
                             <div>
                                 <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Wallets</h1>
                                 <p className="text-[11px] text-slate-400 font-medium">{activeAccounts.length} active account{activeAccounts.length !== 1 ? 's' : ''}</p>
                             </div>
                         </div>
-                        <button
+                        <ActionButton
+                            variant="primary"
                             onClick={() => setIsAdding(true)}
-                            className="px-4 py-2 bg-indigo-600 text-white rounded-xl font-bold text-sm flex items-center gap-1.5 active:scale-95 transition-transform shadow-lg shadow-indigo-500/20"
+                            label="Add"
+                            iconOnly={false}
+                            className="px-4 py-2 bg-indigo-600 text-white rounded-xl font-bold text-sm"
                         >
-                            <Plus className="w-4 h-4" /> Add
-                        </button>
+                            <Plus className="w-4 h-4 mr-1.5" />
+                        </ActionButton>
                     </div>
                 </div>
             }
@@ -206,8 +212,8 @@ const FinanceWallets = () => {
                             className="w-full bg-slate-50 dark:bg-slate-800 rounded-xl p-3 text-slate-900 dark:text-white font-bold outline-none border border-slate-200 dark:border-slate-700 focus:border-indigo-400"
                         />
                         <div className="flex gap-2">
-                            <button onClick={() => setIsAdding(false)} className="flex-1 py-3 text-slate-400 font-bold rounded-xl">Cancel</button>
-                            <button onClick={handleAdd} className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl active:scale-95 transition-transform">Save</button>
+                            <ActionButton variant="back" label="Cancel" onClick={() => setIsAdding(false)} className="flex-1 py-3 text-slate-400 font-bold rounded-xl" />
+                            <ActionButton variant="primary" label="Save" onClick={handleAdd} className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl" />
                         </div>
                     </div>
                 )}

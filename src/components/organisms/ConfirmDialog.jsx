@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, X } from 'lucide-react';
 import clsx from 'clsx';
+import ActionButton from '../atoms/ActionButton';
 
 const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message, confirmText = 'Delete', cancelText = 'Cancel', isDestructive = true }) => {
     return (
@@ -37,26 +38,23 @@ const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message, confirmText
                             </div>
                             
                             <div className="flex items-center gap-3 mt-8">
-                                <button
+                                <ActionButton
+                                    variant="back"
                                     onClick={onClose}
-                                    className="flex-1 py-3 text-sm font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-400 rounded-xl transition-colors"
-                                >
-                                    {cancelText}
-                                </button>
-                                <button
+                                    label={cancelText}
+                                    iconOnly={false}
+                                    className="flex-1 py-3 text-sm font-bold bg-transparent text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-400"
+                                />
+                                <ActionButton
+                                    variant={isDestructive ? "delete" : "primary"}
                                     onClick={() => {
                                         onConfirm();
                                         onClose();
                                     }}
-                                    className={clsx(
-                                        "flex-1 py-3 text-sm font-bold rounded-xl transition-colors text-white",
-                                        isDestructive 
-                                            ? "bg-red-500 hover:bg-red-600 dark:bg-red-500/80 dark:hover:bg-red-500" 
-                                            : "bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500/80 dark:hover:bg-indigo-500"
-                                    )}
-                                >
-                                    {confirmText}
-                                </button>
+                                    label={confirmText}
+                                    iconOnly={false}
+                                    className="flex-1 py-3 text-sm font-bold"
+                                />
                             </div>
                         </motion.div>
                     </div>

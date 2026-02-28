@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
 import { User, Plus, MoreVertical, Search, CheckCircle, UserPlus, Phone, X, Trash2, Check, Archive } from 'lucide-react';
+import ActionButton from '../../components/atoms/ActionButton';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import { motion, AnimatePresence } from 'framer-motion';
 import FinanceBottomNav from '../../components/finance/FinanceBottomNav';
@@ -239,14 +240,16 @@ const DebtManager = () => {
                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Name</label>
                                             <div className="relative">
                                                 <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="John Doe" autoComplete="name" className="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 pr-12 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm" autoFocus />
-                                                <button
+                                                <ActionButton
+                                                    variant="primary"
                                                     type="button"
                                                     onClick={pickContact}
-                                                    className="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 active:scale-90 transition-all"
+                                                    className="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 hover:bg-indigo-100 dark:hover:bg-indigo-500/20"
                                                     title="Import from contacts"
+                                                    iconOnly={true}
                                                 >
                                                     <UserPlus className="w-4 h-4" />
-                                                </button>
+                                                </ActionButton>
                                             </div>
                                             {contactError && (
                                                 <p className="text-[11px] text-amber-600 dark:text-amber-400 font-medium mt-1.5 flex items-center gap-1">
@@ -279,12 +282,20 @@ const DebtManager = () => {
                                     </div>
 
                                     <div className="flex gap-3 mt-8">
-                                        <button type="button" onClick={() => setIsAdding(false)} className="flex-1 py-4 font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors">
-                                            Cancel
-                                        </button>
-                                        <button type="submit" className="flex-[2] py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl shadow-lg shadow-indigo-500/30 active:scale-[0.98] transition-all">
-                                            Save Party
-                                        </button>
+                                        <ActionButton
+                                            variant="back"
+                                            onClick={() => setIsAdding(false)}
+                                            label="Cancel"
+                                            iconOnly={false}
+                                            className="flex-1 py-4 font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl"
+                                        />
+                                        <ActionButton
+                                            variant="primary"
+                                            type="submit"
+                                            label="Save Party"
+                                            iconOnly={false}
+                                            className="flex-[2] py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl shadow-lg shadow-indigo-500/30"
+                                        />
                                     </div>
                                 </motion.form>
                             </div>
@@ -333,23 +344,23 @@ const DebtManager = () => {
                     onSelectAll={toggleSelectAll}
                     isAllSelected={selectedIds.length === debtParties.length}
                     actions={(
-                        <button
+                        <ActionButton
+                            variant="delete"
                             onClick={() => setDeleteConfirmId('bulk')}
-                            className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors"
-                        >
-                            <Trash2 className="w-5 h-5" />
-                        </button>
+                            className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl"
+                        />
                     )}
                 />
             ) : undefined}
             showBack={!isSelectionMode}
             rightNode={isSelectionMode ? null : (
-                <button 
+                <ActionButton 
+                    variant="primary"
                     onClick={() => setIsAdding(true)} 
-                    className="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full transition-colors shadow-sm shadow-indigo-500/30 active:scale-95"
+                    className="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-sm shadow-indigo-500/30"
                 >
                     <Plus className="w-5 h-5" />
-                </button>
+                </ActionButton>
             )}
         >
             <div className="space-y-4">
@@ -388,9 +399,13 @@ const DebtManager = () => {
                                 <p className="text-slate-500 text-sm mb-8 leading-relaxed max-w-xs mx-auto">
                                     Add friends, clients, or businesses you lend to or borrow from.
                                 </p>
-                                <button onClick={() => setIsAdding(true)} className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-indigo-500/20 hover:scale-[1.02] transition-transform">
-                                    + Add Party
-                                </button>
+                                <ActionButton 
+                                    variant="primary"
+                                    onClick={() => setIsAdding(true)} 
+                                    label="+ Add Party"
+                                    iconOnly={false}
+                                    className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-indigo-500/20"
+                                />
                             </div>
                         ) : (
                             partyData.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || (p.tag && p.tag.toLowerCase().includes(searchQuery.toLowerCase()))).map(party => {
@@ -474,18 +489,20 @@ const DebtManager = () => {
                                         </div>
 
                                         <div className="flex gap-2.5 mt-1 pt-4 border-t border-slate-50 dark:border-slate-800/50">
-                                            <button 
+                                            <ActionButton 
+                                                variant="ghost"
                                                 onClick={(e) => { e.stopPropagation(); navigate(`/finance/debts/${party.id}`); }}
-                                                className="flex-1 py-2.5 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold uppercase tracking-wider rounded-xl transition-colors"
-                                            >
-                                                View
-                                            </button>
-                                            <button 
+                                                label="View"
+                                                iconOnly={false}
+                                                className="flex-1 py-2.5 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold uppercase tracking-wider rounded-xl"
+                                            />
+                                            <ActionButton 
+                                                variant="primary"
                                                 onClick={(e) => { e.stopPropagation(); navigate(`/finance/debts/${party.id}`, { state: { openAdd: true }}); }}
-                                                className="flex-1 py-2.5 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider rounded-xl transition-colors"
-                                            >
-                                                Add Entry
-                                            </button>
+                                                label="Add Entry"
+                                                iconOnly={false}
+                                                className="flex-1 py-2.5 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider rounded-xl"
+                                            />
                                         </div>
                                     </motion.div>
                                 );

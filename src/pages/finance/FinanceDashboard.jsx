@@ -16,6 +16,7 @@ import { useAuthContext } from '../../hooks/useAuthContext';
 import FinanceBottomNav from '../../components/finance/FinanceBottomNav';
 import { useToast } from '../../context/ToastContext';
 import PageLayout from '../../components/layout/PageLayout';
+import ActionButton from '../../components/atoms/ActionButton';
 
 const FinanceDashboard = () => {
     const navigate = useNavigate();
@@ -155,12 +156,14 @@ const FinanceDashboard = () => {
                                 style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 90px)' }}
                             >
                                 <span>{undoToast.message}</span>
-                                <button
+                                <ActionButton
+                                    variant="undo"
                                     onClick={handleUndo}
-                                    className="text-indigo-400 hover:text-indigo-300 font-bold uppercase text-xs"
-                                >
-                                    {t('finance.undo', 'Undo')}
-                                </button>
+                                    label={t('finance.undo', 'Undo')}
+                                    iconOnly={false}
+                                    size="sm"
+                                    className="bg-white/10 text-white hover:bg-white/20"
+                                />
                             </motion.div>
                         )}
                     </AnimatePresence>
@@ -177,16 +180,22 @@ const FinanceDashboard = () => {
             title={t('finance.title', 'Finance')}
             rightNode={
                 <div className="flex items-center">
-                    <div className="flex items-center gap-0.5 bg-slate-100 dark:bg-slate-900 rounded-xl p-1 border border-slate-200 dark:border-slate-800">
-                        <button onClick={() => changeMonth(-1)} className="p-1 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-colors shadow-sm">
-                            <ChevronLeft className="w-3.5 h-3.5 text-slate-500" />
-                        </button>
+                    <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 rounded-2xl p-1 border border-slate-200 dark:border-slate-800">
+                        <ActionButton 
+                            variant="prev" 
+                            onClick={() => changeMonth(-1)} 
+                            size="sm" 
+                            className="bg-transparent hover:bg-white dark:hover:bg-slate-800"
+                        />
                         <span className="text-[10px] font-black uppercase tracking-widest min-w-[70px] text-center text-slate-700 dark:text-slate-200">
                             {format(selectedDate, 'MMM yy')}
                         </span>
-                        <button onClick={() => changeMonth(1)} className="p-1 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-colors shadow-sm">
-                            <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
-                        </button>
+                        <ActionButton 
+                            variant="forward" 
+                            onClick={() => changeMonth(1)} 
+                            size="sm" 
+                            className="bg-transparent hover:bg-white dark:hover:bg-slate-800"
+                        />
                     </div>
                 </div>
             }

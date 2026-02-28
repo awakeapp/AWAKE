@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MoreVertical, Edit2, Trash2, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ActionButton from '../atoms/ActionButton';
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -48,15 +49,16 @@ export function ItemMenu({
 
   return (
     <div className={cn("relative", className)} ref={menuRef}>
-      <button
+      <ActionButton
+        variant="ghost"
         onClick={toggleMenu}
         className={cn(
-          "p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-400 active:scale-90",
+          "p-2 rounded-xl text-slate-400",
           iconClassName
         )}
       >
         <MoreVertical className="w-5 h-5" />
-      </button>
+      </ActionButton>
 
       <AnimatePresence>
         {isOpen && (

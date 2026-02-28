@@ -9,6 +9,7 @@ import JumpDateModal from '../../components/organisms/JumpDateModal';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import { useToast } from '../../context/ToastContext';
 import ConfirmDialog from '../../components/organisms/ConfirmDialog';
+import ActionButton from '../../components/atoms/ActionButton';
 
 const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDelete, initialType = 'expense' }) => {
     useScrollLock(isOpen);
@@ -165,12 +166,11 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                                         </div>
                                     </div>
                                 </div>
-                                <button 
+                                <ActionButton 
+                                    variant="exit" 
                                     onClick={onClose} 
-                                    className="p-3 bg-slate-100 dark:bg-slate-800 rounded-2xl text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all active:scale-90"
-                                >
-                                    <X className="w-5 h-5 font-bold" />
-                                </button>
+                                    size="sm"
+                                />
                             </div>
 
                             {/* Type Selection - High Priority Hierarchy */}
@@ -305,18 +305,26 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                         <div className="p-8 pt-0 border-t border-slate-50 dark:border-slate-800/50">
                             <div className="flex gap-4 mt-6">
                                 {editTransactionId && (
-                                    <button
-                                        type="button"
+                                    <ActionButton
+                                        variant="delete"
                                         onClick={() => setDeleteConfirmOpen(true)}
-                                        className="w-16 h-16 bg-rose-50 dark:bg-rose-900/10 text-rose-500 rounded-2xl flex items-center justify-center active:scale-95 transition-all"
-                                    ><Trash className="w-6 h-6" /></button>
+                                        className="w-16 h-16"
+                                        size="lg"
+                                    />
                                 )}
-                                <button
+                                <ActionButton
+                                    variant="primary"
+                                    fullWidth
                                     onClick={handleSubmit}
-                                    className="flex-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black uppercase text-xs tracking-[0.2em] py-5 rounded-2xl shadow-2xl active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                                    label={editTransactionId ? 'Commit Changes' : 'Record Transaction'}
+                                    iconOnly={true} // It will use its variant icon or we can give it children
+                                    className="py-5"
+                                    size="lg"
                                 >
-                                    {editTransactionId ? 'Commit Changes' : 'Record Transaction'}
-                                </button>
+                                    <span className="font-black uppercase text-xs tracking-[0.2em]">
+                                        {editTransactionId ? 'Commit Changes' : 'Record Transaction'}
+                                    </span>
+                                </ActionButton>
                             </div>
                         </div>
                     </motion.div>

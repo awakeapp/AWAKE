@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Trash2, Check } from 'lucide-react';
+import ActionButton from '../atoms/ActionButton';
 import Button from '../atoms/Button';
 import { useData } from '../../context/DataContext';
 import { inferIcon, getIconComponent } from '../../utils/iconInference';
@@ -123,23 +124,25 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
                             Edit Routine
                         </h3>
                         <div className="flex items-center gap-2">
-                            <button
+                            <ActionButton
+                                variant="ghost"
                                 onClick={() => {
                                     setNewTaskName('');
                                     setNewTaskTime('');
                                     setShowAddRow(true);
                                 }}
-                                className="p-1 text-indigo-100 hover:text-white transition-colors rounded-full hover:bg-white/10"
+                                className="p-1 text-indigo-100 hover:text-white rounded-full hover:bg-white/10"
                                 title="Add Task"
                             >
                                 <Plus className="w-6 h-6 stroke-[1.5]" />
-                            </button>
-                            <button
+                            </ActionButton>
+                            <ActionButton
+                                variant="exit"
                                 onClick={onClose}
-                                className="p-1 -mr-1 text-indigo-100 hover:text-white transition-colors rounded-full hover:bg-white/10"
+                                className="p-1 -mr-1 text-indigo-100 hover:text-white rounded-full hover:bg-white/10 bg-transparent"
                             >
                                 <X className="w-6 h-6 stroke-[1.5]" />
-                            </button>
+                            </ActionButton>
                         </div>
                     </div>
 
@@ -197,13 +200,12 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
                                         </select>
                                     </div>
 
-                                    <button
+                                    <ActionButton
+                                        variant="delete"
                                         onClick={() => setDeleteConfirmId(task.id)}
-                                        className="shrink-0 p-1.5 text-slate-300 hover:text-red-500 transition-colors"
+                                        className="shrink-0 p-1.5 text-slate-300 hover:text-red-500 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
                                         aria-label="Delete"
-                                    >
-                                        <Trash2 className="w-4 h-4 stroke-[1.5]" />
-                                    </button>
+                                    />
                                 </motion.div>
                             ))
                         )}
@@ -255,19 +257,21 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
                                     </select>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                    <button
+                                    <ActionButton
+                                        variant="ghost"
                                         onClick={() => setShowAddRow(false)}
-                                        className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                                        className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg"
                                     >
                                         <X className="w-5 h-5" />
-                                    </button>
-                                    <button
+                                    </ActionButton>
+                                    <ActionButton
+                                        variant="primary"
                                         onClick={handleConfirmAdd}
                                         disabled={!newTaskName.trim()}
-                                        className="p-1 text-indigo-600 hover:text-indigo-700 disabled:opacity-30 disabled:cursor-not-allowed"
+                                        className="p-1 bg-transparent text-indigo-600 hover:text-indigo-700 disabled:opacity-30 rounded-lg"
                                     >
                                         <Plus className="w-6 h-6" />
-                                    </button>
+                                    </ActionButton>
                                 </div>
                             </motion.div>
                         )}

@@ -14,6 +14,7 @@ import { DeleteConfirmationModal } from '../../components/ui/DeleteConfirmationM
 import { SelectionBar } from '../../components/ui/SelectionBar';
 import { useSelection } from '../../hooks/useSelection';
 import PageLayout from '../../components/layout/PageLayout';
+import ActionButton from '../../components/atoms/ActionButton';
 
 const TaskDashboard = () => {
     const { t: translate } = useTranslation(); 
@@ -231,25 +232,27 @@ const TaskDashboard = () => {
                         rightNode={
                             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 pl-1">
                                 {canAddTask && (
-                                    <button
+                                    <ActionButton
+                                        variant="ghost"
                                         onClick={() => setIsModalOpen(true)}
-                                        className="flex flex-col items-center justify-center p-1 sm:p-2 text-indigo-600 dark:text-sky-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all group"
+                                        className="flex flex-col items-center justify-center p-1 sm:p-2 text-indigo-600 dark:text-sky-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl group"
                                     >
                                         <Plus className="w-7 h-7 sm:w-8 sm:h-8 stroke-[2.5]" />
                                         <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider mt-0.5 group-hover:text-indigo-700">Add Task</span>
-                                    </button>
+                                    </ActionButton>
                                 )}
                                 
                                 <div className="relative shrink-0" ref={menuRef}>
-                                    <button
+                                    <ActionButton
+                                        variant="ghost"
                                         onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
                                         className={clsx(
-                                            "flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-800 transition-all ",
+                                            "flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-800",
                                             menuOpen && "bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white"
                                         )}
                                     >
                                         <MoreHorizontal className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2]" />
-                                    </button>
+                                    </ActionButton>
 
                                     <div
                                         className={clsx(
@@ -260,13 +263,14 @@ const TaskDashboard = () => {
                                         )}
                                     >
                                         <div className="font-mono text-[11px] text-slate-400 dark:text-white/20 tracking-[0.1em] uppercase px-3.5 pt-2 pb-1.5 flex items-center h-4">Actions</div>
-                                        <button
+                                        <ActionButton
+                                            variant="ghost"
                                             onClick={() => {
                                                 const modes = ['default', 'category', 'priority', 'time'];
                                                 const nextMode = modes[(modes.indexOf(sortMode) + 1) % modes.length];
                                                 handleSortChange(nextMode);
                                             }}
-                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[15px] font-semibold"
+                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white text-left w-full text-[15px] font-semibold"
                                         >
                                             <div className="w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 bg-indigo-500/10 dark:bg-indigo-400/10">
                                                 <ArrowUpDown className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
@@ -275,59 +279,64 @@ const TaskDashboard = () => {
                                                 <span>Sort</span>
                                                 <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">{sortMode}</span>
                                             </div>
-                                        </button>
+                                        </ActionButton>
                                         <div className="h-px bg-slate-100 dark:bg-white/[0.06] mx-2 my-1" />
                                         
                                         <div className="font-mono text-[11px] text-slate-400 dark:text-white/20 tracking-[0.1em] uppercase px-3.5 pt-2 pb-1.5 flex items-center h-4">View</div>
-                                        <button
+                                        <ActionButton
+                                            variant="ghost"
                                             onClick={() => { navigate('/workspace/filter/all'); setMenuOpen(false); }}
-                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[15px] font-semibold"
+                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white text-left w-full text-[15px] font-semibold"
                                         >
                                             <div className="w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 bg-sky-500/10 dark:bg-sky-400/10">
                                                 <ListTodo className="w-4 h-4 text-sky-500 dark:text-sky-400" />
                                             </div>
-                                            Active Tasks
-                                        </button>
-                                        <button
+                                            <span>Active Tasks</span>
+                                        </ActionButton>
+                                        <ActionButton
+                                            variant="ghost"
                                             onClick={() => { navigate('/workspace/calendar'); setMenuOpen(false); }}
-                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[15px] font-semibold"
+                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white text-left w-full text-[15px] font-semibold"
                                         >
                                             <div className="w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 bg-blue-500/10 dark:bg-blue-400/10">
                                                 <CalendarIcon className="w-4 h-4 text-blue-500 dark:text-blue-400" />
                                             </div>
-                                            Calendar View
-                                        </button>
-                                        <button
+                                            <span>Calendar View</span>
+                                        </ActionButton>
+                                        <ActionButton
+                                            variant="ghost"
                                             onClick={() => { navigate('/workspace/overview'); setMenuOpen(false); }}
-                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[15px] font-semibold"
+                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white text-left w-full text-[15px] font-semibold"
                                         >
                                             <div className="w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 bg-purple-500/10 dark:bg-purple-400/10">
                                                 <Layout className="w-4 h-4 text-purple-500 dark:text-purple-400" />
                                             </div>
-                                            Weekly Overview
-                                        </button>
-                                        <button
+                                            <span>Weekly Overview</span>
+                                        </ActionButton>
+                                        <ActionButton
+                                            variant="ghost"
                                             onClick={() => { navigate('/workspace/filter/recent'); setMenuOpen(false); }}
-                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[15px] font-semibold"
+                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white text-left w-full text-[15px] font-semibold"
                                         >
                                             <div className="w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 bg-emerald-500/10 dark:bg-emerald-400/10">
                                                 <Clock className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
                                             </div>
-                                            Recent Tasks
-                                        </button>
+                                            <span>Recent Tasks</span>
+                                        </ActionButton>
                                         
                                         <div className="h-px bg-slate-100 dark:bg-white/[0.06] mx-2 my-1" />
                                         
                                         <div className="font-mono text-[11px] text-slate-400 dark:text-white/20 tracking-[0.1em] uppercase px-3.5 pt-2 pb-1.5 flex items-center h-4">Options</div>
-                                        <button
+                                        <ActionButton
+                                            variant="ghost"
                                             onClick={() => { setIsSettingsOpen(true); setMenuOpen(false); }}
-                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white transition-colors text-left w-full text-[15px] font-semibold"
+                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white text-left w-full text-[15px] font-semibold"
                                         >
                                             <div className="w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 bg-slate-500/10 dark:bg-slate-400/10">
                                                 <Settings className="w-4 h-4 text-slate-500 dark:text-slate-400" />
                                             </div>
-                                            Task Settings
-                                        </button>
+                                            <span>Task Settings</span>
+                                        </ActionButton>
                                     </div>
                                 </div>
                             </div>
@@ -394,14 +403,14 @@ const TaskDashboard = () => {
                                 onSelect={handleSelect}
                                 onLongPress={handleLongPress}
                             />
-                            <button
-                                onClick={() => {
-                                    pendingTasks.forEach(task => handleReschedule(task.id, 'today'));
-                                }}
-                                className="w-full mt-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-[13px] font-medium text-slate-500 hover:text-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
-                            >
-                                Move all to Today
-                            </button>
+                            <ActionButton
+                                        variant="ghost"
+                                        onClick={() => {
+                                            pendingTasks.forEach(task => handleReschedule(task.id, 'today'));
+                                        }}
+                                        label="Move all to Today"
+                                        className="w-full mt-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-[13px] font-medium text-slate-500 hover:text-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                                    />
                         </div>
                     </section>
                 )}

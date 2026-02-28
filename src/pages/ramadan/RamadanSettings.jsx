@@ -101,7 +101,7 @@ const RamadanSettings = () => {
             title="Logic" 
             showBack
             renderFloating={<LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />}
-            contentPadClass="px-4 pb-12 pt-4 flex flex-col gap-6"
+            contentPadClass="px-2 pb-12 pt-4 flex flex-col gap-6"
             bgClass="bg-transparent"
         >
                 

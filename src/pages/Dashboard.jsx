@@ -16,6 +16,7 @@ import clsx from 'clsx';
 import PageLayout from '../components/layout/PageLayout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Trophy, Target, Flame } from 'lucide-react';
+import ActionButton from '../components/atoms/ActionButton';
 import { FirestoreService } from '../services/firestore-service';
 import { orderBy, limit } from 'firebase/firestore';
 
@@ -215,15 +216,16 @@ const Dashboard = () => {
                                 <div className="text-sm font-bold text-slate-700 dark:text-slate-300">{remainingTasksCount}</div>
                             </div>
 
-                            <button
+                            <ActionButton
+                                variant="primary"
                                 onClick={() => setShowManagerModal(true)}
                                 className={clsx(
-                                    "w-10 h-10 rounded-full flex items-center justify-center bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 transition-colors",
+                                    "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
                                     isLocked && "hidden"
                                 )}
                             >
                                 <Edit2 className="w-4 h-4 stroke-[2]" />
-                            </button>
+                            </ActionButton>
                         </div>
                     </div>
                 </div>
@@ -328,12 +330,14 @@ const Dashboard = () => {
                         )}
                     </div>
                 ) : (
-                    <Button
+                    <ActionButton
+                        variant="primary"
                         className="w-full py-4 text-sm font-semibold shadow-xl shadow-indigo-500/20"
                         onClick={handleInitialSubmit}
-                    >
-                        Complete Day
-                    </Button>
+                        label="Complete Day"
+                        iconOnly={false}
+                        fullWidth
+                    />
                 )}
             </div>
 

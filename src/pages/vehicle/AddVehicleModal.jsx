@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import JumpDateModal from '../../components/organisms/JumpDateModal';
 
 import { useScrollLock } from '../../hooks/useScrollLock';
+import ActionButton from '../../components/atoms/ActionButton';
 
 const VEHICLE_TYPES = [
     { id: 'car', label: 'Car', icon: Car },
@@ -67,9 +68,7 @@ const AddVehicleModal = ({ isOpen, onClose, onSave, editVehicle = null }) => {
                     <h2 className="text-lg font-bold text-slate-900 dark:text-white">
                         {editVehicle ? 'Edit Vehicle' : 'Add New Vehicle'}
                     </h2>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
-                        <X className="w-5 h-5 text-slate-500" />
-                    </button>
+                    <ActionButton variant="exit" onClick={onClose} size="sm" />
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-4 space-y-4">
@@ -175,13 +174,14 @@ const AddVehicleModal = ({ isOpen, onClose, onSave, editVehicle = null }) => {
                         </div>
                     </div>
 
-                    <button
-                        type="submit"
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl mt-4 transition-colors flex items-center justify-center gap-2"
-                    >
-                        <Save className="w-5 h-5" />
-                        {editVehicle ? 'Update Vehicle' : 'Add Vehicle'}
-                    </button>
+                    <ActionButton
+                        variant="save"
+                        fullWidth
+                        onClick={handleSubmit}
+                        label={editVehicle ? 'Update Vehicle' : 'Add Vehicle'}
+                        iconOnly={false}
+                        className="mt-4 py-4"
+                    />
                 </form>
             </div>
         </div>

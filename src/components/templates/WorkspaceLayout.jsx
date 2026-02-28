@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next'; // Added i18n support
 import { TRANSITION_FAST } from '../../styles/tokens';
 import { useScrollLock } from '../../hooks/useScrollLock';
+import ActionButton from '../atoms/ActionButton';
 
 const WorkspaceLayout = ({ children }) => {
     const navigate = useNavigate();
@@ -70,9 +71,11 @@ const WorkspaceLayout = ({ children }) => {
                                 style={{ paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' }}
                             >
                                 <h2 className="font-bold text-lg">{t('common.menu', 'Menu')}</h2>
-                                <button onClick={() => setIsSidebarOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
-                                    <X className="w-5 h-5 text-slate-500" />
-                                </button>
+                                <ActionButton 
+                                    variant="exit" 
+                                    onClick={() => setIsSidebarOpen(false)} 
+                                    size="sm" 
+                                />
                             </div>
 
                             {/* Drawer Content */}

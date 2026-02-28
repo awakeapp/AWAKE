@@ -6,6 +6,7 @@ import { twMerge } from "tailwind-merge";
 import { TRANSITION_FAST } from '../../styles/tokens';
 
 import { useScrollLock } from '../../hooks/useScrollLock';
+import ActionButton from '../atoms/ActionButton';
 
 function cn(...inputs) {
   return twMerge(clsx(inputs));
@@ -64,12 +65,12 @@ export function AppModal({
                   {title}
                 </h3>
                 {onClose && (
-                  <button
-                    onClick={onClose}
-                    className="p-2 -mr-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors rounded-full"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
+                  <ActionButton 
+                    variant="exit" 
+                    onClick={onClose} 
+                    size="sm"
+                    className="-mr-2"
+                  />
                 )}
               </div>
             )}

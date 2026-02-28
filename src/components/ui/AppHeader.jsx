@@ -2,7 +2,7 @@ import React from 'react';
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import ActionButton from '../atoms/ActionButton';
 
 function cn(...inputs) {
  return twMerge(clsx(inputs));
@@ -49,12 +49,12 @@ export function AppHeader({
             {/* Left Action Area */}
             <div className="flex-1 flex justify-start items-center min-w-0">
                 {showBack ? (
-                    <button
-                        onClick={handleBack}
-                        className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-300 active:scale-95"
-                    >
-                        <ArrowLeft className="w-6 h-6" />
-                    </button>
+                    <ActionButton 
+                        variant="back" 
+                        onClick={handleBack} 
+                        className="-ml-2"
+                        size="sm"
+                    />
                 ) : leftNode ? (
                     leftNode
                 ) : (

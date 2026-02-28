@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
 import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, AlertCircle, Award, ArrowLeft } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
-
 import { format, startOfMonth, endOfMonth, isWithinInterval, subMonths, addMonths } from 'date-fns';
 import PageLayout from '../../components/layout/PageLayout';
+import ActionButton from '../../components/atoms/ActionButton';
 
 const MonthlyOverview = () => {
   const navigate = useNavigate();
@@ -70,16 +70,22 @@ const MonthlyOverview = () => {
       title="Monthly Overview"
       showBack
       rightNode={
-        <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-900 rounded-lg p-1 border border-slate-200 dark:border-slate-800">
-          <button onClick={() => changeMonth(-1)} className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-md transition-colors">
-            <ChevronLeft className="w-3.5 h-3.5 text-slate-500" />
-          </button>
+        <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-900 rounded-2xl p-1 border border-slate-200 dark:border-slate-800">
+          <ActionButton 
+            variant="prev" 
+            onClick={() => changeMonth(-1)} 
+            size="sm" 
+            className="bg-transparent hover:bg-slate-200 dark:hover:bg-slate-800"
+          />
           <span className="text-[10px] font-black uppercase tracking-widest min-w-[64px] text-center text-slate-700 dark:text-slate-200">
             {format(selectedDate, 'MMM yy')}
           </span>
-          <button onClick={() => changeMonth(1)} className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-md transition-colors">
-            <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
-          </button>
+          <ActionButton 
+            variant="forward" 
+            onClick={() => changeMonth(1)} 
+            size="sm" 
+            className="bg-transparent hover:bg-slate-200 dark:hover:bg-slate-800"
+          />
         </div>
       }
     >

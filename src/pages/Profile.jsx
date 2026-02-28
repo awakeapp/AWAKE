@@ -5,6 +5,7 @@ import {
     Trash2, LogOut, Edit2, Check, X, AlertTriangle, ArrowLeft,
     Fingerprint, Shield, ToggleLeft, ToggleRight
 } from 'lucide-react';
+import ActionButton from '../components/atoms/ActionButton';
 import { useSettings } from '../context/SettingsContext';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useLogout } from '../hooks/useLogout';
@@ -125,12 +126,14 @@ const Profile = () => {
                                 <p className="text-[12px] font-bold text-primary-600 uppercase tracking-widest mt-1">{memberId}</p>
                                 <p className="text-[14px] text-slate-500 mt-0.5 truncate">{user?.email}</p>
                             </div>
-                            <button 
+                            <ActionButton
+                                variant="primary"
                                 onClick={() => setIsEditOpen(true)}
-                                className="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 active:scale-90 transition-all border border-slate-200/50 dark:border-white/5"
+                                size="sm"
+                                className="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 border border-slate-200/50 dark:border-white/5"
                             >
                                 <Edit2 size={18} />
-                            </button>
+                            </ActionButton>
                         </div>
                     </SettingsSection>
 
@@ -159,15 +162,19 @@ const Profile = () => {
                                     className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl outline-none focus:ring-2 focus:ring-primary-500/50 text-[15px]" 
                                 />
                                 <div className="flex gap-2">
-                                    <button 
+                                    <ActionButton
+                                        variant="back"
+                                        label="Cancel"
                                         onClick={() => setIsEditingPassword(false)}
                                         className="flex-1 py-3 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-sm"
-                                    >Cancel</button>
-                                    <button 
+                                    />
+                                    <ActionButton
+                                        variant="primary"
+                                        label={isPasswordLoading ? 'Saving...' : 'Save'}
                                         onClick={handleSavePassword}
                                         disabled={isPasswordLoading}
                                         className="flex-1 py-3 bg-primary-600 text-white font-bold rounded-xl text-sm disabled:opacity-50"
-                                    >{isPasswordLoading ? 'Saving...' : 'Save'}</button>
+                                    />
                                 </div>
                             </div>
                         )}

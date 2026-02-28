@@ -16,6 +16,7 @@ import { AppToggle } from '../components/ui/AppToggle';
 import ConfirmDialog from '../components/organisms/ConfirmDialog';
 import PageLayout from '../components/layout/PageLayout';
 import { motion, AnimatePresence } from 'framer-motion';
+import ActionButton from '../components/atoms/ActionButton';
 
 const Settings = () => {
     const navigate = useNavigate();
@@ -135,10 +136,14 @@ const Settings = () => {
                                             )}
                                         </div>
                                     </div>
-                                    <button 
+                                    <ActionButton
+                                        variant="primary"
                                         onClick={() => setIsInstallGuideOpen(false)}
-                                        className="w-full mt-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black text-sm uppercase tracking-widest active:scale-95 transition-all"
-                                    > Got it </button>
+                                        label="Got it"
+                                        iconOnly={false}
+                                        fullWidth
+                                        className="mt-8 py-4"
+                                    />
                                 </motion.div>
                             </div>
                         )}
@@ -310,12 +315,14 @@ const Settings = () => {
                                 isStandalone ? (
                                     <span className="text-[10px] font-black text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">Standlone</span>
                                 ) : (
-                                    <button 
+                                    <ActionButton
+                                        variant="primary"
                                         onClick={() => setIsInstallGuideOpen(true)}
-                                        className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-3 py-1.5 rounded-xl border border-indigo-500/20 active:scale-95 transition-all"
-                                    >
-                                        Install Now
-                                    </button>
+                                        label="Install Now"
+                                        iconOnly={false}
+                                        size="sm"
+                                        className="text-[11px] font-bold px-3 py-1.5"
+                                    />
                                 )
                             }
                         />

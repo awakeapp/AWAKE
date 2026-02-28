@@ -4,6 +4,7 @@ import { useDate } from '../../context/DateContext';
 import { cn } from '../../lib/utils';
 import JumpDateModal from './JumpDateModal';
 import clsx from 'clsx';
+import ActionButton from '../atoms/ActionButton';
 
 const DateHeader = ({ className, showControls = true, overviewText, onEditClick, isLocked, rightNode, dateStateOverride, allowFuture = false }) => {
     const contextDate = useDate();
@@ -34,12 +35,12 @@ const DateHeader = ({ className, showControls = true, overviewText, onEditClick,
             <div className="flex items-center gap-1.5 sm:gap-3 flex-1 min-w-0">
                 
                 {showControls && (
-                    <button
+                    <ActionButton
+                        variant="prev"
                         onClick={prevDay}
-                        className="p-1.5 sm:p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all flex-shrink-0"
-                    >
-                        <ChevronLeft className="w-6 h-6 sm:w-7 sm:h-7" />
-                    </button>
+                        size="sm"
+                        className="p-1.5 sm:p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all flex-shrink-0"
+                    />
                 )}
 
                 {/* Date Block */}
@@ -75,13 +76,13 @@ const DateHeader = ({ className, showControls = true, overviewText, onEditClick,
                 </div>
 
                 {showControls && (
-                    <button
+                    <ActionButton
+                        variant="forward"
                         onClick={nextDay}
                         disabled={!allowFuture && isToday}
-                        className="p-1.5 sm:p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all disabled:opacity-20 disabled:hover:bg-transparent flex-shrink-0"
-                    >
-                        <ChevronRight className="w-6 h-6 sm:w-7 sm:h-7" />
-                    </button>
+                        size="sm"
+                        className="p-1.5 sm:p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all flex-shrink-0"
+                    />
                 )}
 
                 {!isToday && (

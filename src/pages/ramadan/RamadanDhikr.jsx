@@ -7,6 +7,8 @@ import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageLayout from '../../components/layout/PageLayout';
 
+import ActionButton from '../../components/atoms/ActionButton';
+
 const DhikrListItem = ({ title, count, target, onClick, accentClass, bgTint = "bg-indigo-500/10", delay = 0 }) => {
     const progress = target > 0 ? Math.min((count / target) * 100, 100) : 0;
 
@@ -101,9 +103,10 @@ const FullScreenCounter = ({ dhikr, onSave, onClose }) => {
             className="fixed inset-0 z-[200] bg-white dark:bg-[#1C1C1E] flex flex-col items-center justify-between py-12 px-6 overflow-hidden"
         >
             <div className="w-full flex justify-between items-center z-10 pt-4">
-                <button onClick={() => { onSave(currentCount); onClose(); }} className="p-3 bg-slate-100 dark:bg-white/5 rounded-2xl hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
-                    <ChevronLeft className="w-6 h-6 text-slate-900 dark:text-white" />
-                </button>
+                <ActionButton 
+                    variant="back" 
+                    onClick={() => { onSave(currentCount); onClose(); }} 
+                />
                 <h2 className="text-[16px] font-black tracking-widest uppercase text-slate-900 dark:text-white absolute left-1/2 -translate-x-1/2">{title}</h2>
                 <div className="w-12 h-12" />
             </div>
@@ -259,9 +262,13 @@ const QuranGoalWidget = ({ ramadanData, updateQuranGoal, currentDay }) => {
                         className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 font-bold text-lg focus:outline-none focus:border-indigo-500 text-slate-800 dark:text-slate-100 placeholder:opacity-30"
                         placeholder="Quantity"
                     />
-                    <button onClick={handleSave} className="bg-indigo-600 text-white px-6 py-3 font-bold text-sm rounded-xl active:scale-95 transition-all">
-                        Commit
-                    </button>
+                    <ActionButton 
+                        variant="save" 
+                        onClick={handleSave} 
+                        label="Commit" 
+                        iconOnly={false} 
+                        size="sm"
+                    />
                 </div>
             </motion.div>
         );
@@ -403,7 +410,7 @@ const RamadanDhikr = () => {
     return (
         <PageLayout 
             title="Remembrance" 
-            contentPadClass="px-4 pb-24 pt-4 flex flex-col gap-6"
+            contentPadClass="px-2 pb-24 pt-4 flex flex-col gap-6"
             bgClass="bg-transparent"
         >
             <div className="space-y-4">
@@ -485,18 +492,22 @@ const RamadanDhikr = () => {
                                         />
                                     </div>
                                     <div className="flex gap-2 pt-2">
-                                        <button 
-                                            onClick={() => { setIsAddingDhikr(false); setNewDhikrName(''); }} 
-                                            className="flex-1 py-3 text-slate-500 font-bold text-xs bg-slate-100 dark:bg-slate-800 rounded-xl"
-                                        >
-                                            Discard
-                                        </button>
-                                        <button 
-                                            onClick={handleAddCustomDhikr} 
-                                            className="flex-1 py-3 bg-indigo-600 text-white text-xs font-bold rounded-xl active:scale-95 transition-all"
-                                        >
-                                            Save Dhikr
-                                        </button>
+                                        <ActionButton
+                                            variant="back"
+                                            onClick={() => { setIsAddingDhikr(false); setNewDhikrName(''); }}
+                                            label="Discard"
+                                            iconOnly={false}
+                                            className="flex-1 py-3 bg-slate-100 dark:bg-slate-800 text-slate-500"
+                                            size="sm"
+                                        />
+                                        <ActionButton
+                                            variant="save"
+                                            onClick={handleAddCustomDhikr}
+                                            label="Save Dhikr"
+                                            iconOnly={false}
+                                            className="flex-1 py-3"
+                                            size="sm"
+                                        />
                                     </div>
                                 </div>
                             </motion.div>
