@@ -345,7 +345,7 @@ const TaskDashboard = () => {
                 </div>
             }
         >
-            <div className="space-y-6">
+            <div className="space-y-6 pt-4">
                 <section>
                     {currentTasks.length > 0 ? (
                         <TaskList

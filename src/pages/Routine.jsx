@@ -184,7 +184,7 @@ const Routine = () => {
                 </>
             }
         >
-            <div className="space-y-6">
+            <div className="space-y-6 pt-4">
                 
                 {/* Categories */}
                     {Object.entries(categories).map(([category, tasks]) => (

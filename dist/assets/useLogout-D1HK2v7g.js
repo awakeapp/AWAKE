@@ -1,0 +1,1 @@
+import{r as e,b as c,a as f}from"./index-DgPxFht0.js";const g=()=>{const[a,n]=e.useState(!1),[o,s]=e.useState(null),[l,t]=e.useState(!1),u=async()=>{s(null),t(!0);try{await c(f),a||(t(!1),s(null))}catch(r){a||(console.log(r.message),s(r.message),t(!1))}};return e.useEffect(()=>()=>n(!0),[]),{logout:u,error:o,isPending:l}};export{g as u};
