@@ -55,36 +55,37 @@ const ActionButton = ({
     const getVariantStyles = () => {
         switch (variant) {
             case 'delete':
-                return "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-500/20 active:bg-rose-200";
+                return "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-500/20 shadow-sm shadow-rose-500/10 active:shadow-none";
             case 'save':
-                return "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 active:bg-emerald-200";
+                return "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 shadow-sm shadow-emerald-500/10 active:shadow-none";
             case 'primary':
-                return "bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-white/90 active:bg-slate-700";
+                return "bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-white/90 shadow-md shadow-slate-900/20 dark:shadow-white/20 active:shadow-none";
             case 'ghost':
-                return "bg-transparent hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10";
+                return "bg-transparent text-slate-700 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/5 active:bg-black/10 dark:active:bg-white/10";
             default:
-                return "bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 active:bg-slate-300 dark:active:bg-white/20";
+                return "bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200/50 dark:border-white/5 shadow-sm active:shadow-none";
         }
     };
 
     const sizeStyles = {
-        sm: "p-2 rounded-xl",
-        md: "p-3 rounded-2xl",
-        lg: "p-4 rounded-3xl"
+        sm: "p-2 rounded-[14px]",
+        md: "p-3 rounded-[18px]",
+        lg: "p-4 rounded-[22px]"
     };
 
     return (
         <motion.button
-            whileTap={!disabled ? { scale: 0.94 } : {}}
-            whileHover={!disabled ? { scale: 1.02 } : {}}
+            whileTap={!disabled ? { scale: 0.96, y: 1 } : {}}
+            whileHover={!disabled ? { scale: 1.02, y: -1 } : {}}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             onClick={disabled ? undefined : onClick}
             disabled={disabled}
             className={clsx(
-                "flex items-center justify-center transition-all duration-200 outline-none select-none px-4",
+                "flex items-center justify-center transition-colors duration-200 outline-none select-none px-4",
                 getVariantStyles(),
                 sizeStyles[size],
                 fullWidth ? "w-full" : "w-fit",
-                disabled && "opacity-40 cursor-not-allowed",
+                disabled && "opacity-40 cursor-not-allowed contrast-50 saturate-50",
                 className
             )}
             title={label || variant}
