@@ -15,7 +15,7 @@ const PageLayout = ({
     children,
     bottomNav,
     bgClass = "bg-white dark:bg-slate-950",
-    contentPadClass = "px-4 pb-8 pt-0",
+    contentPadClass = "px-4 pb-8 pt-4",
     renderFloating
 }) => {
     // Header height is 60px
