@@ -110,7 +110,7 @@ const RamadanDashboard = () => {
             title="Ramadan Journey"
             rightNode={locationNode}
             renderFloating={<LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />}
-            contentPadClass="pb-24 pt-4 px-2 flex flex-col gap-6"
+            contentPadClass="pb-24 px-2 flex flex-col gap-6"
             bgClass="bg-transparent"
         >
 

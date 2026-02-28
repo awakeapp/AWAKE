@@ -15,7 +15,7 @@ const PageLayout = ({
     children,
     bottomNav,
     bgClass = "bg-white dark:bg-slate-950",
-    contentPadClass = "px-4 pb-8 pt-4",
+    contentPadClass = "px-4 pb-8",
     renderFloating
 }) => {
     // Header height is 60px
@@ -56,8 +56,8 @@ const PageLayout = ({
                 className={clsx("flex-1 w-full relative [&>*:first-child]:mt-0", contentPadClass)}
                 style={{
                     paddingTop: hasHeader 
-                        ? 'calc(60px + env(safe-area-inset-top, 0px))' // 60px header exactly
-                        : 'calc(0px + env(safe-area-inset-top, 0px))' // No header
+                        ? 'calc(60px + env(safe-area-inset-top, 0px) + 16px)' // 60px header + 16px content gap
+                        : 'calc(0px + env(safe-area-inset-top, 0px) + 16px)'  // No header, but still gap
                 }}
             >
                 {children}

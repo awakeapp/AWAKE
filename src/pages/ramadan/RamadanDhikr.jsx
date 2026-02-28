@@ -422,7 +422,7 @@ const RamadanDhikr = () => {
     return (
         <PageLayout 
             title="Remembrance" 
-            contentPadClass="px-2 pb-24 pt-4 flex flex-col gap-6"
+            contentPadClass="px-2 pb-24 flex flex-col gap-6"
             bgClass="bg-transparent"
         >
             <div className="space-y-4">
