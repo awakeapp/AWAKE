@@ -13,35 +13,9 @@ const PRAYERS = [
     { key: 'isha',   label: 'Isha',   allowMode: true },
 ];
 
-const EXTRA_PRAYERS = [
-    { key: 'taraweeh', label: 'Taraweeh',  allowMode: true,  allowCount: false },
-    { key: 'tahajjud', label: 'Tahajjud',  allowMode: true,  allowCount: false },
-    { key: 'duha',     label: 'Duha',       allowMode: false, allowCount: false },
-    { key: 'rawatib',  label: 'Rawatib',    allowMode: false, allowCount: true  },
-];
+// Removed EXTRA_PRAYERS as per "No static entries."
 
-const ModeSelector = ({ value, onChange }) => (
-    <div className="flex bg-slate-100 dark:bg-white/5 rounded-xl p-1 gap-1 pointer-events-auto shadow-inner">
-        {[
-            { id: 'jamaah', icon: Users },
-            { id: 'alone', icon: User }
-        ].map(m => (
-            <button
-                key={m.id}
-                onClick={(e) => { e.stopPropagation(); onChange(m.id); }}
-                className={clsx(
-                    "flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
-                    value === m.id
-                        ? "bg-white dark:bg-indigo-500 shadow-sm text-indigo-600 dark:text-white"
-                        : "text-slate-400 dark:text-[#48484A] hover:text-slate-600 dark:hover:text-[#8E8E93]"
-                )}
-            >
-                <m.icon className="w-3 H-3" />
-                <span className="hidden xs:inline">{m.id}</span>
-            </button>
-        ))}
-    </div>
-);
+// Mode selector removed as separate component, integrated into PrayerRow
 
 const PrayerRow = ({ prayerKey, label, time, data, onUpdate, allowMode, allowCount, isLast, isActive }) => {
     const completed = data[prayerKey] || false;
@@ -52,87 +26,92 @@ const PrayerRow = ({ prayerKey, label, time, data, onUpdate, allowMode, allowCou
         <div 
             onClick={() => onUpdate(prayerKey, !completed)}
             className={clsx(
-                "group relative flex items-center min-h-[72px] justify-between py-3 transition-all duration-300 cursor-pointer select-none px-4 rounded-[20px]",
+                "group relative flex items-center min-h-[56px] justify-between py-2 transition-all duration-300 cursor-pointer select-none px-4 rounded-[1.5rem]",
                 isActive 
-                    ? "bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 my-2 shadow-sm" 
+                    ? "bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 my-1 shadow-sm" 
                     : "bg-transparent border border-transparent hover:bg-slate-50 dark:hover:bg-white/5"
             )}
         >
             {/* Status Indicator Bar */}
             <div className={clsx(
-                "absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-full transition-all duration-500",
+                "absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full transition-all duration-500",
                 completed ? "bg-emerald-500 scale-y-100" : "bg-slate-200 dark:bg-white/10 scale-y-0"
             )} />
 
-            <div className="flex items-center flex-1 min-w-0 gap-4">
-                <div className={clsx(
-                    "w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 border",
-                    completed 
-                        ? "bg-emerald-500 border-emerald-400 shadow-lg shadow-emerald-500/20" 
-                        : "bg-white dark:bg-[#1C1C1E] border-slate-100 dark:border-white/10"
+            <div className="flex flex-col flex-1 min-w-0 pr-4">
+                <span className={clsx(
+                    "text-[15px] font-black tracking-tight leading-none transition-colors",
+                    completed ? "text-slate-900 dark:text-white" : "text-slate-500 dark:text-[#8E8E93]"
                 )}>
-                    {completed ? (
-                        <Check className="w-6 h-6 text-white stroke-[3]" />
-                    ) : (
-                        <span className="text-[10px] font-black text-slate-300 dark:text-[#48484A] uppercase tracking-tighter">
-                            {label.substring(0, 3)}
+                    {label}
+                    {isActive && <span className="ml-2 text-[9px] font-black uppercase tracking-widest text-indigo-500 animate-pulse">Live</span>}
+                </span>
+                {time && (
+                    <div className="flex items-center gap-1 mt-1">
+                        <Clock className="w-3 h-3 text-slate-400 dark:text-[#48484A]" />
+                        <span className="text-[11px] font-bold text-slate-400 dark:text-[#48484A] tabular-nums">
+                            {time}
                         </span>
-                    )}
-                </div>
-
-                <div className="flex flex-col">
-                    <span className={clsx(
-                        "text-[16px] font-black tracking-tight leading-none transition-colors",
-                        completed ? "text-slate-900 dark:text-white" : "text-slate-500 dark:text-[#8E8E93]"
-                    )}>
-                        {label}
-                        {isActive && <span className="ml-2 text-[9px] font-black uppercase tracking-widest text-indigo-500 animate-pulse">Live</span>}
-                    </span>
-                    {time && (
-                        <div className="flex items-center gap-1 mt-1">
-                            <Clock className="w-3 h-3 text-slate-400 dark:text-[#48484A]" />
-                            <span className="text-[11px] font-bold text-slate-400 dark:text-[#48484A] tabular-nums">
-                                {time}
-                            </span>
-                        </div>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
 
             <div className="flex items-center gap-3 shrink-0 ml-2">
                 {allowCount && completed && (
-                    <div className="flex items-center bg-slate-100 dark:bg-white/5 rounded-xl p-1 pointer-events-auto">
+                    <div className="flex items-center gap-2 mr-3" onClick={e => e.stopPropagation()}>
                         <button
-                            onClick={(e) => { e.stopPropagation(); onUpdate(`${prayerKey}Count`, Math.max(0, count - 1)); }}
-                            className="w-7 h-7 rounded-lg hover:bg-white dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 transition-all flex items-center justify-center"
+                            onClick={() => onUpdate(`${prayerKey}Count`, Math.max(0, count - 1))}
+                            className="w-6 h-6 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all flex items-center justify-center bg-slate-100 dark:bg-white/5"
                         >
-                            <Minus className="w-3.5 h-3.5" />
+                            <Minus className="w-3 h-3" />
                         </button>
-                        <span className="text-xs font-black text-slate-800 dark:text-white w-6 text-center">{count}</span>
+                        <span className="text-[11px] font-black text-slate-800 dark:text-white w-4 text-center">{count}</span>
                         <button
-                            onClick={(e) => { e.stopPropagation(); onUpdate(`${prayerKey}Count`, count + 1); }}
-                            className="w-7 h-7 rounded-lg hover:bg-white dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 transition-all flex items-center justify-center"
+                            onClick={() => onUpdate(`${prayerKey}Count`, count + 1)}
+                            className="w-6 h-6 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all flex items-center justify-center bg-slate-100 dark:bg-white/5"
                         >
-                            <Plus className="w-3.5 h-3.5" />
+                            <Plus className="w-3 h-3" />
                         </button>
                     </div>
                 )}
                 
                 {allowMode && completed && (
-                    <motion.div 
-                        initial={{ opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                    >
-                        <ModeSelector value={mode} onChange={(m) => onUpdate(`${prayerKey}Mode`, m)} />
-                    </motion.div>
-                )}
-                
-                {!completed && (
-                    <div className="w-11 h-6 bg-slate-100 dark:bg-white/5 rounded-full flex items-center px-1">
-                        <div className="w-4 h-4 bg-slate-300 dark:bg-[#48484A] rounded-full" />
+                    <div className="flex items-center gap-2 mr-3" onClick={e => e.stopPropagation()}>
+                        <button 
+                            onClick={() => onUpdate(`${prayerKey}Mode`, 'alone')}
+                            className={clsx("text-[10px] font-bold uppercase tracking-widest transition-colors", mode === 'alone' ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 dark:text-slate-500")}
+                        >
+                            Single
+                        </button>
+                        <span className="text-slate-300 dark:text-slate-600 text-[10px]">|</span>
+                        <button 
+                            onClick={() => onUpdate(`${prayerKey}Mode`, 'jamaah')}
+                            className={clsx("text-[10px] font-bold uppercase tracking-widest transition-colors", mode === 'jamaah' ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 dark:text-slate-500")}
+                        >
+                            Jama
+                        </button>
                     </div>
                 )}
+                
+                <div className={clsx(
+                    "w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300 border",
+                    completed 
+                        ? "bg-emerald-500 border-emerald-400 shadow-sm" 
+                        : "bg-transparent border-slate-300 dark:border-slate-600"
+                )}>
+                    {completed && <Check className="w-4 h-4 text-white stroke-[3]" />}
+                </div>
+
+                {onEdit && (
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); onEdit(prayerKey); }}
+                        className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 transition-colors ml-1"
+                    >
+                        <MoreHorizontal className="w-4 h-4" />
+                    </button>
+                )}
             </div>
+
         </div>
     );
 };
@@ -163,6 +142,8 @@ const PrayerTracker = () => {
     
     const [isAddingPrayer, setIsAddingPrayer] = useState(false);
     const [newPrayerName, setNewPrayerName] = useState('');
+    const [editingPrayerId, setEditingPrayerId] = useState(null);
+    const [editPrayerName, setEditPrayerName] = useState('');
 
     const handleUpdate = (field, value) => {
         updateRamadanDay(todayKey, { [field]: value });
@@ -197,9 +178,26 @@ const PrayerTracker = () => {
         setIsAddingPrayer(false);
     };
 
+    const handleEditPrayer = (id) => {
+        setEditingPrayerId(id);
+        const p = customPrayers.find(x => x.id === id);
+        if (p) setEditPrayerName(p.label);
+    };
+
+    const handleSaveEdit = () => {
+        if (!editPrayerName.trim()) return;
+        updateCustomPrayers(customPrayers.map(p => p.id === editingPrayerId ? { ...p, label: editPrayerName.trim() } : p));
+        setEditingPrayerId(null);
+    };
+
+    const handleDeletePrayer = () => {
+        updateCustomPrayers(customPrayers.filter(p => p.id !== editingPrayerId));
+        setEditingPrayerId(null);
+    };
+
     if (!hijriDate?.isRamadan) return null;
 
-    const allOtherPrayers = [...EXTRA_PRAYERS, ...customPrayers];
+    const allOtherPrayers = [...customPrayers];
 
     const parseTime = (timeStr) => {
         if (!timeStr) return null;
@@ -236,12 +234,12 @@ const PrayerTracker = () => {
             <div className="space-y-4">
                 <div className="flex items-center justify-between px-1">
                     <div>
-                        <h2 className="text-[20px] font-black text-slate-900 dark:text-white uppercase tracking-tightest leading-none">OBLIGATORY</h2>
+                        <h2 className="text-[20px] font-black text-slate-900 dark:text-white uppercase tracking-tightest leading-none">FARDH</h2>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">The Five Foundations</p>
                     </div>
                 </div>
                 
-                <div className="bg-white dark:bg-[#1C1C1E] rounded-[2.5rem] border border-slate-100 dark:border-white/5 shadow-sm p-2 space-y-1">
+                <div className="bg-white dark:bg-[#1C1C1E] rounded-[2rem] border border-slate-100 dark:border-white/5 shadow-sm p-2 space-y-1">
                     {PRAYERS.map((p, idx) => {
                         const rawTime = dailyTimings?.[p.label]; 
                         const formattedTime = formatPrayerTime(rawTime);
@@ -267,23 +265,47 @@ const PrayerTracker = () => {
             <div className="space-y-4">
                 <div className="flex items-center justify-between px-1">
                     <div>
-                        <h2 className="text-[20px] font-black text-slate-900 dark:text-white uppercase tracking-tightest leading-none">VOLUNTARY</h2>
+                        <h2 className="text-[20px] font-black text-slate-900 dark:text-white uppercase tracking-tightest leading-none">OTHER PRAYERS</h2>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Extra Spiritual Miles</p>
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-[#1C1C1E] rounded-[2.5rem] border border-slate-100 dark:border-white/5 shadow-sm p-2 space-y-1">
+                <div className="bg-white dark:bg-[#1C1C1E] rounded-[2rem] border border-slate-100 dark:border-white/5 shadow-sm p-2 space-y-1">
                     {allOtherPrayers.map((p, idx) => (
-                        <PrayerRow
-                            key={p.key || p.id}
-                            prayerKey={p.key || p.id}
-                            label={p.label}
-                            data={todayData}
-                            onUpdate={handleUpdate}
-                            allowMode={p.allowMode}
-                            allowCount={p.allowCount}
-                            isLast={idx === allOtherPrayers.length - 1 && !isAddingPrayer}
-                        />
+                        <div key={p.key || p.id}>
+                            {editingPrayerId === (p.key || p.id) ? (
+                                <motion.div 
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="px-4 py-3 bg-slate-50 dark:bg-black rounded-2xl border border-slate-200 dark:border-white/5 mb-1"
+                                >
+                                    <input 
+                                        type="text" 
+                                        value={editPrayerName}
+                                        onChange={e => setEditPrayerName(e.target.value)}
+                                        autoFocus
+                                        onKeyDown={e => e.key === 'Enter' && handleSaveEdit()}
+                                        className="w-full bg-transparent text-sm font-bold text-slate-800 dark:text-slate-100 focus:outline-none mb-3"
+                                    />
+                                    <div className="flex gap-2">
+                                        <button onClick={handleDeletePrayer} className="flex-1 py-2 bg-rose-100 text-rose-600 rounded-xl text-[10px] font-black uppercase tracking-widest">Delete</button>
+                                        <button onClick={() => setEditingPrayerId(null)} className="flex-1 py-2 text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-widest">Cancel</button>
+                                        <button onClick={handleSaveEdit} className="flex-1 py-2 bg-indigo-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest">Save</button>
+                                    </div>
+                                </motion.div>
+                            ) : (
+                                <PrayerRow
+                                    prayerKey={p.key || p.id}
+                                    label={p.label}
+                                    data={todayData}
+                                    onUpdate={handleUpdate}
+                                    allowMode={p.allowMode}
+                                    allowCount={p.allowCount}
+                                    isLast={idx === allOtherPrayers.length - 1 && !isAddingPrayer}
+                                    onEdit={p.id ? handleEditPrayer : null}
+                                />
+                            )}
+                        </div>
                     ))}
                     
                     <AnimatePresence>

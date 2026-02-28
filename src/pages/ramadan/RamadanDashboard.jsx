@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRamadan } from '../../context/RamadanContext';
 import { usePrayer } from '../../context/PrayerContext';
 import { useNavigate } from 'react-router-dom';
-import { MoreHorizontal, Compass, CloudMoon, Sun } from 'lucide-react';
+import { Compass, CloudMoon, Sun } from 'lucide-react';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationSettings from '../../components/ramadan/NotificationSettings';
@@ -23,37 +23,21 @@ const RamadanDashboard = () => {
         return () => clearInterval(timer);
     }, []);
 
-    const renderHeader = (
-        <div className="flex items-center justify-between">
-            <div>
-                <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tightest uppercase italic">Journey</h1>
-                {displayName && (
-                    <motion.div 
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        onClick={() => setIsLocationModalOpen(true)}
-                        className="flex items-center gap-1.5 mt-0.5 cursor-pointer group"
-                    >
-                        <Compass className="w-3.5 h-3.5 text-emerald-500 group-hover:rotate-45 transition-transform duration-500" />
-                        <span className="text-[10px] font-black text-slate-400 dark:text-[#8E8E93] uppercase tracking-widest truncate max-w-[140px]">
-                            {displayName.split(',')[0]}
-                        </span>
-                    </motion.div>
-                )}
-            </div>
-            
-            <button 
-                onClick={() => navigate('/ramadan/settings')}
-                className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-[#1C1C1E] border border-slate-100 dark:border-white/5 text-slate-500 dark:text-[#8E8E93] active:scale-90 transition-all shadow-sm"
-            >
-                <MoreHorizontal className="w-6 h-6" />
-            </button>
-        </div>
-    );
+    const locationNode = displayName ? (
+        <button 
+            onClick={() => setIsLocationModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors border border-slate-200 dark:border-slate-800"
+        >
+            <Compass className="w-3.5 h-3.5 text-emerald-500" />
+            <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest truncate max-w-[100px]">
+                {displayName.split(',')[0]}
+            </span>
+        </button>
+    ) : null;
 
     if (loading && !dailyTimings) {
         return (
-            <PageLayout header={renderHeader}>
+            <PageLayout title="Ramadan Journey" rightNode={locationNode}>
                 <div className="flex-1 flex flex-col items-center justify-center py-32 space-y-6">
                     <div className="relative">
                         <div className="w-16 h-16 rounded-full border-4 border-slate-100 dark:border-white/5 border-t-emerald-500 animate-spin" />
@@ -117,10 +101,11 @@ const RamadanDashboard = () => {
 
     return (
         <PageLayout
-            header={renderHeader}
+            title="Ramadan Journey"
+            rightNode={locationNode}
             renderFloating={<LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />}
+            contentPadClass="px-4 pb-24 pt-4 flex flex-col gap-6"
         >
-            <div className="space-y-6 pb-12">
 
             {error && !dailyTimings && (
                 <motion.div 
@@ -133,48 +118,47 @@ const RamadanDashboard = () => {
                 </motion.div>
             )}
 
-            <div className="group relative bg-[#1C1C1E] border border-white/5 rounded-[3rem] shadow-2xl overflow-hidden min-h-[320px] sm:min-h-[400px] flex flex-col justify-between">
+            <div className="group relative bg-[#1C1C1E] border border-white/5 rounded-[2rem] shadow-2xl overflow-hidden flex flex-col">
                  <RamadanImageSlider />
                  
                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/60 z-10" />
 
-                 <div className="relative z-20 p-8 sm:p-12 flex-1 flex flex-col justify-between">
-                     <div className="flex justify-between items-start">
+                 <div className="relative z-20 p-5 sm:p-6 flex flex-col gap-4">
+                     <div className="flex justify-between items-center">
                         <motion.div 
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                         >
-                            <span className="bg-white/10 backdrop-blur-xl text-white px-4 py-2 rounded-2xl text-[10px] font-black tracking-[0.2em] uppercase border border-white/10 shadow-2xl">
-                                {isRamadanActive ? `JOURNEY DAY ${hijriDate.day}` : 'PRE-SEASON'}
-                            </span>
+                             <p className="font-black text-white text-lg tracking-tightest leading-none drop-shadow-2xl">
+                                 {hijriDate?.day} Ramadan {hijriDate?.year}
+                             </p>
+                             <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mt-1 drop-shadow-md">
+                                 {now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+                             </p>
                         </motion.div>
                         <motion.div 
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
-                            className="text-right"
                         >
-                             <p className="font-black text-white text-[20px] tracking-tightest leading-none drop-shadow-2xl">
-                                 {hijriDate?.day} Ramadan {hijriDate?.year}
-                             </p>
-                             <p className="text-white/60 text-[11px] font-bold uppercase tracking-widest mt-2 drop-shadow-md">
-                                 {now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
-                             </p>
+                            <span className="bg-white/10 backdrop-blur-xl text-white px-3 py-1.5 rounded-xl text-[9px] font-black tracking-[0.2em] uppercase border border-white/10 shadow-sm">
+                                {isRamadanActive ? `Fasting • Day ${hijriDate.day}` : 'Pre-Season'}
+                            </span>
                         </motion.div>
                      </div>
 
-                     <div className="mt-auto text-center">
+                     <div className="mt-2 flex flex-col">
                          <motion.p 
                             key={nextEvent}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-white/40 uppercase tracking-[0.3em] text-[11px] font-black mb-4 drop-shadow-md"
+                            className="text-white/60 uppercase tracking-[0.2em] text-[10px] font-black mb-1 drop-shadow-md"
                          >
                              {nextEvent}
                          </motion.p>
                          <motion.div 
                             initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
-                            className="text-7xl sm:text-9xl font-black tabular-nums tracking-tighter text-white drop-shadow-[0_8px_32px_rgba(0,0,0,0.8)] italic"
+                            className="text-5xl sm:text-6xl font-black tabular-nums tracking-tighter text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.5)] leading-none"
                          >
                              {countdownStr}
                          </motion.div>
@@ -188,7 +172,7 @@ const RamadanDashboard = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.1 }}
                     className={clsx(
-                        "relative border rounded-[2.5rem] p-6 flex flex-col items-center justify-center shadow-sm transition-all duration-500 overflow-hidden", 
+                        "relative border rounded-3xl p-4 flex flex-col items-center justify-center shadow-sm transition-all duration-500 overflow-hidden", 
                         isSuhoorEndingSoon 
                             ? "bg-rose-500 border-rose-400 text-white shadow-rose-500/20" 
                             : "bg-white dark:bg-[#1C1C1E] border-slate-100 dark:border-white/5"
@@ -198,15 +182,15 @@ const RamadanDashboard = () => {
                         <div className="absolute inset-0 bg-gradient-to-br from-rose-400 to-rose-600 opacity-90" />
                     )}
                     <div className="relative z-10 flex flex-col items-center">
-                        <div className={clsx("p-2 rounded-xl mb-3", isSuhoorEndingSoon ? "bg-white/20" : "bg-orange-500/10")}>
-                            <CloudMoon className={clsx("w-5 h-5", isSuhoorEndingSoon ? "text-white" : "text-orange-500")} />
+                        <div className={clsx("p-1.5 rounded-xl mb-2", isSuhoorEndingSoon ? "bg-white/20" : "bg-orange-500/10")}>
+                            <CloudMoon className={clsx("w-4 h-4", isSuhoorEndingSoon ? "text-white" : "text-orange-500")} />
                         </div>
-                        <span className={clsx("text-[10px] font-black uppercase tracking-widest mb-1", 
+                        <span className={clsx("text-[9px] font-black uppercase tracking-widest mb-0.5", 
                             isSuhoorEndingSoon ? "text-white animate-pulse" : "text-slate-400"
                         )}>
                             Suhoor {isSuhoorEndingSoon && 'Critical'}
                         </span>
-                        <span className={clsx("text-[28px] font-black tracking-tightest leading-none",
+                        <span className={clsx("text-2xl font-black tracking-tightest leading-none",
                             isSuhoorEndingSoon ? "text-white" : "text-slate-900 dark:text-white"
                         )}>{suhoorTimeStr}</span>
                     </div>
@@ -216,15 +200,15 @@ const RamadanDashboard = () => {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="relative bg-emerald-500 border border-emerald-400 rounded-[2.5rem] p-6 flex flex-col items-center justify-center shadow-xl shadow-emerald-500/20 overflow-hidden"
+                    className="relative bg-emerald-500 border border-emerald-400 rounded-3xl p-4 flex flex-col items-center justify-center shadow-md shadow-emerald-500/20 overflow-hidden"
                 >
                     <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 to-emerald-600 opacity-90" />
                     <div className="relative z-10 flex flex-col items-center text-white">
-                        <div className="p-2 rounded-xl bg-white/20 mb-3">
-                            <Sun className="w-5 h-5 text-white" />
+                        <div className="p-1.5 rounded-xl bg-white/20 mb-2">
+                            <Sun className="w-4 h-4 text-white" />
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest mb-1 opacity-80">Iftar Time</span>
-                        <span className="text-[28px] font-black tracking-tightest leading-none">{iftarTimeStr}</span>
+                        <span className="text-[9px] font-black uppercase tracking-widest mb-0.5 opacity-80">Iftar Time</span>
+                        <span className="text-2xl font-black tracking-tightest leading-none">{iftarTimeStr}</span>
                     </div>
                 </motion.div>
             </div>
@@ -247,7 +231,6 @@ const RamadanDashboard = () => {
                     </p>
                 </motion.div>
             )}
-            </div>
         </PageLayout>
     );
 };

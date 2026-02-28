@@ -63,7 +63,6 @@ export const TaskContextProvider = ({ children }) => {
                 setIsLoading(false);
             },
             where('status', '==', 'pending'),
-            orderBy('createdAt', 'asc'),
             limit(1000)
         );
 
@@ -74,7 +73,6 @@ export const TaskContextProvider = ({ children }) => {
                 setCompletedTasks(data);
             },
             where('status', '==', 'completed'),
-            orderBy('createdAt', 'asc'),
             limit(completedLimit)
         );
 

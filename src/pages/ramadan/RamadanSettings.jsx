@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-    Globe, MapPin, BookOpen, Calendar, ChevronRight, Check, Settings2
+    Globe, MapPin, BookOpen, Calendar, ChevronRight, Check, Settings2, Bell
 } from 'lucide-react';
 import { usePrayer } from '../../context/PrayerContext';
 import LocationModal from '../../components/ramadan/LocationModal';
@@ -62,6 +62,16 @@ const RamadanSettings = () => {
     // Use local state only for the range, other things can be direct or handled with clear feedback
     const [localOffset, setLocalOffset] = useState(hijriOffset ?? 0);
     const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+    const [permission, setPermission] = useState(typeof Notification !== 'undefined' ? Notification.permission : 'default');
+
+    const requestPermission = async () => {
+        if (typeof Notification === 'undefined') return false;
+        if (Notification.permission === "granted") return true;
+        
+        const perm = await Notification.requestPermission();
+        setPermission(perm);
+        return perm === "granted";
+    };
 
     useEffect(() => {
         setLocalOffset(hijriOffset ?? 0);
@@ -69,19 +79,16 @@ const RamadanSettings = () => {
 
     const ALADHAN_METHODS = [
         { id: 'NorthAmerica', name: 'ISNA' },
-        { id: 'Karachi', name: 'Karachi' },
-        { id: 'MuslimWorldLeague', name: 'MWL' },
-        { id: 'UmmAlQura', name: 'Umm Qura' },
-        { id: 'Egyptian', name: 'Egyptian' },
-        { id: 'Dubai', name: 'Dubai' },
-        { id: 'Kuwait', name: 'Kuwait' },
-        { id: 'Qatar', name: 'Qatar' },
-        { id: 'Singapore', name: 'MUIS' },
+        { id: 'MuslimWorldLeague', name: 'Muslim World League' },
+        { id: 'UmmAlQura', name: 'Umm al-Qura' },
+        { id: 'Egyptian', name: 'Egypt' },
         { id: 'Turkey', name: 'Turkey' },
+        { id: 'Karachi', name: 'Karachi' },
+        { id: 'Custom', name: 'Custom' },
     ];
 
     const MADHABS = [
-        { id: 0, name: 'Standard' },
+        { id: 0, name: 'Shafi' },
         { id: 1, name: 'Hanafi' },
     ];
 
@@ -90,23 +97,16 @@ const RamadanSettings = () => {
     };
 
     return (
-        <PageLayout
-            header={
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tightest uppercase italic">Logic</h1>
-                        <p className="text-[10px] font-black text-slate-400 dark:text-[#8E8E93] uppercase tracking-[0.2em] mt-0.5">Engine Configuration</p>
-                    </div>
-                </div>
-            }
+        <PageLayout 
+            title="Logic" 
             showBack
             renderFloating={<LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />}
+            contentPadClass="px-4 pb-12 pt-4 flex flex-col gap-6"
         >
-            <div className="space-y-6 pb-12">
                 
                 <SelectionCard 
                     icon={Globe}
-                    title="Engine Basis"
+                    title="Calculation Basis"
                     options={ALADHAN_METHODS}
                     value={calculationMethod}
                     onChange={(val) => handleSettingChange('method', val)}
@@ -115,7 +115,7 @@ const RamadanSettings = () => {
 
                 <SelectionCard 
                     icon={BookOpen}
-                    title="Madhab Selection"
+                    title="Madhab"
                     options={MADHABS}
                     value={madhab}
                     onChange={(val) => handleSettingChange('madhab', val)}
@@ -185,6 +185,37 @@ const RamadanSettings = () => {
                     </div>
                 </motion.div>
 
+                <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="bg-white dark:bg-[#1C1C1E] border border-slate-100 dark:border-white/5 rounded-[2.5rem] p-6 shadow-sm overflow-hidden"
+                >
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2.5 bg-indigo-500/10 rounded-xl">
+                            <Bell className="w-5 h-5 text-indigo-500" />
+                        </div>
+                        <h3 className="text-[17px] font-black uppercase tracking-tight text-slate-900 dark:text-white">Reminders</h3>
+                    </div>
+
+                    <div className="pt-2 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className={clsx("w-2 h-2 rounded-full", permission === 'granted' ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" : "bg-slate-300 dark:bg-[#48484A]")} />
+                            <span className="text-[11px] font-black uppercase tracking-widest text-slate-400 dark:text-[#48484A]">
+                                System Link: {permission === 'granted' ? 'Active' : 'Standby'}
+                            </span>
+                        </div>
+                        {permission !== 'granted' && (
+                            <button 
+                                onClick={requestPermission}
+                                className="text-[11px] font-black uppercase tracking-widest text-indigo-500 hover:text-indigo-400 transition-colors"
+                            >
+                                Sync Notifications
+                            </button>
+                        )}
+                    </div>
+                </motion.div>
+
                 <div className="pt-10 flex flex-col items-center gap-4 text-center">
                     <div className="w-12 h-12 bg-slate-100 dark:bg-white/5 rounded-2xl flex items-center justify-center">
                         <Settings2 className="w-6 h-6 text-slate-300 dark:text-[#48484A]" />
@@ -197,7 +228,6 @@ const RamadanSettings = () => {
                     </div>
                 </div>
 
-            </div>
         </PageLayout>
     );
 };

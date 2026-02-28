@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import { Home, Moon, Heart, BarChart2, MoreHorizontal } from 'lucide-react';
+import { Home, Moon, Heart, BarChart2, Menu } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { AppBottomNav } from '../ui/AppBottomNav';
 
@@ -35,7 +35,7 @@ const RamadanBottomNav = () => {
             exact: false 
         },
         { 
-            icon: MoreHorizontal, 
+            icon: Menu, 
             label: 'More', 
             path: '/ramadan/settings', 
             exact: false 

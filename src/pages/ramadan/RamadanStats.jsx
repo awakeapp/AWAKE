@@ -78,13 +78,7 @@ const RamadanStats = () => {
 
     if (!isRamadanActive) {
         return (
-            <PageLayout
-                header={
-                    <div className="flex items-center justify-between w-full">
-                        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Analysis</h1>
-                    </div>
-                }
-            >
+            <PageLayout title="Analysis">
                 <div className="flex flex-col items-center justify-center py-20 px-8 text-center space-y-4">
                     <div className="w-16 h-16 bg-slate-50 dark:bg-slate-900 rounded-2xl flex items-center justify-center">
                         <Moon className="w-8 h-8 text-slate-300 dark:text-slate-700" />
@@ -132,22 +126,7 @@ const RamadanStats = () => {
     const grandTotalDhikr = totalTahlil + totalSalawat + totalIstighfar;
 
     return (
-        <PageLayout
-            header={
-                <div className="flex flex-row items-center justify-between w-full">
-                    <div>
-                        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Analysis</h1>
-                        <p className="text-xs font-medium text-slate-500">{hijriDate?.day} Ramadan</p>
-                    </div>
-                    <button 
-                        onClick={() => navigate('/ramadan/settings')}
-                        className="p-2 -mr-2 text-slate-400 dark:text-[#8E8E93] hover:text-slate-600 dark:hover:text-white transition-colors"
-                    >
-                        <MoreHorizontal className="w-6 h-6" />
-                    </button>
-                </div>
-            }
-        >
+        <PageLayout title="Analysis" contentPadClass="px-4 pb-24 pt-4 flex flex-col gap-6">
             <div className="space-y-4">
                 {/* Hero Summary Card */}
                 <motion.div 

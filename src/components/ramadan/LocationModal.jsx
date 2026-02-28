@@ -105,7 +105,7 @@ const LocationModal = ({ isOpen, onClose }) => {
                                     <Compass className="w-6 h-6 text-indigo-500" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tightest italic">Qibla Nexus</h2>
+                                    <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tightest">Qibla Nexus</h2>
                                     <p className="text-[10px] font-black text-slate-400 dark:text-[#8E8E93] uppercase tracking-[0.2em] mt-0.5">Global Sync</p>
                                 </div>
                             </div>

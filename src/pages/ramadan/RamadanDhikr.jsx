@@ -2,143 +2,188 @@ import React, { useState, useEffect } from 'react';
 import { useRamadan } from '../../context/RamadanContext';
 import { usePrayer } from '../../context/PrayerContext';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Target, MoreHorizontal, Activity, Check, Plus, Minus, Hash, Flame } from 'lucide-react';
+import { BookOpen, Target, MoreHorizontal, Activity, Check, Plus, Minus, Hash, Flame, ChevronLeft } from 'lucide-react';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageLayout from '../../components/layout/PageLayout';
 
-const CounterCard = ({ title, count, target, onSave, accentClass, bgTint = "bg-indigo-500/10", delay = 0 }) => {
-    const [inputVal, setInputVal] = useState(String(count));
-    const [saved, setSaved] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
-
-    useEffect(() => {
-        setInputVal(String(count));
-    }, [count]);
-
-    const handleSave = () => {
-        const parsed = parseInt(inputVal, 10);
-        if (!isNaN(parsed) && parsed >= 0) {
-            onSave(parsed);
-            setSaved(true);
-            setIsEditing(false);
-            setTimeout(() => setSaved(false), 1500);
-        }
-    };
-    
-    const handleAddOne = (e) => {
-        e.stopPropagation();
-        const newVal = count + 1;
-        onSave(newVal);
-        setInputVal(String(newVal));
-    };
-
-    const handleSubOne = (e) => {
-        e.stopPropagation();
-        const newVal = Math.max(0, count - 1);
-        onSave(newVal);
-        setInputVal(String(newVal));
-    };
-
+const DhikrListItem = ({ title, count, target, onClick, accentClass, bgTint = "bg-indigo-500/10", delay = 0 }) => {
     const progress = target > 0 ? Math.min((count / target) * 100, 100) : 0;
 
     return (
         <motion.div 
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay }}
-            className="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow"
+            onClick={onClick}
+            className="group relative bg-white dark:bg-[#1C1C1E] border border-slate-100 dark:border-white/5 rounded-[2rem] p-5 shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden flex items-center justify-between"
         >
-            <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                    <div className={clsx("p-2 rounded-xl", bgTint)}>
-                        <Hash className={clsx("w-4 h-4", accentClass.replace('bg-', 'text-'))} />
+            <div className="flex items-center gap-4">
+                <div className={clsx("p-3 rounded-2xl", bgTint)}>
+                    <Hash className={clsx("w-5 h-5", accentClass.replace('bg-', 'text-'))} />
+                </div>
+                <div>
+                    <h3 className="text-[16px] font-black text-slate-900 dark:text-white leading-none mb-1.5">{title}</h3>
+                    <div className="flex items-center gap-2">
+                        <span className="text-[13px] font-bold text-slate-500 dark:text-[#8E8E93] tabular-nums tracking-tight">
+                            {count} {target > 0 && `/ ${target}`}
+                        </span>
                     </div>
-                    <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">{title}</h3>
-                </div>
-                {target > 0 && count >= target && (
-                    <motion.div 
-                        initial={{ scale: 0 }} 
-                        animate={{ scale: 1 }} 
-                        className="bg-emerald-500 text-white p-1 rounded-full shadow-sm"
-                    >
-                        <Check className="w-3 h-3 stroke-[3]" />
-                    </motion.div>
-                )}
-            </div>
-
-            <div className="flex items-center justify-between gap-4 mb-4">
-                <div 
-                    onClick={() => setIsEditing(true)}
-                    className="flex-1 cursor-text"
-                >
-                    <AnimatePresence mode="wait">
-                        {!isEditing ? (
-                            <motion.div 
-                                key="display"
-                                initial={{ opacity: 0, y: 5 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -5 }}
-                                className="flex items-baseline gap-1"
-                            >
-                                <span className="text-3xl font-black text-slate-900 dark:text-white tabular-nums tracking-tight">
-                                    {count}
-                                </span>
-                                {target > 0 && (
-                                    <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">/ {target}</span>
-                                )}
-                            </motion.div>
-                        ) : (
-                            <motion.div 
-                                key="editor"
-                                initial={{ opacity: 0, y: 5 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -5 }}
-                                className="flex items-center gap-2"
-                            >
-                                <input
-                                    type="number"
-                                    autoFocus
-                                    value={inputVal}
-                                    onChange={e => setInputVal(e.target.value)}
-                                    onBlur={handleSave}
-                                    onKeyDown={e => e.key === 'Enter' && handleSave()}
-                                    className="w-full bg-slate-100 dark:bg-slate-800 border-none p-1 text-2xl font-black tracking-tight text-indigo-600 dark:text-indigo-400 outline-none rounded-lg"
-                                />
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
-
-                <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 p-1 rounded-2xl border border-slate-100 dark:border-slate-800">
-                    <button 
-                        onClick={handleSubOne}
-                        className="w-10 h-10 rounded-xl bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 active:scale-95 transition-all flex items-center justify-center shadow-sm"
-                    >
-                        <Minus className="w-5 h-5" />
-                    </button>
-                    <button 
-                        onClick={handleAddOne}
-                        className={clsx(
-                            "w-10 h-10 rounded-xl flex items-center justify-center shadow-sm active:scale-95 transition-all text-white",
-                            accentClass
-                        )}
-                    >
-                        <Plus className="w-5 h-5" />
-                    </button>
                 </div>
             </div>
 
             {target > 0 && (
-                <div className="relative w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${progress}%` }}
-                        transition={{ duration: 0.8 }}
-                        className={clsx("absolute inset-y-0 left-0 rounded-full", accentClass, progress >= 100 && "shadow-lg")}
-                    />
+                <div className="w-12 h-12 relative flex items-center justify-center shrink-0">
+                    <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                        <path
+                            className="text-slate-100 dark:text-white/5"
+                            strokeWidth="3"
+                            stroke="currentColor"
+                            fill="none"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                        <path
+                            className={accentClass.replace('bg-', 'text-')}
+                            strokeWidth="3"
+                            strokeDasharray={`${progress}, 100`}
+                            strokeLinecap="round"
+                            stroke="currentColor"
+                            fill="none"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                    </svg>
+                    {progress >= 100 && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <Check className={clsx("w-4 h-4", accentClass.replace('bg-', 'text-'))} />
+                        </div>
+                    )}
                 </div>
             )}
+        </motion.div>
+    );
+};
+
+const FullScreenCounter = ({ dhikr, onSave, onClose }) => {
+    const { title, count, target } = dhikr;
+    const [currentCount, setCurrentCount] = useState(count);
+    const [showResetConfirm, setShowResetConfirm] = useState(false);
+    
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (currentCount !== count) onSave(currentCount);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [currentCount, count, onSave]);
+
+    const handleIncrement = () => {
+        if (navigator.vibrate) navigator.vibrate(10);
+        setCurrentCount(prev => prev + 1);
+    };
+
+    const handleReset = () => {
+        if (!showResetConfirm) {
+            setShowResetConfirm(true);
+            setTimeout(() => setShowResetConfirm(false), 3000);
+            return;
+        }
+        setCurrentCount(0);
+        setShowResetConfirm(false);
+    };
+
+    const progress = target > 0 ? Math.min((currentCount / target) * 100, 100) : 0;
+    const isComplete = target > 0 && currentCount >= target;
+
+    return (
+        <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed inset-0 z-[200] bg-white dark:bg-[#1C1C1E] flex flex-col items-center justify-between py-12 px-6 overflow-hidden"
+        >
+            <div className="w-full flex justify-between items-center z-10 pt-4">
+                <button onClick={() => { onSave(currentCount); onClose(); }} className="p-3 bg-slate-100 dark:bg-white/5 rounded-2xl hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
+                    <ChevronLeft className="w-6 h-6 text-slate-900 dark:text-white" />
+                </button>
+                <h2 className="text-[16px] font-black tracking-widest uppercase text-slate-900 dark:text-white absolute left-1/2 -translate-x-1/2">{title}</h2>
+                <div className="w-12 h-12" />
+            </div>
+
+            <div className="flex-1 flex flex-col items-center justify-center relative w-full pt-10">
+                <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleIncrement}
+                    className="relative w-48 h-48 rounded-full bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 flex flex-col items-center justify-center focus:outline-none shadow-[0_0_60px_rgba(99,102,241,0.05)] dark:shadow-[0_0_60px_rgba(99,102,241,0.1)] group select-none transition-transform mb-8"
+                    style={{ WebkitTapHighlightColor: 'transparent' }}
+                >
+                    {target > 0 && (
+                        <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none drop-shadow-md" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="48" stroke="currentColor" strokeWidth="2" fill="none" className="text-slate-200 dark:text-white/5" />
+                            <motion.circle 
+                                cx="50" cy="50" r="48" 
+                                stroke="currentColor" 
+                                strokeWidth="4" 
+                                strokeLinecap="round"
+                                strokeDasharray="301.59" 
+                                initial={{ strokeDashoffset: 301.59 }}
+                                animate={{ strokeDashoffset: 301.59 - (progress / 100) * 301.59 }}
+                                fill="none" 
+                                className="text-indigo-500 transition-all duration-300 ease-out" 
+                            />
+                        </svg>
+                    )}
+                    <div className="absolute inset-4 rounded-full bg-gradient-to-b from-white dark:from-white/5 to-slate-50 dark:to-transparent border border-white dark:border-white/5 shadow-inner flex flex-col flex-1 items-center justify-center">
+                        <div className="w-16 h-16 rounded-full bg-indigo-50 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-500 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-indigo-500/30">
+                            <Plus className="w-8 h-8" />
+                        </div>
+                    </div>
+                </motion.button>
+                
+                <div className="flex flex-col items-center text-center">
+                    <span className="text-[80px] font-black tracking-tighter leading-none tabular-nums text-slate-900 dark:text-white">
+                        {currentCount}
+                    </span>
+                    {target > 0 && (
+                        <motion.div 
+                            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                            className={clsx(
+                                "mt-4 px-6 py-2.5 rounded-full border text-[11px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors",
+                                isComplete ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30" : "bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10"
+                            )}
+                        >
+                            Target: {target}
+                            {isComplete && <Check className="w-3.5 h-3.5" />}
+                        </motion.div>
+                    )}
+                </div>
+            </div>
+
+            <div className="pb-8 z-10 min-h-[60px]">
+                <AnimatePresence mode="wait">
+                    {!showResetConfirm ? (
+                        <motion.button
+                            key="reset-btn"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={handleReset}
+                            className="px-6 py-3 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-[#8E8E93] text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-white/10 transition-colors"
+                        >
+                            Reset Counter
+                        </motion.button>
+                    ) : (
+                        <motion.button
+                            key="confirm-btn"
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            onClick={handleReset}
+                            className="px-6 py-3 rounded-2xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-500 border border-rose-200 dark:border-rose-500/30 text-[10px] font-black uppercase tracking-widest shadow-sm"
+                        >
+                            Tap to Confirm
+                        </motion.button>
+                    )}
+                </AnimatePresence>
+            </div>
         </motion.div>
     );
 };
@@ -289,6 +334,7 @@ const RamadanDhikr = () => {
     const [isAddingDhikr, setIsAddingDhikr] = useState(false);
     const [newDhikrName, setNewDhikrName] = useState('');
     const [newDhikrTarget, setNewDhikrTarget] = useState(100);
+    const [activeCounter, setActiveCounter] = useState(null);
 
     const customDhikrItems = ramadanData?.customDhikr || [];
 
@@ -315,13 +361,7 @@ const RamadanDhikr = () => {
 
     if (!isRamadanActive) {
         return (
-            <PageLayout
-                header={
-                    <div className="flex items-center justify-between w-full">
-                        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Remembrance</h1>
-                    </div>
-                }
-            >
+            <PageLayout title="Remembrance">
                 <div className="flex flex-col items-center justify-center py-20 px-8 text-center space-y-4">
                     <div className="w-16 h-16 bg-slate-50 dark:bg-slate-900 rounded-2xl flex items-center justify-center">
                         <Flame className="w-8 h-8 text-slate-300 dark:text-slate-700" />
@@ -361,22 +401,7 @@ const RamadanDhikr = () => {
     };
 
     return (
-        <PageLayout
-            header={
-                <div className="flex flex-row items-center justify-between w-full">
-                    <div>
-                        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Remembrance</h1>
-                        <p className="text-xs font-medium text-slate-500">{hijriDate?.day} Ramadan</p>
-                    </div>
-                    <button 
-                        onClick={() => navigate('/ramadan/settings')}
-                        className="p-2 -mr-2 text-slate-400 dark:text-[#8E8E93] hover:text-slate-600 dark:hover:text-white transition-colors"
-                    >
-                        <MoreHorizontal className="w-6 h-6" />
-                    </button>
-                </div>
-            }
-        >
+        <PageLayout title="Remembrance" contentPadClass="px-4 pb-24 pt-4 flex flex-col gap-6">
             <div className="space-y-4">
                 <QuranGoalWidget 
                     ramadanData={ramadanData} 
@@ -385,38 +410,38 @@ const RamadanDhikr = () => {
                 />
 
                 <div className="space-y-3">
-                    <CounterCard 
+                    <DhikrListItem 
                         title="Tahlil (La ilaha illAllah)" 
                         count={todayData.tahlil || 0} 
                         target={100}
-                        onSave={(val) => handleSave('tahlil', val)}
+                        onClick={() => setActiveCounter({ key: 'tahlil', title: 'Tahlil (La ilaha illAllah)', count: todayData.tahlil || 0, target: 100 })}
                         accentClass="bg-blue-500 border-blue-600"
                         delay={0.1}
                     />
-                    <CounterCard 
+                    <DhikrListItem 
                         title="Salawat" 
                         count={todayData.salawat || 0} 
                         target={100}
-                        onSave={(val) => handleSave('salawat', val)}
+                        onClick={() => setActiveCounter({ key: 'salawat', title: 'Salawat', count: todayData.salawat || 0, target: 100 })}
                         accentClass="bg-indigo-500 border-indigo-600"
                         delay={0.2}
                     />
-                    <CounterCard 
+                    <DhikrListItem 
                         title="Istighfar" 
                         count={todayData.istighfar || 0} 
                         target={100}
-                        onSave={(val) => handleSave('istighfar', val)}
+                        onClick={() => setActiveCounter({ key: 'istighfar', title: 'Istighfar', count: todayData.istighfar || 0, target: 100 })}
                         accentClass="bg-violet-500 border-violet-600"
                         delay={0.3}
                     />
                     
                     {customDhikrItems.map((cd, index) => (
-                        <CounterCard 
+                        <DhikrListItem 
                             key={cd.id}
                             title={cd.title} 
                             count={todayData[cd.id] || 0} 
                             target={cd.target}
-                            onSave={(val) => handleSave(cd.id, val)}
+                            onClick={() => setActiveCounter({ key: cd.id, title: cd.title, count: todayData[cd.id] || 0, target: cd.target })}
                             accentClass={["bg-blue-500", "bg-indigo-500", "bg-violet-500", "bg-emerald-500"][index % 4]}
                             delay={0.4 + (index * 0.1)}
                         />
@@ -486,20 +511,20 @@ const RamadanDhikr = () => {
                 <div className="pt-6 border-t border-slate-200 dark:border-slate-800">
                     <h2 className="text-base font-bold text-slate-900 dark:text-white mb-3 px-1">Quranic Log</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <CounterCard 
+                        <DhikrListItem 
                             title="Pages Read" 
                             count={todayData.quranPages || 0} 
                             target={0}
-                            onSave={(val) => handleSave('quranPages', val)}
+                            onClick={() => setActiveCounter({ key: 'quranPages', title: 'Pages Read', count: todayData.quranPages || 0, target: 0 })}
                             accentClass="bg-emerald-500"
                             bgTint="bg-emerald-500/10"
                             delay={0.1}
                         />
-                        <CounterCard 
+                        <DhikrListItem 
                             title="Juz Read" 
                             count={todayData.quranJuz || 0} 
                             target={0}
-                            onSave={(val) => handleSave('quranJuz', val)}
+                            onClick={() => setActiveCounter({ key: 'quranJuz', title: 'Juz Read', count: todayData.quranJuz || 0, target: 0 })}
                             accentClass="bg-emerald-600"
                             bgTint="bg-emerald-600/10"
                             delay={0.2}
@@ -507,6 +532,16 @@ const RamadanDhikr = () => {
                     </div>
                 </div>
             </div>
+
+            <AnimatePresence>
+                {activeCounter && (
+                    <FullScreenCounter 
+                        dhikr={activeCounter} 
+                        onSave={(val) => handleSave(activeCounter.key, val)}
+                        onClose={() => setActiveCounter(null)}
+                    />
+                )}
+            </AnimatePresence>
         </PageLayout>
     );
 };

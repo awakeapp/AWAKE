@@ -1,19 +1,6 @@
 {
   "indexes": [
-    {
-      "collectionGroup": "tasks",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "status",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "createdAt",
-          "order": "ASCENDING"
-        }
-      ]
-    },
+
     {
       "collectionGroup": "ledgerEntries",
       "queryScope": "COLLECTION",

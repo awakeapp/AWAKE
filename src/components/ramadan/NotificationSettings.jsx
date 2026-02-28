@@ -96,22 +96,19 @@ const NotificationSettings = () => {
         }
     };
 
-    const ToggleRow = ({ label, description, isOn, onToggle }) => (
-        <div className="flex items-center justify-between py-5 border-b border-slate-100 dark:border-white/5 last:border-0 group">
-            <div className="space-y-1">
-                <span className="block text-[13px] font-black uppercase tracking-widest text-slate-400 dark:text-[#8E8E93] group-hover:text-indigo-500 transition-colors">{label}</span>
-                <span className="block text-[11px] font-bold text-slate-400 dark:text-[#48484A]">{description}</span>
-            </div>
+    const ToggleRow = ({ label, isOn, onToggle }) => (
+        <div className="flex items-center justify-between py-4 border-b border-slate-100 dark:border-white/5 last:border-0 group">
+            <span className="block text-[13px] font-black uppercase tracking-widest text-slate-500 dark:text-[#8E8E93] group-hover:text-indigo-500 transition-colors">{label}</span>
             <button 
                 onClick={onToggle}
                 className={clsx(
-                    "relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-500 shadow-inner",
-                    isOn ? "bg-indigo-600 shadow-indigo-600/30" : "bg-slate-200 dark:bg-white/5"
+                    "relative inline-flex h-6 w-10 items-center rounded-full transition-all duration-300 shadow-inner",
+                    isOn ? "bg-indigo-600" : "bg-slate-200 dark:bg-white/10"
                 )}
             >
                 <div className={clsx(
-                    "w-5 h-5 bg-white rounded-full shadow-lg transition-transform duration-500 ease-in-out",
-                    isOn ? "translate-x-6" : "translate-x-1"
+                    "w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-300 ease-in-out",
+                    isOn ? "translate-x-5" : "translate-x-1"
                 )} />
             </button>
         </div>
@@ -130,65 +127,26 @@ const NotificationSettings = () => {
                     <Bell className="w-5 h-5 text-indigo-500" />
                 </div>
                 <div>
-                    <h2 className="text-[17px] font-black uppercase tracking-tight text-slate-900 dark:text-white">Pulse Reminders</h2>
-                    <p className="text-[10px] font-black text-slate-400 dark:text-[#8E8E93] uppercase tracking-[0.2em] mt-0.5">Spiritual Sync</p>
+                    <h2 className="text-[17px] font-black uppercase tracking-tight text-slate-900 dark:text-white">Reminders</h2>
                 </div>
             </div>
             
-            <AnimatePresence>
-                {permission === 'denied' && (
-                    <motion.div 
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="mb-6"
-                    >
-                        <div className="flex items-start gap-3 bg-rose-50 dark:bg-rose-950/20 p-4 rounded-2xl border border-rose-100 dark:border-rose-950/30">
-                            <Info className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-                            <p className="text-[11px] font-bold text-rose-600 dark:text-rose-400 leading-relaxed uppercase tracking-tight">
-                                Frequency Blocked. Enable system notifications to activate beacon alerts.
-                            </p>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
             <div className="flex flex-col">
                 <ToggleRow 
-                    label="Suhoor Signal" 
-                    description="Triggered 30m prior to Dawn"
+                    label="Suhoor" 
                     isOn={prefs.suhoor} 
                     onToggle={() => handleToggle('suhoor')} 
                 />
                 <ToggleRow 
-                    label="Iftar Signal" 
-                    description="Sync with sunset transition"
+                    label="Iftar" 
                     isOn={prefs.iftar} 
                     onToggle={() => handleToggle('iftar')} 
                 />
                 <ToggleRow 
-                    label="Tahajjud Wake" 
-                    description="Deep night spiritual call"
+                    label="Tahajjud" 
                     isOn={prefs.tahajjud} 
                     onToggle={() => handleToggle('tahajjud')} 
                 />
-            </div>
-
-            <div className="mt-8 pt-6 border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <div className={clsx("w-2 h-2 rounded-full", permission === 'granted' ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" : "bg-slate-300 dark:bg-[#48484A]")} />
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-[#48484A]">
-                        System Link: {permission === 'granted' ? 'Active' : 'Standby'}
-                    </span>
-                </div>
-                {permission !== 'granted' && (
-                    <button 
-                        onClick={requestPermission}
-                        className="text-[10px] font-black uppercase tracking-widest text-indigo-500 hover:text-indigo-400 transition-colors"
-                    >
-                        Sync Notifications
-                    </button>
-                )}
             </div>
         </motion.div>
     );
