@@ -45,7 +45,7 @@ const DateHeader = ({ className, showControls = true, overviewText, onEditClick,
 
                 {/* Date Block */}
                 <div 
-                    className="flex items-center gap-2.5 cursor-pointer group hover:opacity-80 transition-opacity flex-shrink-0" 
+                    className="flex items-center gap-1.5 sm:gap-2.5 cursor-pointer group hover:opacity-80 transition-opacity min-w-0" 
                     onClick={() => setIsJumpModalOpen(true)}
                 >
                     <div className={cn(
@@ -66,11 +66,6 @@ const DateHeader = ({ className, showControls = true, overviewText, onEditClick,
                         </div>
                         <span className="text-sm sm:text-base font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1.5 leading-none truncate flex items-center gap-2">
                             {displayDate}
-                            {isLocked && (
-                                <span className="text-[10px] tracking-widest font-bold bg-slate-200/50 dark:bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded-md">
-                                    LOCKED
-                                </span>
-                            )}
                         </span>
                     </div>
                 </div>
@@ -88,7 +83,7 @@ const DateHeader = ({ className, showControls = true, overviewText, onEditClick,
                 {!isToday && (
                     <button
                         onClick={jumpToToday}
-                        className="flex items-center justify-center bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-xs sm:text-sm font-bold uppercase tracking-wider px-3 sm:px-4 py-2 rounded-xl transition-colors flex-shrink-0 ml-0.5 sm:ml-1"
+                        className="flex items-center justify-center bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl transition-colors flex-shrink-0"
                     >
                         Today
                     </button>
