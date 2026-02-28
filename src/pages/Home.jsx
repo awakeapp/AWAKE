@@ -12,6 +12,7 @@ import FuelLogModal from '../components/organisms/FuelLogModal';
 import FinanceLogModal from '../components/organisms/FinanceLogModal';
 import AddTaskModal from '../components/molecules/workspace/AddTaskModal';
 import MotivationBanner from '../components/organisms/MotivationBanner';
+import Pressable from '../components/atoms/Pressable';
 import RamadanImageSlider from '../components/ramadan/RamadanImageSlider';
 import { useTranslation } from 'react-i18next';
 import { RAMADAN_MODE } from '../lib/featureFlags';
@@ -121,9 +122,11 @@ const Home = () => {
 
             {/* Ramadan Tracker Entry Card — only when RAMADAN_MODE=true */}
             {RAMADAN_MODE && (
-                <div
+                <Pressable
                     onClick={() => navigate('/ramadan')}
-                    className="w-full bg-slate-900 rounded-3xl p-6 shadow-lg shadow-black/20 active:scale-[0.98] transition-all duration-75 cursor-pointer relative overflow-hidden flex flex-col justify-between min-h-[190px]"
+                    block
+                    scaleDown={0.97}
+                    className="w-full bg-slate-900 rounded-3xl p-6 shadow-lg shadow-black/20 relative overflow-hidden flex flex-col justify-between min-h-[190px]"
                 >
                     <RamadanImageSlider />
                     
@@ -174,7 +177,7 @@ const Home = () => {
                             </div>
                         </div>
                     )}
-                </div>
+                </Pressable>
             )}
 
             {/* Quick Actions Title */}
@@ -183,9 +186,10 @@ const Home = () => {
                 <div className="grid grid-cols-2 gap-3 text-left">
                     
                     {/* Routine Overview */}
-                    <div 
+                    <Pressable 
                         onClick={() => navigate('/routine')}
-                        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-32 active:bg-slate-50 dark:active:bg-slate-800/80 transition-colors duration-75 cursor-pointer shadow-sm relative overflow-hidden group"
+                        block
+                        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-32 shadow-sm relative overflow-hidden group"
                     >
                         <div 
                             className="absolute bottom-0 left-0 h-1 bg-indigo-500/20 transition-all duration-1000"
@@ -198,12 +202,13 @@ const Home = () => {
                             )}>
                                 {routineProgress === 100 ? <Trophy className="w-5 h-5" /> : <Target className="w-5 h-5" />}
                             </div>
-                            <button
+                            <Pressable
                                 onClick={(e) => { e.stopPropagation(); navigate('/routine'); }}
-                                className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:bg-slate-300 dark:active:bg-slate-600 text-slate-600 dark:text-slate-300 rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
+                                scaleDown={0.9}
+                                className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
                             >
                                 View
-                            </button>
+                            </Pressable>
                         </div>
                         <div className="relative z-10 pt-2">
                             <div className="text-[19px] font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
@@ -213,23 +218,25 @@ const Home = () => {
                                 {t('home.daily_routine', 'Daily Routine')}
                             </div>
                         </div>
-                    </div>
+                    </Pressable>
 
                     {/* Task Quick Action */}
-                    <div 
+                    <Pressable 
                         onClick={() => setIsTaskModalOpen(true)}
-                        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-32 active:bg-slate-50 dark:active:bg-slate-800/80 transition-colors duration-75 cursor-pointer shadow-sm relative overflow-hidden group"
+                        block
+                        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-32 shadow-sm relative overflow-hidden group"
                     >
                         <div className="flex items-start justify-between relative z-10">
                             <div className="p-2 bg-blue-50 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400 rounded-xl shadow-sm">
                                 <List className="w-5 h-5" />
                             </div>
-                            <button
+                            <Pressable
                                 onClick={(e) => { e.stopPropagation(); setIsTaskModalOpen(true); }}
-                                className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
+                                scaleDown={0.9}
+                                className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
                             >
                                 + Task
-                            </button>
+                            </Pressable>
                         </div>
                         <div className="relative z-10 pt-2">
                             <div className="text-[19px] font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
@@ -239,23 +246,25 @@ const Home = () => {
                                 {completedWorkspaceTasks} / {totalWorkspaceTasks} {t('home.completed', 'Completed')}
                             </div>
                         </div>
-                    </div>
+                    </Pressable>
 
                     {/* Finance Log (Merged Spend) */}
-                    <div 
+                    <Pressable 
                         onClick={() => setIsFinanceModalOpen(true)}
-                        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-32 active:bg-slate-50 dark:active:bg-slate-800/80 transition-colors duration-75 cursor-pointer shadow-sm relative overflow-hidden group"
+                        block
+                        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-32 shadow-sm relative overflow-hidden group"
                     >
                         <div className="flex items-start justify-between relative z-10">
                             <div className="p-2 bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10 dark:text-emerald-400 rounded-xl shadow-sm">
                                 <IndianRupee className="w-5 h-5" />
                             </div>
-                            <button
+                            <Pressable
                                 onClick={(e) => { e.stopPropagation(); setIsFinanceModalOpen(true); }}
-                                className="bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
+                                scaleDown={0.9}
+                                className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
                             >
                                 + Log
-                            </button>
+                            </Pressable>
                         </div>
                         <div className="relative z-10 pt-2">
                             <div className="text-[19px] font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
@@ -265,23 +274,25 @@ const Home = () => {
                                 {t('home.todays_spend', "Today's Spent")}
                             </div>
                         </div>
-                    </div>
+                    </Pressable>
 
                     {/* Fuel Log */}
-                    <div 
+                    <Pressable 
                         onClick={() => setIsFuelModalOpen(true)}
-                        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-32 active:bg-slate-50 dark:active:bg-slate-800/80 transition-colors duration-75 cursor-pointer shadow-sm relative overflow-hidden group"
+                        block
+                        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-32 shadow-sm relative overflow-hidden group"
                     >
                         <div className="flex items-start justify-between relative z-10">
                             <div className="p-2 bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-400 rounded-xl shadow-sm">
                                 <Fuel className="w-5 h-5" />
                             </div>
-                            <button
+                            <Pressable
                                 onClick={(e) => { e.stopPropagation(); setIsFuelModalOpen(true); }}
-                                className="bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
+                                scaleDown={0.9}
+                                className="bg-orange-500 hover:bg-orange-600 text-white rounded-lg px-2.5 py-1 text-xs font-bold transition-colors shadow-sm"
                             >
                                 + Fuel
-                            </button>
+                            </Pressable>
                         </div>
                         <div className="relative z-10 pt-2">
                             <div className="text-[19px] font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
@@ -291,7 +302,7 @@ const Home = () => {
                                 Add Fill-up
                             </div>
                         </div>
-                    </div>
+                    </Pressable>
 
                 </div>
             </div>

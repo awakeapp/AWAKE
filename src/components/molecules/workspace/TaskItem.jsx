@@ -10,6 +10,7 @@ import { useSettings } from '../../../context/SettingsContext';
 import JumpDateModal from '../../organisms/JumpDateModal';
 import { format } from 'date-fns';
 import { ItemMenu } from '../../ui/ItemMenu';
+import Pressable from '../../atoms/Pressable';
 
 const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', onReschedule, onDelete, isRoutine = false, onEdit, isSelectMode = false, isSelected = false, onSelect, onLongPress }) => {
     const displayTitle = task.name || task.title || 'Untitled';
@@ -55,12 +56,10 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
     };
 
     return (
-        <motion.div
+        <Pressable
             layout
             initial={false}
             animate={{ opacity: isCompleted ? 0.6 : 1 }}
-            transition={{ duration: 0.2 }}
-            whileHover={{ y: -2 }}
             onClick={(e) => {
                 if (isSelectMode && onSelect) {
                     onSelect(task.id);
@@ -73,8 +72,10 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
             onMouseLeave={handlePointerUpOrLeave}
             onTouchStart={handlePointerDown}
             onTouchEnd={handlePointerUpOrLeave}
+            block
+            scaleDown={0.98}
             className={clsx(
-                "group relative flex items-center gap-2.5 sm:gap-3 p-2.5 rounded-2xl border transition-all duration-200 cursor-pointer active:scale-[0.98]", 
+                "group relative flex items-center gap-2.5 sm:gap-3 p-2.5 rounded-2xl border transition-all duration-200 cursor-pointer", 
                 isSelected ? "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800" :
                 isCarryOver
                     ? "bg-orange-50/40 dark:bg-orange-950/20 border-orange-100/50 dark:border-orange-900/30"
@@ -244,7 +245,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                     </div>
                 )}
             </div>
-        </motion.div>
+        </Pressable>
     );
 });
 

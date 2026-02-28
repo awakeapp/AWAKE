@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ItemMenu } from '../../../components/ui/ItemMenu';
 import { clsx } from 'clsx';
 import { useRef } from 'react';
+import Pressable from '../../../components/atoms/Pressable';
 
 const LedgerScreen = ({ 
     activeVehicle, trendData, maxTrendCost, stats, combinedHistory, historyFilter, setHistoryFilter, onAddEntry, sortedVehicles, showArchived, getIcon, setVehicleActive, setDeleteConfirmId, toggleArchiveVehicle,
@@ -93,13 +94,14 @@ const LedgerScreen = ({
 
                 <div className="flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar mb-4">
                     {['All', 'Fuel', 'Service', 'EMI', 'Insurance'].map(f => (
-                        <button
+                        <Pressable
                             key={f}
                             onClick={() => setHistoryFilter(f)}
+                            scaleDown={0.92}
                             className={`text-[10px] uppercase tracking-wider font-bold px-3 py-1.5 rounded-full whitespace-nowrap transition-colors ${historyFilter === f ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700'}`}
                         >
                             {f}
-                        </button>
+                        </Pressable>
                     ))}
                 </div>
 
@@ -113,7 +115,7 @@ const LedgerScreen = ({
                         combinedHistory.map((record, index) => {
                             const isSelected = selectedIds.includes(record.id);
                             return (
-                                <div 
+                                <Pressable 
                                     key={record.id || index} 
                                     onClick={() => isSelectionMode && toggleSelection(record.id)}
                                     onMouseDown={() => handlePointerDown(record.id)}
@@ -121,8 +123,9 @@ const LedgerScreen = ({
                                     onMouseLeave={handlePointerUpOrLeave}
                                     onTouchStart={() => handlePointerDown(record.id)}
                                     onTouchEnd={handlePointerUpOrLeave}
+                                    scaleDown={0.98}
                                     className={clsx(
-                                        "bg-white dark:bg-slate-900 p-4 rounded-xl border transition-all flex items-start justify-between group cursor-pointer",
+                                        "bg-white dark:bg-slate-900 p-4 rounded-xl border transition-all flex items-start justify-between group cursor-pointer w-full text-left",
                                         isSelected ? "border-indigo-500 ring-1 ring-indigo-500 bg-indigo-50/10" : "border-slate-100 dark:border-slate-800"
                                     )}
                                 >
@@ -164,7 +167,7 @@ const LedgerScreen = ({
                                             />
                                         )}
                                     </div>
-                                </div>
+                                </Pressable>
                             );
                         })
                     )}

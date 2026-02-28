@@ -16,6 +16,7 @@ import { AppToggle } from '../components/ui/AppToggle';
 import ConfirmDialog from '../components/organisms/ConfirmDialog';
 import PageLayout from '../components/layout/PageLayout';
 import { motion, AnimatePresence } from 'framer-motion';
+import Pressable from '../components/atoms/Pressable';
 import ActionButton from '../components/atoms/ActionButton';
 
 const Settings = () => {
@@ -178,12 +179,13 @@ const Settings = () => {
                                         </span>
                                     </div>
                                 </div>
-                                <button
+                                <Pressable
                                     onClick={() => navigate('/profile')}
-                                    className="w-10 h-10 rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 active:scale-90 transition-all border border-slate-200/50 dark:border-white/5"
+                                    scaleDown={0.9}
+                                    className="w-10 h-10 rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5"
                                 >
                                     <Edit2 className="w-5 h-5" />
-                                </button>
+                                </Pressable>
                             </div>
                         </div>
                     </div>

@@ -67,7 +67,8 @@ const PartyDetail = () => {
         getPartyStatus,
         getPendingEntries,
         addSettlementPayment,
-        accounts
+        accounts,
+        financeConfig
     } = context;
 
     const party = debtParties.find(p => p.id === partyId && !p.is_deleted);
@@ -242,12 +243,30 @@ const PartyDetail = () => {
         const title = isReceivable ? 'Pending Payment Summary:' : 'Pending Repayment Summary:';
         const signOff = isReceivable ? 'Kindly clear at earliest convenience.' : 'I will clear this at earliest convenience.';
 
+        let message = '';
         if (isWhatsapp) {
-            return `Hi ${party.name},\n\n${title}\n\n${PENDING_LIST}\n${divider}\n*TOTAL: ₹${amtStr}*\n${divider}\n\n${signOff}`;
+            message = `Hi ${party.name},\n\n${title}\n\n${PENDING_LIST}\n${divider}\n*TOTAL: ₹${amtStr}*\n${divider}\n\n${signOff}`;
         } else {
-            return `Hi ${party.name},\n${title}\n${PENDING_LIST}\n${divider}\nTOTAL: ₹${amtStr}\n${divider}\n\n${signOff}`;
+            message = `Hi ${party.name},\n${title}\n${PENDING_LIST}\n${divider}\nTOTAL: ₹${amtStr}\n${divider}\n\n${signOff}`;
         }
-    }, [party.name, totalSelectedPending, selectedPendingEntries, reminderMethod, balance]);
+        
+        if (isReceivable && financeConfig?.upiId) {
+            let baseUrl = window.location.origin;
+            if (import.meta.env.BASE_URL && import.meta.env.BASE_URL !== '/') {
+                baseUrl += import.meta.env.BASE_URL;
+            }
+            // Create a clean URL pointing to /pay
+            const payPath = baseUrl.replace(/\/$/, '') + '/pay';
+            const payUrl = new URL(payPath);
+            payUrl.searchParams.set('upi', btoa(encodeURIComponent(financeConfig.upiId)));
+            payUrl.searchParams.set('am', btoa(encodeURIComponent(totalSelectedPending.toString())));
+            payUrl.searchParams.set('pn', btoa(encodeURIComponent(user?.name || 'AWAKE User')));
+            
+            message += `\n\nPay instantly via UPI:\n${payUrl.toString()}`;
+        }
+        
+        return message;
+    }, [party.name, totalSelectedPending, selectedPendingEntries, reminderMethod, balance, financeConfig, user]);
 
     const openReminderModal = () => {
         setIsReminderOpen(true);

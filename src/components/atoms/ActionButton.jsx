@@ -1,17 +1,16 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { 
     ChevronLeft, 
     X, 
     Check, 
     Trash2, 
     Undo2, 
-    Save, 
     ArrowLeft, 
     ArrowRight,
     ChevronRight
 } from 'lucide-react';
 import clsx from 'clsx';
+import Pressable from './Pressable';
 
 /**
  * ActionButton - A premium, standardized action button for back, exit, save, delete, and undo.
@@ -73,23 +72,10 @@ const ActionButton = ({
         lg: "p-4 rounded-[22px]"
     };
 
-    const handleClick = (e) => {
-        if (disabled) return;
-        // Premium haptic feedback pattern
-        if (typeof navigator !== 'undefined' && navigator.vibrate) {
-            navigator.vibrate(10);
-        }
-        if (onClick) {
-            onClick(e);
-        }
-    };
-
     return (
-        <motion.button
-            whileTap={!disabled ? { scale: 0.96, y: 1 } : {}}
-            whileHover={!disabled ? { scale: 1.02, y: -1 } : {}}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            onClick={handleClick}
+        <Pressable
+            as="button"
+            onClick={onClick}
             disabled={disabled}
             className={clsx(
                 "flex items-center justify-center transition-colors duration-200 outline-none select-none px-4",
@@ -115,7 +101,7 @@ const ActionButton = ({
                     )}
                 </>
             )}
-        </motion.button>
+        </Pressable>
     );
 };
 

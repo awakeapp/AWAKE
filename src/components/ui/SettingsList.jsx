@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
+import Pressable from '../atoms/Pressable';
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -30,9 +31,13 @@ export const SettingsRow = ({
     isLast = false,
     className 
 }) => {
+    const Wrapper = onClick ? Pressable : 'div';
+    
     return (
-        <div 
+        <Wrapper 
             onClick={onClick}
+            block
+            scaleDown={0.98}
             className={cn(
                 "group flex items-center min-h-[56px] transition-all duration-200",
                 onClick ? "cursor-pointer active:bg-slate-50 dark:active:bg-[#2C2C2E]" : "",
@@ -77,7 +82,7 @@ export const SettingsRow = ({
                     </div>
                 </div>
             </div>
-        </div>
+        </Wrapper>
     );
 };
 

@@ -7,6 +7,7 @@ import { useData } from '../../context/DataContext';
 import { inferIcon, getIconComponent } from '../../utils/iconInference';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import { DeleteConfirmationModal } from '../ui/DeleteConfirmationModal';
+import Pressable from '../atoms/Pressable';
 
 const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
     useScrollLock(isOpen);
@@ -278,19 +279,21 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
 
                         {!showAddRow && (
                             <div className="pt-2 pb-6">
-                                <button
+                                <Pressable
                                     onClick={() => {
                                         setNewTaskName('');
                                         setNewTaskTime('');
                                         setShowAddRow(true);
                                     }}
-                                    className="flex items-center gap-2 text-slate-400 hover:text-indigo-600 transition-colors px-1 group"
+                                    scaleDown={0.96}
+                                    block
+                                    className="flex items-center gap-2 text-slate-400 hover:text-indigo-600 transition-colors px-1 group w-max"
                                 >
                                     <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/30 transition-colors">
                                         <Plus className="w-4 h-4" />
                                     </div>
                                     <span className="text-sm font-normal">Add task</span>
-                                </button>
+                                </Pressable>
                             </div>
                         )}
                     </div>

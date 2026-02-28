@@ -7,6 +7,7 @@ import { useDate } from '../../context/DateContext';
 
 
 import { useScrollLock } from '../../hooks/useScrollLock';
+import Pressable from '../atoms/Pressable';
 
 const HABIT_COMPONENTS = {
     Pizza, Candy, Salad, CheckCircle, Wallet, Smartphone, GlassWater, Activity
@@ -44,12 +45,13 @@ const DayOverviewModal = ({ isOpen, onClose, data, onConfirm }) => {
                                 <h2 className="text-xl font-normal text-slate-900 dark:text-white tracking-tight">Day Overview</h2>
                                 <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-1">Daily Recap</p>
                             </div>
-                            <button
+                            <Pressable
                                 onClick={onClose}
-                                className="p-2 bg-slate-50 dark:bg-slate-900 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-full transition-all active:bg-slate-200 dark:active:bg-slate-800"
+                                scaleDown={0.9}
+                                className="p-2 bg-slate-50 dark:bg-slate-900 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-full transition-all"
                             >
                                 <X className="w-5 h-5" />
-                            </button>
+                            </Pressable>
                         </div>
 
                         {/* Completion Rate Circle */}
@@ -179,13 +181,15 @@ const DayOverviewModal = ({ isOpen, onClose, data, onConfirm }) => {
                         {/* Actions */}
                         {!isPast && (
                             <div className="space-y-4">
-                                <Button
+                                <Pressable
                                     onClick={onConfirm}
-                                    className="w-full py-4 text-base font-medium rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2 transition-all active:bg-indigo-800"
+                                    scaleDown={0.96}
+                                    block
+                                    className="w-full py-4 text-base font-medium rounded-[20px] bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2 transition-all"
                                 >
                                     <Lock className="w-4 h-4" />
                                     Lock & Save Day
-                                </Button>
+                                </Pressable>
                             </div>
                         )}
                     </div>

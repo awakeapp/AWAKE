@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import { inferIcon, getIconComponent } from '../../utils/iconInference';
 
 import { useScrollLock } from '../../hooks/useScrollLock';
+import Pressable from '../atoms/Pressable';
 
 const HabitManagerDialog = ({ isOpen, onClose, onAdd }) => {
     useScrollLock(isOpen);
@@ -62,12 +63,13 @@ const HabitManagerDialog = ({ isOpen, onClose, onAdd }) => {
                             {/* Header */}
                             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
                                 <h2 className="text-lg font-bold text-slate-900 dark:text-white">Add New Habit</h2>
-                                <button
+                                <Pressable
                                     onClick={handleClose}
+                                    scaleDown={0.9}
                                     className="p-2 -mr-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full transition-colors"
                                 >
                                     <X className="w-5 h-5" />
-                                </button>
+                                </Pressable>
                             </div>
 
                             {/* Scrollable Body */}
@@ -100,10 +102,11 @@ const HabitManagerDialog = ({ isOpen, onClose, onAdd }) => {
                                         Tracking Type
                                     </label>
                                     <div className="grid grid-cols-2 gap-3">
-                                        <button
+                                        <Pressable
                                             onClick={() => setType('toggle')}
+                                            scaleDown={0.96}
                                             className={clsx(
-                                                "p-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all duration-200",
+                                                "p-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all duration-200 w-full",
                                                 type === 'toggle'
                                                     ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400"
                                                     : "border-slate-200 dark:border-slate-800 text-slate-400 hover:border-slate-300 dark:hover:border-slate-700"
@@ -111,11 +114,12 @@ const HabitManagerDialog = ({ isOpen, onClose, onAdd }) => {
                                         >
                                             <ToggleLeft className="w-5 h-5" />
                                             <span className="font-semibold text-xs">Yes / No</span>
-                                        </button>
-                                        <button
+                                        </Pressable>
+                                        <Pressable
                                             onClick={() => setType('number')}
+                                            scaleDown={0.96}
                                             className={clsx(
-                                                "p-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all duration-200",
+                                                "p-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all duration-200 w-full",
                                                 type === 'number'
                                                     ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400"
                                                     : "border-slate-200 dark:border-slate-800 text-slate-400 hover:border-slate-300 dark:hover:border-slate-700"
@@ -123,7 +127,7 @@ const HabitManagerDialog = ({ isOpen, onClose, onAdd }) => {
                                         >
                                             <Clock className="w-5 h-5" />
                                             <span className="font-semibold text-xs">Time / Duration</span>
-                                        </button>
+                                        </Pressable>
                                     </div>
                                 </div>
 
@@ -141,28 +145,30 @@ const HabitManagerDialog = ({ isOpen, onClose, onAdd }) => {
                                                     Track In
                                                 </label>
                                                 <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
-                                                    <button
+                                                    <Pressable
                                                         onClick={() => setUnit('hrs')}
+                                                        scaleDown={0.96}
                                                         className={clsx(
-                                                            "flex-1 py-1.5 text-xs font-bold rounded-md transition-all",
+                                                            "flex-1 py-1.5 text-xs font-bold rounded-md transition-all flex items-center justify-center",
                                                             unit === 'hrs'
                                                                 ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm"
                                                                 : "text-slate-500 hover:text-slate-700"
                                                         )}
                                                     >
                                                         Hours
-                                                    </button>
-                                                    <button
+                                                    </Pressable>
+                                                    <Pressable
                                                         onClick={() => setUnit('mins')}
+                                                        scaleDown={0.96}
                                                         className={clsx(
-                                                            "flex-1 py-1.5 text-xs font-bold rounded-md transition-all",
+                                                            "flex-1 py-1.5 text-xs font-bold rounded-md transition-all flex items-center justify-center",
                                                             unit === 'mins'
                                                                 ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm"
                                                                 : "text-slate-500 hover:text-slate-700"
                                                         )}
                                                     >
                                                         Minutes
-                                                    </button>
+                                                    </Pressable>
                                                 </div>
                                             </div>
                                         </motion.div>
@@ -172,13 +178,15 @@ const HabitManagerDialog = ({ isOpen, onClose, onAdd }) => {
 
                             {/* Footer - Pinned to bottom */}
                             <div className="p-6 pt-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 pb-10 sm:pb-6">
-                                <button
+                                <Pressable
                                     onClick={handleSubmit}
                                     disabled={!name.trim()}
-                                    className="w-full py-3.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold text-base shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
+                                    scaleDown={0.96}
+                                    block
+                                    className="w-full py-3.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[14px] font-bold text-base shadow-lg transition-all disabled:opacity-50 flex justify-center items-center"
                                 >
                                     Create Habit
-                                </button>
+                                </Pressable>
                             </div>
                         </motion.div>
                     </motion.div>

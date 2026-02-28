@@ -7,6 +7,7 @@ import JumpDateModal from '../../organisms/JumpDateModal';
 import { useTasks } from '../../../context/TaskContext';
 
 import { useScrollLock } from '../../../hooks/useScrollLock';
+import Pressable from '../../atoms/Pressable';
 
 const EditTaskModal = ({ isOpen, onClose, task }) => {
  useScrollLock(isOpen);
@@ -97,12 +98,13 @@ const EditTaskModal = ({ isOpen, onClose, task }) => {
  {/* Header */}
  <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-white/[0.06]">
  <h2 className="text-[17px] font-semibold text-slate-900 dark:text-white tracking-tight">Edit Task</h2>
- <button 
+ <Pressable 
  onClick={onClose} 
+ scaleDown={0.9}
  className="p-1.5 -mr-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-full transition-colors "
  >
  <X className="w-5 h-5" />
- </button>
+ </Pressable>
  </div>
 
  {/* Scrollable Body */}
@@ -216,21 +218,23 @@ const EditTaskModal = ({ isOpen, onClose, task }) => {
  
  {/* Action Footers embedded in scroll to prevent squishing on tiny screens */}
  <div className="pt-2 mt-1 flex items-center justify-end gap-2">
- <button
+ <Pressable
  type="button"
  onClick={onClose}
  disabled={isSubmitting}
+ scaleDown={0.96}
  className="px-4 py-2.5 rounded-[12px] text-[15px] font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors disabled:opacity-50"
  >
  Cancel
- </button>
- <button
+ </Pressable>
+ <Pressable
  type="submit"
  disabled={!title.trim() || isSubmitting}
- className="px-6 py-2.5 rounded-[12px] text-[15px] font-semibold text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:opacity-50 disabled:bg-slate-200 dark:disabled:bg-slate-800 dark:disabled:text-slate-500 transition-colors active:scale-[0.98] flex items-center"
+ scaleDown={0.96}
+ className="px-6 py-2.5 rounded-[12px] text-[15px] font-semibold text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:opacity-50 disabled:bg-slate-200 dark:disabled:bg-slate-800 dark:disabled:text-slate-500 transition-colors flex items-center"
  >
  {isSubmitting ? 'Saving...' : 'Save Changes'}
- </button>
+ </Pressable>
  </div>
  </form>
  </div>

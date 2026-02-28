@@ -17,6 +17,7 @@ import FinanceBottomNav from '../../components/finance/FinanceBottomNav';
 import { useToast } from '../../context/ToastContext';
 import PageLayout from '../../components/layout/PageLayout';
 import ActionButton from '../../components/atoms/ActionButton';
+import Pressable from '../../components/atoms/Pressable';
 
 const FinanceDashboard = () => {
     const navigate = useNavigate();
@@ -262,9 +263,10 @@ const FinanceDashboard = () => {
 
                 {/* Quick Actions — Analytics & Budget */}
                 <div className="grid grid-cols-2 gap-3">
-                    <button
+                    <Pressable
                         onClick={() => setIsAnalyticsOpen(true)}
-                        className="flex items-center gap-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl px-4 py-3.5 active:scale-[0.97] transition-all shadow-sm"
+                        scaleDown={0.96}
+                        className="flex items-center gap-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl px-4 py-3.5 shadow-sm w-full text-left"
                     >
                         <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center shrink-0">
                             <PieChart className="w-[18px] h-[18px] text-emerald-500" strokeWidth={2.5} />
@@ -273,10 +275,11 @@ const FinanceDashboard = () => {
                             <p className="text-[13px] font-bold text-slate-900 dark:text-white leading-tight">Analytics</p>
                             <p className="text-[10px] text-slate-400 font-medium">Spending insights</p>
                         </div>
-                    </button>
-                    <button
+                    </Pressable>
+                    <Pressable
                         onClick={() => setIsBudgetOpen(true)}
-                        className="flex items-center gap-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl px-4 py-3.5 active:scale-[0.97] transition-all shadow-sm"
+                        scaleDown={0.96}
+                        className="flex items-center gap-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl px-4 py-3.5 shadow-sm w-full text-left"
                     >
                         <div className="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center shrink-0">
                             <TrendingUp className="w-[18px] h-[18px] text-rose-500" strokeWidth={2.5} />
@@ -285,7 +288,7 @@ const FinanceDashboard = () => {
                             <p className="text-[13px] font-bold text-slate-900 dark:text-white leading-tight">Budget</p>
                             <p className="text-[10px] text-slate-400 font-medium">Category limits</p>
                         </div>
-                    </button>
+                    </Pressable>
                 </div>
 
                 {/* Transactions List */}
@@ -310,26 +313,28 @@ const FinanceDashboard = () => {
                                 <p className="text-slate-500 text-sm mb-6 max-w-[200px] mx-auto">
                                     {t('finance.start_tracking', 'Start tracking where your money goes.')}
                                 </p>
-                                <button
+                                <Pressable
                                     onClick={() => {
                                         setEditTransactionId(null);
                                         setAddType('expense');
                                         setIsAddOpen(true);
                                     }}
-                                    className="bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 px-6 py-2.5 rounded-xl font-bold active:scale-95 transition-all text-sm"
+                                    scaleDown={0.96}
+                                    className="bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 px-6 py-2.5 rounded-xl font-bold transition-all text-sm inline-block"
                                 >
                                     {t('finance.add_first_record', '+ Add Record')}
-                                </button>
+                                </Pressable>
                             </div>
                         ) : (
                             sortedMonthlyTx.map(tx => {
                                 const cat = categories.find(c => c.id === tx.categoryId);
                                 const isIncome = tx.type === 'income';
                                 return (
-                                    <div
+                                    <Pressable
                                         key={tx.id}
                                         onClick={() => handleEdit(tx.id)}
-                                        className="relative flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-[1.25rem] border border-slate-100 dark:border-slate-800 active:scale-[0.98] transition-all cursor-pointer overflow-hidden"
+                                        scaleDown={0.98}
+                                        className="relative flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-[1.25rem] border border-slate-100 dark:border-slate-800 transition-all cursor-pointer overflow-hidden w-full text-left"
                                     >
                                         <div className="flex items-center gap-4 relative z-10 w-full">
                                             <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl shrink-0 ${cat?.color ? cat.color + '/10' : 'bg-slate-50 dark:bg-slate-800'} ${cat?.color?.replace('bg-', 'text-') || 'text-slate-500'}`}>
@@ -359,7 +364,7 @@ const FinanceDashboard = () => {
                                                 </p>
                                             </div>
                                         </div>
-                                    </div>
+                                    </Pressable>
                                 );
                             })
                         )}
