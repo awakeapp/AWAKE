@@ -146,21 +146,21 @@ const Login = () => {
                 className="w-full max-w-md relative z-10"
             >
                 <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-2xl dark:bg-slate-900/80 dark:border-slate-800 rounded-3xl overflow-hidden">
-                    <AppCardHeader className="space-y-2 text-center pb-6 pt-8">
+                    <CardHeader className="space-y-2 text-center pb-6 pt-8">
                         <div className="mx-auto flex justify-center mb-6 relative">
                             <div className="relative">
                                 <img src={awakeLogo} alt="Awake Logo" className="h-8 w-auto relative z-10 drop-shadow-sm object-contain dark:brightness-0 dark:invert" />
                             </div>
                         </div>
-                        <AppCardTitle className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+                        <CardTitle className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
                             {isSignup ? 'Create Account' : 'Welcome Back'}
-                        </AppCardTitle>
+                        </CardTitle>
                         <p className="text-slate-500 font-medium dark:text-slate-400">
                             {isSignup ? 'Create your universal identity' : 'Sign in to access your space'}
                         </p>
-                    </AppCardHeader>
+                    </CardHeader>
 
-                    <AppCardContent className="px-8 pb-10">
+                    <CardContent className="px-8 pb-10">
                         <form onSubmit={handleSubmit} className="space-y-5">
                             <AnimatePresence mode="popLayout">
                                 {isSignup && (
@@ -337,7 +337,7 @@ const Login = () => {
                                 </button>
                             </div>
                         </form>
-                    </AppCardContent>
+                    </CardContent>
                 </Card>
             </motion.div>
 

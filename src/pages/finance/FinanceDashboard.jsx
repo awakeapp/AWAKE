@@ -116,7 +116,7 @@ const FinanceDashboard = () => {
             bottomNav={<FinanceBottomNav />}
             renderFloating={
                 <>
-                    <div className="fixed right-6 z-40" style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 88px)' }}>
+                    <div className="fixed right-6 z-40" style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)' }}>
                         <button
                             onClick={() => {
                                 setEditTransactionId(null);
@@ -151,7 +151,8 @@ const FinanceDashboard = () => {
                                 initial={{ opacity: 0, y: 50 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: 50 }}
-                                className="fixed bottom-[80px] left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-4 text-sm font-medium border border-white/10"
+                                className="fixed left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-4 text-sm font-medium border border-white/10"
+                                style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 90px)' }}
                             >
                                 <span>{undoToast.message}</span>
                                 <button
@@ -175,25 +176,18 @@ const FinanceDashboard = () => {
             }
             title={t('finance.title', 'Finance')}
             rightNode={
-                <div className="flex items-center gap-1.5">
-                    <div className="flex items-center gap-0.5 bg-slate-50 dark:bg-slate-900 rounded-lg p-1 border border-slate-200 dark:border-slate-800">
-                        <button onClick={() => changeMonth(-1)} className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-md transition-colors">
+                <div className="flex items-center">
+                    <div className="flex items-center gap-0.5 bg-slate-100 dark:bg-slate-900 rounded-xl p-1 border border-slate-200 dark:border-slate-800">
+                        <button onClick={() => changeMonth(-1)} className="p-1 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-colors shadow-sm">
                             <ChevronLeft className="w-3.5 h-3.5 text-slate-500" />
                         </button>
-                        <span className="text-[10px] font-black uppercase tracking-widest min-w-[64px] text-center text-slate-700 dark:text-slate-200">
+                        <span className="text-[10px] font-black uppercase tracking-widest min-w-[70px] text-center text-slate-700 dark:text-slate-200">
                             {format(selectedDate, 'MMM yy')}
                         </span>
-                        <button onClick={() => changeMonth(1)} className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-md transition-colors">
+                        <button onClick={() => changeMonth(1)} className="p-1 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-colors shadow-sm">
                             <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
                         </button>
                     </div>
-
-                    <button 
-                        onClick={() => navigate('/finance/more')}
-                        className="p-2 rounded-xl transition-all bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95"
-                    >
-                        <MoreHorizontal className="w-5 h-5" />
-                    </button>
                 </div>
             }
         >

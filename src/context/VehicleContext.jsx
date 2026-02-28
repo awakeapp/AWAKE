@@ -705,13 +705,13 @@ export const VehicleContextProvider = ({ children }) => {
         // 1. EMI & Loan Risks
         if (loan) {
             const loanStatus = getLoanDetailedStatus(loan.id);
-            if (loanStatus.isPastDue) {
+            if (loanStatus && loanStatus.isPastDue) {
                 risks.push({
                     type: 'critical',
                     title: `EMI Overdue by ${loanStatus.daysLate} days`,
                     detail: 'Immediate payment required to avoid penalties.'
                 });
-            } else if (loanStatus.status === 'active') {
+            } else if (loanStatus && loanStatus.status === 'active') {
                 risks.push({
                     type: 'info',
                     title: `Interest Remaining: ₹${loanStatus.interestBalance.toLocaleString()}`,

@@ -36,9 +36,9 @@ export function AppHeader({
     return (
         <header
             className={cn(
-                "fixed top-0 left-0 right-0 z-[100] w-full px-4",
-                "flex items-center justify-between",
-                transparent ? "bg-transparent" : "bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800",
+                "fixed top-0 left-0 right-0 z-[100] w-full px-5",
+                "flex items-center justify-between gap-4",
+                transparent ? "bg-transparent" : "bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50",
                 className
             )}
             style={{
@@ -46,8 +46,8 @@ export function AppHeader({
                 height: 'calc(60px + env(safe-area-inset-top, 0px))'
             }}
         >
-            {/* Left Action Area: 16px from edge (px-4 handles it) */}
-            <div className="flex-1 flex justify-start items-center">
+            {/* Left Action Area */}
+            <div className="flex-1 flex justify-start items-center min-w-0">
                 {showBack ? (
                     <button
                         onClick={handleBack}
@@ -55,20 +55,26 @@ export function AppHeader({
                     >
                         <ArrowLeft className="w-6 h-6" />
                     </button>
-                ) : (
+                ) : leftNode ? (
                     leftNode
+                ) : (
+                    <h1 className="text-[17px] font-black tracking-tightest text-slate-900 dark:text-white uppercase truncate">
+                        {title}
+                    </h1>
                 )}
             </div>
 
-            {/* Center Title: Exactly Centered */}
-            <div className="absolute left-1/2 -translate-x-1/2 flex justify-center text-center max-w-[50%] pointer-events-none">
-                <h1 className="text-base font-bold text-slate-900 dark:text-white truncate">
-                    {title}
-                </h1>
-            </div>
+            {/* Center Area (Optional, used if leftNode exists) */}
+            {leftNode && (
+                <div className="flex-1 flex justify-center text-center truncate">
+                    <h1 className="text-[15px] font-bold text-slate-900 dark:text-white uppercase tracking-tight truncate">
+                        {title}
+                    </h1>
+                </div>
+            )}
 
-            {/* Right Action Area: 16px from edge */}
-            <div className="flex-1 flex justify-end items-center gap-2">
+            {/* Right Action Area */}
+            <div className="flex-1 flex justify-end items-center gap-3 shrink-0">
                 {rightNode}
             </div>
         </header>

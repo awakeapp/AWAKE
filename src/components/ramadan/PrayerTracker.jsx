@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { useRamadan } from '../../context/RamadanContext';
 import { usePrayer } from '../../context/PrayerContext';
-import { Plus, Minus, Check, Clock, Users, User, ChevronRight } from 'lucide-react';
+import { Plus, Minus, Check, Clock, Users, User, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const PRAYERS = [
@@ -17,7 +17,7 @@ const PRAYERS = [
 
 // Mode selector removed as separate component, integrated into PrayerRow
 
-const PrayerRow = ({ prayerKey, label, time, data, onUpdate, allowMode, allowCount, isLast, isActive }) => {
+const PrayerRow = ({ prayerKey, label, time, data, onUpdate, allowMode, allowCount, isLast, isActive, onEdit }) => {
     const completed = data[prayerKey] || false;
     const mode = data[`${prayerKey}Mode`] || 'jamaah';
     const count = data[`${prayerKey}Count`] || 0;

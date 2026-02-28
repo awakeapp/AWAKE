@@ -235,7 +235,8 @@ const VehicleDashboard = () => {
                     {activeTab === 'dashboard' && (
                         <button
                             onClick={() => alert("Add Entry: Full ledger entry modal coming soon")}
-                            className="fixed bottom-[80px] right-6 bg-indigo-600 text-white px-5 py-3 rounded-2xl shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
+                            className="fixed right-6 bg-indigo-600 text-white px-5 py-3 rounded-2xl shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
+                            style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)' }}
                         >
                             <Plus className="w-5 h-5" /> Add Entry
                         </button>
@@ -243,7 +244,8 @@ const VehicleDashboard = () => {
                     {activeTab === 'service' && (
                         <button
                             onClick={() => alert("Add Reminder Modal Coming Soon")}
-                            className="fixed bottom-[80px] right-6 bg-blue-600 text-white px-5 py-3 rounded-2xl shadow-xl shadow-blue-600/30 flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
+                            className="fixed right-6 bg-blue-600 text-white px-5 py-3 rounded-2xl shadow-xl shadow-blue-600/30 flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
+                            style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)' }}
                         >
                             <Plus className="w-5 h-5" /> Add Reminder
                         </button>
@@ -251,7 +253,8 @@ const VehicleDashboard = () => {
                     {activeTab === 'loan' && activeLoan && (
                         <button
                             onClick={() => setIsPayEMIOpen(true)}
-                            className="fixed bottom-[80px] right-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-5 py-3 rounded-2xl shadow-xl flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
+                            className="fixed right-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-5 py-3 rounded-2xl shadow-xl flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
+                            style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)' }}
                         >
                             <Plus className="w-5 h-5" /> Record EMI
                         </button>
@@ -282,7 +285,7 @@ const VehicleDashboard = () => {
                     />
                 </>
             }
-            title={isSelectionMode ? undefined : "Fleet Management"}
+            title={isSelectionMode ? undefined : "Vehicle"}
             header={isSelectionMode ? (
                 <SelectionBar 
                     count={selectedIds.length}
@@ -300,12 +303,12 @@ const VehicleDashboard = () => {
                 />
             ) : undefined}
             rightNode={isSelectionMode ? null : (
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center">
                     {/* Vehicle Switcher */}
                     <div className="relative" ref={selectorRef}>
                         <button 
                             onClick={() => setIsVehicleSelectorOpen(!isVehicleSelectorOpen)}
-                            className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-sm"
+                            className="flex items-center gap-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-full hover:bg-white dark:hover:bg-slate-800 transition-colors shadow-sm"
                         >
                             <span className="font-bold text-slate-800 dark:text-slate-200 text-[11px] leading-tight max-w-[80px] truncate uppercase tracking-tight">
                                 {activeVehicle ? activeVehicle.name : 'Select'}
@@ -346,13 +349,6 @@ const VehicleDashboard = () => {
                             )}
                         </AnimatePresence>
                     </div>
-
-                    <button 
-                        onClick={() => navigate('/vehicle/more')}
-                        className="p-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 transition-all shadow-sm"
-                    >
-                        <MoreHorizontal className="w-5 h-5" />
-                    </button>
                 </div>
             )}
         >
