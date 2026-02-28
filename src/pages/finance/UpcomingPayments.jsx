@@ -43,10 +43,11 @@ const UpcomingPayments = () => {
         selectedIds,
         isSelectionMode,
         toggleSelection,
-        clearSelection,
         enterSelectionMode,
         exitSelectionMode,
-        toggleSelectAll
+        toggleSelectAll,
+        count: selectedCount,
+        isAllSelected
     } = useSelection(subscriptions.map(s => s.id));
 
     useScrollLock(isAdding);
@@ -111,8 +112,8 @@ const UpcomingPayments = () => {
 
     const handleBulkDelete = async () => {
         try {
-            await Promise.all(Array.from(selectedIds).map(id => deleteSubscription(id)));
-            showToast(`Deleted ${selectedIds.size} subscriptions`, 'success');
+            await Promise.all(selectedIds.map(id => deleteSubscription(id)));
+            showToast(`Deleted ${selectedCount} subscriptions`, 'success');
             exitSelectionMode();
         } catch (error) {
             showToast('Failed to delete some subscriptions', 'error');
@@ -127,10 +128,10 @@ const UpcomingPayments = () => {
             title={isSelectionMode ? undefined : t('finance.upcoming', 'Upcoming')}
             header={isSelectionMode ? (
                 <SelectionBar 
-                    count={selectedIds.size}
+                    count={selectedCount}
                     onCancel={exitSelectionMode}
                     onSelectAll={toggleSelectAll}
-                    isAllSelected={selectedIds.size === subscriptions.length}
+                    isAllSelected={isAllSelected}
                     actions={(
                         <button
                             onClick={() => setDeleteConfirmId('bulk')}
@@ -172,7 +173,7 @@ const UpcomingPayments = () => {
                     sortedSubs.map(sub => {
                         const Icon = ICONS[sub.iconIdx || 0].icon;
                         const daysLeft = getDaysLeft(sub.nextBillingDate || sub.dueDate);
-                        const isSelected = selectedIds.has(sub.id);
+                        const isSelected = selectedIds.includes(sub.id);
 
                         return (
                             <div 
@@ -333,7 +334,7 @@ const UpcomingPayments = () => {
                     showToast('Subscription deleted', 'info');
                     setDeleteConfirmId(null);
                 }}
-                title={deleteConfirmId === 'bulk' ? `Delete ${selectedIds.size} Subscriptions?` : "Delete Subscription?"}
+                title={deleteConfirmId === 'bulk' ? `Delete ${selectedCount} Subscriptions?` : "Delete Subscription?"}
                 message={deleteConfirmId === 'bulk' ? "Are you sure you want to delete these subscriptions? This action cannot be undone." : "Are you sure you want to delete this subscription? This cannot be undone."}
             />
         </div>

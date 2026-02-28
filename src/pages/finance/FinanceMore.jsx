@@ -17,7 +17,7 @@ const FinanceMore = () => {
     const { user } = useAuthContext();
     const [isExporting, setIsExporting] = useState(false);
 
-    const activeAccounts = accounts.filter(a => !a.isArchived);
+    const activeAccounts = (accounts || []).filter(a => !a.isArchived);
 
     const handleExportFinance = async () => {
         setIsExporting(true);
@@ -25,7 +25,7 @@ const FinanceMore = () => {
             const data = {
                 exportDate: new Date().toISOString(),
                 user: user?.displayName || 'User',
-                transactions: transactions.filter(t => !t.isDeleted),
+                transactions: (transactions || []).filter(t => !t.isDeleted),
                 categories,
                 accounts,
                 subscriptions,

@@ -159,9 +159,27 @@ const PartyDetail = () => {
         enterSelectionMode,
         exitSelectionMode,
         toggleSelectAll,
-        selectedCount,
+        count: selectedCount,
         isAllSelected
     } = useSelection();
+
+    const handlePointerDown = (id) => {
+        if (!isSelectionMode) {
+            timerRef.current = setTimeout(() => {
+                enterSelectionMode(id);
+                if (window.navigator && window.navigator.vibrate) {
+                    window.navigator.vibrate(50);
+                }
+            }, 500);
+        }
+    };
+
+    const handlePointerUpOrLeave = () => {
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+            timerRef.current = null;
+        }
+    };
 
     // --- Receipt attachment state ---
     const [receiptFile, setReceiptFile] = useState(null); // File object (before upload)
@@ -788,7 +806,7 @@ const PartyDetail = () => {
                             const notesExpanded = expandedNotes[tx.id];
                             const isPositive = tx.type === 'you_gave' || tx.type === 'you_repaid';
 
-                            const isSelected = selectedIds.has(tx.id);
+                            const isSelected = selectedIds.includes(tx.id);
                             return (
                                 <div 
                                     key={tx.id} 

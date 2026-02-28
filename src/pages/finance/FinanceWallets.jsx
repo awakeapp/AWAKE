@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import FinanceBottomNav from '../../components/finance/FinanceBottomNav';
 import PageLayout from '../../components/layout/PageLayout';
 import { ItemMenu } from '../../components/ui/ItemMenu';
@@ -8,7 +8,7 @@ import { DeleteConfirmationModal } from '../../components/ui/DeleteConfirmationM
 import { useSelection } from '../../hooks/useSelection';
 import { SelectionBar } from '../../components/ui/SelectionBar';
 import { ArrowLeft, Wallet, Plus, Trash2, Archive as ArchiveIcon } from 'lucide-react';
-import { useRef } from 'react';
+import clsx from 'clsx';
 
 const FinanceWallets = () => {
     const navigate = useNavigate();
@@ -26,7 +26,7 @@ const FinanceWallets = () => {
         enterSelectionMode,
         exitSelectionMode,
         toggleSelectAll,
-        selectedCount,
+        count: selectedCount,
         isAllSelected
     } = useSelection();
 
@@ -117,7 +117,7 @@ const FinanceWallets = () => {
                 {/* Active Accounts */}
                 {activeAccounts.map(acc => {
                     const bal = getAccountBalance ? getAccountBalance(acc.id) : acc.balance;
-                    const isSelected = selectedIds.has(acc.id);
+                    const isSelected = selectedIds.includes(acc.id);
                     return (
                         <div key={acc.id} className="relative group">
                             <button
@@ -178,7 +178,7 @@ const FinanceWallets = () => {
                             >
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center">
-                                        <Archive className="w-5 h-5 text-slate-400" />
+                                        <ArchiveIcon className="w-5 h-5 text-slate-400" />
                                     </div>
                                     <p className="font-bold text-slate-500 text-[15px]">{acc.name}</p>
                                 </div>
