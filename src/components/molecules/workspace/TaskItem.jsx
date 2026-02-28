@@ -31,6 +31,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
 
     const isDatePickerOpen = activePopoverId === task.id;
     const [showInfo, setShowInfo] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const timerRef = useRef(null);
 
@@ -82,7 +83,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                     : isCompleted
                         ? "bg-slate-50/50 dark:bg-slate-900/30 border-transparent shadow-none"
                         : "bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-slate-100 dark:border-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none hover:shadow-[0_20px_40px_rgb(0,0,0,0.06)] hover:border-indigo-100/50 dark:hover:border-indigo-900/30",
-                isDatePickerOpen ? "z-50" : "z-0"
+                (isMenuOpen || isDatePickerOpen || showInfo) ? "z-[150]" : "z-0"
             )}
         >
             {!isCompleted && !isCarryOver && (
@@ -209,6 +210,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                 ) : (
                     <div className="flex items-center gap-1">
                         <ItemMenu 
+                            onOpenChange={setIsMenuOpen}
                             onEdit={onEdit ? () => onEdit(task) : null}
                             onDelete={onDelete ? () => onDelete(task.id) : null}
                             extraActions={[

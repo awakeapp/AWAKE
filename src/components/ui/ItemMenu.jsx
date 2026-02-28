@@ -16,10 +16,18 @@ export function ItemMenu({
   onView,
   extraActions = [], // { label, icon, onClick, variant }
   className,
-  iconClassName
+  iconClassName,
+  onOpenChange // NEW: callback to lift state up
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
+
+  // Sync state upward when it changes
+  useEffect(() => {
+    if (onOpenChange) {
+      onOpenChange(isOpen);
+    }
+  }, [isOpen, onOpenChange]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {

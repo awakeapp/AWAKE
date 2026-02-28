@@ -23,7 +23,7 @@ const RoutineCategory = ({ title, tasks, onUpdateStatus, isLocked }) => {
     const total = tasks.length;
 
     return (
-        <section className={`mb-2 transition-all duration-300 ${isLocked ? 'opacity-70 grayscale-[0.5] pointer-events-none' : ''}`}>
+        <section className={`mb-2 relative z-0 hover:z-[100] focus-within:z-[100] transition-all duration-300 ${isLocked ? 'opacity-70 grayscale-[0.5] pointer-events-none' : ''}`}>
             {/* Compact Category Header */}
             <div className="w-full flex items-center justify-between px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200">
                 <div className="flex items-center gap-2.5">
