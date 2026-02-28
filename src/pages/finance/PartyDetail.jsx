@@ -949,18 +949,6 @@ const PartyDetail = () => {
                 )}
             </AnimatePresence>
 
-            <ConfirmDialog
-                isOpen={!!deleteConfirmId}
-                onClose={() => setDeleteConfirmId(null)}
-                onConfirm={() => {
-                    softDeleteDebtTransaction(deleteConfirmId);
-                    showToast('Entry deleted', 'info');
-                }}
-                title="Delete Entry?"
-                message="Are you sure you want to delete this entry? This action cannot be undone."
-                confirmText="Delete"
-            />
-
             {/* ========== New Entry Modal ========== */}
             <AnimatePresence>
                 {isAddCardOpen && (
