@@ -5,13 +5,44 @@ import { CreditCard, CheckCircle2, AlertTriangle, Smartphone } from 'lucide-reac
 const PayPortal = () => {
     const [searchParams] = useSearchParams();
 
-    // Plain params — no encoding needed
-    const upiId  = searchParams.get('upi') || '';
-    const amount = searchParams.get('am')  || '';
-    const name   = searchParams.get('pn')  || '';
+    // Helper to decode either plain or base64 (for backward compatibility)
+    const resolveParam = (val, isAmount) => {
+        if (!val) return '';
+        
+        // If it's an amount and purely numeric, it's plain text.
+        if (isAmount && /^\d+(\.\d+)?$/.test(val)) return val;
+        
+        // If it's an UPI ID and contains '@', it's plain text.
+        if (!isAmount && val.includes('@')) return val;
+
+        try {
+            // Assume it might be base64 (older links)
+            return decodeURIComponent(atob(val));
+        } catch(e) {
+            return val;
+        }
+    };
+
+    const upiIdRaw = searchParams.get('upi') || '';
+    const amountRaw = searchParams.get('am') || '';
+    const nameRaw = searchParams.get('pn') || '';
+
+    let upiId = resolveParam(upiIdRaw, false);
+    let amountStr = resolveParam(amountRaw, true);
+    let name = resolveParam(nameRaw, false);
+
+    // If 'upiId' still looks like base64 garbage or 'amountStr' is garbage, fallback to plain
+    if (!upiId.includes('@')) {
+        upiId = upiIdRaw; 
+    }
+    
+    // Clean amount (remove any commas just in case, though toString() doesn't add them)
+    const cleanAmount = parseFloat(amountStr.replace(/,/g, ''));
+    const amount = isNaN(cleanAmount) ? 0 : cleanAmount;
+
     const [paid, setPaid] = useState(false);
 
-    const isValid = upiId && amount && !isNaN(Number(amount)) && Number(amount) > 0;
+    const isValid = upiId && amount > 0;
 
     const handlePayClick = () => {
         const uri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(name || 'Payment')}&am=${encodeURIComponent(amount)}&cu=INR&tn=${encodeURIComponent('Paid via AWAKE')}`;
@@ -27,9 +58,15 @@ const PayPortal = () => {
                     <AlertTriangle className="w-10 h-10 text-rose-500" />
                 </div>
                 <h1 className="text-2xl font-black text-slate-900 mb-2 tracking-tight">Invalid Link</h1>
-                <p className="text-slate-500 font-medium text-sm max-w-xs">
-                    This payment link is broken or missing details. Please ask for a new one.
+                <p className="text-slate-500 font-medium text-sm max-w-xs mb-4">
+                    This payment link is broken, missing, or expired. Please ask for a new one.
                 </p>
+                <div className="text-xs text-slate-400 bg-slate-100 p-3 rounded-xl text-left font-mono break-all w-full max-w-xs">
+                    Debug Info:<br/>
+                    UPI: {upiId || "Missing"}<br/>
+                    Amount Raw: {amountRaw || "Missing"}<br/>
+                    Amount Parsed: {amount}
+                </div>
             </div>
         );
     }
