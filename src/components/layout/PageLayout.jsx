@@ -23,7 +23,7 @@ const PageLayout = ({
 
     return (
         <div 
-            className={clsx("min-h-screen flex flex-col relative", bgClass)}
+            className={clsx("min-h-screen flex flex-col relative w-full", bgClass)}
             style={bottomNav ? { paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.5rem)' } : {}}
         >
             {/* 1. Standardized Fixed Header */}
@@ -36,7 +36,7 @@ const PageLayout = ({
                             height: 'calc(60px + env(safe-area-inset-top, 0px))'
                         }}
                     >
-                        <div className="max-w-screen-md mx-auto px-4 h-full flex items-center">
+                        <div className="w-full h-full flex items-center px-4">
                             {header}
                         </div>
                     </header>
@@ -53,7 +53,7 @@ const PageLayout = ({
 
             {/* 2. Content Area: handles top spacing for fixed header */}
             <main 
-                className={clsx("flex-1 w-full max-w-screen-md mx-auto relative", contentPadClass)}
+                className={clsx("flex-1 w-full relative", contentPadClass)}
                 style={{
                     paddingTop: hasHeader 
                         ? 'calc(60px + env(safe-area-inset-top, 0px))' // 60px header

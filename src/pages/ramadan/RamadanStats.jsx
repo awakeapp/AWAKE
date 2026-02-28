@@ -78,7 +78,7 @@ const RamadanStats = () => {
 
     if (!isRamadanActive) {
         return (
-            <PageLayout title="Analysis">
+            <PageLayout title="Analysis" bgClass="bg-transparent">
                 <div className="flex flex-col items-center justify-center py-20 px-8 text-center space-y-4">
                     <div className="w-16 h-16 bg-slate-50 dark:bg-slate-900 rounded-2xl flex items-center justify-center">
                         <Moon className="w-8 h-8 text-slate-300 dark:text-slate-700" />
@@ -126,7 +126,11 @@ const RamadanStats = () => {
     const grandTotalDhikr = totalTahlil + totalSalawat + totalIstighfar;
 
     return (
-        <PageLayout title="Analysis" contentPadClass="px-4 pb-24 pt-4 flex flex-col gap-6">
+        <PageLayout 
+            title="Analysis" 
+            contentPadClass="px-4 pb-24 pt-4 flex flex-col gap-6"
+            bgClass="bg-transparent"
+        >
             <div className="space-y-4">
                 {/* Hero Summary Card */}
                 <motion.div 

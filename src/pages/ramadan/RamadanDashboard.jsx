@@ -37,7 +37,11 @@ const RamadanDashboard = () => {
 
     if (loading && !dailyTimings) {
         return (
-            <PageLayout title="Ramadan Journey" rightNode={locationNode}>
+            <PageLayout 
+                title="Ramadan Journey" 
+                rightNode={locationNode}
+                bgClass="bg-transparent"
+            >
                 <div className="flex-1 flex flex-col items-center justify-center py-32 space-y-6">
                     <div className="relative">
                         <div className="w-16 h-16 rounded-full border-4 border-slate-100 dark:border-white/5 border-t-emerald-500 animate-spin" />
@@ -104,7 +108,8 @@ const RamadanDashboard = () => {
             title="Ramadan Journey"
             rightNode={locationNode}
             renderFloating={<LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />}
-            contentPadClass="px-4 pb-24 pt-4 flex flex-col gap-6"
+            contentPadClass="pb-24 pt-4 px-4 flex flex-col gap-6"
+            bgClass="bg-transparent"
         >
 
             {error && !dailyTimings && (

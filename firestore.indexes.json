@@ -2,7 +2,7 @@
   "indexes": [
     {
       "collectionGroup": "ledgerEntries",
-      "queryScope": "COLLECTION",
+      "queryScope": "COLLECTION_GROUP",
       "fields": [
         {
           "fieldPath": "vehicleId",
@@ -16,7 +16,21 @@
     },
     {
       "collectionGroup": "ledgerEntries",
-      "queryScope": "COLLECTION",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "vehicleId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "type",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "ledgerEntries",
+      "queryScope": "COLLECTION_GROUP",
       "fields": [
         {
           "fieldPath": "vehicleId",
@@ -29,19 +43,15 @@
       ]
     },
     {
-      "collectionGroup": "ledgerEntries",
-      "queryScope": "COLLECTION",
+      "collectionGroup": "parties",
+      "queryScope": "COLLECTION_GROUP",
       "fields": [
         {
-          "fieldPath": "type",
+          "fieldPath": "userId",
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "vehicleId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "amount",
+          "fieldPath": "updatedAt",
           "order": "ASCENDING"
         }
       ]
