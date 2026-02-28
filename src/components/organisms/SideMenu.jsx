@@ -56,8 +56,11 @@ const SideMenu = ({ isOpen, onClose }) => {
                     >
                         {/* Header */}
                         <div 
-                            className="px-6 h-16 flex items-center justify-between border-b border-slate-200/50 dark:border-white/5"
-                            style={{ paddingTop: 'env(safe-area-inset-top)' }}
+                            className="px-5 flex items-center justify-between border-b border-slate-200/50 dark:border-white/5"
+                            style={{ 
+                                paddingTop: 'env(safe-area-inset-top, 0px)',
+                                height: 'calc(60px + env(safe-area-inset-top, 0px))'
+                            }}
                         >
                             <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
                                 {t('common.menu', 'Menu')}

@@ -67,8 +67,11 @@ const WorkspaceLayout = ({ children }) => {
                         >
                             {/* Drawer Header */}
                             <div 
-                                className="p-5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800"
-                                style={{ paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' }}
+                                className="px-5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800"
+                                style={{ 
+                                    paddingTop: 'env(safe-area-inset-top, 0px)',
+                                    height: 'calc(60px + env(safe-area-inset-top, 0px))'
+                                }}
                             >
                                 <h2 className="font-bold text-lg">{t('common.menu', 'Menu')}</h2>
                                 <ActionButton 
