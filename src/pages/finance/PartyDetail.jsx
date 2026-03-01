@@ -151,6 +151,11 @@ const PartyDetail = () => {
     const [editTransactionId, setEditTransactionId] = useState(null);
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
     const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+    const [linkToFinance, setLinkToFinance] = useState(false);
+    const [selectedAccountId, setSelectedAccountId] = useState(() => {
+        const active = accounts?.find(a => !a.isArchived);
+        return active?.id || '';
+    });
     const timerRef = useRef(null);
 
     const {
@@ -573,6 +578,23 @@ const PartyDetail = () => {
                     notes: note,
                     ...(receipt_url && { receipt_url })
                 });
+
+                // Sync to Finance if toggle is on
+                if (linkToFinance && selectedAccountId) {
+                    const isExpense = txType === 'you_gave' || txType === 'you_repaid';
+                    try {
+                        await addTransaction({
+                            type: isExpense ? 'expense' : 'income',
+                            amount: Number(amount),
+                            accountId: selectedAccountId,
+                            categoryId: '',
+                            date: new Date(date + 'T12:00:00').toISOString(),
+                            note: `Debt: ${party.name} - ${note || txType.replace('_', ' ')}`
+                        });
+                    } catch (finErr) {
+                        console.warn('Finance sync failed:', finErr);
+                    }
+                }
                 showToast('Entry saved', 'success');
             }
             resetForm();
@@ -637,6 +659,7 @@ const PartyDetail = () => {
         setDueDatePickerOpen(false);
         setDueDateManuallySet(false);
         setEditTransactionId(null);
+        setLinkToFinance(false);
         // Clear receipt
         setReceiptFile(null);
         if (receiptPreview) URL.revokeObjectURL(receiptPreview);
@@ -1103,6 +1126,41 @@ const PartyDetail = () => {
                                         }}
                                     />
                                 </div>
+
+                                {/* Finance Sync Toggle */}
+                                {!editTransactionId && (txType === 'you_gave' || txType === 'you_received' || txType === 'you_borrowed' || txType === 'you_repaid') && (
+                                    <div className="space-y-3">
+                                        <div
+                                            className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 cursor-pointer transition-all"
+                                            onClick={() => setLinkToFinance(!linkToFinance)}
+                                        >
+                                            <div>
+                                                <p className="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-1.5">
+                                                    <Wallet className="w-4 h-4 text-indigo-500" />
+                                                    {(txType === 'you_gave' || txType === 'you_repaid') ? 'Record as Expense' : 'Record as Income'}
+                                                </p>
+                                                <p className="text-[10px] text-slate-500 mt-0.5">Also show in Finance spending history</p>
+                                            </div>
+                                            <button type="button">
+                                                {linkToFinance ? <ToggleRight className="w-8 h-8 text-indigo-600" /> : <ToggleLeft className="w-8 h-8 text-slate-400" />}
+                                            </button>
+                                        </div>
+                                        {linkToFinance && accounts.length > 0 && (
+                                            <div className="space-y-1.5">
+                                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">From Account</label>
+                                                <select
+                                                    value={selectedAccountId}
+                                                    onChange={e => setSelectedAccountId(e.target.value)}
+                                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-[13px] outline-none focus:border-indigo-400/50 transition-all appearance-none"
+                                                >
+                                                    {accounts.filter(a => !a.isArchived).map(acc => (
+                                                        <option key={acc.id} value={acc.id}>{acc.name}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
 
                             {/* Footer Actions */}
