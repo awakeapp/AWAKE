@@ -5,6 +5,7 @@ import { useTasks } from '../context/TaskContext';
 import { useFinance } from '../context/FinanceContext';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { usePrayer } from '../context/PrayerContext';
+import { useClock } from '../context/ClockContext';
 import { motion } from 'framer-motion';
 import { Trophy, Target, List, IndianRupee, ArrowRight, Zap, Moon, ChevronRight, Fuel } from 'lucide-react';
 import clsx from 'clsx';
@@ -29,12 +30,7 @@ const Home = () => {
     const [isFuelModalOpen, setIsFuelModalOpen] = useState(false);
     const [isFinanceModalOpen, setIsFinanceModalOpen] = useState(false);
     const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-    const [now, setNow] = useState(new Date());
-
-    useEffect(() => {
-        const timer = setInterval(() => setNow(new Date()), 1000);
-        return () => clearInterval(timer);
-    }, []);
+    const { now } = useClock();
 
     // --- Welcome Logic ---
     const hour = now.getHours();

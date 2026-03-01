@@ -3,6 +3,7 @@ import { useRamadan } from '../../context/RamadanContext';
 import { usePrayer } from '../../context/PrayerContext';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Target, MoreHorizontal, Activity, Check, Plus, Minus, Hash, Flame, ChevronLeft } from 'lucide-react';
+import { useClock } from '../../context/ClockContext';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageLayout from '../../components/layout/PageLayout';
@@ -349,18 +350,13 @@ const RamadanDhikr = () => {
     const navigate = useNavigate();
     const { loading, error, ramadanData, updateRamadanDay, updateQuranGoal, updateCustomDhikr, hijriDate } = useRamadan();
     const { serverTodayKey } = usePrayer();
-    const [now, setNow] = useState(new Date());
+    const { now } = useClock();
     const [isAddingDhikr, setIsAddingDhikr] = useState(false);
     const [newDhikrName, setNewDhikrName] = useState('');
     const [newDhikrTarget, setNewDhikrTarget] = useState(100);
     const [activeCounter, setActiveCounter] = useState(null);
 
     const customDhikrItems = ramadanData?.customDhikr || [];
-
-    useEffect(() => {
-        const timer = setInterval(() => setNow(new Date()), 60000);
-        return () => clearInterval(timer);
-    }, []);
 
     if (loading) return (
         <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950">

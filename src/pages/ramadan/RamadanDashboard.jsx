@@ -3,6 +3,7 @@ import { useRamadan } from '../../context/RamadanContext';
 import { usePrayer } from '../../context/PrayerContext';
 import { useNavigate } from 'react-router-dom';
 import { Compass, CloudMoon, Sun } from 'lucide-react';
+import { useClock } from '../../context/ClockContext';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationSettings from '../../components/ramadan/NotificationSettings';
@@ -16,13 +17,8 @@ const RamadanDashboard = () => {
     const navigate = useNavigate();
     const { hijriDate } = useRamadan();
     const { dailyTimings, displayName, loading, error } = usePrayer();
-    const [now, setNow] = useState(new Date());
+    const { now } = useClock();
     const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
-
-    useEffect(() => {
-        const timer = setInterval(() => setNow(new Date()), 1000);
-        return () => clearInterval(timer);
-    }, []);
 
     const locationNode = displayName ? (
         <ActionButton 

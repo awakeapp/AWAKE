@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { useRamadan } from '../../context/RamadanContext';
 import { usePrayer } from '../../context/PrayerContext';
 import { Plus, Minus, Check, Clock, Users, User, ChevronRight, MoreHorizontal } from 'lucide-react';
+import { useClock } from '../../context/ClockContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const PRAYERS = [
@@ -119,23 +120,9 @@ const PrayerRow = ({ prayerKey, label, time, data, onUpdate, allowMode, allowCou
 const PrayerTracker = () => {
     const { ramadanData, updateRamadanDay, updateCustomPrayers, hijriDate } = useRamadan();
     const { dailyTimings, serverTodayKey } = usePrayer();
+    const { now } = useClock();
     
-    const [todayKey, setTodayKey] = useState(serverTodayKey || new Date().toLocaleDateString('en-CA'));
-    const [now, setNow] = useState(new Date());
-    
-    useEffect(() => {
-        const timer = setInterval(() => setNow(new Date()), 1000);
-        
-        if (serverTodayKey) {
-            setTodayKey(serverTodayKey);
-        } else {
-            const interval = setInterval(() => {
-                setTodayKey(new Date().toLocaleDateString('en-CA'));
-            }, 60000);
-            return () => { clearInterval(interval); clearInterval(timer); };
-        }
-        return () => clearInterval(timer);
-    }, [serverTodayKey]);
+    const todayKey = serverTodayKey || now.toLocaleDateString('en-CA');
 
     const todayData = ramadanData?.days?.[todayKey] || {};
     const customPrayers = ramadanData?.customPrayers || [];

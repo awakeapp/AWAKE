@@ -13,6 +13,7 @@ import { PrayerProvider } from './context/PrayerContext';
 import { RamadanProvider } from './context/RamadanContext';
 import { RAMADAN_MODE } from './lib/featureFlags';
 import { ToastProvider } from './context/ToastContext';
+import { ClockProvider } from './context/ClockContext';
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -138,6 +139,7 @@ function App() {
           <SettingsProvider>
           <DateContextProvider>
             <DataContextProvider>
+              <ClockProvider>
               {/* PrayerProvider provides core logic, RamadanProvider handles tracking */}
               <PrayerProvider>
                 <RamadanProvider>
@@ -214,6 +216,7 @@ function App() {
                 </TaskContextProvider>
               </RamadanProvider>
             </PrayerProvider>
+              </ClockProvider>
             </DataContextProvider>
           </DateContextProvider>
           </SettingsProvider>
