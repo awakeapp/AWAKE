@@ -71,7 +71,10 @@ const FinanceSettings = () => {
                                         type="text"
                                         value={upiId}
                                         onChange={(e) => setUpiId(e.target.value)}
+                                        onFocus={(e) => e.target.select()}
+                                        onPaste={(e) => e.stopPropagation()}
                                         placeholder="e.g. yourname@okhdfcbank"
+                                        style={{ userSelect: 'auto', WebkitUserSelect: 'auto' }}
                                         className="w-full text-[13px] text-slate-500 dark:text-slate-400 bg-transparent outline-none mt-1 font-medium"
                                         autoFocus
                                     />

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { CreditCard, CheckCircle2, AlertTriangle, Smartphone } from 'lucide-react';
 
 const PayPortal = () => {
-    const [searchParams] = useSearchParams();
+    const nativeParams = new URLSearchParams(window.location.search);
+    const getParam = (key) => nativeParams.get(key) || '';
 
     // Helper to decode either plain or base64 (for backward compatibility)
     const resolveParam = (val, isAmount) => {
@@ -23,9 +23,9 @@ const PayPortal = () => {
         }
     };
 
-    const upiIdRaw = searchParams.get('upi') || '';
-    const amountRaw = searchParams.get('am') || '';
-    const nameRaw = searchParams.get('pn') || '';
+    const upiIdRaw = getParam('upi');
+    const amountRaw = getParam('am');
+    const nameRaw = getParam('pn');
 
     let upiId = resolveParam(upiIdRaw, false);
     let amountStr = resolveParam(amountRaw, true);
@@ -61,11 +61,11 @@ const PayPortal = () => {
                 <p className="text-slate-500 font-medium text-sm max-w-xs mb-4">
                     This payment link is broken, missing, or expired. Please ask for a new one.
                 </p>
-                <div className="text-xs text-slate-400 bg-slate-100 p-3 rounded-xl text-left font-mono break-all w-full max-w-xs">
-                    Debug Info:<br/>
-                    UPI: {upiId || "Missing"}<br/>
-                    Amount Raw: {amountRaw || "Missing"}<br/>
-                    Amount Parsed: {amount}
+                <div className="text-[10px] text-slate-400 bg-slate-100 dark:bg-slate-900 p-3 rounded-xl text-left font-mono break-all w-full max-w-xs overflow-x-auto shadow-inner border border-slate-200 dark:border-slate-800">
+                    <p className="font-bold text-rose-500 mb-1">Debug Info:</p>
+                    <p>UPI: {upiId || "Missing"} (Raw: {upiIdRaw || "N/A"})</p>
+                    <p>Amount: {amountRaw || "Missing"} → {amount}</p>
+                    <p>URL: {window.location.href}</p>
                 </div>
             </div>
         );

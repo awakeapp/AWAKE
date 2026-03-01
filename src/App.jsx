@@ -105,6 +105,18 @@ function App() {
     initRemoteConfig().catch(console.error);
   }, []);
 
+  // Root-level intercept for the payment portal to avoid GitHub Pages 404 router issues
+  // or HashRouter/BrowserRouter conflicts.
+  const isPayQuery = window.location.search.includes('pay=true') || window.location.search.includes('upi=');
+  const isPayRoute = window.location.pathname.endsWith('/pay');
+  if (isPayQuery || isPayRoute) {
+    return (
+      <ThemeContextProvider>
+        <PayPortal />
+      </ThemeContextProvider>
+    );
+  }
+
   if (showWelcome) {
     return (
       <AuthContextProvider>

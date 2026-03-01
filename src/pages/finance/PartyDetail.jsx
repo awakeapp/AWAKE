@@ -249,16 +249,16 @@ const PartyDetail = () => {
         } else {
             message = `Hi ${party.name},\n${title}\n${PENDING_LIST}\n${divider}\nTOTAL: ₹${amtStr}\n${divider}\n\n${signOff}`;
         }
-        
         if (isReceivable && financeConfig?.upiId) {
             let baseUrl = window.location.origin;
             if (import.meta.env.BASE_URL && import.meta.env.BASE_URL !== '/') {
                 baseUrl += import.meta.env.BASE_URL.replace(/\/$/, '');
             }
-            const payUrl = new URL(baseUrl + '/pay');
+            const payUrl = new URL(baseUrl + '/');
+            payUrl.searchParams.set('pay', 'true');
             payUrl.searchParams.set('upi', financeConfig.upiId);
             payUrl.searchParams.set('am', totalSelectedPending.toString());
-            payUrl.searchParams.set('pn', user?.name || 'AWAKE User');
+            payUrl.searchParams.set('pn', user?.name || 'Payment');
             message += `\n\n💳 Pay instantly via UPI:\n${payUrl.toString()}`;
         }
         
