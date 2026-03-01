@@ -24,7 +24,7 @@ import PageLayout from '../../components/layout/PageLayout';
 import { useSelection } from '../../hooks/useSelection';
 import { SelectionBar } from '../../components/ui/SelectionBar';
 import { useToast } from '../../context/ToastContext';
-import QuickActionModal from '../../components/organisms/QuickActionModal';
+import VehicleEntryModal from '../../components/organisms/vehicle/VehicleEntryModal';
 import AddFollowUpModal from '../../components/organisms/vehicle/AddFollowUpModal';
 
 const VehicleDashboard = () => {
@@ -294,7 +294,7 @@ const VehicleDashboard = () => {
                         message="Are you sure you want to archive this vehicle? It will be hidden from the main view." 
                         confirmLabel="Archive"
                     />
-                    <QuickActionModal isOpen={isQuickAddOpen} onClose={() => setIsQuickAddOpen(false)} />
+                    <VehicleEntryModal isOpen={isQuickAddOpen} onClose={() => setIsQuickAddOpen(false)} activeVehicle={activeVehicle} />
                     <AddFollowUpModal 
                         isOpen={isAddFollowUpOpen} 
                         onClose={() => setIsAddFollowUpOpen(false)} 
