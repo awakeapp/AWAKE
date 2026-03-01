@@ -32,6 +32,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
     const isDatePickerOpen = activePopoverId === task.id;
     const [showInfo, setShowInfo] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
 
     const timerRef = useRef(null);
 
@@ -231,8 +232,17 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                             ].filter(Boolean)}
                         />
                         <div 
-                            className="px-1 py-1 transition-opacity active:opacity-70 duration-150"
-                            onClick={(e) => { e.stopPropagation(); onUpdateStatus(task.id); }}
+                            className={clsx("px-1 py-1 transition-opacity duration-150", isProcessing ? "opacity-50 pointer-events-none" : "active:opacity-70 pointer-events-auto")}
+                            onClick={async (e) => { 
+                                e.stopPropagation(); 
+                                if (isProcessing) return;
+                                setIsProcessing(true);
+                                try {
+                                    await onUpdateStatus(task.id); 
+                                } finally {
+                                    setIsProcessing(false);
+                                }
+                            }}
                         >
                             {isRoutine ? (
                                 <ToggleSwitch

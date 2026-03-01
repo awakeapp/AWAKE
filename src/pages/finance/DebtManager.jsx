@@ -59,6 +59,7 @@ const DebtManager = () => {
 
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
     const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const contactPickerSupported = typeof navigator !== 'undefined' && 'contacts' in navigator && 'ContactsManager' in window;
 
@@ -513,10 +514,20 @@ const DebtManager = () => {
                     <DeleteConfirmationModal
                         isOpen={!!deleteConfirmId}
                         onClose={() => setDeleteConfirmId(null)}
-                        onConfirm={deleteConfirmId === 'bulk' ? handleBulkDelete : () => {
-                            softDeleteDebtParty(deleteConfirmId);
-                            setDeleteConfirmId(null);
-                            showToast('Party deleted', 'success');
+                        isLoading={isDeleting || isBulkDeleting}
+                        onConfirm={async () => {
+                            if (deleteConfirmId === 'bulk') {
+                                await handleBulkDelete();
+                            } else {
+                                setIsDeleting(true);
+                                try {
+                                    await softDeleteDebtParty(deleteConfirmId);
+                                    showToast('Party deleted', 'success');
+                                } finally {
+                                    setIsDeleting(false);
+                                    setDeleteConfirmId(null);
+                                }
+                            }
                         }}
                         title={deleteConfirmId === 'bulk' ? `Delete ${selectedIds.length} Parties?` : "Delete Party?"}
                         message={deleteConfirmId === 'bulk' ? "Are you sure you want to delete these parties? All transaction history will be lost." : "Are you sure you want to delete this party? All related transaction history will be lost."}

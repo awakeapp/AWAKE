@@ -427,12 +427,22 @@ export const VehicleContextProvider = ({ children }) => {
             else if(lowType.includes('insurance')) typeMap = 'insurance';
             else typeMap = 'service';
             
+            const numCost = Number(recordDetails.cost || 0);
+            const numOdo = Number(recordDetails.odometer || 0);
+
+            if (numCost < 0 || numCost > 9999999) {
+                throw new Error("Service cost must be between 0 and 9,999,999");
+            }
+            if (numOdo < 0 || numOdo > 9999999) {
+                throw new Error("Odometer must be a valid positive number");
+            }
+            
             let newRecord = {
                 vehicleId: recordDetails.vehicleId,
                 type: typeMap,
-                amount: Number(recordDetails.cost || 0),
+                amount: numCost,
                 date: recordDetails.date,
-                odometer: Number(recordDetails.odometer || 0),
+                odometer: numOdo,
                 notes: recordDetails.notes || recordDetails.type,
                 attachment: recordDetails.attachment || null
             };

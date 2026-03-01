@@ -151,6 +151,12 @@ const PartyDetail = () => {
     const [editTransactionId, setEditTransactionId] = useState(null);
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
     const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const isMounted = React.useRef(true);
+    
+    React.useEffect(() => {
+        return () => { isMounted.current = false; };
+    }, []);
     const [linkToFinance, setLinkToFinance] = useState(false);
     const [selectedAccountId, setSelectedAccountId] = useState(() => {
         const active = accounts?.find(a => !a.isArchived);
@@ -521,8 +527,11 @@ const PartyDetail = () => {
     // --- Handlers ---
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!amount || Number(amount) <= 0) {
-            showToast('Please enter a valid amount', 'error');
+        if (isSubmitting) return;
+        
+        const numAmt = Number(amount);
+        if (!numAmt || isNaN(numAmt) || numAmt <= 0 || numAmt > 9999999) {
+            showToast('Please enter a valid amount (1 - 99,99,999)', 'error');
             return;
         }
         if (!note.trim()) {
@@ -541,6 +550,8 @@ const PartyDetail = () => {
     };
 
     const finalSubmit = async () => {
+        if (isSubmitting) return;
+        setIsSubmitting(true);
         try {
             // Upload receipt first if one is selected
             let receipt_url = null;
@@ -552,54 +563,61 @@ const PartyDetail = () => {
                     const { url } = await StorageService.uploadImage(receiptFile, path);
                     receipt_url = url;
                 } catch (e) {
-                    showToast('Receipt upload failed, saving without it.', 'warning');
+                    if (isMounted.current) showToast('Receipt upload failed, saving without it.', 'warning');
                 } finally {
-                    setIsUploadingReceipt(false);
+                    if (isMounted.current) setIsUploadingReceipt(false);
                 }
             }
+
+            if (!isMounted.current) return; // Prevent saving if unmounted mid-upload
 
             if (editTransactionId) {
                 await editDebtTransaction(editTransactionId, {
                     type: txType,
-                    amount: Number(amount),
+                    amount: Math.round(Number(amount) * 100) / 100, // floating point drift limit
                     date: new Date(date + 'T12:00:00').toISOString(),
                     due_date: dueDate ? new Date(dueDate + 'T12:00:00').toISOString() : null,
                     notes: note,
                     ...(receipt_url && { receipt_url })
                 });
-                showToast('Entry updated', 'success');
+                if (isMounted.current) showToast('Entry updated', 'success');
             } else {
+                // Sync to Finance if toggle is ON FIRST to guarantee Atomicity on Network Drop
+                if (linkToFinance && selectedAccountId) {
+                    const isExpense = txType === 'you_gave' || txType === 'you_repaid';
+                    // If this fails, the catch block intercepts it and Debt is never malformed
+                    await addTransaction({
+                        type: isExpense ? 'expense' : 'income',
+                        amount: Math.round(Number(amount) * 100) / 100,
+                        accountId: selectedAccountId,
+                        categoryId: '',
+                        date: new Date(date + 'T12:00:00').toISOString(),
+                        note: `Debt: ${party.name} - ${note || txType.replace('_', ' ')}`
+                    });
+                }
+
+                if (!isMounted.current) return;
+
                 await addDebtTransaction({
                     party_id: party.id,
                     type: txType,
-                    amount: Number(amount),
+                    amount: Math.round(Number(amount) * 100) / 100,
                     date: new Date(date + 'T12:00:00').toISOString(),
                     due_date: dueDate ? new Date(dueDate + 'T12:00:00').toISOString() : null,
                     notes: note,
                     ...(receipt_url && { receipt_url })
                 });
 
-                // Sync to Finance if toggle is on
-                if (linkToFinance && selectedAccountId) {
-                    const isExpense = txType === 'you_gave' || txType === 'you_repaid';
-                    try {
-                        await addTransaction({
-                            type: isExpense ? 'expense' : 'income',
-                            amount: Number(amount),
-                            accountId: selectedAccountId,
-                            categoryId: '',
-                            date: new Date(date + 'T12:00:00').toISOString(),
-                            note: `Debt: ${party.name} - ${note || txType.replace('_', ' ')}`
-                        });
-                    } catch (finErr) {
-                        console.warn('Finance sync failed:', finErr);
-                    }
-                }
-                showToast('Entry saved', 'success');
+                if (isMounted.current) showToast('Entry saved', 'success');
             }
-            resetForm();
+            if (isMounted.current) resetForm();
         } catch (error) {
-            showToast('Failed to save entry', 'error');
+            if (isMounted.current) showToast('Failed to save entry', 'error');
+        } finally {
+            if (isMounted.current) {
+                setIsSubmitting(false);
+                setShowSubmitConfirm(false);
+            }
         }
     };
 
@@ -734,9 +752,9 @@ const PartyDetail = () => {
                     <DeleteConfirmationModal 
                         isOpen={showSubmitConfirm}
                         onClose={() => setShowSubmitConfirm(false)}
+                        isLoading={isSubmitting}
                         onConfirm={async () => {
                             await finalSubmit();
-                            setShowSubmitConfirm(false);
                         }}
                         isFinancial={true}
                         title="Confirm Entry?"

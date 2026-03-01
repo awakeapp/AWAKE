@@ -9,7 +9,8 @@ export function DeleteConfirmationModal({
   title = "Delete Item?",
   message = "This action cannot be undone. Are you sure you want to proceed?",
   confirmLabel = "Delete",
-  isFinancial = false
+  isFinancial = false,
+  isLoading = false
 }) {
   if (!isOpen) return null;
 
@@ -47,21 +48,23 @@ export function DeleteConfirmationModal({
           <div className="flex gap-3 p-6 pt-0">
             <button
               onClick={onClose}
-              className="flex-1 py-4 font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl transition-colors"
+              disabled={isLoading}
+              className="flex-1 py-4 font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               onClick={() => {
+                if (isLoading) return;
                 onConfirm();
-                onClose();
               }}
+              disabled={isLoading}
               className={clsx(
-                "flex-1 py-4 text-white font-bold rounded-2xl shadow-lg active:scale-95 transition-all",
+                "flex-1 py-4 text-white font-bold rounded-2xl shadow-lg active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed",
                 isFinancial ? "bg-amber-600 shadow-amber-500/30" : "bg-red-600 shadow-red-500/30"
               )}
             >
-              {confirmLabel}
+              {isLoading ? 'Working...' : confirmLabel}
             </button>
           </div>
         </motion.div>

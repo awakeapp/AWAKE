@@ -4,7 +4,7 @@ import { AlertTriangle, X } from 'lucide-react';
 import clsx from 'clsx';
 import ActionButton from '../atoms/ActionButton';
 
-const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message, confirmText = 'Delete', cancelText = 'Cancel', isDestructive = true }) => {
+const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message, confirmText = 'Delete', cancelText = 'Cancel', isDestructive = true, isLoading = false }) => {
     return (
         <AnimatePresence>
             {isOpen && (
@@ -41,6 +41,7 @@ const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message, confirmText
                                 <ActionButton
                                     variant="back"
                                     onClick={onClose}
+                                    disabled={isLoading}
                                     label={cancelText}
                                     iconOnly={false}
                                     className="flex-1 py-3 text-sm font-bold bg-transparent text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-400"
@@ -48,12 +49,13 @@ const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message, confirmText
                                 <ActionButton
                                     variant={isDestructive ? "delete" : "primary"}
                                     onClick={() => {
+                                        if (isLoading) return;
                                         onConfirm();
-                                        onClose();
                                     }}
-                                    label={confirmText}
+                                    disabled={isLoading}
+                                    label={isLoading ? 'Working...' : confirmText}
                                     iconOnly={false}
-                                    className="flex-1 py-3 text-sm font-bold"
+                                    className={clsx("flex-1 py-3 text-sm font-bold", isLoading && "opacity-50 cursor-not-allowed")}
                                 />
                             </div>
                         </motion.div>
