@@ -29,7 +29,7 @@ const DebtManager = () => {
         );
     }
 
-    const { debtParties, addDebtParty, deleteDebtParty, getPartyBalance, getPartyTransactions, getPartyStatus } = context;
+    const { debtParties, addDebtParty, softDeleteDebtParty, getPartyBalance, getPartyTransactions, getPartyStatus } = context;
     const [isAdding, setIsAdding] = useState(false);
     const { showToast } = useToast();
     useScrollLock(isAdding);
@@ -205,7 +205,7 @@ const DebtManager = () => {
     const handleBulkDelete = async () => {
         setIsBulkDeleting(true);
         try {
-            await Promise.all(selectedIds.map(id => deleteDebtParty(id)));
+            await Promise.all(selectedIds.map(id => softDeleteDebtParty(id)));
             showToast(`Deleted ${selectedIds.length} parties`, 'success');
             exitSelectionMode();
         } catch (error) {
@@ -514,7 +514,7 @@ const DebtManager = () => {
                         isOpen={!!deleteConfirmId}
                         onClose={() => setDeleteConfirmId(null)}
                         onConfirm={deleteConfirmId === 'bulk' ? handleBulkDelete : () => {
-                            deleteDebtParty(deleteConfirmId);
+                            softDeleteDebtParty(deleteConfirmId);
                             setDeleteConfirmId(null);
                             showToast('Party deleted', 'success');
                         }}

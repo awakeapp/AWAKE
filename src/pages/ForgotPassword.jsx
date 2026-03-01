@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useResetPassword } from '../hooks/useResetPassword';
 import Button from '../components/atoms/Button';
 import Input from '../components/atoms/Input';
@@ -10,6 +10,7 @@ import awakeLogo from '../assets/awake_logo_new.png';
 import ErrorDisplay from '../components/molecules/ErrorDisplay';
 
 const ForgotPassword = () => {
+    const navigate = useNavigate();
     const [identifier, setIdentifier] = useState('');
     // Removed OTP state as Firebase handles via link
 

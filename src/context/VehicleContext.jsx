@@ -38,7 +38,7 @@ export const useVehicle = () => {
 
 export const VehicleContextProvider = ({ children }) => {
     const { user, authIsReady } = useAuthContext();
-    const { addTransaction, categories } = useFinance(); // Integrate Finance
+    const { addTransaction, deleteTransaction, editTransaction, categories } = useFinance(); // Integrate Finance
     const { showError } = useGlobalError();
 
     const [vehicles, setVehicles] = useState([]);
@@ -179,7 +179,7 @@ export const VehicleContextProvider = ({ children }) => {
             if (!user?.uid) return;
             setError(null);
 
-            await FirestoreService.deleteItem(`users/${user.uid}/vehicles/${vehicleId}`);
+            await FirestoreService.deleteItem(`users/${user.uid}/vehicles`, vehicleId);
         } catch (error) {
             const normalized = normalizeError(error);
             console.error("Error deleting vehicle:", normalized);
@@ -376,8 +376,8 @@ export const VehicleContextProvider = ({ children }) => {
                     note: `Vehicle: ${vehicle?.name} - ${followUp.type}`,
                     date: completionDetails.date
                 };
-                await addTransaction(tx);
-                newRecord.financeTxId = true; // Just flag it was logged
+                const financeTxDocId = await addTransaction(tx);
+                newRecord.financeTxId = financeTxDocId || true; // Store real ID for reverse-sync
             }
 
             // Add Service Record to Standardized Ledger
@@ -450,8 +450,8 @@ export const VehicleContextProvider = ({ children }) => {
                     note: `Vehicle: ${vehicle?.name} - ${recordDetails.type}`,
                     date: recordDetails.date
                 };
-                await addTransaction(tx);
-                newRecord.financeTxId = true;
+                const financeTxDocId = await addTransaction(tx);
+                newRecord.financeTxId = financeTxDocId || true; // Store real ID for reverse-sync
             }
 
             await FirestoreService.addItem(`users/${user.uid}/ledgerEntries`, newRecord);
@@ -473,27 +473,60 @@ export const VehicleContextProvider = ({ children }) => {
         try {
             if (!user) return;
             setError(null);
+
+            // Find the record to get the paired finance transaction ID
+            const record = serviceRecords.find(r => r.id === id);
+
+            // Delete the ledger entry
             await FirestoreService.deleteItem(`users/${user.uid}/ledgerEntries`, id);
+
+            // Reverse the paired finance transaction (soft-delete)
+            if (record?.financeTxId && record.financeTxId !== true) {
+                try {
+                    await deleteTransaction(record.financeTxId);
+                } catch (finErr) {
+                    console.warn('Could not reverse paired finance transaction:', finErr);
+                }
+            }
         } catch (err) {
             const normalized = normalizeError(err);
             console.error(normalized);
             setError(normalized);
             throw normalized;
         }
-    }, [user]);
+    }, [user, serviceRecords, deleteTransaction]);
 
     const updateServiceRecord = useCallback(async (id, updates) => {
         try {
             if (!user) return;
             setError(null);
+
             await FirestoreService.updateItem(`users/${user.uid}/ledgerEntries`, id, updates);
+
+            // Sync changes to the paired finance transaction
+            const record = serviceRecords.find(r => r.id === id);
+            if (record?.financeTxId && record.financeTxId !== true) {
+                const financeUpdates = {};
+                if (updates.amount !== undefined) financeUpdates.amount = Number(updates.amount);
+                if (updates.date !== undefined) financeUpdates.date = updates.date;
+                if (updates.notes !== undefined) financeUpdates.note = updates.notes;
+
+                if (Object.keys(financeUpdates).length > 0) {
+                    try {
+                        financeUpdates.updatedAt = Date.now();
+                        await editTransaction(record.financeTxId, financeUpdates);
+                    } catch (finErr) {
+                        console.warn('Could not sync paired finance transaction:', finErr);
+                    }
+                }
+            }
         } catch (err) {
             const normalized = normalizeError(err);
             console.error(normalized);
             setError(normalized);
             throw normalized;
         }
-    }, [user]);
+    }, [user, serviceRecords, editTransaction]);
 
     const getLatestRecord = useCallback((vehicleId, type) => {
         return serviceRecords
@@ -593,7 +626,8 @@ export const VehicleContextProvider = ({ children }) => {
                     note: `Vehicle: ${vehicle?.name} - Loan EMI (${payment.type}) - ${loan.lender}`,
                     date: payment.date
                 };
-                await addTransaction(tx);
+                const emiFinanceTxId = await addTransaction(tx);
+                payment.financeTxId = emiFinanceTxId || true;
             }
 
             // Write Standardized Ledger Entry to Backend

@@ -57,7 +57,15 @@ const Profile = () => {
             setCurrentPassword('');
             setNewPassword('');
         } catch (e) {
-            showToast(e.message, 'error');
+            const friendlyMessages = {
+                'auth/wrong-password': 'Current password is incorrect',
+                'auth/weak-password': 'New password is too weak (min 6 characters)',
+                'auth/requires-recent-login': 'Session expired. Please sign out and sign in again.',
+                'auth/too-many-requests': 'Too many attempts. Try again later.',
+                'auth/network-request-failed': 'Network error. Check your connection.',
+            };
+            const msg = friendlyMessages[e.code] || 'Failed to update password. Please try again.';
+            showToast(msg, 'error');
         } finally {
             setIsPasswordLoading(false);
         }

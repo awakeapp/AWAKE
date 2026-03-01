@@ -373,7 +373,8 @@ export const FinanceContextProvider = ({ children }) => {
         };
 
         try {
-            await FirestoreService.addItem(`users/${user.uid}/transactions`, newTx);
+            const docRef = await FirestoreService.addItem(`users/${user.uid}/transactions`, newTx);
+            return docRef.id;
         } catch (error) {
             console.error("Failed to add transaction via FirestoreService:", error);
             throw error;
