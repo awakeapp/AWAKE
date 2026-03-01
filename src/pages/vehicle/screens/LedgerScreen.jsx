@@ -1,6 +1,7 @@
 import { useVehicle } from '../../../context/VehicleContext';
+import { useState } from 'react';
 import { format } from 'date-fns';
-import { Fuel, Settings, Landmark, Zap, AlertTriangle, Wallet, TrendingUp, History, Archive, CheckCircle, Check, MoreVertical } from 'lucide-react';
+import { Fuel, Settings, Landmark, Zap, AlertTriangle, Wallet, TrendingUp, History, Archive, CheckCircle, Check, MoreVertical, X, Save } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ItemMenu } from '../../../components/ui/ItemMenu';
 import { clsx } from 'clsx';
@@ -9,9 +10,13 @@ import Pressable from '../../../components/atoms/Pressable';
 
 const LedgerScreen = ({ 
     activeVehicle, trendData, maxTrendCost, stats, combinedHistory, historyFilter, setHistoryFilter, onAddEntry, sortedVehicles, showArchived, getIcon, setVehicleActive, setDeleteConfirmId, toggleArchiveVehicle,
-    isSelectionMode, selectedIds, toggleSelection, enterSelectionMode
+    isSelectionMode, selectedIds, toggleSelection, enterSelectionMode, onEditEntry
 }) => {
     const longPressTimer = useRef(null);
+    const [editingEntry, setEditingEntry] = useState(null);
+    const [editAmount, setEditAmount] = useState('');
+    const [editNotes, setEditNotes] = useState('');
+    const [editDate, setEditDate] = useState('');
 
     const handlePointerDown = (id) => {
         longPressTimer.current = setTimeout(() => {
@@ -27,6 +32,7 @@ const LedgerScreen = ({
     };
     
     return (
+        <>
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Cost Breakdown */}
             {stats?.breakdown && (
@@ -162,7 +168,12 @@ const LedgerScreen = ({
                                         </div>
                                         {!isSelectionMode && (
                                             <ItemMenu 
-                                                onEdit={() => alert("Edit item coming soon")}
+                                                onEdit={() => {
+                                                    setEditingEntry(record);
+                                                    setEditAmount(String(record.amount || ''));
+                                                    setEditNotes(record.notes || '');
+                                                    setEditDate(format(new Date(record.date), 'yyyy-MM-dd'));
+                                                }}
                                                 onDelete={() => setDeleteConfirmId(record.id)}
                                             />
                                         )}
@@ -174,6 +185,85 @@ const LedgerScreen = ({
                 </div>
             </section>
         </div>
+
+        {/* Edit Entry Modal */}
+        <AnimatePresence>
+            {editingEntry && (
+                <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setEditingEntry(null)} className="absolute inset-0 bg-black/50 backdrop-blur-md" />
+                    <motion.div
+                        initial={{ y: '100%', opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: '100%', opacity: 0 }} transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                        className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl border border-white/10 dark:border-slate-800 relative z-10 p-7"
+                    >
+                        <div className="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Edit Entry</h3>
+                                <p className="text-[11px] text-slate-400 font-medium mt-0.5 capitalize">{editingEntry.type}</p>
+                            </div>
+                            <button onClick={() => setEditingEntry(null)} className="w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-full text-slate-400 active:scale-90 transition-all">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="space-y-1.5">
+                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Amount (₹)</label>
+                                <input
+                                    type="number"
+                                    inputMode="decimal"
+                                    value={editAmount}
+                                    onChange={e => setEditAmount(e.target.value)}
+                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-lg outline-none focus:border-indigo-400/50 transition-all"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Date</label>
+                                <input
+                                    type="date"
+                                    value={editDate}
+                                    onChange={e => setEditDate(e.target.value)}
+                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-[13px] outline-none focus:border-indigo-400/50 transition-all"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Notes</label>
+                                <input
+                                    type="text"
+                                    value={editNotes}
+                                    onChange={e => setEditNotes(e.target.value)}
+                                    placeholder="Service details..."
+                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-[13px] outline-none focus:border-indigo-400/50 transition-all placeholder:text-slate-400"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3 mt-6">
+                            <button onClick={() => setEditingEntry(null)} className="flex-1 py-4 font-bold text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl transition-colors text-sm">
+                                Cancel
+                            </button>
+                            <button
+                                onClick={async () => {
+                                    if (onEditEntry) {
+                                        const updates = {};
+                                        if (editAmount && Number(editAmount) !== Number(editingEntry.amount)) updates.amount = Number(editAmount);
+                                        if (editDate && new Date(editDate + 'T12:00:00').toISOString() !== editingEntry.date) updates.date = new Date(editDate + 'T12:00:00').toISOString();
+                                        if (editNotes !== (editingEntry.notes || '')) updates.notes = editNotes;
+                                        if (Object.keys(updates).length > 0) {
+                                            await onEditEntry(editingEntry.id, updates);
+                                        }
+                                    }
+                                    setEditingEntry(null);
+                                }}
+                                className="flex-[2] py-4 bg-indigo-600 text-white font-black rounded-2xl shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all text-sm uppercase tracking-wider flex items-center justify-center gap-2"
+                            >
+                                <Save className="w-4 h-4" /> Save Changes
+                            </button>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
+        </AnimatePresence>
+    </>
     );
 };
 

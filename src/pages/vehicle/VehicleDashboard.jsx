@@ -24,6 +24,8 @@ import PageLayout from '../../components/layout/PageLayout';
 import { useSelection } from '../../hooks/useSelection';
 import { SelectionBar } from '../../components/ui/SelectionBar';
 import { useToast } from '../../context/ToastContext';
+import QuickActionModal from '../../components/organisms/QuickActionModal';
+import AddFollowUpModal from '../../components/organisms/vehicle/AddFollowUpModal';
 
 const VehicleDashboard = () => {
     const navigate = useNavigate();
@@ -42,7 +44,9 @@ const VehicleDashboard = () => {
         addLoan,
         payEMI,
         deleteVehicle,
-        deleteServiceRecord
+        deleteServiceRecord,
+        addFollowUp,
+        updateServiceRecord
     } = useVehicle();
     const { showToast } = useToast();
 
@@ -62,6 +66,8 @@ const VehicleDashboard = () => {
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
     const [archiveConfirmId, setArchiveConfirmId] = useState(null);
     const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+    const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
+    const [isAddFollowUpOpen, setIsAddFollowUpOpen] = useState(false);
     
     const activeVehicle = getActiveVehicle();
     const activeLoan = activeVehicle ? getLoanForVehicle(activeVehicle.id) : null;
@@ -236,7 +242,7 @@ const VehicleDashboard = () => {
                     {/* Contextual FABs */}
                     {activeTab === 'dashboard' && (
                         <Pressable
-                            onClick={() => alert("Add Entry: Full ledger entry modal coming soon")}
+                            onClick={() => setIsQuickAddOpen(true)}
                             scaleDown={0.96}
                             className="fixed right-6 bg-indigo-600 text-white px-5 py-3 rounded-2xl shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
                             style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)' }}
@@ -246,7 +252,7 @@ const VehicleDashboard = () => {
                     )}
                     {activeTab === 'service' && (
                         <Pressable
-                            onClick={() => alert("Add Reminder Modal Coming Soon")}
+                            onClick={() => setIsAddFollowUpOpen(true)}
                             scaleDown={0.96}
                             className="fixed right-6 bg-blue-600 text-white px-5 py-3 rounded-2xl shadow-xl shadow-blue-600/30 flex items-center justify-center gap-2 hover:scale-105 transition-transform z-40 font-bold text-sm"
                             style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)' }}
@@ -287,6 +293,13 @@ const VehicleDashboard = () => {
                         title="Archive Vehicle?" 
                         message="Are you sure you want to archive this vehicle? It will be hidden from the main view." 
                         confirmLabel="Archive"
+                    />
+                    <QuickActionModal isOpen={isQuickAddOpen} onClose={() => setIsQuickAddOpen(false)} />
+                    <AddFollowUpModal 
+                        isOpen={isAddFollowUpOpen} 
+                        onClose={() => setIsAddFollowUpOpen(false)} 
+                        vehicle={activeVehicle}
+                        onSave={(data) => { addFollowUp(data); setIsAddFollowUpOpen(false); showToast('Reminder added', 'success'); }} 
                     />
                 </>
             }
@@ -410,6 +423,7 @@ const VehicleDashboard = () => {
                                     selectedIds={selectedIds}
                                     toggleSelection={toggleSelection}
                                     enterSelectionMode={enterSelectionMode}
+                                    onEditEntry={async (id, updates) => { await updateServiceRecord(id, updates); showToast('Entry updated', 'success'); }}
                                 />
                             </div>
                             

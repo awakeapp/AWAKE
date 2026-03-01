@@ -34,7 +34,7 @@ const COLORS = [
 ];
 
 const UpcomingPayments = () => {
-    const { subscriptions, addSubscription, deleteSubscription, toggleSubscriptionStatus } = useFinance();
+    const { subscriptions, addSubscription, updateSubscription, deleteSubscription, toggleSubscriptionStatus } = useFinance();
     const [isAdding, setIsAdding] = useState(false);
     const { t } = useTranslation();
     const { showToast } = useToast();
@@ -59,6 +59,7 @@ const UpcomingPayments = () => {
     const [selectedIconIdx, setSelectedIconIdx] = useState(0);
     const [selectedColorIdx, setSelectedColorIdx] = useState(0);
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+    const [editingSubId, setEditingSubId] = useState(null);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -66,21 +67,32 @@ const UpcomingPayments = () => {
 
         const dayNum = Number(day);
         if (dayNum < 1 || dayNum > 31) {
-            alert("Please enter a valid day (1-31)");
+            showToast('Please enter a valid day (1-31)', 'error');
             return;
         }
 
-
         try {
-            addSubscription({
-                name,
-                amount,
-                dueDate: dayNum,
-                iconIdx: selectedIconIdx,
-                colorIdx: selectedColorIdx
-            });
-            showToast('Subscription added', 'success');
+            if (editingSubId) {
+                updateSubscription(editingSubId, {
+                    name,
+                    amount,
+                    dueDate: dayNum,
+                    iconIdx: selectedIconIdx,
+                    colorIdx: selectedColorIdx
+                });
+                showToast('Subscription updated', 'success');
+            } else {
+                addSubscription({
+                    name,
+                    amount,
+                    dueDate: dayNum,
+                    iconIdx: selectedIconIdx,
+                    colorIdx: selectedColorIdx
+                });
+                showToast('Subscription added', 'success');
+            }
             setIsAdding(false);
+            setEditingSubId(null);
             setName('');
             setAmount('');
             setDay('');
@@ -196,7 +208,15 @@ const UpcomingPayments = () => {
                                         </div>
                                     ) : (
                                         <ItemMenu 
-                                            onEdit={() => alert("Edit coming soon")}
+                                            onEdit={() => {
+                                                setEditingSubId(sub.id);
+                                                setName(sub.name || '');
+                                                setAmount(String(sub.amount || ''));
+                                                setDay(String(sub.dueDate || ''));
+                                                setSelectedIconIdx(sub.iconIdx || 0);
+                                                setSelectedColorIdx(sub.colorIdx || 0);
+                                                setIsAdding(true);
+                                            }}
                                             onDelete={() => setDeleteConfirmId(sub.id)}
                                             extraActions={[
                                                 {

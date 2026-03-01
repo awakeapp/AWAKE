@@ -198,19 +198,43 @@ const DocumentCard = ({ doc, vehicleId, currentUrl, userId, onUpdate }) => {
 const VehicleMore = () => {
     const navigate = useNavigate();
     const { user } = useAuthContext();
+    const { showToast } = useToast();
     const {
         vehicles,
         getActiveVehicle,
         toggleArchiveVehicle,
         deleteVehicle,
-        updateVehicle
+        updateVehicle,
+        serviceRecords
     } = useVehicle();
 
     const activeVehicle = getActiveVehicle();
 
     const handleExportCSV = () => {
         if (!activeVehicle) return;
-        alert("Exporting " + activeVehicle.name + " data as CSV...");
+        const vehicleRecords = serviceRecords.filter(r => r.vehicleId === activeVehicle.id);
+        if (vehicleRecords.length === 0) {
+            showToast('No records to export', 'info');
+            return;
+        }
+        const headers = ['Date', 'Type', 'Amount', 'Odometer', 'Notes'];
+        const rows = vehicleRecords
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .map(r => [
+                r.date ? new Date(r.date).toLocaleDateString() : '',
+                r.type,
+                r.amount || 0,
+                r.odometer || '',
+                r.notes ? `"${r.notes.replace(/"/g, '""')}"` : ''
+            ].join(','));
+        const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join('\n');
+        const link = document.createElement('a');
+        link.setAttribute('href', encodeURI(csvContent));
+        link.setAttribute('download', `${activeVehicle.name}_ledger.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('CSV exported!', 'success');
     };
 
     const handleDocUpdate = async (updates) => {
@@ -235,7 +259,7 @@ const VehicleMore = () => {
                         icon={Settings}
                         title="Maintenance Templates"
                         subtitle="Service intervals & checklists"
-                        onClick={() => alert("Templates module coming soon")}
+                        onClick={() => navigate('/vehicle/dashboard?tab=service')}
                         isLast
                     />
                 </SettingsSection>
