@@ -2,18 +2,21 @@
 import { test, expect } from '@playwright/test';
 
 test('verify app access and login page redirect', async ({ page }) => {
-    // Go to the app root
-    await page.goto('http://localhost:3000/');
+    // Increase timeout to 30s to allow WelcomeSequence and all redirects
+    test.setTimeout(30000);
 
-    // Expect to be redirected to /login because authentication is required
-    await expect(page).toHaveURL(/.*\/login/);
+    // Go to the app root
+    await page.goto('http://localhost:3000/AWAKE/');
+
+    // Wait for the URL to eventually contain /login
+    await expect(page).toHaveURL(/.*\/login/, { timeout: 20000 });
 
     // Check for the "Welcome Back" text specifically found in the Login component
-    await expect(page.getByText('Welcome Back')).toBeVisible();
+    await expect(page.getByText('Welcome Back')).toBeVisible({ timeout: 10000 });
 
     // Check for the "Sign In" button
     await expect(page.getByRole('button', { name: 'Sign In' })).toBeVisible();
 
-    // Take a screenshot for debugging purposes (optional, saved to test-results)
+    // Take a screenshot
     await page.screenshot({ path: 'tests/screenshot-access.png' });
 });
