@@ -269,17 +269,11 @@ export const FinanceContextProvider = ({ children }) => {
     }, [accounts]);
 
     const getCalculatedBalance = useCallback(() => {
-        const income = transactions
-            .filter(t => !t.isDeleted && t.type === 'income')
-            .reduce((acc, t) => acc + Number(t.amount), 0);
-        const expense = transactions
-            .filter(t => !t.isDeleted && t.type === 'expense')
-            .reduce((acc, t) => acc + Number(t.amount), 0);
-        const savings = transactions
-            .filter(t => !t.isDeleted && t.type === 'savings')
-            .reduce((acc, t) => acc + Number(t.amount), 0);
-        return income - expense - savings;
-    }, [transactions]);
+        // The authoritative source of truth for total balance is the sum of all unarchived accounts.
+        return accounts
+            .filter(a => !a.isArchived)
+            .reduce((acc, a) => acc + Number(a.balance || 0), 0);
+    }, [accounts]);
 
     const getTotalBalance = useCallback(() => {
         // User requested Total Income - Total Expense logic
@@ -359,24 +353,24 @@ export const FinanceContextProvider = ({ children }) => {
             throw new Error('Invalid amount. Must be between 1 and 99,99,999.');
         }
 
-        const newTx = {
-            transactionId: crypto.randomUUID(),
+        const txId = crypto.randomUUID();
+
+        const payload = {
+            transactionId: txId,
             accountId: tx.accountId,
             type: tx.type,
             amount: numAmount,
             categoryId: tx.categoryId,
             date: tx.date || new Date().toISOString(),
-            note: tx.note || tx.description || '',
             description: tx.note || tx.description || 'Transaction',
-            createdAt: Date.now(),
             metadata: { ...tx }
         };
 
         try {
-            const docRef = await FirestoreService.addItem(`users/${user.uid}/transactions`, newTx);
-            return docRef.id;
+            await CloudFunctionService.commitFinancialTransaction(payload);
+            return txId; // Return the exact Firestore ID used by the cloud function for callers
         } catch (error) {
-            console.error("Failed to add transaction via FirestoreService:", error);
+            console.error("Failed to add transaction via Cloud Function:", error);
             throw error;
         }
     }, [user]);
@@ -384,23 +378,26 @@ export const FinanceContextProvider = ({ children }) => {
     const addTransfer = useCallback(async ({ amount, fromAccountId, toAccountId, note, date }) => {
         if (!user) return;
 
-        const newTx = {
+        const numAmount = Number(amount);
+        if (!numAmount || isNaN(numAmount) || numAmount <= 0 || numAmount > 9999999) {
+            throw new Error('Invalid amount. Must be between 1 and 99,99,999.');
+        }
+
+        const payload = {
             transactionId: crypto.randomUUID(),
             accountId: fromAccountId,
             toAccountId: toAccountId,
             type: 'transfer',
-            amount: Number(amount),
+            amount: numAmount,
             date: date || new Date().toISOString(),
-            note: note || '',
             description: note || 'Fund Transfer',
-            categoryId: 'cat_transfer',
-            createdAt: Date.now()
+            categoryId: 'cat_transfer'
         };
 
         try {
-            await FirestoreService.addItem(`users/${user.uid}/transactions`, newTx);
+            await CloudFunctionService.commitFinancialTransaction(payload);
         } catch (error) {
-            console.error("Failed to add transfer via FirestoreService:", error);
+            console.error("Failed to add transfer via Cloud Function:", error);
             throw error;
         }
     }, [user]);
@@ -415,7 +412,6 @@ export const FinanceContextProvider = ({ children }) => {
         await FirestoreService.addItem(`users/${user.uid}/recurringRules`, newRule);
     }, [user]);
 
-    // SOFT DELETE REFACTOR: Compensation Transaction
     const deleteTransaction = useCallback(async (id) => {
         if (!user) return;
         const tx = transactions.find(t => t.transactionId === id || t.id === id);
@@ -424,6 +420,28 @@ export const FinanceContextProvider = ({ children }) => {
 
         const docId = tx.id;
         try {
+            // Apply reverse logic to accounts to compensate for the soft-delete
+            const account = accounts.find(a => a.id === tx.accountId);
+            if (account) {
+               let newBalance = Number(account.balance || 0);
+               const amt = Number(tx.amount);
+               if (tx.type === 'income') newBalance -= amt;
+               if (tx.type === 'expense') newBalance += amt;
+               if (tx.type === 'transfer') {
+                   newBalance += amt;
+                   const toAccount = accounts.find(a => a.id === tx.toAccountId);
+                   if (toAccount) {
+                       await FirestoreService.updateItem(`users/${user.uid}/accounts`, toAccount.id, {
+                           balance: Math.round((Number(toAccount.balance || 0) - amt) * 100) / 100
+                       });
+                   }
+               }
+               
+               await FirestoreService.updateItem(`users/${user.uid}/accounts`, account.id, {
+                   balance: Math.round(newBalance * 100) / 100
+               });
+            }
+
             await FirestoreService.updateItem(`users/${user.uid}/transactions`, docId, {
                 isDeleted: true,
                 deletedAt: Date.now()
@@ -432,15 +450,38 @@ export const FinanceContextProvider = ({ children }) => {
             console.error("Failed to delete transaction:", error);
             throw error;
         }
-    }, [user, transactions]);
+    }, [user, transactions, accounts]);
 
     const restoreTransaction = useCallback(async (id) => {
         if (!user) return;
         const tx = transactions.find(t => t.transactionId === id || t.id === id);
         if (!tx) return;
+        if (!tx.isDeleted) return;
 
         const docId = tx.id;
         try {
+            // Re-apply logic to accounts to compensate for the restore
+            const account = accounts.find(a => a.id === tx.accountId);
+            if (account) {
+               let newBalance = Number(account.balance || 0);
+               const amt = Number(tx.amount);
+               if (tx.type === 'income') newBalance += amt;
+               if (tx.type === 'expense') newBalance -= amt;
+               if (tx.type === 'transfer') {
+                   newBalance -= amt;
+                   const toAccount = accounts.find(a => a.id === tx.toAccountId);
+                   if (toAccount) {
+                       await FirestoreService.updateItem(`users/${user.uid}/accounts`, toAccount.id, {
+                           balance: Math.round((Number(toAccount.balance || 0) + amt) * 100) / 100
+                       });
+                   }
+               }
+               
+               await FirestoreService.updateItem(`users/${user.uid}/accounts`, account.id, {
+                   balance: Math.round(newBalance * 100) / 100
+               });
+            }
+
             await FirestoreService.updateItem(`users/${user.uid}/transactions`, docId, {
                 isDeleted: false,
                 deletedAt: null
@@ -448,7 +489,7 @@ export const FinanceContextProvider = ({ children }) => {
         } catch (error) {
             console.error("Failed to restore transaction:", error);
         }
-    }, [user, transactions]);
+    }, [user, transactions, accounts]);
 
     const editTransaction = useCallback(async (id, updatedTx) => {
         if (!user) return;
@@ -457,9 +498,68 @@ export const FinanceContextProvider = ({ children }) => {
 
         const docId = tx.id;
         try {
+            // Adjust balances if amount or type or accounts physically change natively
+            if (!tx.isDeleted && ('amount' in updatedTx || 'accountId' in updatedTx || 'type' in updatedTx || 'toAccountId' in updatedTx)) {
+                
+                let oldBalTracker = 0;
+                
+                // 1. Reverse the old transaction from balances
+                const oldAccount = accounts.find(a => a.id === tx.accountId);
+                if (oldAccount) {
+                    let oldBal = Number(oldAccount.balance || 0);
+                    const oldAmt = Number(tx.amount);
+                    if (tx.type === 'income') oldBal -= oldAmt;
+                    if (tx.type === 'expense') oldBal += oldAmt;
+                    if (tx.type === 'transfer') {
+                        oldBal += oldAmt;
+                        const oldToAccount = accounts.find(a => a.id === tx.toAccountId);
+                        if (oldToAccount) {
+                            await FirestoreService.updateItem(`users/${user.uid}/accounts`, oldToAccount.id, {
+                                balance: Math.round((Number(oldToAccount.balance || 0) - oldAmt) * 100) / 100
+                            });
+                        }
+                    }
+                    oldBalTracker = oldBal;
+                    await FirestoreService.updateItem(`users/${user.uid}/accounts`, oldAccount.id, {
+                        balance: Math.round(oldBal * 100) / 100
+                    });
+                }
+                
+                // 2. Re-apply the transaction securely using exact modified state objects
+                const newType = updatedTx.type || tx.type;
+                const newAccId = updatedTx.accountId || tx.accountId;
+                const newAmt = ('amount' in updatedTx) ? Number(updatedTx.amount) : Number(tx.amount);
+                const newToAccId = updatedTx.toAccountId || tx.toAccountId;
+                
+                const isSameAcc = (newAccId === tx.accountId);
+                
+                const newAcc = accounts.find(a => a.id === newAccId);
+                if (newAcc) {
+                    let freshBal = isSameAcc ? oldBalTracker : Number(newAcc.balance || 0); 
+                    if (newType === 'income') freshBal += newAmt;
+                    if (newType === 'expense') freshBal -= newAmt;
+                    if (newType === 'transfer') {
+                        freshBal -= newAmt;
+                        const isSameToAcc = (newToAccId === tx.toAccountId);
+                        const newToAcc = accounts.find(a => a.id === newToAccId);
+                        if (newToAcc) {
+                            let freshToBal = Number(newToAcc.balance || 0);
+                            // Compensate if we just mathematically deducted from it identically in the reverse step
+                            if (isSameToAcc && tx.type === 'transfer') freshToBal -= Number(tx.amount); 
+                            
+                            await FirestoreService.updateItem(`users/${user.uid}/accounts`, newToAcc.id, {
+                                balance: Math.round((freshToBal + newAmt) * 100) / 100
+                            });
+                        }
+                    }
+                    await FirestoreService.updateItem(`users/${user.uid}/accounts`, newAccId, {
+                        balance: Math.round(freshBal * 100) / 100
+                    });
+                }
+            }
+
             await FirestoreService.updateItem(`users/${user.uid}/transactions`, docId, {
                 ...updatedTx,
-                note: updatedTx.note || updatedTx.description || '',
                 description: updatedTx.note || updatedTx.description || tx.description,
                 updatedAt: Date.now()
             });
@@ -467,7 +567,7 @@ export const FinanceContextProvider = ({ children }) => {
             console.error("Failed to edit transaction:", error);
             throw error;
         }
-    }, [user, transactions]);
+    }, [user, transactions, accounts]);
 
     const checkDuplicate = useCallback((newTx) => {
         if (!newTx || !newTx.amount || !newTx.categoryId) return false;
@@ -551,7 +651,7 @@ export const FinanceContextProvider = ({ children }) => {
         }
     }, [user]);
 
-    const addDebtPayment = useCallback(async (debtId, amount, date = new Date()) => {
+    const addDebtPayment = useCallback(async (debtId, amount, date = new Date(), accountId = 'acc_cash') => {
         if (!user) return;
         const debt = debts.find(d => d.id === debtId);
         if (!debt) return;
@@ -561,7 +661,7 @@ export const FinanceContextProvider = ({ children }) => {
 
         await CloudFunctionService.commitFinancialTransaction({
             transactionId: crypto.randomUUID(),
-            accountId: 'acc_bank', // Default pending UI support
+            accountId: accountId, // Provided by UI or default acc_cash
             type: isReceiving ? 'income' : 'expense',
             amount: numAmount,
             categoryId: 'cat_debt',
@@ -577,16 +677,16 @@ export const FinanceContextProvider = ({ children }) => {
         await FirestoreService.updateItem(`users/${user.uid}/debts`, debtId, {
             paidAmount: newPaidAmount,
             isSettled,
-            payments: [...(debt.payments || []), { amount: numAmount, date: new Date(date).toISOString(), id: `pay_${Date.now()}` }]
+            payments: [...(debt.payments || []), { amount: numAmount, date: new Date(date).toISOString(), id: `pay_${Date.now()}`, accountId }]
         });
     }, [user, debts]);
 
-    const settleDebt = useCallback((id) => {
+    const settleDebt = useCallback((id, accountId = 'acc_cash') => {
         const debt = debts.find(d => d.id === id);
         if (debt && !debt.isSettled) {
             const remaining = Number(debt.amount) - (debt.paidAmount || 0);
             if (remaining > 0) {
-                addDebtPayment(id, remaining);
+                addDebtPayment(id, remaining, new Date(), accountId);
             }
         }
     }, [debts, addDebtPayment]);
