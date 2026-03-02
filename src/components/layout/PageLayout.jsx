@@ -24,7 +24,7 @@ const PageLayout = ({
     return (
         <div 
             className={clsx("min-h-screen flex flex-col relative w-full", bgClass)}
-            style={bottomNav ? { paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.5rem)' } : {}}
+            style={bottomNav ? { paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 7rem)' } : {}}
         >
             {/* 1. Standardized Fixed Header */}
             {hasHeader && (

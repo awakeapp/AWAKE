@@ -41,55 +41,37 @@ const PartyDetail = () => {
     const { showToast } = useToast();
     const { user } = useAuthContext();
 
-    if (!context || !context.debtParties) {
-        return (
-            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-6">
-                <div className="animate-pulse flex flex-col items-center">
-                    <div className="w-12 h-12 bg-slate-200 dark:bg-slate-800 rounded-full mb-4"></div>
-                    <div className="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                </div>
-            </div>
-        );
-    }
+    // --- Guard: context not yet loaded ---
+    const isContextReady = !!(context && context.debtParties);
 
     const {
-        debtParties,
-        getPartyTransactions,
-        getPartyBalance,
+        debtParties = [],
+        getPartyTransactions = () => [],
+        getPartyBalance = () => 0,
         addDebtTransaction,
         softDeleteDebtTransaction,
         reverseDebtTransaction,
-        isEntryLocked,
-        getEntrySettledAmount,
+        isEntryLocked = () => false,
+        getEntrySettledAmount = () => 0,
         updateDebtParty,
         addTransaction,
         editDebtTransaction,
-        getPartyStatus,
-        getPendingEntries,
+        getPartyStatus = () => 'active',
+        getPendingEntries = () => [],
         addSettlementPayment,
-        accounts,
+        accounts = [],
         financeConfig
-    } = context;
+    } = context || {};
 
-    const party = debtParties.find(p => p.id === partyId && !p.is_deleted);
-    if (!party) {
-        return (
-            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
-                <AlertTriangle className="w-12 h-12 text-slate-400 mb-4" />
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Party Not Found</h2>
-                <p className="text-slate-500 mb-6">This party may have been deleted.</p>
-                <button onClick={() => navigate(-1)} className="px-6 py-2 bg-indigo-600 text-white rounded-xl font-bold">Go Back</button>
-            </div>
-        );
-    }
+    const party = isContextReady ? debtParties.find(p => p.id === partyId && !p.is_deleted) : null;
 
-    const allTransactions = getPartyTransactions(partyId);
-    const balance = getPartyBalance(partyId);
+    const allTransactions = isContextReady && party ? getPartyTransactions(partyId) : [];
+    const balance = isContextReady && party ? getPartyBalance(partyId) : 0;
     const isReceivable = balance > 0;
     const isPayable = balance < 0;
-    const partyStatus = getPartyStatus(partyId);
+    const partyStatus = isContextReady && party ? getPartyStatus(partyId) : 'active';
     const statusBadge = STATUS_BADGE[partyStatus] || STATUS_BADGE.active;
-    const pendingEntries = getPendingEntries(partyId);
+    const pendingEntries = isContextReady && party ? getPendingEntries(partyId) : [];
 
     // --- Computed summary ---
     const summary = useMemo(() => {
@@ -590,7 +572,7 @@ const PartyDetail = () => {
                         type: isExpense ? 'expense' : 'income',
                         amount: Math.round(Number(amount) * 100) / 100,
                         accountId: selectedAccountId,
-                        categoryId: '',
+                        categoryId: isExpense ? 'cat_debt_out' : 'cat_debt_in',
                         date: new Date(date + 'T12:00:00').toISOString(),
                         note: `Debt: ${party.name} - ${note || txType.replace('_', ' ')}`
                     });
@@ -692,6 +674,29 @@ const PartyDetail = () => {
             return copy;
         });
     };
+
+    // --- Post-hook guards (MUST be after all hooks to comply with Rules of Hooks) ---
+    if (!isContextReady) {
+        return (
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-6">
+                <div className="animate-pulse flex flex-col items-center">
+                    <div className="w-12 h-12 bg-slate-200 dark:bg-slate-800 rounded-full mb-4" />
+                    <div className="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded" />
+                </div>
+            </div>
+        );
+    }
+
+    if (!party) {
+        return (
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
+                <AlertTriangle className="w-12 h-12 text-slate-400 mb-4" />
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Party Not Found</h2>
+                <p className="text-slate-500 mb-6">This party may have been deleted.</p>
+                <button onClick={() => navigate(-1)} className="px-6 py-2 bg-indigo-600 text-white rounded-xl font-bold">Go Back</button>
+            </div>
+        );
+    }
 
     // --- Render ---
     return (

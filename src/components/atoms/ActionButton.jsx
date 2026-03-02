@@ -21,7 +21,7 @@ import Pressable from './Pressable';
  * @param {boolean} disabled - Whether the button is disabled.
  * @param {string} label - Optional text label (usually hidden for icon-only buttons).
  */
-const ActionButton = ({ 
+const ActionButton = React.forwardRef(({ 
     variant = 'back', 
     onClick, 
     className, 
@@ -30,8 +30,9 @@ const ActionButton = ({
     iconOnly = true,
     size = 'md',
     fullWidth = false,
-    children
-}) => {
+    children,
+    ...rest
+}, ref) => {
     
     const getIcon = () => {
         const iconSize = size === 'sm' ? "w-5 h-5" : "w-6 h-6";
@@ -87,6 +88,8 @@ const ActionButton = ({
             )}
             title={label || variant}
             aria-label={label || variant}
+            {...rest}
+            ref={ref}
         >
             {children || (
                 <>
@@ -103,6 +106,8 @@ const ActionButton = ({
             )}
         </Pressable>
     );
-};
+});
+
+ActionButton.displayName = 'ActionButton';
 
 export default ActionButton;
