@@ -66,13 +66,15 @@ const DebtManager = () => {
     const [editParty, setEditParty] = useState(null);
     const [editName, setEditName] = useState('');
     const [editPhone, setEditPhone] = useState('');
+    const [editCountryCode, setEditCountryCode] = useState('+91');
     const [editTag, setEditTag] = useState('');
     useScrollLock(!!editParty);
 
     const openEditParty = (party) => {
         setEditParty(party);
         setEditName(party.name || '');
-        setEditPhone(party.phone || '');
+        setEditPhone(party.phone_number || '');
+        setEditCountryCode(party.country_code || '+91');
         setEditTag(party.tag || '');
     };
 
@@ -82,7 +84,8 @@ const DebtManager = () => {
         try {
             await context.updateDebtParty(editParty.id, {
                 name: editName.trim(),
-                phone: editPhone.trim(),
+                phone_number: editPhone.trim(),
+                country_code: editCountryCode.trim(),
                 tag: editTag.trim(),
             });
             showToast('Party updated', 'success');
@@ -442,8 +445,8 @@ const DebtManager = () => {
                     </div>
                 </div>
 
-                {/* Search Bar: max 12px bottom margin handled by container gap or specific margin */}
-                <div className="relative mb-3">
+                {/* Search Bar */}
+                <div className="relative">
                     <input 
                         type="text" 
                         value={searchQuery} 
@@ -455,7 +458,7 @@ const DebtManager = () => {
                 </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-1.5 mt-2">
                         {partyData.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || (p.tag && p.tag.toLowerCase().includes(searchQuery.toLowerCase()))).length === 0 ? (
                             <div className="text-center py-16 px-6">
                                 <div className="w-20 h-20 bg-indigo-50 dark:bg-indigo-900/20 rounded-full flex items-center justify-center mx-auto mb-6 text-indigo-300">
@@ -489,79 +492,77 @@ const DebtManager = () => {
                                 return (
                                     <motion.div 
                                         key={party.id} 
-                                        initial={{ opacity: 0, y: 10 }} 
+                                        initial={{ opacity: 0, y: 6 }} 
                                         animate={{ opacity: 1, y: 0 }} 
                                         onClick={() => isSelectionMode ? toggleSelection(party.id) : navigate(`/finance/debts/${party.id}`)}
                                         onContextMenu={(e) => { e.preventDefault(); enterSelectionMode(party.id); }}
                                         className={clsx(
-                                            "bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border transition-all flex flex-col gap-2 relative overflow-hidden group cursor-pointer active:scale-[0.98]",
+                                            "bg-white dark:bg-slate-900 px-4 py-3 rounded-2xl border transition-all flex items-center gap-3 cursor-pointer active:scale-[0.99] active:bg-slate-50 dark:active:bg-slate-800/80",
                                             selectedIds.includes(party.id) ? "border-indigo-500 ring-2 ring-indigo-500/20" : "border-slate-100 dark:border-slate-800"
                                         )}
                                     >
-                                        <div className={`absolute top-0 right-0 w-32 h-32 -mr-16 -mt-16 blur-3xl opacity-[0.03] pointer-events-none rounded-full ${isSettled ? 'bg-slate-400' : isReceivable ? 'bg-emerald-500' : 'bg-red-500'}`} />
-
-                                        <div className="flex items-start justify-between gap-4">
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-3">
-                                                    {isSelectionMode && (
-                                                        <div className={clsx(
-                                                            "w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-colors",
-                                                            selectedIds.includes(party.id) ? "bg-indigo-600 border-indigo-600" : "border-slate-300 dark:border-slate-700"
-                                                        )}>
-                                                            {selectedIds.includes(party.id) && <Check className="w-3 h-3 text-white" />}
-                                                        </div>
-                                                    )}
-                                                    <h4 className="text-lg font-black text-slate-900 dark:text-white capitalize truncate leading-tight tracking-tight">
-                                                        {party.name}
-                                                    </h4>
-                                                </div>
-                                                <div className="flex items-center gap-2 mt-1.5 overflow-hidden">
-                                                    <span className="text-xxs text-slate-400 font-bold uppercase tracking-wider whitespace-nowrap">
-                                                        {new Date(party.lastTxDate).toLocaleDateString([], { month: 'short', day: 'numeric' })}
-                                                    </span>
-                                                    <span className="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-800 shrink-0" />
-                                                    <span className="text-xxs text-slate-400 font-bold uppercase tracking-wider whitespace-nowrap">
-                                                        {getPartyTransactions(party.id).length} Entries
-                                                    </span>
-                                                    {party.tag && (
-                                                        <>
-                                                            <span className="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-800 shrink-0" />
-                                                            <span className="text-xxs bg-slate-50 dark:bg-slate-800/50 px-1.5 py-0.5 rounded text-slate-500 truncate">{party.tag}</span>
-                                                        </>
-                                                    )}
-                                                </div>
+                                        {/* Selection circle */}
+                                        {isSelectionMode && (
+                                            <div className={clsx(
+                                                "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors",
+                                                selectedIds.includes(party.id) ? "bg-indigo-600 border-indigo-600" : "border-slate-300 dark:border-slate-700"
+                                            )}>
+                                                {selectedIds.includes(party.id) && <Check className="w-3 h-3 text-white" />}
                                             </div>
+                                        )}
 
-                                            <div className="text-right shrink-0 flex flex-col items-end gap-2">
-                                                {!isSelectionMode && (
-                                                    <ItemMenu 
-                                                        onEdit={() => { openEditParty(party); }}
-                                                        onDelete={() => setDeleteConfirmId(party.id)}
-                                                    />
-                                                )}
-                                                {isSettled ? (
-                                                    <span className="text-xxs font-black uppercase tracking-widest text-slate-400 px-2.5 py-1 bg-slate-50 dark:bg-slate-800 rounded-lg">Settled</span>
-                                                ) : (
-                                                    <div className="flex flex-col items-end">
-                                                        <p className={`text-xl font-black tracking-tightest leading-none ${isReceivable ? 'text-emerald-600 dark:text-emerald-500' : 'text-red-600 dark:text-red-500'}`}>
-                                                            {formatCurrency(Math.abs(bal), true)}
-                                                        </p>
-                                                        <p className={`text-micro font-black uppercase tracking-[0.15em] mt-1.5 ${isReceivable ? 'text-emerald-500/60' : 'text-red-500/60'}`}>
-                                                            {isReceivable ? 'To Get' : 'To Pay'}
-                                                        </p>
-                                                    </div>
+                                        {/* Avatar dot */}
+                                        {!isSelectionMode && (
+                                            <div className={clsx(
+                                                "w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-sm font-black uppercase",
+                                                isSettled ? 'bg-slate-100 dark:bg-slate-800 text-slate-400' :
+                                                isReceivable ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
+                                                'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400'
+                                            )}>
+                                                {party.name?.[0] || '?'}
+                                            </div>
+                                        )}
+
+                                        {/* Name + meta */}
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-bold text-slate-900 dark:text-white capitalize truncate leading-tight">{party.name}</p>
+                                            <div className="flex items-center gap-1.5 mt-0.5">
+                                                <span className="text-xxs text-slate-400 font-medium">{getPartyTransactions(party.id).length} entries</span>
+                                                {party.tag && (
+                                                    <>
+                                                        <span className="w-0.5 h-0.5 rounded-full bg-slate-300 dark:bg-slate-700" />
+                                                        <span className="text-xxs text-slate-400 font-medium truncate">{party.tag}</span>
+                                                    </>
                                                 )}
                                             </div>
                                         </div>
 
-                                        <div className="flex gap-2 mt-1 pt-3 border-t border-slate-100/80 dark:border-slate-800/50">
-                                            <ActionButton 
-                                                variant="primary"
+                                        {/* Balance + actions */}
+                                        <div className="flex items-center gap-2 shrink-0">
+                                            {isSettled ? (
+                                                <span className="text-xxs font-bold text-slate-400 px-2 py-0.5 bg-slate-50 dark:bg-slate-800 rounded-full">Settled</span>
+                                            ) : (
+                                                <div className="text-right">
+                                                    <p className={`text-sm font-black leading-none ${isReceivable ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                                                        {formatCurrency(Math.abs(bal), true)}
+                                                    </p>
+                                                    <p className={`text-micro font-bold uppercase tracking-wide mt-0.5 ${isReceivable ? 'text-emerald-400' : 'text-red-400'}`}>
+                                                        {isReceivable ? 'to get' : 'to pay'}
+                                                    </p>
+                                                </div>
+                                            )}
+                                            <button
                                                 onClick={(e) => { e.stopPropagation(); navigate(`/finance/debts/${party.id}`, { state: { openAdd: true }}); }}
-                                                label="+ Add Entry"
-                                                iconOnly={false}
-                                                className="flex-1 py-2 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold rounded-xl"
-                                            />
+                                                className="w-7 h-7 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-colors"
+                                            >
+                                                <Plus className="w-3.5 h-3.5" />
+                                            </button>
+                                            {!isSelectionMode && (
+                                                <ItemMenu 
+                                                    onEdit={(e) => { e?.stopPropagation?.(); openEditParty(party); }}
+                                                    onDelete={(e) => { e?.stopPropagation?.(); setDeleteConfirmId(party.id); }}
+                                                />
+                                            )}
                                         </div>
                                     </motion.div>
                                 );
