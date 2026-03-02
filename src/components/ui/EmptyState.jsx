@@ -1,5 +1,4 @@
 import React from 'react';
-import { LucideIcon } from 'lucide-react';
 import clsx from 'clsx';
 import ActionButton from '../atoms/ActionButton';
 

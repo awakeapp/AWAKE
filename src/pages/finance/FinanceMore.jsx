@@ -81,7 +81,7 @@ const FinanceMore = () => {
                         icon={Settings} 
                         title="Finance Settings" 
                         subtitle="Calculation & display preferences" 
-                        onClick={() => navigate('/finance/settings')} 
+                        onClick={() => navigate('/settings')} 
                         isLast
                     />
                 </SettingsSection>

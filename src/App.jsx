@@ -54,7 +54,6 @@ const DebtManager = lazy(() => import('./pages/finance/DebtManager'));
 const PartyDetail = lazy(() => import('./pages/finance/PartyDetail'));
 const AccountDetail = lazy(() => import('./pages/finance/AccountDetail'));
 const MonthlyOverview = lazy(() => import('./pages/finance/MonthlyOverview'));
-const FinanceSettings = lazy(() => import('./pages/finance/FinanceSettings'));
 const FinanceEMI = lazy(() => import('./pages/finance/FinanceEMI'));
 const FinanceMore = lazy(() => import('./pages/finance/FinanceMore'));
 const FinanceUpcoming = lazy(() => import('./pages/finance/FinanceUpcoming'));
@@ -177,7 +176,6 @@ function App() {
                             <Route path="/finance/debts/:partyId" element={<PartyDetail />} />
                             <Route path="/finance/account/:id" element={<AccountDetail />} />
                             <Route path="/finance/monthly" element={<MonthlyOverview />} />
-                            <Route path="/finance/settings" element={<FinanceSettings />} />
                             <Route path="/finance/emi" element={<FinanceEMI />} />
                             <Route path="/finance/more" element={<FinanceMore />} />
                             <Route path="/finance/wallets" element={<FinanceWallets />} />

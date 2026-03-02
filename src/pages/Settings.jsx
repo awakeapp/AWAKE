@@ -3,13 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { 
     User, Moon, Sun, Monitor, Bell, Database, Shield, Info, LogOut, 
     Trash2, ChevronRight, ArrowLeft, Edit2, KeyRound, Mail, Globe, 
-    Clock, Smartphone, UserPlus, Heart, Handshake, Car, Download
+    Clock, Smartphone, UserPlus, Heart, Handshake, Car, Download, CreditCard, Check, X
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useSettings } from '../context/SettingsContext';
 import { useLogout } from '../hooks/useLogout';
+import { useFinance } from '../context/FinanceContext';
+import { useToast } from '../context/ToastContext';
 import { AppHeader } from '../components/ui/AppHeader';
 import { SettingsList, SettingsSection, SettingsRow } from '../components/ui/SettingsList';
 import { AppToggle } from '../components/ui/AppToggle';
@@ -26,10 +28,14 @@ const Settings = () => {
     const { themePreference, setThemePreference } = useTheme();
     const { appSettings, updateSetting } = useSettings();
     const { logout } = useLogout();
+    const { financeConfig, updateFinanceConfig } = useFinance();
+    const { showToast } = useToast();
 
     const [isConfirmSignOutOpen, setIsConfirmSignOutOpen] = useState(false);
     const [isConfirmResetOpen, setIsConfirmResetOpen] = useState(false);
     const [isInstallGuideOpen, setIsInstallGuideOpen] = useState(false);
+    const [isEditingUpi, setIsEditingUpi] = useState(false);
+    const [upiId, setUpiId] = useState(financeConfig?.upiId || '');
 
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -54,6 +60,16 @@ const Settings = () => {
             ...current,
             [key]: !current[key]
         });
+    };
+
+    const handleSaveUpi = async () => {
+        try {
+            await updateFinanceConfig({ upiId: upiId.trim() });
+            showToast('UPI ID saved successfully!', 'success');
+            setIsEditingUpi(false);
+        } catch (error) {
+            showToast('Failed to save UPI ID', 'error');
+        }
     };
 
     const memberId = `AWK-${user?.uid?.slice(-4).toUpperCase() || 'GUEST'}`;
@@ -289,6 +305,50 @@ const Settings = () => {
                                 />
                             }
                         />
+                    </SettingsSection>
+
+                    {/* Finance Integration */}
+                    <SettingsSection title="Finance">
+                        <div className="bg-white dark:bg-slate-900 overflow-hidden mx-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm transition-all focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-transparent">
+                            <div className="flex items-center p-4 gap-3">
+                                <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                                    <CreditCard className="w-4 h-4 text-indigo-500" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="font-bold text-sm-minus text-slate-900 dark:text-white">My UPI ID</p>
+                                    {isEditingUpi ? (
+                                        <input 
+                                            type="text"
+                                            value={upiId}
+                                            onChange={(e) => setUpiId(e.target.value)}
+                                            onFocus={(e) => e.target.select()}
+                                            placeholder="e.g. yourname@okhdfcbank"
+                                            style={{ userSelect: 'auto', WebkitUserSelect: 'auto' }}
+                                            className="w-full text-sm-minus text-slate-500 dark:text-slate-400 bg-transparent outline-none mt-1 font-medium"
+                                            autoFocus
+                                        />
+                                    ) : (
+                                        <p className="text-xs-plus text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5" onClick={() => setIsEditingUpi(true)}>
+                                            {financeConfig?.upiId ? financeConfig.upiId : 'Tap to add your UPI ID...'}
+                                        </p>
+                                    )}
+                                </div>
+                                {isEditingUpi ? (
+                                    <div className="flex items-center gap-2">
+                                        <button onClick={() => { setIsEditingUpi(false); setUpiId(financeConfig?.upiId || ''); }} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                        <button onClick={handleSaveUpi} className="p-1.5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400 rounded-lg font-bold">
+                                            <Check className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button onClick={() => setIsEditingUpi(true)} className="text-xs-plus font-bold text-indigo-600 dark:text-indigo-400 px-3 py-1 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg">
+                                        {financeConfig?.upiId ? 'Edit' : 'Add'}
+                                    </button>
+                                )}
+                            </div>
+                        </div>
                     </SettingsSection>
 
                     {/* Security & Data */}
