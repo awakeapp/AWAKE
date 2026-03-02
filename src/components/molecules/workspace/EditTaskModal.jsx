@@ -97,7 +97,7 @@ const EditTaskModal = ({ isOpen, onClose, task }) => {
  <div className="bg-white dark:bg-[#111827] w-full max-w-sm rounded-[24px] pointer-events-auto flex flex-col shadow-2xl relative overflow-hidden">
  {/* Header */}
  <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-white/[0.06]">
- <h2 className="text-[17px] font-semibold text-slate-900 dark:text-white tracking-tight">Edit Task</h2>
+ <h2 className="text-base-plus font-semibold text-slate-900 dark:text-white tracking-tight">Edit Task</h2>
  <Pressable 
  onClick={onClose} 
  scaleDown={0.9}
@@ -120,7 +120,7 @@ const EditTaskModal = ({ isOpen, onClose, task }) => {
  placeholder="Task name"
  value={title}
  onChange={(e) => setTitle(e.target.value)}
- className="w-full text-[16px] bg-slate-50 dark:bg-white/[0.04] border border-transparent dark:border-white/[0.04] rounded-[14px] px-4 py-3.5 focus:ring-2 focus:ring-indigo-500/30 dark:focus:ring-indigo-500/40 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 font-medium transition-all"
+ className="w-full text-base bg-slate-50 dark:bg-white/[0.04] border border-transparent dark:border-white/[0.04] rounded-[14px] px-4 py-3.5 focus:ring-2 focus:ring-indigo-500/30 dark:focus:ring-indigo-500/40 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 font-medium transition-all"
  />
  </div>
 
@@ -130,9 +130,9 @@ const EditTaskModal = ({ isOpen, onClose, task }) => {
  value={description}
  onChange={handleDescriptionChange}
  rows="2"
- className="w-full text-[14px] bg-slate-50 dark:bg-white/[0.04] border border-transparent dark:border-white/[0.04] rounded-[14px] px-4 py-3 pb-8 focus:ring-2 focus:ring-indigo-500/30 dark:focus:ring-indigo-500/40 text-slate-700 dark:text-slate-300 placeholder-slate-400 dark:placeholder-slate-500 transition-all resize-none"
+ className="w-full text-sm bg-slate-50 dark:bg-white/[0.04] border border-transparent dark:border-white/[0.04] rounded-[14px] px-4 py-3 pb-8 focus:ring-2 focus:ring-indigo-500/30 dark:focus:ring-indigo-500/40 text-slate-700 dark:text-slate-300 placeholder-slate-400 dark:placeholder-slate-500 transition-all resize-none"
  />
- <div className="absolute bottom-2.5 right-3.5 text-[11px] font-medium text-slate-400 dark:text-slate-500 pointer-events-none">
+ <div className="absolute bottom-2.5 right-3.5 text-xs-plus font-medium text-slate-400 dark:text-slate-500 pointer-events-none">
  {wordCount}/20
  </div>
  </div>
@@ -145,7 +145,7 @@ const EditTaskModal = ({ isOpen, onClose, task }) => {
  <select
  value={category}
  onChange={(e) => setCategory(e.target.value)}
- className="w-full appearance-none bg-slate-50 dark:bg-white/[0.04] border border-transparent dark:border-white/[0.04] rounded-[12px] px-3.5 py-3 text-[14px] font-medium text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500/30 transition-all"
+ className="w-full appearance-none bg-slate-50 dark:bg-white/[0.04] border border-transparent dark:border-white/[0.04] rounded-[12px] px-3.5 py-3 text-sm font-medium text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500/30 transition-all"
  >
  <option value="Work">Work</option>
  <option value="Health">Health</option>
@@ -162,7 +162,7 @@ const EditTaskModal = ({ isOpen, onClose, task }) => {
  <select
  value={priority}
  onChange={(e) => setPriority(e.target.value)}
- className="w-full appearance-none bg-slate-50 dark:bg-white/[0.04] border border-transparent dark:border-white/[0.04] rounded-[12px] px-3.5 py-3 text-[14px] font-medium text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500/30 transition-all"
+ className="w-full appearance-none bg-slate-50 dark:bg-white/[0.04] border border-transparent dark:border-white/[0.04] rounded-[12px] px-3.5 py-3 text-sm font-medium text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500/30 transition-all"
  >
  <option value="Low">Low</option>
  <option value="Medium">Medium</option>
@@ -182,7 +182,7 @@ const EditTaskModal = ({ isOpen, onClose, task }) => {
  type="time"
  value={startTime}
  onChange={(e) => setStartTime(e.target.value)}
- className="w-full bg-transparent border-none p-0 py-3 pr-3 text-[14px] font-medium text-slate-800 dark:text-slate-200 focus:ring-0"
+ className="w-full bg-transparent border-none p-0 py-3 pr-3 text-sm font-medium text-slate-800 dark:text-slate-200 focus:ring-0"
  />
  </div>
 
@@ -194,7 +194,7 @@ const EditTaskModal = ({ isOpen, onClose, task }) => {
  className="w-full h-full flex items-center bg-slate-50 dark:bg-white/[0.04] border border-transparent dark:border-white/[0.04] rounded-[12px] px-3.5 py-3 focus:ring-2 focus:ring-indigo-500/30 transition-all text-left"
  >
  <CalendarIcon className="w-4 h-4 text-slate-400 dark:text-slate-500 flex-shrink-0 mr-2" />
- <span className="text-[14px] font-medium text-slate-800 dark:text-slate-200 truncate">
+ <span className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
  {date ? format(new Date(date), 'MMM do') : 'Today'}
  </span>
  </button>
@@ -223,7 +223,7 @@ const EditTaskModal = ({ isOpen, onClose, task }) => {
  onClick={onClose}
  disabled={isSubmitting}
  scaleDown={0.96}
- className="px-4 py-2.5 rounded-[12px] text-[15px] font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors disabled:opacity-50"
+ className="px-4 py-2.5 rounded-[12px] text-base-minus font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors disabled:opacity-50"
  >
  Cancel
  </Pressable>
@@ -231,7 +231,7 @@ const EditTaskModal = ({ isOpen, onClose, task }) => {
  type="submit"
  disabled={!title.trim() || isSubmitting}
  scaleDown={0.96}
- className="px-6 py-2.5 rounded-[12px] text-[15px] font-semibold text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:opacity-50 disabled:bg-slate-200 dark:disabled:bg-slate-800 dark:disabled:text-slate-500 transition-colors flex items-center"
+ className="px-6 py-2.5 rounded-[12px] text-base-minus font-semibold text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:opacity-50 disabled:bg-slate-200 dark:disabled:bg-slate-800 dark:disabled:text-slate-500 transition-colors flex items-center"
  >
  {isSubmitting ? 'Saving...' : 'Save Changes'}
  </Pressable>

@@ -195,7 +195,7 @@ const AddLoanModal = ({ isOpen, onClose, onSave, vehicle }) => {
                             <div className="flex items-center gap-3">
                                 <Calculator className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                                 <div>
-                                    <p className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase">Estimated Monthly EMI</p>
+                                    <p className="text-xxs font-bold text-indigo-600 dark:text-indigo-400 uppercase">Estimated Monthly EMI</p>
                                     <p className="text-xl font-bold text-slate-900 dark:text-white">₹{calculatedEMI.toLocaleString()}</p>
                                 </div>
                             </div>

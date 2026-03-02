@@ -329,7 +329,7 @@ const VehicleDashboard = () => {
                             scaleDown={0.96}
                             className="flex items-center gap-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-full hover:bg-white dark:hover:bg-slate-800 transition-colors shadow-sm"
                         >
-                            <span className="font-bold text-slate-800 dark:text-slate-200 text-[11px] leading-tight max-w-[80px] truncate uppercase tracking-tight">
+                            <span className="font-bold text-slate-800 dark:text-slate-200 text-xs-plus leading-tight max-w-[80px] truncate uppercase tracking-tight">
                                 {activeVehicle ? activeVehicle.name : 'Select'}
                             </span>
                             <ChevronDown className="w-3 h-3 text-slate-500" />
@@ -344,7 +344,7 @@ const VehicleDashboard = () => {
                                     className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden z-50 origin-top-right"
                                 >
                                     <div className="p-2 space-y-1">
-                                        <div className="px-3 py-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Switch Vehicle</div>
+                                        <div className="px-3 py-1.5 text-xxs font-black text-slate-400 uppercase tracking-widest">Switch Vehicle</div>
                                         {sortedVehicles.filter(v => !v.isArchived).map(vehicle => (
                                             <Pressable
                                                 key={vehicle.id}
@@ -360,7 +360,7 @@ const VehicleDashboard = () => {
                                                 </div>
                                                 <div className="flex-1 text-left">
                                                     <p className={`text-xs font-bold ${vehicle.isActive ? 'text-indigo-900 dark:text-indigo-100' : 'text-slate-700 dark:text-slate-200'}`}>{vehicle.name}</p>
-                                                    <p className="text-[10px] text-slate-500 truncate">{vehicle.brandModel}</p>
+                                                    <p className="text-xxs text-slate-500 truncate">{vehicle.brandModel}</p>
                                                 </div>
                                             </Pressable>
                                         ))}
@@ -380,7 +380,7 @@ const VehicleDashboard = () => {
                             <div className="bg-gradient-to-br from-slate-900 to-slate-800 dark:from-indigo-900 dark:to-slate-900 rounded-3xl p-5 text-white shadow-xl shadow-slate-900/10 mb-6 relative overflow-hidden">
                                  {/* Alert Badge if Overdue */}
                                  {stats?.overdueCount > 0 && (
-                                     <div className="absolute top-4 right-4 bg-red-500/90 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 animate-pulse">
+                                     <div className="absolute top-4 right-4 bg-red-500/90 text-white text-xxs font-bold px-2 py-1 rounded-full flex items-center gap-1 animate-pulse">
                                          <ShieldAlert className="w-3 h-3" />
                                          {stats.overdueCount} Alerts
                                      </div>
@@ -388,15 +388,15 @@ const VehicleDashboard = () => {
                                  
                                 <div className="flex divide-x divide-white/10 mt-2">
                                      <div className="flex-1 p-2 pl-0 text-left">
-                                         <p className="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider">Month Cost</p>
+                                         <p className="text-xxs text-slate-400 uppercase font-bold mb-1 tracking-wider">Month Cost</p>
                                          <p className="font-bold text-xl">₹{stats?.monthSpend.toLocaleString()}</p>
                                      </div>
                                      <div className="flex-1 p-2 text-center">
-                                         <p className="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider">Total Cost</p>
+                                         <p className="text-xxs text-slate-400 uppercase font-bold mb-1 tracking-wider">Total Cost</p>
                                          <p className="font-bold text-xl">₹{stats?.totalSpend.toLocaleString()}</p>
                                      </div>
                                      <div className="flex-1 p-2 pr-0 text-right flex flex-col items-end">
-                                         <p className="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider">Cost/Km</p>
+                                         <p className="text-xxs text-slate-400 uppercase font-bold mb-1 tracking-wider">Cost/Km</p>
                                          <p className="font-bold text-xl">₹{stats?.costPerKm}</p>
                                      </div>
                                 </div>

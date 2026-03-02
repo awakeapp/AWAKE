@@ -62,13 +62,13 @@ export const SettingsRow = ({
                 <div className="flex-1 min-w-0 flex items-center justify-between">
                     <div className="flex flex-col min-w-0">
                         <span className={cn(
-                            "text-[16px] font-semibold leading-tight truncate",
+                            "text-base font-semibold leading-tight truncate",
                             isDanger ? "text-rose-500" : "text-slate-900 dark:text-white"
                         )}>
                             {title}
                         </span>
                         {subtitle && (
-                            <span className="text-[13px] text-slate-500 dark:text-slate-400 mt-1 truncate">
+                            <span className="text-sm-minus text-slate-500 dark:text-slate-400 mt-1 truncate">
                                 {subtitle}
                             </span>
                         )}

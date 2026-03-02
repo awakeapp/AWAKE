@@ -123,7 +123,7 @@ const SecurityShield = ({ children }) => {
                                 <p className="text-rose-500 text-xs font-bold mt-2 animate-shake">{error}</p>
                             )}
 
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-8">
+                            <p className="text-xxs font-bold text-slate-400 uppercase tracking-widest mt-8">
                                 Protected by AWAKE Security
                             </p>
                         </div>

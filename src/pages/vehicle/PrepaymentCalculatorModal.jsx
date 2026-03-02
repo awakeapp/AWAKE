@@ -87,7 +87,7 @@ const PrepaymentCalculatorModal = ({ isOpen, onClose, loan, onSavePayment }) => 
                 <form onSubmit={handleSave} className="p-4 space-y-4">
                     <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl flex justify-between items-center border border-slate-100 dark:border-slate-800">
                         <div>
-                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1">Current Principal Balance</p>
+                            <p className="text-xxs text-slate-500 font-bold uppercase tracking-wider mb-1">Current Principal Balance</p>
                             <p className="text-xl font-bold text-slate-900 dark:text-white">₹{loan.remainingPrincipal.toLocaleString()}</p>
                         </div>
                     </div>
@@ -116,11 +116,11 @@ const PrepaymentCalculatorModal = ({ isOpen, onClose, loan, onSavePayment }) => 
                             </h4>
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <p className="text-[10px] text-emerald-600 dark:text-emerald-500 font-bold uppercase">Interest Saved</p>
+                                    <p className="text-xxs text-emerald-600 dark:text-emerald-500 font-bold uppercase">Interest Saved</p>
                                     <p className="text-lg font-bold text-emerald-900 dark:text-emerald-100">₹{Math.round(calcResult.interestSaved).toLocaleString()}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-[10px] text-emerald-600 dark:text-emerald-500 font-bold uppercase">Tenure Reduced By</p>
+                                    <p className="text-xxs text-emerald-600 dark:text-emerald-500 font-bold uppercase">Tenure Reduced By</p>
                                     <p className="text-lg font-bold text-emerald-900 dark:text-emerald-100">{calcResult.monthsSaved} <span className="text-xs">months</span></p>
                                 </div>
                             </div>

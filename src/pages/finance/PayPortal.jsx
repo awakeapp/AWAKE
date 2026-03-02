@@ -62,7 +62,7 @@ const PayPortal = () => {
                 <p className="text-slate-500 font-medium text-sm max-w-xs mb-4">
                     This payment link is broken, missing, or expired. Please ask for a new one.
                 </p>
-                <div className="text-[10px] text-slate-400 bg-slate-100 dark:bg-slate-900 p-3 rounded-xl text-left font-mono break-all w-full max-w-xs overflow-x-auto shadow-inner border border-slate-200 dark:border-slate-800">
+                <div className="text-xxs text-slate-400 bg-slate-100 dark:bg-slate-900 p-3 rounded-xl text-left font-mono break-all w-full max-w-xs overflow-x-auto shadow-inner border border-slate-200 dark:border-slate-800">
                     <p className="font-bold text-rose-500 mb-1">Debug Info:</p>
                     <p>UPI: {upiId || "Missing"} (Raw: {upiIdRaw || "N/A"})</p>
                     <p>Amount: {amountRaw || "Missing"} → {amount}</p>
@@ -84,7 +84,7 @@ const PayPortal = () => {
                     {/* Header band */}
                     <div className="bg-gradient-to-br from-indigo-600 to-indigo-800 px-8 pt-10 pb-14 text-center relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
-                        <p className="text-[10px] font-black uppercase tracking-[0.25em] text-indigo-200 mb-3">Payment Request</p>
+                        <p className="text-xxs font-black uppercase tracking-[0.25em] text-indigo-200 mb-3">Payment Request</p>
                         <div className="flex items-baseline justify-center gap-1 mb-1">
                             <span className="text-2xl font-black text-indigo-300">₹</span>
                             <span className="text-6xl font-black text-white tracking-tighter leading-none">{formattedAmt}</span>
@@ -97,7 +97,7 @@ const PayPortal = () => {
                     {/* Body */}
                     <div className="px-8 -mt-6 pb-8">
                         <div className="bg-white rounded-2xl shadow-lg shadow-slate-100 border border-slate-100 p-4 mb-6 text-center">
-                            <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-1">UPI ID</p>
+                            <p className="text-xxs uppercase font-black tracking-widest text-slate-400 mb-1">UPI ID</p>
                             <p className="text-sm font-bold text-slate-900 break-all">{upiId}</p>
                         </div>
 
@@ -105,7 +105,7 @@ const PayPortal = () => {
                             <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-center mb-4">
                                 <CheckCircle2 className="w-6 h-6 text-emerald-500 mx-auto mb-1" />
                                 <p className="text-sm font-bold text-emerald-700">Redirected to UPI app!</p>
-                                <p className="text-[11px] text-emerald-600 mt-0.5">Complete the payment in your UPI app.</p>
+                                <p className="text-xs-plus text-emerald-600 mt-0.5">Complete the payment in your UPI app.</p>
                             </div>
                         ) : (
                             <button
@@ -116,13 +116,13 @@ const PayPortal = () => {
                             </button>
                         )}
 
-                        <p className="text-center text-[10px] text-slate-400 font-medium leading-relaxed">
+                        <p className="text-center text-xxs text-slate-400 font-medium leading-relaxed">
                             Opens GPay, PhonePe, Paytm or any<br />UPI app installed on your phone.
                         </p>
                     </div>
                 </div>
 
-                <p className="text-center text-[9px] font-black uppercase tracking-widest text-slate-400 mt-6">
+                <p className="text-center text-micro font-black uppercase tracking-widest text-slate-400 mt-6">
                     Powered by AWAKE
                 </p>
             </div>

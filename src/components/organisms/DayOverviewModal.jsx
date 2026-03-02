@@ -43,7 +43,7 @@ const DayOverviewModal = ({ isOpen, onClose, data, onConfirm }) => {
                         <div className="flex items-start justify-between mb-8">
                             <div>
                                 <h2 className="text-xl font-normal text-slate-900 dark:text-white tracking-tight">Day Overview</h2>
-                                <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-1">Daily Recap</p>
+                                <p className="text-xxs font-medium text-slate-400 uppercase tracking-widest mt-1">Daily Recap</p>
                             </div>
                             <Pressable
                                 onClick={onClose}
@@ -91,7 +91,7 @@ const DayOverviewModal = ({ isOpen, onClose, data, onConfirm }) => {
                                     </div>
                                 </div>
                             </div>
-                            <p className="text-slate-400 dark:text-slate-500 text-[10px] font-medium mt-2 tracking-[0.2em] uppercase">Completion Rate</p>
+                            <p className="text-slate-400 dark:text-slate-500 text-xxs font-medium mt-2 tracking-[0.2em] uppercase">Completion Rate</p>
                         </div>
 
                         {/* Stats Cards */}
@@ -101,14 +101,14 @@ const DayOverviewModal = ({ isOpen, onClose, data, onConfirm }) => {
                                     <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                                 </div>
                                 <span className="text-xl font-medium text-slate-900 dark:text-white">{completed}</span>
-                                <span className="text-[9px] font-medium text-emerald-600/60 dark:text-emerald-500/60 uppercase tracking-widest mt-1">Completed</span>
+                                <span className="text-micro font-medium text-emerald-600/60 dark:text-emerald-500/60 uppercase tracking-widest mt-1">Completed</span>
                             </div>
                             <div className="bg-rose-50/30 dark:bg-rose-500/5 p-4 rounded-3xl flex flex-col items-center ring-1 ring-rose-500/5 hover:bg-rose-50/50 transition-colors">
                                 <div className="w-8 h-8 bg-white dark:bg-rose-500/10 rounded-full flex items-center justify-center mb-2 shadow-sm ring-1 ring-rose-500/10">
                                     <AlertCircle className="w-4 h-4 text-rose-500" />
                                 </div>
                                 <span className="text-xl font-medium text-slate-900 dark:text-white">{missed}</span>
-                                <span className="text-[9px] font-medium text-rose-600/60 dark:text-rose-500/60 uppercase tracking-widest mt-1">Missed</span>
+                                <span className="text-micro font-medium text-rose-600/60 dark:text-rose-500/60 uppercase tracking-widest mt-1">Missed</span>
                             </div>
                         </div>
 
@@ -119,12 +119,12 @@ const DayOverviewModal = ({ isOpen, onClose, data, onConfirm }) => {
                                     <Wallet className="w-4 h-4 text-indigo-500" />
                                 </div>
                                 <div>
-                                    <p className="text-[9px] font-medium text-slate-400 uppercase tracking-[0.1em] mb-0.5">Today's Spend</p>
+                                    <p className="text-micro font-medium text-slate-400 uppercase tracking-[0.1em] mb-0.5">Today's Spend</p>
                                     <p className="text-base font-medium text-slate-700 dark:text-slate-200">₹{dailySpend.toLocaleString()}</p>
                                 </div>
                             </div>
                             <div className="text-right">
-                                <p className="text-[9px] font-medium text-slate-400 uppercase tracking-[0.1em] mb-0.5">Weekly Save</p>
+                                <p className="text-micro font-medium text-slate-400 uppercase tracking-[0.1em] mb-0.5">Weekly Save</p>
                                 <p className={clsx(
                                     "text-base font-medium",
                                     weeklySavings >= 0 ? "text-emerald-500" : "text-rose-500"
@@ -138,7 +138,7 @@ const DayOverviewModal = ({ isOpen, onClose, data, onConfirm }) => {
                         <div className="mb-10">
                             <div className="flex items-center gap-3 mb-5 px-1">
                                 <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800/40"></div>
-                                <h4 className="text-[9px] font-medium text-slate-400 uppercase tracking-[0.2em] text-center">Habit Breakdown</h4>
+                                <h4 className="text-micro font-medium text-slate-400 uppercase tracking-[0.2em] text-center">Habit Breakdown</h4>
                                 <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800/40"></div>
                             </div>
                             <div className="grid grid-cols-2 gap-y-4 gap-x-3">

@@ -47,7 +47,7 @@ const LoanScreen = ({ activeLoan, activeVehicle, loanDetail, setIsAmortizationOp
              <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800">
                  <div className="flex justify-between items-start mb-6">
                      <div>
-                         <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Total Loan Principal</p>
+                         <p className="text-xxs text-slate-400 font-bold uppercase tracking-wider mb-1">Total Loan Principal</p>
                          <h4 className="text-2xl font-bold text-slate-900 dark:text-white">₹{activeLoan.totalLoanAmount.toLocaleString()}</h4>
                          <p className="text-xs text-slate-500 mt-1">{activeLoan.lender}</p>
                      </div>
@@ -69,7 +69,7 @@ const LoanScreen = ({ activeLoan, activeVehicle, loanDetail, setIsAmortizationOp
                                  className="h-full bg-gradient-to-r from-indigo-500 to-indigo-600"
                              />
                          </div>
-                         <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-wide">
+                         <div className="flex justify-between text-xxs font-bold text-slate-400 mt-2 uppercase tracking-wide">
                              <span>Total Payable: ₹{(loanDetail?.totalPayable || activeLoan.totalPayable || 0).toLocaleString()}</span>
                              <span>Balance: ₹{(loanDetail?.remainingBalance || 0).toLocaleString()}</span>
                          </div>
@@ -77,11 +77,11 @@ const LoanScreen = ({ activeLoan, activeVehicle, loanDetail, setIsAmortizationOp
 
                      <div className="grid grid-cols-2 gap-4 py-4 border-y border-slate-50 dark:border-slate-800">
                          <div>
-                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Tenure & Date</p>
+                             <p className="text-xxs text-slate-400 font-bold uppercase tracking-wider mb-1">Tenure & Date</p>
                              <p className="font-bold text-sm">{activeLoan.tenureMonths} mo • {activeLoan.startDate ? format(new Date(activeLoan.startDate), 'MMM yyyy') : 'N/A'}</p>
                          </div>
                          <div>
-                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Total Payable & Int</p>
+                             <p className="text-xxs text-slate-400 font-bold uppercase tracking-wider mb-1">Total Payable & Int</p>
                              <p className="font-bold text-sm">₹{(activeLoan.totalPayable || 0).toLocaleString()} <span className="text-slate-400 text-xs font-normal"> / ₹{(activeLoan.totalInterest || 0).toLocaleString()} int</span></p>
                          </div>
                      </div>
@@ -103,7 +103,7 @@ const LoanScreen = ({ activeLoan, activeVehicle, loanDetail, setIsAmortizationOp
 
                      <div className="flex items-center justify-between pt-2">
                          <div>
-                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Monthly EMI</p>
+                             <p className="text-xxs text-slate-400 font-bold uppercase tracking-wider mb-1">Monthly EMI</p>
                              <p className="text-lg font-bold text-slate-900 dark:text-white">₹{(loanDetail?.emi || activeLoan.emiAmount).toLocaleString()}</p>
                          </div>
                          <button
@@ -132,12 +132,12 @@ const LoanScreen = ({ activeLoan, activeVehicle, loanDetail, setIsAmortizationOp
                                      </div>
                                      <div>
                                          <p className="font-bold text-sm text-slate-900 dark:text-white">{payment.type} Payment</p>
-                                         <p className="text-[10px] text-slate-400 uppercase font-bold">{format(new Date(payment.date), 'MMM d, yyyy')}</p>
+                                         <p className="text-xxs text-slate-400 uppercase font-bold">{format(new Date(payment.date), 'MMM d, yyyy')}</p>
                                      </div>
                                  </div>
                                  <div className="text-right">
                                      <p className="font-bold text-slate-900 dark:text-white text-sm">₹{payment.amount.toLocaleString()}</p>
-                                     <p className="text-[9px] text-slate-400">P: ₹{payment.principal.toLocaleString()} | I: ₹{payment.interest.toLocaleString()}</p>
+                                     <p className="text-micro text-slate-400">P: ₹{payment.principal.toLocaleString()} | I: ₹{payment.interest.toLocaleString()}</p>
                                  </div>
                              </div>
                          ))}

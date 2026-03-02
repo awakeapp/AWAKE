@@ -58,7 +58,7 @@ export function AppHeader({
                 ) : leftNode ? (
                     leftNode
                 ) : (
-                    <h1 className="text-[17px] font-black tracking-tightest text-slate-900 dark:text-white uppercase truncate">
+                    <h1 className="text-base-plus font-black tracking-tightest text-slate-900 dark:text-white uppercase truncate">
                         {title}
                     </h1>
                 )}
@@ -67,7 +67,7 @@ export function AppHeader({
             {/* Center Area (Optional, used if leftNode exists) */}
             {leftNode && (
                 <div className="flex-1 flex justify-center text-center truncate">
-                    <h1 className="text-[15px] font-bold text-slate-900 dark:text-white uppercase tracking-tight truncate">
+                    <h1 className="text-base-minus font-bold text-slate-900 dark:text-white uppercase tracking-tight truncate">
                         {title}
                     </h1>
                 </div>

@@ -52,7 +52,7 @@ const LedgerScreen = ({
                                 <div className={`w-6 h-6 rounded-full ${item.bg} ${item.color} flex items-center justify-center mb-1`}>
                                     <item.icon className="w-3 h-3" />
                                 </div>
-                                <p className="text-[9px] font-bold text-slate-500 uppercase">{item.label}</p>
+                                <p className="text-micro font-bold text-slate-500 uppercase">{item.label}</p>
                                 <p className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">
                                     ₹{item.amount > 1000 ? (item.amount / 1000).toFixed(1) + 'k' : item.amount}
                                 </p>
@@ -72,7 +72,7 @@ const LedgerScreen = ({
                     <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl p-4 shadow-sm flex items-end justify-between h-32">
                         {trendData.map((data, i) => (
                             <div key={i} className="flex flex-col items-center gap-2 w-full group relative">
-                                <span className="absolute -top-6 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                <span className="absolute -top-6 text-xxs font-bold text-indigo-600 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                                     ₹{data.cost > 1000 ? (data.cost / 1000).toFixed(1) + 'k' : data.cost}
                                 </span>
                                 <div className="w-full max-w-[24px] bg-slate-100 dark:bg-slate-800 rounded-t-lg relative flex flex-col justify-end h-16">
@@ -82,7 +82,7 @@ const LedgerScreen = ({
                                         className="bg-indigo-500 rounded-t-lg w-full transition-all group-hover:bg-indigo-400"
                                     />
                                 </div>
-                                <p className="text-[9px] font-bold text-slate-400 uppercase">{data.label}</p>
+                                <p className="text-micro font-bold text-slate-400 uppercase">{data.label}</p>
                             </div>
                         ))}
                     </div>
@@ -104,7 +104,7 @@ const LedgerScreen = ({
                             key={f}
                             onClick={() => setHistoryFilter(f)}
                             scaleDown={0.92}
-                            className={`text-[10px] uppercase tracking-wider font-bold px-3 py-1.5 rounded-full whitespace-nowrap transition-colors ${historyFilter === f ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700'}`}
+                            className={`text-xxs uppercase tracking-wider font-bold px-3 py-1.5 rounded-full whitespace-nowrap transition-colors ${historyFilter === f ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700'}`}
                         >
                             {f}
                         </Pressable>
@@ -161,7 +161,7 @@ const LedgerScreen = ({
                                                 <span className="block font-bold text-slate-900 dark:text-white text-sm">₹{Number(record.amount).toLocaleString()}</span>
                                             )}
                                             {record.odometer && (
-                                                <span className="block text-[10px] text-slate-400 mt-1 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-lg inline-block">
+                                                <span className="block text-xxs text-slate-400 mt-1 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-lg inline-block">
                                                     {Number(record.odometer).toLocaleString()} km
                                                 </span>
                                             )}
@@ -198,7 +198,7 @@ const LedgerScreen = ({
                         <div className="flex items-center justify-between mb-6">
                             <div>
                                 <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Edit Entry</h3>
-                                <p className="text-[11px] text-slate-400 font-medium mt-0.5 capitalize">{editingEntry.type}</p>
+                                <p className="text-xs-plus text-slate-400 font-medium mt-0.5 capitalize">{editingEntry.type}</p>
                             </div>
                             <button onClick={() => setEditingEntry(null)} className="w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-full text-slate-400 active:scale-90 transition-all">
                                 <X className="w-5 h-5" />
@@ -207,7 +207,7 @@ const LedgerScreen = ({
 
                         <div className="space-y-4">
                             <div className="space-y-1.5">
-                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Amount (₹)</label>
+                                <label className="text-micro font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Amount (₹)</label>
                                 <input
                                     type="number"
                                     inputMode="decimal"
@@ -217,22 +217,22 @@ const LedgerScreen = ({
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Date</label>
+                                <label className="text-micro font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Date</label>
                                 <input
                                     type="date"
                                     value={editDate}
                                     onChange={e => setEditDate(e.target.value)}
-                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-[13px] outline-none focus:border-indigo-400/50 transition-all"
+                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-sm-minus outline-none focus:border-indigo-400/50 transition-all"
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Notes</label>
+                                <label className="text-micro font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Notes</label>
                                 <input
                                     type="text"
                                     value={editNotes}
                                     onChange={e => setEditNotes(e.target.value)}
                                     placeholder="Service details..."
-                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-[13px] outline-none focus:border-indigo-400/50 transition-all placeholder:text-slate-400"
+                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-sm-minus outline-none focus:border-indigo-400/50 transition-all placeholder:text-slate-400"
                                 />
                             </div>
                         </div>

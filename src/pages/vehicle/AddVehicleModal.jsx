@@ -88,7 +88,7 @@ const AddVehicleModal = ({ isOpen, onClose, onSave, editVehicle = null }) => {
                                         }`}
                                 >
                                     <Icon className="w-6 h-6 mb-1" />
-                                    <span className="text-[10px] font-bold">{type.label}</span>
+                                    <span className="text-xxs font-bold">{type.label}</span>
                                 </button>
                             );
                         })}

@@ -41,16 +41,16 @@ const PrayerRow = ({ prayerKey, label, time, data, onUpdate, allowMode, allowCou
 
             <div className="flex flex-col flex-1 min-w-0 pr-4">
                 <span className={clsx(
-                    "text-[15px] font-black tracking-tight leading-none transition-colors",
+                    "text-base-minus font-black tracking-tight leading-none transition-colors",
                     completed ? "text-slate-900 dark:text-white" : "text-slate-500 dark:text-[#8E8E93]"
                 )}>
                     {label}
-                    {isActive && <span className="ml-2 text-[9px] font-black uppercase tracking-widest text-indigo-500 animate-pulse">Live</span>}
+                    {isActive && <span className="ml-2 text-micro font-black uppercase tracking-widest text-indigo-500 animate-pulse">Live</span>}
                 </span>
                 {time && (
                     <div className="flex items-center gap-1 mt-1">
                         <Clock className="w-3 h-3 text-slate-400 dark:text-[#48484A]" />
-                        <span className="text-[11px] font-bold text-slate-400 dark:text-[#48484A] tabular-nums">
+                        <span className="text-xs-plus font-bold text-slate-400 dark:text-[#48484A] tabular-nums">
                             {time}
                         </span>
                     </div>
@@ -66,7 +66,7 @@ const PrayerRow = ({ prayerKey, label, time, data, onUpdate, allowMode, allowCou
                         >
                             <Minus className="w-3 h-3" />
                         </button>
-                        <span className="text-[11px] font-black text-slate-800 dark:text-white w-4 text-center">{count}</span>
+                        <span className="text-xs-plus font-black text-slate-800 dark:text-white w-4 text-center">{count}</span>
                         <button
                             onClick={() => onUpdate(`${prayerKey}Count`, count + 1)}
                             className="w-6 h-6 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all flex items-center justify-center bg-slate-100 dark:bg-white/5"
@@ -80,14 +80,14 @@ const PrayerRow = ({ prayerKey, label, time, data, onUpdate, allowMode, allowCou
                     <div className="flex items-center gap-2 mr-3" onClick={e => e.stopPropagation()}>
                         <button 
                             onClick={() => onUpdate(`${prayerKey}Mode`, 'alone')}
-                            className={clsx("text-[10px] font-bold uppercase tracking-widest transition-colors", mode === 'alone' ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 dark:text-slate-500")}
+                            className={clsx("text-xxs font-bold uppercase tracking-widest transition-colors", mode === 'alone' ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 dark:text-slate-500")}
                         >
                             Single
                         </button>
-                        <span className="text-slate-300 dark:text-slate-600 text-[10px]">|</span>
+                        <span className="text-slate-300 dark:text-slate-600 text-xxs">|</span>
                         <button 
                             onClick={() => onUpdate(`${prayerKey}Mode`, 'jamaah')}
-                            className={clsx("text-[10px] font-bold uppercase tracking-widest transition-colors", mode === 'jamaah' ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 dark:text-slate-500")}
+                            className={clsx("text-xxs font-bold uppercase tracking-widest transition-colors", mode === 'jamaah' ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 dark:text-slate-500")}
                         >
                             Jama
                         </button>
@@ -221,8 +221,8 @@ const PrayerTracker = () => {
             <div className="space-y-4">
                 <div className="flex items-center justify-between px-1">
                     <div>
-                        <h2 className="text-[20px] font-black text-slate-900 dark:text-white uppercase tracking-tightest leading-none">FARDH</h2>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">The Five Foundations</p>
+                        <h2 className="text-xl-minus font-black text-slate-900 dark:text-white uppercase tracking-tightest leading-none">FARDH</h2>
+                        <p className="text-xxs font-black text-slate-400 uppercase tracking-[0.2em] mt-1">The Five Foundations</p>
                     </div>
                 </div>
                 
@@ -252,8 +252,8 @@ const PrayerTracker = () => {
             <div className="space-y-4">
                 <div className="flex items-center justify-between px-1">
                     <div>
-                        <h2 className="text-[20px] font-black text-slate-900 dark:text-white uppercase tracking-tightest leading-none">OTHER PRAYERS</h2>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Extra Spiritual Miles</p>
+                        <h2 className="text-xl-minus font-black text-slate-900 dark:text-white uppercase tracking-tightest leading-none">OTHER PRAYERS</h2>
+                        <p className="text-xxs font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Extra Spiritual Miles</p>
                     </div>
                 </div>
 
@@ -275,9 +275,9 @@ const PrayerTracker = () => {
                                         className="w-full bg-transparent text-sm font-bold text-slate-800 dark:text-slate-100 focus:outline-none mb-3"
                                     />
                                     <div className="flex gap-2">
-                                        <button onClick={handleDeletePrayer} className="flex-1 py-2 bg-rose-100 text-rose-600 rounded-xl text-[10px] font-black uppercase tracking-widest">Delete</button>
-                                        <button onClick={() => setEditingPrayerId(null)} className="flex-1 py-2 text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-widest">Cancel</button>
-                                        <button onClick={handleSaveEdit} className="flex-1 py-2 bg-indigo-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest">Save</button>
+                                        <button onClick={handleDeletePrayer} className="flex-1 py-2 bg-rose-100 text-rose-600 rounded-xl text-xxs font-black uppercase tracking-widest">Delete</button>
+                                        <button onClick={() => setEditingPrayerId(null)} className="flex-1 py-2 text-slate-500 rounded-xl text-xxs font-black uppercase tracking-widest">Cancel</button>
+                                        <button onClick={handleSaveEdit} className="flex-1 py-2 bg-indigo-600 text-white rounded-xl text-xxs font-black uppercase tracking-widest">Save</button>
                                     </div>
                                 </motion.div>
                             ) : (
@@ -316,13 +316,13 @@ const PrayerTracker = () => {
                                     <div className="flex gap-3">
                                         <button 
                                             onClick={() => { setIsAddingPrayer(false); setNewPrayerName(''); }} 
-                                            className="flex-1 py-4 text-slate-500 font-bold uppercase text-[11px] tracking-widest"
+                                            className="flex-1 py-4 text-slate-500 font-bold uppercase text-xs-plus tracking-widest"
                                         >
                                             Discard
                                         </button>
                                         <button 
                                             onClick={handleAddPrayer} 
-                                            className="flex-[2] py-4 bg-indigo-600 text-white text-[11px] font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-indigo-500/20"
+                                            className="flex-[2] py-4 bg-indigo-600 text-white text-xs-plus font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-indigo-500/20"
                                         >
                                             Add Prayer
                                         </button>
@@ -333,7 +333,7 @@ const PrayerTracker = () => {
                             <motion.button 
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => setIsAddingPrayer(true)} 
-                                className="w-full py-5 text-indigo-500 font-black uppercase text-[11px] tracking-[0.2em] hover:bg-indigo-500/5 rounded-[2rem] transition-all flex justify-center items-center gap-2"
+                                className="w-full py-5 text-indigo-500 font-black uppercase text-xs-plus tracking-[0.2em] hover:bg-indigo-500/5 rounded-[2rem] transition-all flex justify-center items-center gap-2"
                             >
                                 <Plus className="w-4 h-4 stroke-[3]" /> Custom Dedication
                             </motion.button>

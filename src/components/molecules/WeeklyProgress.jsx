@@ -182,7 +182,7 @@ const WeeklyProgress = () => {
 
                 {trendInsight && (
                     <div className="mt-4 pt-4 border-t border-slate-50 dark:border-slate-800">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">Consistency Insight</p>
+                        <p className="text-xxs font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">Consistency Insight</p>
                         <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">
                             {trendInsight}
                         </p>

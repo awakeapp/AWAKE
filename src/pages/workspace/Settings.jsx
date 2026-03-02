@@ -79,7 +79,7 @@ const WorkspaceSettings = () => {
                                 <select
                                     value={settings.defaultPriority}
                                     onChange={e => handleChange('defaultPriority', e.target.value)}
-                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer max-w-[120px]"
+                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer max-w-[120px]"
                                 >
                                     <option value="Low">Low</option>
                                     <option value="Medium">Medium</option>
@@ -95,7 +95,7 @@ const WorkspaceSettings = () => {
                                 <select
                                     value={settings.defaultDuration}
                                     onChange={e => handleChange('defaultDuration', parseInt(e.target.value))}
-                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer"
+                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer"
                                 >
                                     <option value={15}>15 min</option>
                                     <option value={30}>30 min</option>
@@ -106,7 +106,7 @@ const WorkspaceSettings = () => {
                         />
                     </SettingsSection>
 
-                    <p className="text-center text-[11px] text-slate-400 dark:text-slate-600 mt-8 font-bold tracking-widest uppercase">
+                    <p className="text-center text-xs-plus text-slate-400 dark:text-slate-600 mt-8 font-bold tracking-widest uppercase">
                         AWAKE Workspace Scoped Settings
                     </p>
                 </SettingsList>

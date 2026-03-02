@@ -74,7 +74,7 @@ const AmortizationScheduleModal = ({ isOpen, onClose, loan }) => {
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-4 space-y-2 relative">
-                    <div className="grid grid-cols-5 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 px-2 sticky top-0 bg-white dark:bg-slate-900 py-2 z-10 border-b dark:border-slate-800">
+                    <div className="grid grid-cols-5 text-xxs font-bold text-slate-500 uppercase tracking-wider mb-2 px-2 sticky top-0 bg-white dark:bg-slate-900 py-2 z-10 border-b dark:border-slate-800">
                         <span>Date</span>
                         <span className="text-right">EMI</span>
                         <span className="text-right text-indigo-500">Principal</span>
@@ -84,7 +84,7 @@ const AmortizationScheduleModal = ({ isOpen, onClose, loan }) => {
                     {schedule.map((row) => (
                         <div key={row.month} className="grid grid-cols-5 text-xs p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors items-center">
                             <span className="font-bold text-slate-700 dark:text-slate-300">
-                                <span className="text-[10px] text-slate-400 block mb-0.5">Month {row.month}</span>
+                                <span className="text-xxs text-slate-400 block mb-0.5">Month {row.month}</span>
                                 {format(row.date, 'MMM yyyy')}
                             </span>
                             <span className="text-right font-bold dark:text-white">₹{Math.round(row.emi).toLocaleString()}</span>

@@ -23,7 +23,7 @@ const ServiceScreen = ({ activeVehicle, nextService, activeTab, setEditingVehicl
                             </div>
                             <div>
                                 <p className="font-bold text-indigo-900 dark:text-indigo-100 text-sm">{nextService.type}</p>
-                                <p className="text-[10px] text-indigo-700 dark:text-indigo-300 mt-0.5 max-w-[180px] break-words">
+                                <p className="text-xxs text-indigo-700 dark:text-indigo-300 mt-0.5 max-w-[180px] break-words">
                                     {nextService.dueDate && `Due: ${format(new Date(nextService.dueDate), 'MMM d, yyyy')} `}
                                     {nextService.dueDate && nextService.dueOdometer && '| '}
                                     {nextService.dueOdometer && `At ${Number(nextService.dueOdometer).toLocaleString()} km`}
@@ -36,7 +36,7 @@ const ServiceScreen = ({ activeVehicle, nextService, activeTab, setEditingVehicl
                                     <p className="font-bold text-indigo-900 dark:text-indigo-100 leading-none">
                                         {Math.max(0, Math.ceil((new Date(nextService.dueDate) - new Date()) / (1000 * 60 * 60 * 24)))}
                                     </p>
-                                    <p className="text-[9px] text-indigo-600 dark:text-indigo-400 uppercase font-bold tracking-wider">Days</p>
+                                    <p className="text-micro text-indigo-600 dark:text-indigo-400 uppercase font-bold tracking-wider">Days</p>
                                 </div>
                             )}
                             {nextService.dueOdometer && (
@@ -44,7 +44,7 @@ const ServiceScreen = ({ activeVehicle, nextService, activeTab, setEditingVehicl
                                     <p className="font-bold text-indigo-900 dark:text-indigo-100 leading-none">
                                         {Math.max(0, Number(nextService.dueOdometer) - Number(activeVehicle?.odometer || 0)).toLocaleString()}
                                     </p>
-                                    <p className="text-[9px] text-indigo-600 dark:text-indigo-400 uppercase font-bold tracking-wider">km left</p>
+                                    <p className="text-micro text-indigo-600 dark:text-indigo-400 uppercase font-bold tracking-wider">km left</p>
                                 </div>
                             )}
                         </div>

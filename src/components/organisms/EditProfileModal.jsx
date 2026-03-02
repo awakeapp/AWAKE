@@ -180,7 +180,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                         {/* Avatar Section */}
                         {uploadSrc ? (
                             <div className="flex flex-col items-center">
-                                <p className="text-[10px] font-black uppercase text-indigo-500 tracking-widest mb-3"><CropIcon className="inline w-3 h-3 mr-1"/> Crop your photo</p>
+                                <p className="text-xxs font-black uppercase text-indigo-500 tracking-widest mb-3"><CropIcon className="inline w-3 h-3 mr-1"/> Crop your photo</p>
                                 <div className="bg-slate-100 dark:bg-slate-950 rounded-2xl overflow-hidden shadow-inner max-h-[300px] flex items-center justify-center p-4">
                                      <ReactCrop
                                         crop={crop}
@@ -198,7 +198,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                                         />
                                     </ReactCrop>
                                 </div>
-                                <button onClick={() => { setUploadSrc(null); setCrop(undefined); }} className="text-[11px] font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 mt-4 uppercase tracking-wider">Cancel Selection</button>
+                                <button onClick={() => { setUploadSrc(null); setCrop(undefined); }} className="text-xs-plus font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 mt-4 uppercase tracking-wider">Cancel Selection</button>
                             </div>
                         ) : (
                             <div className="flex flex-col items-center gap-4">
@@ -216,7 +216,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                                     </div>
                                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[2px]">
                                         <Camera className="text-white w-6 h-6 mb-1" />
-                                        <span className="text-[9px] font-black text-white uppercase tracking-wider">Change</span>
+                                        <span className="text-micro font-black text-white uppercase tracking-wider">Change</span>
                                     </div>
                                     {isSaving && (
                                         <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full z-10">
@@ -234,11 +234,11 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                                 />
 
                                 <div className="flex items-center gap-4 mt-2">
-                                    <button className="text-[10px] font-black text-indigo-500 uppercase tracking-widest cursor-pointer hover:text-indigo-600 active:scale-95 transition-transform" onClick={() => fileInputRef.current?.click()}>
+                                    <button className="text-xxs font-black text-indigo-500 uppercase tracking-widest cursor-pointer hover:text-indigo-600 active:scale-95 transition-transform" onClick={() => fileInputRef.current?.click()}>
                                         Upload New
                                     </button>
                                     {user?.photoURL && (
-                                         <button className="text-[10px] font-black text-rose-500 uppercase tracking-widest cursor-pointer hover:text-rose-600 active:scale-95 transition-transform flex items-center gap-1" onClick={removePhoto}>
+                                         <button className="text-xxs font-black text-rose-500 uppercase tracking-widest cursor-pointer hover:text-rose-600 active:scale-95 transition-transform flex items-center gap-1" onClick={removePhoto}>
                                            <Trash2 className="w-3 h-3"/> Remove
                                         </button>
                                     )}
@@ -249,7 +249,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                         {/* Form Section */}
                         <div className="space-y-5">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Display Name</label>
+                                <label className="text-xxs font-black text-slate-400 uppercase tracking-widest ml-1">Display Name</label>
                                 <Input
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
@@ -258,7 +258,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                                 />
                             </div>
                             <div className="space-y-2 opacity-70 pointer-events-none">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 flex items-center justify-between">
+                                <label className="text-xxs font-black text-slate-400 uppercase tracking-widest ml-1 flex items-center justify-between">
                                     Email Address
                                     <span className="text-emerald-500">Verified</span>
                                 </label>

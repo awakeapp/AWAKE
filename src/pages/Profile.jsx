@@ -130,9 +130,9 @@ const Profile = () => {
                                 )}
                             </div>
                             <div className="flex-1 min-w-0">
-                                <h2 className="text-[20px] font-bold text-slate-900 dark:text-white truncate">{user?.displayName || 'User'}</h2>
-                                <p className="text-[12px] font-bold text-primary-600 uppercase tracking-widest mt-1">{memberId}</p>
-                                <p className="text-[14px] text-slate-500 mt-0.5 truncate">{user?.email}</p>
+                                <h2 className="text-xl-minus font-bold text-slate-900 dark:text-white truncate">{user?.displayName || 'User'}</h2>
+                                <p className="text-xs font-bold text-primary-600 uppercase tracking-widest mt-1">{memberId}</p>
+                                <p className="text-sm text-slate-500 mt-0.5 truncate">{user?.email}</p>
                             </div>
                             <ActionButton
                                 variant="primary"
@@ -160,14 +160,14 @@ const Profile = () => {
                                     placeholder="Current Password" 
                                     value={currentPassword}
                                     onChange={e => setCurrentPassword(e.target.value)}
-                                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl outline-none focus:ring-2 focus:ring-primary-500/50 text-[15px]" 
+                                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl outline-none focus:ring-2 focus:ring-primary-500/50 text-base-minus" 
                                 />
                                 <input 
                                     type="password" 
                                     placeholder="New Password" 
                                     value={newPassword}
                                     onChange={e => setNewPassword(e.target.value)}
-                                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl outline-none focus:ring-2 focus:ring-primary-500/50 text-[15px]" 
+                                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl outline-none focus:ring-2 focus:ring-primary-500/50 text-base-minus" 
                                 />
                                 <div className="flex gap-2">
                                     <ActionButton
@@ -190,7 +190,7 @@ const Profile = () => {
                             icon={Mail} 
                             title="Email Address"
                             subtitle={user?.email}
-                            rightElement={<span className="text-[11px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md">VERIFIED</span>}
+                            rightElement={<span className="text-xs-plus font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md">VERIFIED</span>}
                         />
 
                         {/* App Lock */}

@@ -19,7 +19,7 @@ const HabitToggle = ({ id, icon, label, value, onChange, onDelete, disabled, isE
                 <div className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center shrink-0 text-slate-500 dark:text-slate-400 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/20 group-hover:text-indigo-600 transition-colors">
                     <Icon className="w-4.5 h-4.5" />
                 </div>
-                <span className="font-normal text-[15px] text-slate-700 dark:text-slate-300 truncate">{label}</span>
+                <span className="font-normal text-base-minus text-slate-700 dark:text-slate-300 truncate">{label}</span>
             </div>
 
             <div className="flex items-center gap-3">
@@ -48,7 +48,7 @@ const HabitToggle = ({ id, icon, label, value, onChange, onDelete, disabled, isE
                                 onClick={() => onChange(false)}
                                 disabled={disabled}
                                 className={clsx(
-                                    "flex-1 px-3 py-1.5 text-[11px] font-bold rounded-full transition-all duration-200",
+                                    "flex-1 px-3 py-1.5 text-xs-plus font-bold rounded-full transition-all duration-200",
                                     !value
                                         ? "bg-emerald-500 text-white shadow-sm"
                                         : "text-slate-400 dark:text-slate-500 hover:text-slate-600"
@@ -60,7 +60,7 @@ const HabitToggle = ({ id, icon, label, value, onChange, onDelete, disabled, isE
                                 onClick={() => onChange(true)}
                                 disabled={disabled}
                                 className={clsx(
-                                    "flex-1 px-3 py-1.5 text-[11px] font-bold rounded-full transition-all duration-200",
+                                    "flex-1 px-3 py-1.5 text-xs-plus font-bold rounded-full transition-all duration-200",
                                     value
                                         ? "bg-rose-500 text-white shadow-sm"
                                         : "text-slate-400 dark:text-slate-500 hover:text-slate-600"
@@ -96,8 +96,8 @@ const NumericHabitInput = ({ id, icon, label, value, unit, onChange, onDelete, d
                     <Icon className="w-4.5 h-4.5" />
                 </div>
                 <div className="flex flex-col min-w-0">
-                    <span className="font-normal text-[15px] text-slate-700 dark:text-slate-300 truncate">{label}</span>
-                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{unit === 'hrs' ? 'Hours' : 'Minutes'}</span>
+                    <span className="font-normal text-base-minus text-slate-700 dark:text-slate-300 truncate">{label}</span>
+                    <span className="text-xxs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{unit === 'hrs' ? 'Hours' : 'Minutes'}</span>
                 </div>
             </div>
 
@@ -136,7 +136,7 @@ const NumericHabitInput = ({ id, icon, label, value, unit, onChange, onDelete, d
                                     getColorClass(value)
                                 )}
                             />
-                            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-600 w-8">{unit === 'hrs' ? 'hr' : 'min'}</span>
+                            <span className="text-xs-plus font-bold text-slate-400 dark:text-slate-600 w-8">{unit === 'hrs' ? 'hr' : 'min'}</span>
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -172,7 +172,7 @@ const DailyHabits = ({ habits, onUpdateHabit, isLocked }) => {
                             {isEditing ? <Check className="w-3.5 h-3.5" /> : <Edit2 className="w-3.5 h-3.5" />}
                         </Pressable>
                     )}
-                    <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.1em] dark:text-slate-500">
+                    <h3 className="text-xs-plus font-bold text-slate-400 uppercase tracking-[0.1em] dark:text-slate-500">
                         Daily Habits
                     </h3>
                 </div>

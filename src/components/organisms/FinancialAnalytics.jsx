@@ -73,14 +73,14 @@ const FinancialAnalytics = () => {
                     <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-3">
                         <TrendingUp className="w-5 h-5 text-emerald-500" />
                     </div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Income</p>
+                    <p className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-1">Total Income</p>
                     <p className="text-xl font-black text-slate-900 dark:text-white">₹{stats.income.toLocaleString()}</p>
                 </div>
                 <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-100 dark:border-white/5 shadow-sm">
                     <div className="w-10 h-10 rounded-2xl bg-rose-500/10 flex items-center justify-center mb-3">
                         <TrendingDown className="w-5 h-5 text-rose-500" />
                     </div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Expense</p>
+                    <p className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-1">Total Expense</p>
                     <p className="text-xl font-black text-slate-900 dark:text-white">₹{stats.expense.toLocaleString()}</p>
                 </div>
             </div>

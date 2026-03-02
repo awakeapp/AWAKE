@@ -76,7 +76,7 @@ const HealthTips = () => {
                                 {tip.science}
                             </p>
                             <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase">Action</span>
+                                <span className="text-xxs font-bold text-slate-400 uppercase">Action</span>
                                 <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">{tip.action}</span>
                             </div>
                         </div>

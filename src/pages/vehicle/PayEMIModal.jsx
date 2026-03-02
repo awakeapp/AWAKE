@@ -63,7 +63,7 @@ const PayEMIModal = ({ isOpen, onClose, onSave, loan, vehicle, loanDetail }) => 
                             <Banknote className="w-5 h-5" />
                             Record Payment
                         </h2>
-                        <p className="text-[10px] opacity-80">{loan.lender} - {vehicle?.name}</p>
+                        <p className="text-xxs opacity-80">{loan.lender} - {vehicle?.name}</p>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
                         <X className="w-5 h-5" />
@@ -190,7 +190,7 @@ const PayEMIModal = ({ isOpen, onClose, onSave, loan, vehicle, loanDetail }) => 
                         </select>
                     </div>
 
-                    <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase mt-2">
+                    <div className="flex items-center gap-2 text-xxs text-slate-400 font-bold uppercase mt-2">
                         <TrendingDown className="w-3 h-3" />
                         Remaining Principal: ₹{remaining.toLocaleString()}
                     </div>

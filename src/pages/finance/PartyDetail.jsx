@@ -722,7 +722,7 @@ const PartyDetail = () => {
                         <div className="flex flex-col items-center flex-1 px-4 min-w-0">
                             <h1 className="text-xl font-black text-slate-900 dark:text-white truncate w-full text-center tracking-tight leading-tight capitalize">{party.name}</h1>
                         </div>
-                        <div className={`px-3 py-1.5 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-sm shrink-0 ${statusBadge.cls}`}>
+                        <div className={`px-3 py-1.5 rounded-xl font-black uppercase tracking-widest text-micro shadow-sm shrink-0 ${statusBadge.cls}`}>
                             {statusBadge.label}
                         </div>
                     </div>
@@ -772,18 +772,18 @@ const PartyDetail = () => {
                         <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/10 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none" />
                         
                         <div className="relative z-10">
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-200/80 mb-2 text-center">Net Balance</p>
-                            <p className={`text-[44px] font-black tracking-tightest text-center mb-6 leading-none drop-shadow-md ${balance >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
+                            <p className="text-xxs font-black uppercase tracking-[0.2em] text-indigo-200/80 mb-2 text-center">Net Balance</p>
+                            <p className={`text-display-sm font-black tracking-tightest text-center mb-6 leading-none drop-shadow-md ${balance >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
                                 {balance >= 0 ? '+' : '-'}₹{Math.abs(balance).toLocaleString()}
                             </p>
                             
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="bg-white/10 dark:bg-black/20 rounded-2xl p-4 backdrop-blur-md border border-white/10 text-center">
-                                    <p className="text-[9px] font-black uppercase tracking-[0.15em] text-indigo-200/70 mb-1">To Get</p>
+                                    <p className="text-micro font-black uppercase tracking-[0.15em] text-indigo-200/70 mb-1">To Get</p>
                                     <p className="text-sm font-black text-emerald-300">₹{summary.totalReceivable.toLocaleString()}</p>
                                 </div>
                                 <div className="bg-white/10 dark:bg-black/20 rounded-2xl p-4 backdrop-blur-md border border-white/10 text-center">
-                                    <p className="text-[9px] font-black uppercase tracking-[0.15em] text-indigo-200/70 mb-1">To Pay</p>
+                                    <p className="text-micro font-black uppercase tracking-[0.15em] text-indigo-200/70 mb-1">To Pay</p>
                                     <p className="text-sm font-black text-rose-300">₹{summary.totalPayable.toLocaleString()}</p>
                                 </div>
                             </div>
@@ -795,7 +795,7 @@ const PartyDetail = () => {
                     {balance !== 0 && (
                         <button
                             onClick={() => { setTxType(isReceivable ? 'you_received' : 'you_repaid'); setIsAddCardOpen(true); }}
-                            className="flex-1 py-4 bg-indigo-600 text-white rounded-[1.5rem] font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 shadow-xl shadow-indigo-500/20 active:scale-[0.98] transition-all"
+                            className="flex-1 py-4 bg-indigo-600 text-white rounded-[1.5rem] font-black uppercase tracking-widest text-xxs flex items-center justify-center gap-2 shadow-xl shadow-indigo-500/20 active:scale-[0.98] transition-all"
                         >
                             <CreditCard className="w-4 h-4" /> Record Payment
                         </button>
@@ -803,7 +803,7 @@ const PartyDetail = () => {
                     <button
                         onClick={openReminderModal}
                         disabled={!canRemind}
-                        className={`py-4 rounded-[1.5rem] font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${
+                        className={`py-4 rounded-[1.5rem] font-black uppercase tracking-widest text-xxs flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${
                             balance !== 0 ? 'px-4' : 'flex-1 px-4'
                         } ${
                             canRemind
@@ -817,7 +817,7 @@ const PartyDetail = () => {
                 </div>
 
                 {lastReminderDaysAgo !== null && (
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider text-center -mt-1 opacity-70">
+                    <p className="text-xxs text-slate-400 font-bold uppercase tracking-wider text-center -mt-1 opacity-70">
                         {lastReminderDaysAgo === 0 ? 'Reminder sent today' : `Last reminder ${lastReminderDaysAgo}d ago`}
                     </p>
                 )}
@@ -838,7 +838,7 @@ const PartyDetail = () => {
                 {/* Ledger header */}
                 <div className="flex items-center justify-between">
                     <h3 className="font-black text-slate-900 dark:text-white text-base tracking-tight">Ledger <span className="text-slate-400 font-bold text-sm ml-1">({filteredTransactions.length})</span></h3>
-                    <button onClick={() => setIsAddCardOpen(true)} className="text-white text-[11px] font-black flex items-center gap-1.5 bg-indigo-600 px-4 py-2 rounded-xl active:scale-95 transition-transform shadow-md shadow-indigo-500/20 uppercase tracking-wider">
+                    <button onClick={() => setIsAddCardOpen(true)} className="text-white text-xs-plus font-black flex items-center gap-1.5 bg-indigo-600 px-4 py-2 rounded-xl active:scale-95 transition-transform shadow-md shadow-indigo-500/20 uppercase tracking-wider">
                         <Plus className="w-3.5 h-3.5" /> Entry
                     </button>
                 </div>
@@ -898,10 +898,10 @@ const PartyDetail = () => {
                                                 <div className="flex justify-between items-start">
                                                     <div>
                                                         <p className="font-bold text-slate-900 dark:text-white text-sm leading-tight">{typeDef.label}</p>
-                                                        <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1 flex-wrap">
+                                                        <p className="text-xs-plus text-slate-400 mt-0.5 flex items-center gap-1 flex-wrap">
                                                             {format(new Date(tx.date), 'dd MMM yyyy')}
-                                                            {isReversal && <span className="bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400 px-1 py-px rounded text-[8px] uppercase tracking-wider font-bold">Rev</span>}
-                                                            {hasSettlements && <span className="bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 px-1 py-px rounded text-[8px] uppercase tracking-wider font-bold">Stl</span>}
+                                                            {isReversal && <span className="bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400 px-1 py-px rounded text-micro uppercase tracking-wider font-bold">Rev</span>}
+                                                            {hasSettlements && <span className="bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 px-1 py-px rounded text-micro uppercase tracking-wider font-bold">Stl</span>}
                                                         </p>
                                                     </div>
                                                     <div className="text-right shrink-0 ml-3 flex items-center gap-3">
@@ -909,7 +909,7 @@ const PartyDetail = () => {
                                                             <p className={`text-base font-black ${isPositive ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                                                                 {isPositive ? '+' : '−'}{formatCurrency(tx.amount, true)}
                                                             </p>
-                                                            <p className={`text-[10px] font-bold mt-0.5 ${runBal >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                            <p className={`text-xxs font-bold mt-0.5 ${runBal >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
                                                                 Bal: {runBal >= 0 ? '+' : '−'}{formatCurrency(Math.abs(runBal), true)}
                                                             </p>
                                                         </div>
@@ -933,7 +933,7 @@ const PartyDetail = () => {
                                                 {/* Settlement progress */}
                                                 {isOutstandingEntry && (
                                                     <div className="mt-2.5">
-                                                        <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                                                        <div className="flex justify-between items-center text-xxs font-bold uppercase tracking-wider text-slate-400 mb-1">
                                                             <span>Settled {formatCurrency(settled, true)}</span>
                                                             <span>{entryRemaining <= 0 ? 'Fully Paid' : `${formatCurrency(entryRemaining, true)} left`}</span>
                                                         </div>
@@ -948,7 +948,7 @@ const PartyDetail = () => {
 
                                                 {/* Collapsible notes */}
                                                 {hasNotes && (
-                                                    <button onClick={() => toggleNotes(tx.id)} className="flex items-center gap-1 text-[11px] text-slate-400 mt-2 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+                                                    <button onClick={() => toggleNotes(tx.id)} className="flex items-center gap-1 text-xs-plus text-slate-400 mt-2 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
                                                         <ChevronDown className={`w-3 h-3 transition-transform ${notesExpanded ? 'rotate-180' : ''}`} />
                                                         {notesExpanded ? 'Hide note' : 'Show note'}
                                                     </button>
@@ -971,7 +971,7 @@ const PartyDetail = () => {
                                             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
                                                 <ZoomIn className="w-5 h-5 text-white" />
                                             </div>
-                                            <div className="absolute top-1.5 left-1.5 bg-black/50 backdrop-blur-sm text-white text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md flex items-center gap-1">
+                                            <div className="absolute top-1.5 left-1.5 bg-black/50 backdrop-blur-sm text-white text-micro font-black uppercase tracking-widest px-2 py-0.5 rounded-md flex items-center gap-1">
                                                 <Paperclip className="w-2.5 h-2.5"/> Receipt
                                             </div>
                                         </div>
@@ -1021,7 +1021,7 @@ const PartyDetail = () => {
                                 <div className="flex items-center justify-between mb-6">
                                     <div>
                                         <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">New Entry</h3>
-                                        <p className="text-[11px] text-slate-400 font-medium mt-0.5">{party.name}</p>
+                                        <p className="text-xs-plus text-slate-400 font-medium mt-0.5">{party.name}</p>
                                     </div>
                                     <button type="button" onClick={() => resetForm()} className="w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-full text-slate-400 hover:text-slate-900 dark:hover:text-white active:scale-90 transition-all">
                                         <Plus className="w-5 h-5 rotate-45" />
@@ -1062,7 +1062,7 @@ const PartyDetail = () => {
 
                                 {/* Amount — Hero Size */}
                                 <div className="text-center py-4 mb-2">
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Amount</p>
+                                    <p className="text-micro font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Amount</p>
                                     <div className="inline-flex items-baseline gap-1">
                                         <span className="text-4xl font-black text-slate-300 dark:text-slate-600">₹</span>
                                         <input
@@ -1085,27 +1085,27 @@ const PartyDetail = () => {
                             <div className="flex-1 overflow-y-auto px-7 pb-4 space-y-4 scrollbar-hide">
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="space-y-1.5">
-                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Date</label>
-                                        <button type="button" onClick={() => setDatePickerOpen(true)} className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-left flex items-center gap-2.5 text-[13px] transition-all hover:border-indigo-400/50">
+                                        <label className="text-micro font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Date</label>
+                                        <button type="button" onClick={() => setDatePickerOpen(true)} className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-left flex items-center gap-2.5 text-sm-minus transition-all hover:border-indigo-400/50">
                                             <Calendar className="w-4 h-4 text-indigo-400 shrink-0" />{format(new Date(date + 'T00:00:00'), 'MMM d, yyyy')}
                                         </button>
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Due Date</label>
-                                        <button type="button" onClick={() => setDueDatePickerOpen(true)} className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-left flex items-center gap-2.5 text-[13px] transition-all hover:border-indigo-400/50">
+                                        <label className="text-micro font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Due Date</label>
+                                        <button type="button" onClick={() => setDueDatePickerOpen(true)} className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-left flex items-center gap-2.5 text-sm-minus transition-all hover:border-indigo-400/50">
                                             <Clock className="w-4 h-4 text-indigo-400 shrink-0" />{dueDate ? format(new Date(dueDate + 'T00:00:00'), 'MMM d, yyyy') : 'No Date'}
                                         </button>
                                     </div>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">What is this for?</label>
+                                    <label className="text-micro font-black text-slate-400 uppercase tracking-[0.15em] ml-1">What is this for?</label>
                                     <input type="text" value={note} onChange={e => setNote(e.target.value)} placeholder="Enter description..." required
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-[13px] outline-none focus:border-indigo-400/50 transition-all placeholder:text-slate-400" />
+                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-sm-minus outline-none focus:border-indigo-400/50 transition-all placeholder:text-slate-400" />
                                 </div>
 
                                 {/* Receipt Attachment */}
                                 <div className="space-y-2">
-                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Receipt / Bill</label>
+                                    <label className="text-micro font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Receipt / Bill</label>
                                     {receiptPreview ? (
                                         <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
                                             <img src={receiptPreview} alt="Receipt" className="w-full h-36 object-cover" />
@@ -1117,7 +1117,7 @@ const PartyDetail = () => {
                                                     <XIcon className="w-4 h-4" />
                                                 </button>
                                             </div>
-                                            <div className="absolute top-2 right-2 bg-emerald-500 text-white text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md">Attached</div>
+                                            <div className="absolute top-2 right-2 bg-emerald-500 text-white text-micro font-black uppercase tracking-wider px-2 py-0.5 rounded-md">Attached</div>
                                         </div>
                                     ) : (
                                         <button
@@ -1126,8 +1126,8 @@ const PartyDetail = () => {
                                             className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-5 flex flex-col items-center justify-center gap-2 text-slate-400 hover:border-indigo-400/70 hover:text-indigo-500 hover:bg-indigo-50/40 dark:hover:bg-indigo-500/5 transition-all active:scale-[0.98]"
                                         >
                                             <Paperclip className="w-5 h-5" />
-                                            <span className="text-[11px] font-black uppercase tracking-widest">Attach Receipt or Bill</span>
-                                            <span className="text-[10px] font-medium text-slate-300 dark:text-slate-600">JPG, PNG — auto compressed</span>
+                                            <span className="text-xs-plus font-black uppercase tracking-widest">Attach Receipt or Bill</span>
+                                            <span className="text-xxs font-medium text-slate-300 dark:text-slate-600">JPG, PNG — auto compressed</span>
                                         </button>
                                     )}
                                     <input
@@ -1157,7 +1157,7 @@ const PartyDetail = () => {
                                                     <Wallet className="w-4 h-4 text-indigo-500" />
                                                     {(txType === 'you_gave' || txType === 'you_repaid') ? 'Record as Expense' : 'Record as Income'}
                                                 </p>
-                                                <p className="text-[10px] text-slate-500 mt-0.5">Also show in Finance spending history</p>
+                                                <p className="text-xxs text-slate-500 mt-0.5">Also show in Finance spending history</p>
                                             </div>
                                             <button type="button">
                                                 {linkToFinance ? <ToggleRight className="w-8 h-8 text-indigo-600" /> : <ToggleLeft className="w-8 h-8 text-slate-400" />}
@@ -1165,11 +1165,11 @@ const PartyDetail = () => {
                                         </div>
                                         {linkToFinance && accounts.length > 0 && (
                                             <div className="space-y-1.5">
-                                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">From Account</label>
+                                                <label className="text-micro font-black text-slate-400 uppercase tracking-[0.15em] ml-1">From Account</label>
                                                 <select
                                                     value={selectedAccountId}
                                                     onChange={e => setSelectedAccountId(e.target.value)}
-                                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-[13px] outline-none focus:border-indigo-400/50 transition-all appearance-none"
+                                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-sm-minus outline-none focus:border-indigo-400/50 transition-all appearance-none"
                                                 >
                                                     {accounts.filter(a => !a.isArchived).map(acc => (
                                                         <option key={acc.id} value={acc.id}>{acc.name}</option>
@@ -1263,7 +1263,7 @@ const PartyDetail = () => {
                                                             </div>
                                                             <div className="text-left">
                                                                 <p className="font-bold text-slate-900 dark:text-white text-sm">{entry.type === 'you_gave' ? 'You Gave' : 'You Borrowed'}</p>
-                                                                <p className="text-[10px] text-slate-400">{format(new Date(entry.date), 'MMM d, yyyy')} • Rem {formatCurrency(entry.remaining, true)}</p>
+                                                                <p className="text-xxs text-slate-400">{format(new Date(entry.date), 'MMM d, yyyy')} • Rem {formatCurrency(entry.remaining, true)}</p>
                                                             </div>
                                                         </button>
                                                         <p className="font-black text-slate-900 dark:text-white text-sm">{formatCurrency(entry.amount, true)}</p>
@@ -1276,7 +1276,7 @@ const PartyDetail = () => {
                                                                 <input type="number" value={selectedSettleEntries[entry.id] || ''} onChange={e => { const val = Math.min(Number(e.target.value) || 0, entry.remaining); setSelectedSettleEntries(prev => ({ ...prev, [entry.id]: String(val) })); }} max={entry.remaining} placeholder="0"
                                                                     className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl py-2 pl-8 pr-3 text-sm font-bold text-slate-900 dark:text-white outline-none" />
                                                             </div>
-                                                            <button type="button" onClick={() => setSelectedSettleEntries(prev => ({ ...prev, [entry.id]: String(entry.remaining) }))} className="text-[9px] font-bold uppercase text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-1 rounded-lg shrink-0">Max</button>
+                                                            <button type="button" onClick={() => setSelectedSettleEntries(prev => ({ ...prev, [entry.id]: String(entry.remaining) }))} className="text-micro font-bold uppercase text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-1 rounded-lg shrink-0">Max</button>
                                                         </div>
                                                     )}
                                                 </div>
@@ -1305,11 +1305,11 @@ const PartyDetail = () => {
                                                 <div key={entry.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl text-sm">
                                                     <div>
                                                         <p className="font-bold text-slate-900 dark:text-white">{entry.type === 'you_gave' ? 'You Gave' : 'You Borrowed'}</p>
-                                                        <p className="text-[10px] text-slate-400">{format(new Date(entry.date), 'MMM d, yyyy')}</p>
+                                                        <p className="text-xxs text-slate-400">{format(new Date(entry.date), 'MMM d, yyyy')}</p>
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="font-black text-indigo-600 dark:text-indigo-400">{formatCurrency(allocate, true)}</p>
-                                                        <p className="text-[10px] text-slate-400">of {formatCurrency(entry.remaining, true)}</p>
+                                                        <p className="text-xxs text-slate-400">of {formatCurrency(entry.remaining, true)}</p>
                                                     </div>
                                                 </div>
                                             );
@@ -1330,7 +1330,7 @@ const PartyDetail = () => {
                                         <Wallet className="w-4 h-4 text-indigo-500" /> 
                                         {isReceivable ? 'Record as Income' : 'Record as Expense'}
                                     </p>
-                                    <p className="text-[10px] text-slate-500 mt-0.5">Add to main finance ledger</p>
+                                    <p className="text-xxs text-slate-500 mt-0.5">Add to main finance ledger</p>
                                 </div>
                                 <button type="button">
                                     {createFinanceEntry ? <ToggleRight className="w-8 h-8 text-indigo-600" /> : <ToggleLeft className="w-8 h-8 text-slate-400" />}
@@ -1363,7 +1363,7 @@ const PartyDetail = () => {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Send Reminder</h3>
-                                        <p className="text-[11px] text-slate-400 font-medium mt-0.5">{party.name}</p>
+                                        <p className="text-xs-plus text-slate-400 font-medium mt-0.5">{party.name}</p>
                                     </div>
                                     <button type="button" onClick={() => setIsReminderOpen(false)} className="w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-full text-slate-400 hover:text-slate-900 dark:hover:text-white active:scale-90 transition-all">
                                         <Plus className="w-5 h-5 rotate-45" />
@@ -1382,7 +1382,7 @@ const PartyDetail = () => {
                                         className={`py-4 rounded-xl flex flex-col items-center justify-center gap-2 transition-all ${reminderMethod === 'whatsapp' ? 'bg-white dark:bg-slate-700 shadow-md text-emerald-500' : 'text-slate-400 hover:text-slate-500 dark:hover:text-slate-300'}`}
                                     >
                                         <MessageCircle className="w-6 h-6" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">WhatsApp</span>
+                                        <span className="text-xxs font-black uppercase tracking-widest">WhatsApp</span>
                                     </button>
                                     <button
                                         type="button"
@@ -1390,7 +1390,7 @@ const PartyDetail = () => {
                                         className={`py-4 rounded-xl flex flex-col items-center justify-center gap-2 transition-all ${reminderMethod === 'sms' ? 'bg-white dark:bg-slate-700 shadow-md text-indigo-500' : 'text-slate-400 hover:text-slate-500 dark:hover:text-slate-300'}`}
                                     >
                                         <MessageSquare className="w-6 h-6" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">SMS</span>
+                                        <span className="text-xxs font-black uppercase tracking-widest">SMS</span>
                                     </button>
                                 </div>
 
@@ -1418,13 +1418,13 @@ const PartyDetail = () => {
                                 {/* Selectable Entries Checklist */}
                                 <div className="bg-slate-50 dark:bg-slate-800/20 rounded-[1.5rem] p-5 border border-slate-100 dark:border-slate-800/80">
                                     <div className="flex items-center justify-between mb-4">
-                                        <p className="text-[10px] uppercase font-black tracking-widest text-slate-400">
+                                        <p className="text-xxs uppercase font-black tracking-widest text-slate-400">
                                             Select Entries to Send
                                         </p>
                                         <button 
                                             type="button" 
                                             onClick={() => setSelectedEntryIds(selectedEntryIds.length === pendingEntries.length ? [] : pendingEntries.map(e => e.id))}
-                                            className="text-[10px] uppercase font-black tracking-widest text-indigo-500 hover:text-indigo-400 transition-colors"
+                                            className="text-xxs uppercase font-black tracking-widest text-indigo-500 hover:text-indigo-400 transition-colors"
                                         >
                                             {selectedEntryIds.length === pendingEntries.length ? 'Deselect All' : 'Select All'}
                                         </button>
@@ -1445,7 +1445,7 @@ const PartyDetail = () => {
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{e.notes || 'Entry'}</p>
-                                                    <p className="text-[10px] font-medium text-slate-400">{format(new Date(e.date), 'dd MMM yyyy')}</p>
+                                                    <p className="text-xxs font-medium text-slate-400">{format(new Date(e.date), 'dd MMM yyyy')}</p>
                                                 </div>
                                                 <p className="text-xs font-black text-slate-900 dark:text-white shrink-0">{formatCurrency(e.remaining, true)}</p>
                                             </div>
@@ -1455,7 +1455,7 @@ const PartyDetail = () => {
 
                                 {/* Message Preview Context */}
                                 <div className="bg-slate-50 dark:bg-slate-800/30 rounded-[1.5rem] p-5 border border-slate-100 dark:border-slate-800/80">
-                                    <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-3">
+                                    <p className="text-xxs uppercase font-black tracking-widest text-slate-400 mb-3">
                                         Message Preview
                                     </p>
                                     <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-wrap font-mono min-h-[120px] max-h-[140px] overflow-y-auto">
@@ -1465,7 +1465,7 @@ const PartyDetail = () => {
                                 
                                 {pendingEntries.length > 4 && reminderMethod === 'whatsapp' && whatsappMode === 'text' && (
                                     <div className="bg-amber-50 dark:bg-amber-500/10 p-3 rounded-lg border border-amber-200 dark:border-amber-500/30 text-center">
-                                        <p className="text-[11px] font-bold text-amber-700 dark:text-amber-400">Large breakdown. "Text + Image" is recommended.</p>
+                                        <p className="text-xs-plus font-bold text-amber-700 dark:text-amber-400">Large breakdown. "Text + Image" is recommended.</p>
                                     </div>
                                 )}
 
@@ -1508,7 +1508,7 @@ const PartyDetail = () => {
                         </div>
                         
                         <p className="text-sm font-black text-slate-500 uppercase tracking-widest mb-3">Total Outstanding Balance</p>
-                        <p className={`text-[80px] leading-none font-black mb-10 tracking-tighter ${(balance > 0) ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        <p className={`text-display-lg leading-none font-black mb-10 tracking-tighter ${(balance > 0) ? 'text-emerald-400' : 'text-rose-400'}`}>
                             {formatCurrency(totalSelectedPending, true)}
                         </p>
                         
@@ -1543,10 +1543,10 @@ const PartyDetail = () => {
 // --- Summary Cell Component ---
 const SummaryCell = ({ label, value, color, icon }) => (
     <div className="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 text-center">
-        <p className="text-[8px] font-black uppercase tracking-[0.15em] text-slate-400 mb-1.5 flex items-center justify-center gap-1">
+        <p className="text-micro font-black uppercase tracking-[0.15em] text-slate-400 mb-1.5 flex items-center justify-center gap-1">
             {icon}{label}
         </p>
-        <p className={`text-[15px] font-black ${color}`}>{value}</p>
+        <p className={`text-base-minus font-black ${color}`}>{value}</p>
     </div>
 );
 

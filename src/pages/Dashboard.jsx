@@ -212,7 +212,7 @@ const Dashboard = () => {
                         <div className="flex items-center gap-3">
                              {/* Mobile Task Count */}
                              <div className="sm:hidden text-right mr-2">
-                                <div className="text-[10px] font-bold text-slate-400 uppercase">Tasks</div>
+                                <div className="text-xxs font-bold text-slate-400 uppercase">Tasks</div>
                                 <div className="text-sm font-bold text-slate-700 dark:text-slate-300">{remainingTasksCount}</div>
                             </div>
 
@@ -297,8 +297,8 @@ const Dashboard = () => {
             {topTasks.length > 0 && (
                 <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
                     <div className="flex items-center justify-between mb-3 px-1">
-                        <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Priority Tasks</h3>
-                        <button onClick={() => navigate('/workspace')} className="text-[11px] font-bold text-indigo-500 hover:text-indigo-600">VIEW ALL</button>
+                        <h3 className="text-xs-plus font-bold text-slate-400 uppercase tracking-widest">Priority Tasks</h3>
+                        <button onClick={() => navigate('/workspace')} className="text-xs-plus font-bold text-indigo-500 hover:text-indigo-600">VIEW ALL</button>
                     </div>
                     <div className="space-y-2">
                         {topTasks.map(task => (
@@ -345,9 +345,9 @@ const Dashboard = () => {
 
             {/* Footer Links */}
             <div className="flex justify-center gap-6 opacity-40 pt-8 pb-4">
-                <button onClick={() => navigate('/history')} className="text-[10px] font-bold uppercase tracking-wider text-slate-500">History</button>
+                <button onClick={() => navigate('/history')} className="text-xxs font-bold uppercase tracking-wider text-slate-500">History</button>
                 <div className="w-px h-3 bg-slate-300 my-auto"></div>
-                <button onClick={() => navigate('/settings')} className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Settings</button>
+                <button onClick={() => navigate('/settings')} className="text-xxs font-bold uppercase tracking-wider text-slate-500">Settings</button>
             </div>
         </PageLayout>
     );

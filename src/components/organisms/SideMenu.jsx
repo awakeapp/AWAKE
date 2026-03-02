@@ -109,7 +109,7 @@ const SideMenu = ({ isOpen, onClose }) => {
 
                         {/* Footer */}
                         <div className="p-6 border-t border-slate-200/50 dark:border-white/5 text-center">
-                            <p className="text-[11px] font-bold tracking-widest text-slate-400 dark:text-slate-600 uppercase">
+                            <p className="text-xs-plus font-bold tracking-widest text-slate-400 dark:text-slate-600 uppercase">
                                 HUMI AWAKE v1.2.0
                             </p>
                         </div>

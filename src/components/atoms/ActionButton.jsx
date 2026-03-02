@@ -94,7 +94,7 @@ const ActionButton = ({
                     {!iconOnly && label && (
                         <span className={clsx(
                             "font-bold uppercase tracking-widest ml-2",
-                            size === 'sm' ? "text-[8px]" : "text-[10px]"
+                            size === 'sm' ? "text-micro" : "text-xxs"
                         )}>
                             {label}
                         </span>

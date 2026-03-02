@@ -58,7 +58,7 @@ export function AppBottomNav({ items = [], className }) {
                                 </Pressable>
                                 {item.label && (
                                     <span className={cn(
-                                        "absolute -bottom-6 text-[10px] font-bold tracking-tight whitespace-nowrap",
+                                        "absolute -bottom-6 text-xxs font-bold tracking-tight whitespace-nowrap",
                                         isActive ? "text-primary-600 dark:text-primary-500" : "text-slate-400 dark:text-slate-500"
                                     )}>
                                         {item.label}
@@ -86,7 +86,7 @@ export function AppBottomNav({ items = [], className }) {
                                     isActive ? "stroke-[2.5px] scale-110" : "stroke-[1.75px]"
                                 )} />
                             </div>
-                            <span className="text-[10px] font-medium tracking-tight">
+                            <span className="text-xxs font-medium tracking-tight">
                                 {item.label}
                             </span>
                             {/* Dot indicator */}

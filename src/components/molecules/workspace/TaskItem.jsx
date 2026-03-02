@@ -97,7 +97,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
 
             {!isCarryOver && task.time && (
                 <div className="shrink-0 flex flex-col items-center justify-center min-w-[50px] py-1 px-1.5 bg-slate-50/50 dark:bg-slate-800/50 rounded-xl border border-slate-100/50 dark:border-slate-700/50">
-                    <span className="text-[14px] font-medium text-slate-800 dark:text-slate-100 tabular-nums leading-none tracking-tight">
+                    <span className="text-sm font-medium text-slate-800 dark:text-slate-100 tabular-nums leading-none tracking-tight">
                         {(() => {
                             const [h, m] = task.time.split(':').map(Number);
                             if (timeFormat === '24h') {
@@ -147,7 +147,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                                                 initial={{ opacity: 0, y: 5, scale: 0.95 }}
                                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                                 exit={{ opacity: 0, scale: 0.95 }}
-                                                className="absolute top-full left-0 mt-2 p-3 bg-white dark:bg-slate-800 rounded-[14px] shadow-xl border border-slate-100 dark:border-slate-700 w-56 sm:w-64 z-[90] text-[13px] leading-relaxed text-slate-600 dark:text-slate-300 pointer-events-auto shadow-[0_20px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_48px_rgba(0,0,0,0.55)]"
+                                                className="absolute top-full left-0 mt-2 p-3 bg-white dark:bg-slate-800 rounded-[14px] shadow-xl border border-slate-100 dark:border-slate-700 w-56 sm:w-64 z-[90] text-sm-minus leading-relaxed text-slate-600 dark:text-slate-300 pointer-events-auto shadow-[0_20px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_48px_rgba(0,0,0,0.55)]"
                                                 onClick={(e) => e.stopPropagation()}
                                             >
                                                 {task.description}
@@ -158,7 +158,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                             </div>
                         )}
                         <span className={clsx(
-                            "text-[14px] sm:text-[15px] font-medium tracking-tight transition-colors duration-200 leading-tight whitespace-pre-wrap break-words [overflow-wrap:anywhere] block w-full",
+                            "text-sm sm:text-base-minus font-medium tracking-tight transition-colors duration-200 leading-tight whitespace-pre-wrap break-words [overflow-wrap:anywhere] block w-full",
                             isCarryOver
                                 ? "text-slate-600 dark:text-slate-400"
                                 : isCompleted
@@ -173,7 +173,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                         <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
                             {task.priority && (
                                 <span className={clsx(
-                                    "text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md",
+                                    "text-micro font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md",
                                     task.priority === 'High' ? "bg-red-50 text-red-500 dark:bg-red-900/20" :
                                         task.priority === 'Medium' ? "bg-amber-50 text-amber-500 dark:bg-amber-900/20" :
                                             "bg-blue-50 text-blue-500 dark:bg-blue-900/20"
@@ -184,7 +184,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
                             {task.category && !isRoutine && (
                                 <div className="flex items-center gap-1 opacity-60">
                                     <Tag className="w-2.5 h-2.5" />
-                                    <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 truncate">
+                                    <span className="text-xxs font-medium text-slate-500 dark:text-slate-400 truncate">
                                         {task.category}
                                     </span>
                                 </div>
@@ -194,7 +194,7 @@ const TaskItem = memo(({ task, onUpdateStatus, isLocked, variant = 'default', on
 
                     {isCarryOver && (
                         <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-orange-500/80 font-bold uppercase tracking-wider">
+                            <span className="text-xxs text-orange-500/80 font-bold uppercase tracking-wider">
                                 ROLLOVER • {task.date}
                             </span>
                         </div>

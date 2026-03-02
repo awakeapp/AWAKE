@@ -69,7 +69,7 @@ const RoutineHeader = ({ onEditClick, isLocked }) => {
  }}
  scaleDown={0.94}
  className={cn(
- "px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] rounded transition-opacity flex items-center justify-center min-w-[70px]",
+ "px-3 py-2 text-xxs font-semibold uppercase tracking-[0.1em] rounded transition-opacity flex items-center justify-center min-w-[70px]",
  isToday
  ? "text-slate-500 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
  : "text-white bg-indigo-600 hover:bg-indigo-500 shadow-sm shadow-indigo-500/20"
@@ -126,7 +126,7 @@ const RoutineHeader = ({ onEditClick, isLocked }) => {
 
  {/* "Viewing past date" indicator */}
  {!isToday && (
- <div className="flex items-center justify-between px-5 py-3 bg-amber-50 dark:bg-amber-950/30 border-t border-amber-100/50 dark:border-amber-900/50 text-[11px]">
+ <div className="flex items-center justify-between px-5 py-3 bg-amber-50 dark:bg-amber-950/30 border-t border-amber-100/50 dark:border-amber-900/50 text-xs-plus">
  <div className="flex items-center gap-2 text-amber-600 dark:text-amber-500">
  <span className="font-bold tracking-wide uppercase">
  VIEWING PAST DATE: {displayDate}

@@ -83,7 +83,7 @@ const DailyWellnessCard = () => {
                     transition={{ delay: 0.1 }}
                     className="mt-6 bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 flex items-start gap-3"
                 >
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Action</span>
+                    <span className="text-xxs font-bold text-slate-400 uppercase tracking-wider mt-0.5">Action</span>
                     <p className="text-slate-700 dark:text-slate-200 text-sm font-medium">
                         {tip.action}
                     </p>

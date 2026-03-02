@@ -69,7 +69,7 @@ const Sidebar = ({ onClose }) => {
                     </div>
                     <div className="flex-1 overflow-hidden">
                         <p className="text-sm font-bold text-slate-700 dark:text-slate-200 truncate">{user?.name}</p>
-                        <p className="text-[10px] font-medium text-slate-400 truncate tracking-wide">{user?.email}</p>
+                        <p className="text-xxs font-medium text-slate-400 truncate tracking-wide">{user?.email}</p>
                     </div>
                     <button onClick={handleLogout} className="text-slate-400 hover:text-red-600 transition-colors">
                         <LogOut className="w-5 h-5" />

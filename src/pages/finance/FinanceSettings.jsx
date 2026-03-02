@@ -65,7 +65,7 @@ const FinanceSettings = () => {
                                 <CreditCard className="w-4 h-4 text-indigo-500" />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="font-bold text-[13px] text-slate-900 dark:text-white">My UPI ID</p>
+                                <p className="font-bold text-sm-minus text-slate-900 dark:text-white">My UPI ID</p>
                                 {isEditingUpi ? (
                                     <input 
                                         type="text"
@@ -75,11 +75,11 @@ const FinanceSettings = () => {
                                         onPaste={(e) => e.stopPropagation()}
                                         placeholder="e.g. yourname@okhdfcbank"
                                         style={{ userSelect: 'auto', WebkitUserSelect: 'auto' }}
-                                        className="w-full text-[13px] text-slate-500 dark:text-slate-400 bg-transparent outline-none mt-1 font-medium"
+                                        className="w-full text-sm-minus text-slate-500 dark:text-slate-400 bg-transparent outline-none mt-1 font-medium"
                                         autoFocus
                                     />
                                 ) : (
-                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5" onClick={() => setIsEditingUpi(true)}>
+                                    <p className="text-xs-plus text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5" onClick={() => setIsEditingUpi(true)}>
                                         {financeConfig?.upiId ? financeConfig.upiId : 'Tap to add your UPI ID...'}
                                     </p>
                                 )}
@@ -94,7 +94,7 @@ const FinanceSettings = () => {
                                     </button>
                                 </div>
                             ) : (
-                                <button onClick={() => setIsEditingUpi(true)} className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 px-3 py-1 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg">
+                                <button onClick={() => setIsEditingUpi(true)} className="text-xs-plus font-bold text-indigo-600 dark:text-indigo-400 px-3 py-1 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg">
                                     {financeConfig?.upiId ? 'Edit' : 'Add'}
                                 </button>
                             )}
@@ -102,7 +102,7 @@ const FinanceSettings = () => {
                     </div>
                 </SettingsSection>
 
-                <p className="text-center text-[11px] text-slate-400 dark:text-slate-600 mt-8 font-bold tracking-widest uppercase">
+                <p className="text-center text-xs-plus text-slate-400 dark:text-slate-600 mt-8 font-bold tracking-widest uppercase">
                     AWAKE Finance Scoped Settings
                 </p>
             </SettingsList>

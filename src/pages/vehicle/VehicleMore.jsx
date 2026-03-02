@@ -99,16 +99,16 @@ const DocumentCard = ({ doc, vehicleId, currentUrl, userId, onUpdate }) => {
                     </div>
                     <div className="flex-1 min-w-0">
                         <p className="font-black text-slate-900 dark:text-white text-sm">{doc.label}</p>
-                        <p className="text-[11px] text-slate-400">{doc.subtitle}</p>
+                        <p className="text-xs-plus text-slate-400">{doc.subtitle}</p>
                     </div>
                     {hasDoc ? (
                         <div className="flex items-center gap-2">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <span className="text-micro font-black uppercase tracking-widest text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full flex items-center gap-1">
                                 <CheckCircle2 className="w-2.5 h-2.5"/> Saved
                             </span>
                         </div>
                     ) : (
-                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">None</span>
+                        <span className="text-micro font-black uppercase tracking-widest text-slate-400">None</span>
                     )}
                 </div>
 
@@ -127,13 +127,13 @@ const DocumentCard = ({ doc, vehicleId, currentUrl, userId, onUpdate }) => {
                         <div className="flex gap-2">
                             <button
                                 onClick={() => fileInputRef.current?.click()}
-                                className="flex-1 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-1.5 active:scale-95"
+                                className="flex-1 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-xs-plus font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-1.5 active:scale-95"
                             >
                                 <Upload className="w-3.5 h-3.5"/> Replace
                             </button>
                             <button
                                 onClick={handleRemove}
-                                className="flex-1 py-2.5 border border-red-100 dark:border-red-500/20 rounded-xl text-[11px] font-black uppercase tracking-wider text-rose-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors flex items-center justify-center gap-1.5 active:scale-95"
+                                className="flex-1 py-2.5 border border-red-100 dark:border-red-500/20 rounded-xl text-xs-plus font-black uppercase tracking-wider text-rose-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors flex items-center justify-center gap-1.5 active:scale-95"
                             >
                                 <X className="w-3.5 h-3.5"/> Remove
                             </button>
@@ -144,7 +144,7 @@ const DocumentCard = ({ doc, vehicleId, currentUrl, userId, onUpdate }) => {
                         <button
                             onClick={() => fileInputRef.current?.click()}
                             disabled={isUploading}
-                            className="w-full py-3 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center gap-2 text-slate-400 hover:border-indigo-400/60 hover:text-indigo-500 hover:bg-indigo-50/40 dark:hover:bg-indigo-500/5 transition-all text-[11px] font-black uppercase tracking-widest active:scale-[0.98] disabled:opacity-50"
+                            className="w-full py-3 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center gap-2 text-slate-400 hover:border-indigo-400/60 hover:text-indigo-500 hover:bg-indigo-50/40 dark:hover:bg-indigo-500/5 transition-all text-xs-plus font-black uppercase tracking-widest active:scale-[0.98] disabled:opacity-50"
                         >
                             {isUploading
                                 ? <><Loader2 className="w-4 h-4 animate-spin"/> Uploading...</>
@@ -180,7 +180,7 @@ const DocumentCard = ({ doc, vehicleId, currentUrl, userId, onUpdate }) => {
                             <X className="w-5 h-5" />
                         </button>
                         <div className="text-center" onClick={e => e.stopPropagation()}>
-                            <p className="text-white/60 text-[10px] font-black uppercase tracking-widest mb-3">{doc.label}</p>
+                            <p className="text-white/60 text-xxs font-black uppercase tracking-widest mb-3">{doc.label}</p>
                             <img
                                 src={currentUrl}
                                 alt={doc.label}
@@ -268,7 +268,7 @@ const VehicleMore = () => {
                 {activeVehicle && (
                     <SettingsSection title={`${activeVehicle.name} — Documents`}>
                         <div className="px-4 py-3 space-y-3">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                            <p className="text-xxs font-black uppercase tracking-widest text-slate-400">
                                 Store your vehicle documents securely. Photos are auto-compressed and stored privately.
                             </p>
                             {DOCUMENT_TYPES.map(doc => (
@@ -320,7 +320,7 @@ const VehicleMore = () => {
                     </SettingsSection>
                 )}
 
-                <p className="text-center text-[11px] text-slate-400 dark:text-slate-600 mt-8 font-bold tracking-widest uppercase">
+                <p className="text-center text-xs-plus text-slate-400 dark:text-slate-600 mt-8 font-bold tracking-widest uppercase">
                     AWAKE Vehicle Module
                 </p>
             </SettingsList>

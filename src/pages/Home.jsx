@@ -133,13 +133,13 @@ const Home = () => {
                                 <Moon className="w-5 h-5 text-white drop-shadow-md" />
                             </div>
                             <div>
-                                <h3 className="text-[13px] font-bold text-white uppercase tracking-widest drop-shadow-md">Ramadan Tracker</h3>
+                                <h3 className="text-sm-minus font-bold text-white uppercase tracking-widest drop-shadow-md">Ramadan Tracker</h3>
                                 {isRamadanActive ? (
-                                    <p className="text-[12px] font-medium text-white/90 drop-shadow-md mt-0.5">
+                                    <p className="text-xs font-medium text-white/90 drop-shadow-md mt-0.5">
                                         Day {hijriDate?.day}
                                     </p>
                                 ) : (
-                                    <p className="text-[12px] font-medium text-white/90 drop-shadow-md mt-0.5">Pre-Ramadan</p>
+                                    <p className="text-xs font-medium text-white/90 drop-shadow-md mt-0.5">Pre-Ramadan</p>
                                 )}
                             </div>
                         </div>
@@ -164,11 +164,11 @@ const Home = () => {
                     {dailyTimings && (
                         <div className="relative z-10 flex justify-between w-full mt-3 pt-3 border-t border-white/20">
                             <div className="text-left">
-                                <p className="text-white/70 text-[10px] uppercase font-bold tracking-wider mb-0.5">Suhoor Ends</p>
+                                <p className="text-white/70 text-xxs uppercase font-bold tracking-wider mb-0.5">Suhoor Ends</p>
                                 <p className="text-white font-bold text-lg drop-shadow-md">{suhoorTimeStr}</p>
                             </div>
                             <div className="text-right">
-                                <p className="text-white/70 text-[10px] uppercase font-bold tracking-wider mb-0.5">Iftar Time</p>
+                                <p className="text-white/70 text-xxs uppercase font-bold tracking-wider mb-0.5">Iftar Time</p>
                                 <p className="text-white font-bold text-lg drop-shadow-md">{iftarTimeStr}</p>
                             </div>
                         </div>
@@ -178,7 +178,7 @@ const Home = () => {
 
             {/* Quick Actions Title */}
             <div className="pt-2 px-1">
-                <h2 className="text-[17px] font-semibold text-slate-900 dark:text-white mb-3">Quick Actions</h2>
+                <h2 className="text-base-plus font-semibold text-slate-900 dark:text-white mb-3">Quick Actions</h2>
                 <div className="grid grid-cols-2 gap-3 text-left">
                     
                     {/* Routine Overview */}
@@ -207,7 +207,7 @@ const Home = () => {
                             </Pressable>
                         </div>
                         <div className="relative z-10 pt-2">
-                            <div className="text-[19px] font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                            <div className="text-xl-minus font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
                                 {routineProgress}% <span className="text-xs text-slate-400 font-medium">{t('home.done', 'Done')}</span>
                             </div>
                             <div className="text-[11.5px] text-slate-500 dark:text-slate-400 font-medium truncate">
@@ -235,7 +235,7 @@ const Home = () => {
                             </Pressable>
                         </div>
                         <div className="relative z-10 pt-2">
-                            <div className="text-[19px] font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                            <div className="text-xl-minus font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
                                 {remainingTasksCount} <span className="text-xs text-slate-400 font-medium">{t('home.left', 'Left')}</span>
                             </div>
                             <div className="text-[11.5px] text-slate-500 dark:text-slate-400 font-medium truncate">
@@ -263,7 +263,7 @@ const Home = () => {
                             </Pressable>
                         </div>
                         <div className="relative z-10 pt-2">
-                            <div className="text-[19px] font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                            <div className="text-xl-minus font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
                                 <span dir="ltr">₹{dailySpend.toLocaleString()}</span>
                             </div>
                             <div className="text-[11.5px] text-slate-500 dark:text-slate-400 font-medium truncate">
@@ -291,7 +291,7 @@ const Home = () => {
                             </Pressable>
                         </div>
                         <div className="relative z-10 pt-2">
-                            <div className="text-[19px] font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                            <div className="text-xl-minus font-semibold text-slate-800 dark:text-slate-100 leading-none mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
                                 Vehicle
                             </div>
                             <div className="text-[11.5px] text-slate-500 dark:text-slate-400 font-medium truncate">

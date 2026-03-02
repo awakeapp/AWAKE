@@ -60,7 +60,7 @@ const Dashboard = () => {
                             exit={{ opacity: 0, height: 0 }}
                             className="space-y-3"
                         >
-                            <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest pl-1">Attention Needed</h3>
+                            <h3 className="text-xs-plus font-bold text-slate-400 uppercase tracking-widest pl-1">Attention Needed</h3>
                             {alerts.slice(0, 3).map((alert) => (
                                 <motion.div
                                     key={alert.id}
@@ -86,7 +86,7 @@ const Dashboard = () => {
                                                 {alert.title}
                                             </h4>
                                             {alert.sub && <p className="text-xs text-slate-500 mt-0.5">{alert.sub}</p>}
-                                            {alert.date && <p className="text-[10px] text-slate-400 mt-1">Due {format(new Date(alert.date), 'MMM dd')}</p>}
+                                            {alert.date && <p className="text-xxs text-slate-400 mt-1">Due {format(new Date(alert.date), 'MMM dd')}</p>}
                                         </div>
                                     </div>
                                     <ChevronRight className="w-4 h-4 text-slate-300" />
@@ -100,7 +100,7 @@ const Dashboard = () => {
             {/* Zone 4: Module Overview (Standardized Grid) */}
             <div>
                 <div className="flex items-center justify-between mb-3 pl-1">
-                    <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Your World</h3>
+                    <h3 className="text-xs-plus font-bold text-slate-400 uppercase tracking-widest">Your World</h3>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">

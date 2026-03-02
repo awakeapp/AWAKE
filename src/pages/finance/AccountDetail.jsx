@@ -157,16 +157,16 @@ const AccountDetail = () => {
                                     </div>
                                     <button 
                                         onClick={() => setShowSaveConfirm(true)} 
-                                        className="bg-emerald-500 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest"
+                                        className="bg-emerald-500 text-white px-4 py-1.5 rounded-full text-xxs font-black uppercase tracking-widest"
                                     >
                                         Save Settings
                                     </button>
                                 </div>
                             ) : (
                                 <div className="space-y-1">
-                                    <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.2em] mb-1">{account.name}</p>
+                                    <p className="text-white/40 text-micro font-black uppercase tracking-[0.2em] mb-1">{account.name}</p>
                                     <h2 className="text-4xl font-black tracking-tightest leading-tight">{formatCurrency(account.balance, true)}</h2>
-                                    <button onClick={handleEdit} className="text-[10px] font-bold text-indigo-300 hover:text-white uppercase tracking-wider mt-2">Edit Account</button>
+                                    <button onClick={handleEdit} className="text-xxs font-bold text-indigo-300 hover:text-white uppercase tracking-wider mt-2">Edit Account</button>
                                 </div>
                             )}
                         </div>
@@ -197,7 +197,7 @@ const AccountDetail = () => {
         >
             <div className="space-y-6">
                     <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 shadow-sm border border-slate-100 dark:border-slate-800">
-                        <h3 className="font-black text-[10px] uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
+                        <h3 className="font-black text-xxs uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
                             <History className="w-3.5 h-3.5" />
                             Transaction History
                         </h3>
@@ -258,7 +258,7 @@ const AccountDetail = () => {
                                                  </div>
                                                  <div className="min-w-0 flex-1">
                                                      <p className="font-bold text-slate-900 dark:text-white text-sm truncate uppercase tracking-tight">{label}</p>
-                                                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">{format(new Date(tx.date || tx.createdAt), 'MMM d, yyyy')}</p>
+                                                     <p className="text-xxs text-slate-400 font-bold uppercase tracking-wider mt-0.5">{format(new Date(tx.date || tx.createdAt), 'MMM d, yyyy')}</p>
                                                  </div>
                                              </div>
                                              <div className="flex items-center gap-3">

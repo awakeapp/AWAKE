@@ -111,7 +111,7 @@ const ReportModal = ({ isOpen, onClose, onSuccess }) => {
                         >
                             <X className="w-5 h-5 text-black dark:text-white" />
                         </button>
-                        <h2 className="text-[17px] font-semibold text-black dark:text-white">Performance Report</h2>
+                        <h2 className="text-base-plus font-semibold text-black dark:text-white">Performance Report</h2>
                         <div className="w-9" />
                     </div>
 
@@ -130,7 +130,7 @@ const ReportModal = ({ isOpen, onClose, onSuccess }) => {
                                             selectedRange === key && "bg-emerald-50/50 dark:bg-emerald-900/10"
                                         )}
                                     >
-                                        <p className="text-[16px] text-black dark:text-white leading-tight font-medium py-2.5">{label}</p>
+                                        <p className="text-base text-black dark:text-white leading-tight font-medium py-2.5">{label}</p>
                                         <div className={clsx(
                                             "w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-all",
                                             selectedRange === key
@@ -147,21 +147,21 @@ const ReportModal = ({ isOpen, onClose, onSuccess }) => {
                             {selectedRange === 'custom' && (
                                 <div className="mt-4 bg-white dark:bg-[#1C1C1E] rounded-xl border border-slate-200 dark:border-[#2C2C2E] p-4 space-y-3">
                                     <div>
-                                        <label className="text-[13px] font-medium text-slate-500 dark:text-[#8E8E93] mb-1 block">Start Date</label>
+                                        <label className="text-sm-minus font-medium text-slate-500 dark:text-[#8E8E93] mb-1 block">Start Date</label>
                                         <input
                                             type="date"
                                             value={customStart}
                                             onChange={(e) => setCustomStart(e.target.value)}
-                                            className="w-full bg-[#F2F2F7] dark:bg-black border-none rounded-lg px-4 py-3 text-[16px] font-medium outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-black dark:text-white"
+                                            className="w-full bg-[#F2F2F7] dark:bg-black border-none rounded-lg px-4 py-3 text-base font-medium outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-black dark:text-white"
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-[13px] font-medium text-slate-500 dark:text-[#8E8E93] mb-1 block">End Date</label>
+                                        <label className="text-sm-minus font-medium text-slate-500 dark:text-[#8E8E93] mb-1 block">End Date</label>
                                         <input
                                             type="date"
                                             value={customEnd}
                                             onChange={(e) => setCustomEnd(e.target.value)}
-                                            className="w-full bg-[#F2F2F7] dark:bg-black border-none rounded-lg px-4 py-3 text-[16px] font-medium outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-black dark:text-white"
+                                            className="w-full bg-[#F2F2F7] dark:bg-black border-none rounded-lg px-4 py-3 text-base font-medium outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-black dark:text-white"
                                         />
                                     </div>
                                 </div>
@@ -171,7 +171,7 @@ const ReportModal = ({ isOpen, onClose, onSuccess }) => {
                         {/* Stats summary */}
                         {stats && (
                             <div className="mt-6 px-2">
-                                <p className="text-[13px] text-slate-500 dark:text-[#8E8E93] leading-relaxed">
+                                <p className="text-sm-minus text-slate-500 dark:text-[#8E8E93] leading-relaxed">
                                     Your report includes <span className="font-semibold text-black dark:text-white">{stats.totalDays} active days</span>,{' '}
                                     <span className="font-semibold text-black dark:text-white">{stats.perfectDays} perfect days</span>,{' '}
                                     and an average score of <span className="font-semibold text-black dark:text-white">{stats.averageScore}%</span>.
@@ -182,7 +182,7 @@ const ReportModal = ({ isOpen, onClose, onSuccess }) => {
                         {loadingStats && (
                             <div className="mt-6 flex items-center gap-2 px-2">
                                 <Loader2 className="w-4 h-4 text-slate-400 animate-spin" />
-                                <p className="text-[13px] text-slate-400">Loading report data...</p>
+                                <p className="text-sm-minus text-slate-400">Loading report data...</p>
                             </div>
                         )}
                     </div>
@@ -192,7 +192,7 @@ const ReportModal = ({ isOpen, onClose, onSuccess }) => {
                         <button
                             onClick={handleGenerate}
                             disabled={!canGenerate || isGenerating || loadingStats}
-                            className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] text-white text-[16px] font-semibold rounded-xl transition-all disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2"
+                            className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] text-white text-base font-semibold rounded-xl transition-all disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2"
                         >
                             {isGenerating ? (
                                 <>

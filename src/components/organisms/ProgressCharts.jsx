@@ -36,17 +36,17 @@ const ProgressCharts = ({ data }) => {
                 <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center">
                     <TrendingUp className="w-5 h-5 text-emerald-500 mb-1" />
                     <span className="text-xl font-bold text-slate-800">{averageScore}%</span>
-                    <span className="text-[10px] uppercase font-bold text-slate-400">Avg Score</span>
+                    <span className="text-xxs uppercase font-bold text-slate-400">Avg Score</span>
                 </div>
                 <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center">
                     <Award className="w-5 h-5 text-amber-500 mb-1" />
                     <span className="text-xl font-bold text-slate-800">{currentStreak}</span>
-                    <span className="text-[10px] uppercase font-bold text-slate-400">Streak</span>
+                    <span className="text-xxs uppercase font-bold text-slate-400">Streak</span>
                 </div>
                 <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center">
                     <Calendar className="w-5 h-5 text-indigo-500 mb-1" />
                     <span className="text-xl font-bold text-slate-800">{totalDays}</span>
-                    <span className="text-[10px] uppercase font-bold text-slate-400">Days</span>
+                    <span className="text-xxs uppercase font-bold text-slate-400">Days</span>
                 </div>
             </div>
 

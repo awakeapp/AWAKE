@@ -239,7 +239,7 @@ const DebtManager = () => {
 
                                     <div className="space-y-5">
                                         <div>
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Name</label>
+                                            <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2 block">Name</label>
                                             <div className="relative">
                                                 <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="John Doe" autoComplete="name" className="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 pr-12 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm" autoFocus />
                                                 <ActionButton
@@ -254,7 +254,7 @@ const DebtManager = () => {
                                                 </ActionButton>
                                             </div>
                                             {contactError && (
-                                                <p className="text-[11px] text-amber-600 dark:text-amber-400 font-medium mt-1.5 flex items-center gap-1">
+                                                <p className="text-xs-plus text-amber-600 dark:text-amber-400 font-medium mt-1.5 flex items-center gap-1">
                                                     <span className="shrink-0">⚠</span> {contactError}
                                                 </p>
                                             )}
@@ -262,22 +262,22 @@ const DebtManager = () => {
 
                                         <div className="grid grid-cols-[100px_1fr] gap-4">
                                             <div>
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Code</label>
+                                                <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2 block">Code</label>
                                                 <input type="text" value={countryCode} onChange={e => setCountryCode(e.target.value)} placeholder="+91" className="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm text-center" />
                                             </div>
                                             <div>
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Phone No. (Opt)</label>
+                                                <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2 block">Phone No. (Opt)</label>
                                                 <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="9876543210" autoComplete="tel" className="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm" />
                                             </div>
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Tag (Opt)</label>
+                                                <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2 block">Tag (Opt)</label>
                                                 <input type="text" value={tag} onChange={e => setTag(e.target.value)} placeholder="Vendor, Friend" className="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm" />
                                             </div>
                                             <div>
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Cred. Limit (Opt)</label>
+                                                <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2 block">Cred. Limit (Opt)</label>
                                                 <input type="number" value={creditLimit} onChange={e => setCreditLimit(e.target.value)} placeholder="₹0" className="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm" />
                                             </div>
                                         </div>
@@ -369,11 +369,11 @@ const DebtManager = () => {
                 {/* Summary Section */}
                 <div className="grid grid-cols-2 gap-3">
                     <div className="bg-emerald-50 text-emerald-900 dark:bg-emerald-500/10 dark:text-emerald-100 p-4 rounded-[1.5rem] shadow-sm border border-emerald-100 dark:border-emerald-500/20">
-                        <p className="text-[9px] font-black uppercase tracking-[0.15em] opacity-60 mb-1">To Get</p>
+                        <p className="text-micro font-black uppercase tracking-[0.15em] opacity-60 mb-1">To Get</p>
                         <h2 className="text-xl font-black">{formatCurrency(totalReceivable, true)}</h2>
                     </div>
                     <div className="bg-red-50 text-red-900 dark:bg-red-500/10 dark:text-red-100 p-4 rounded-[1.5rem] shadow-sm border border-red-100 dark:border-red-500/20">
-                        <p className="text-[9px] font-black uppercase tracking-[0.15em] opacity-60 mb-1">To Pay</p>
+                        <p className="text-micro font-black uppercase tracking-[0.15em] opacity-60 mb-1">To Pay</p>
                         <h2 className="text-xl font-black">{formatCurrency(totalPayable, true)}</h2>
                     </div>
                 </div>
@@ -452,17 +452,17 @@ const DebtManager = () => {
                                                     </h4>
                                                 </div>
                                                 <div className="flex items-center gap-2 mt-1.5 overflow-hidden">
-                                                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider whitespace-nowrap">
+                                                    <span className="text-xxs text-slate-400 font-bold uppercase tracking-wider whitespace-nowrap">
                                                         {new Date(party.lastTxDate).toLocaleDateString([], { month: 'short', day: 'numeric' })}
                                                     </span>
                                                     <span className="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-800 shrink-0" />
-                                                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider whitespace-nowrap">
+                                                    <span className="text-xxs text-slate-400 font-bold uppercase tracking-wider whitespace-nowrap">
                                                         {getPartyTransactions(party.id).length} Entries
                                                     </span>
                                                     {party.tag && (
                                                         <>
                                                             <span className="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-800 shrink-0" />
-                                                            <span className="text-[10px] bg-slate-50 dark:bg-slate-800/50 px-1.5 py-0.5 rounded text-slate-500 truncate">{party.tag}</span>
+                                                            <span className="text-xxs bg-slate-50 dark:bg-slate-800/50 px-1.5 py-0.5 rounded text-slate-500 truncate">{party.tag}</span>
                                                         </>
                                                     )}
                                                 </div>
@@ -476,13 +476,13 @@ const DebtManager = () => {
                                                     />
                                                 )}
                                                 {isSettled ? (
-                                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2.5 py-1 bg-slate-50 dark:bg-slate-800 rounded-lg">Settled</span>
+                                                    <span className="text-xxs font-black uppercase tracking-widest text-slate-400 px-2.5 py-1 bg-slate-50 dark:bg-slate-800 rounded-lg">Settled</span>
                                                 ) : (
                                                     <div className="flex flex-col items-end">
                                                         <p className={`text-xl font-black tracking-tightest leading-none ${isReceivable ? 'text-emerald-600 dark:text-emerald-500' : 'text-red-600 dark:text-red-500'}`}>
                                                             {formatCurrency(Math.abs(bal), true)}
                                                         </p>
-                                                        <p className={`text-[9px] font-black uppercase tracking-[0.15em] mt-1.5 ${isReceivable ? 'text-emerald-500/60' : 'text-red-500/60'}`}>
+                                                        <p className={`text-micro font-black uppercase tracking-[0.15em] mt-1.5 ${isReceivable ? 'text-emerald-500/60' : 'text-red-500/60'}`}>
                                                             {isReceivable ? 'To Get' : 'To Pay'}
                                                         </p>
                                                     </div>

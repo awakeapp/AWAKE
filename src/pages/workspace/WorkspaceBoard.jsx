@@ -46,7 +46,7 @@ const WorkspaceBoard = () => {
                                 {catTasks.map(task => (
                                     <div key={task.id} className="bg-white dark:bg-slate-900 p-3 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow group cursor-pointer group">
                                         <div className="flex justify-between items-start mb-2">
-                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase
+                                            <span className={`px-2 py-0.5 rounded text-xxs font-bold uppercase
                                                 ${task.priority === 'High' ? 'bg-red-100 text-red-600' :
                                                     task.priority === 'Medium' ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-600'
                                                 }
@@ -59,7 +59,7 @@ const WorkspaceBoard = () => {
                                         </h4>
                                         <div className="flex items-center justify-between text-xs text-slate-400 mt-3">
                                             <span>{task.date ? format(new Date(task.date), 'MMM d') : 'No Date'}</span>
-                                            <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-500">
+                                            <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xxs font-bold text-slate-500">
                                                 {task.estimatedTime}m
                                             </div>
                                         </div>

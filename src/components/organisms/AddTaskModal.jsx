@@ -59,7 +59,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave }) => {
                     <div className="px-6 pt-2 pb-6 space-y-5">
                         {/* Name Input - Open & Calm */}
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">
+                            <label className="text-xxs font-bold text-slate-400 uppercase tracking-widest pl-1">
                                 Task Name
                             </label>
                             <div className="relative">
@@ -77,7 +77,7 @@ const AddTaskModal = ({ isOpen, onClose, onSave }) => {
 
                         {/* Time Picker - Row Style */}
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">
+                            <label className="text-xxs font-bold text-slate-400 uppercase tracking-widest pl-1">
                                 Time
                             </label>
                             <div className="relative group">

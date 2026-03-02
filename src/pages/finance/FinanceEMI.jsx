@@ -83,19 +83,19 @@ const FinanceEMI = () => {
                 {/* Summary Cards */}
                 <div className="grid grid-cols-2 gap-3 mb-6">
                     <div className="bg-white dark:bg-[#1C1C1E] rounded-2xl p-4 border border-slate-200 dark:border-[#2C2C2E]">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Monthly EMI</p>
+                        <p className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-1">Monthly EMI</p>
                         <p className="text-2xl font-black text-slate-900 dark:text-white">{formatCurrency(summary.totalEMI, true)}</p>
                     </div>
                     <div className="bg-white dark:bg-[#1C1C1E] rounded-2xl p-4 border border-slate-200 dark:border-[#2C2C2E]">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Outstanding</p>
+                        <p className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-1">Outstanding</p>
                         <p className="text-2xl font-black text-rose-500">{formatCurrency(summary.totalOutstanding, true)}</p>
                     </div>
                     <div className="bg-white dark:bg-[#1C1C1E] rounded-2xl p-4 border border-slate-200 dark:border-[#2C2C2E]">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Active Loans</p>
+                        <p className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-1">Active Loans</p>
                         <p className="text-2xl font-black text-indigo-500">{summary.totalLoans}</p>
                     </div>
                     <div className="bg-white dark:bg-[#1C1C1E] rounded-2xl p-4 border border-slate-200 dark:border-[#2C2C2E]">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Overdue</p>
+                        <p className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-1">Overdue</p>
                         <p className={`text-2xl font-black ${summary.overdueCount > 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
                             {summary.overdueCount > 0 ? summary.overdueCount : '✓'}
                         </p>
@@ -106,8 +106,8 @@ const FinanceEMI = () => {
                 <div className="bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 rounded-2xl p-4 mb-6 flex items-start gap-3">
                     <AlertCircle className="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" />
                     <div>
-                        <p className="text-[13px] font-bold text-indigo-900 dark:text-indigo-300">Synced with Vehicle Module</p>
-                        <p className="text-[12px] text-indigo-700/70 dark:text-indigo-400/60 mt-0.5">
+                        <p className="text-sm-minus font-bold text-indigo-900 dark:text-indigo-300">Synced with Vehicle Module</p>
+                        <p className="text-xs text-indigo-700/70 dark:text-indigo-400/60 mt-0.5">
                             EMI data is automatically synced from your Vehicle loans. Any changes made in Vehicle → Loans will reflect here instantly.
                         </p>
                     </div>
@@ -115,7 +115,7 @@ const FinanceEMI = () => {
 
                 {/* Loans List */}
                 <div className="mb-4">
-                    <p className="text-[13px] font-semibold text-slate-500 dark:text-[#8E8E93] uppercase tracking-wider px-1 mb-3">Your Loans</p>
+                    <p className="text-sm-minus font-semibold text-slate-500 dark:text-[#8E8E93] uppercase tracking-wider px-1 mb-3">Your Loans</p>
                 </div>
 
                 {isLoading ? (
@@ -126,7 +126,7 @@ const FinanceEMI = () => {
                     <div className="text-center py-16 bg-white dark:bg-[#1C1C1E] rounded-2xl border border-slate-200 dark:border-[#2C2C2E]">
                         <CreditCard className="w-12 h-12 text-slate-300 mx-auto mb-4" />
                         <p className="text-slate-900 dark:text-white font-bold mb-1">No EMI Loans Found</p>
-                        <p className="text-[13px] text-slate-500 max-w-[240px] mx-auto mb-6">
+                        <p className="text-sm-minus text-slate-500 max-w-[240px] mx-auto mb-6">
                             Add a vehicle loan in the Vehicle module to see your EMI details here.
                         </p>
                         <button
@@ -154,16 +154,16 @@ const FinanceEMI = () => {
                                                 <CreditCard className={`w-5 h-5 ${status.color}`} />
                                             </div>
                                             <div>
-                                                <h3 className="text-[16px] font-bold text-slate-900 dark:text-white">{loan.lender || 'Loan'}</h3>
-                                                <p className="text-[12px] text-slate-500 mt-0.5">{loan.vehicleName || 'Vehicle'}</p>
+                                                <h3 className="text-base font-bold text-slate-900 dark:text-white">{loan.lender || 'Loan'}</h3>
+                                                <p className="text-xs text-slate-500 mt-0.5">{loan.vehicleName || 'Vehicle'}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg ${status.bg} ${status.color}`}>
+                                            <span className={`text-xxs font-black uppercase tracking-widest px-2.5 py-1 rounded-lg ${status.bg} ${status.color}`}>
                                                 {status.label}
                                             </span>
                                             {daysInfo && (
-                                                <p className="text-[11px] text-slate-400 mt-1.5 flex items-center justify-end gap-1">
+                                                <p className="text-xs-plus text-slate-400 mt-1.5 flex items-center justify-end gap-1">
                                                     <Clock className="w-3 h-3" /> {daysInfo}
                                                 </p>
                                             )}
@@ -172,24 +172,24 @@ const FinanceEMI = () => {
 
                                     <div className="grid grid-cols-3 gap-3 mb-4">
                                         <div>
-                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">EMI</p>
-                                            <p className="text-[15px] font-bold text-slate-900 dark:text-white">{formatCurrency(loan.emiAmount, true)}</p>
+                                            <p className="text-micro font-black text-slate-400 uppercase tracking-widest">EMI</p>
+                                            <p className="text-base-minus font-bold text-slate-900 dark:text-white">{formatCurrency(loan.emiAmount, true)}</p>
                                         </div>
                                         <div>
-                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Remaining</p>
-                                            <p className="text-[15px] font-bold text-rose-500">{formatCurrency(loan.remainingPrincipal, true)}</p>
+                                            <p className="text-micro font-black text-slate-400 uppercase tracking-widest">Remaining</p>
+                                            <p className="text-base-minus font-bold text-rose-500">{formatCurrency(loan.remainingPrincipal, true)}</p>
                                         </div>
                                         <div>
-                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Rate</p>
-                                            <p className="text-[15px] font-bold text-slate-900 dark:text-white">{loan.interestRate || '—'}%</p>
+                                            <p className="text-micro font-black text-slate-400 uppercase tracking-widest">Rate</p>
+                                            <p className="text-base-minus font-bold text-slate-900 dark:text-white">{loan.interestRate || '—'}%</p>
                                         </div>
                                     </div>
 
                                     {/* Progress Bar */}
                                     <div>
                                         <div className="flex justify-between mb-1.5">
-                                            <p className="text-[10px] font-bold text-slate-400">Repayment Progress</p>
-                                            <p className="text-[10px] font-black text-indigo-500">{progress}%</p>
+                                            <p className="text-xxs font-bold text-slate-400">Repayment Progress</p>
+                                            <p className="text-xxs font-black text-indigo-500">{progress}%</p>
                                         </div>
                                         <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                             <div 

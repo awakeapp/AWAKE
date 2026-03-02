@@ -106,7 +106,7 @@ const LocationModal = ({ isOpen, onClose }) => {
                                 </div>
                                 <div>
                                     <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tightest">Qibla Nexus</h2>
-                                    <p className="text-[10px] font-black text-slate-400 dark:text-[#8E8E93] uppercase tracking-[0.2em] mt-0.5">Global Sync</p>
+                                    <p className="text-xxs font-black text-slate-400 dark:text-[#8E8E93] uppercase tracking-[0.2em] mt-0.5">Global Sync</p>
                                 </div>
                             </div>
                             <button 
@@ -166,7 +166,7 @@ const LocationModal = ({ isOpen, onClose }) => {
                                             animate={{ opacity: 1, y: 0 }}
                                             className="space-y-3"
                                         >
-                                            <p className="text-[10px] font-black text-slate-400 dark:text-[#48484A] uppercase tracking-[0.3em] px-2">Identified Hubs</p>
+                                            <p className="text-xxs font-black text-slate-400 dark:text-[#48484A] uppercase tracking-[0.3em] px-2">Identified Hubs</p>
                                             <div className="space-y-2">
                                                 {searchResults.map((result, idx) => (
                                                     <button
@@ -181,7 +181,7 @@ const LocationModal = ({ isOpen, onClose }) => {
                                                             <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight truncate">
                                                                 {result.city || result.displayName.split(',')[0]}
                                                             </p>
-                                                            <p className="text-[10px] font-bold text-slate-400 dark:text-[#48484A] mt-1 uppercase tracking-widest truncate">
+                                                            <p className="text-xxs font-bold text-slate-400 dark:text-[#48484A] mt-1 uppercase tracking-widest truncate">
                                                                 {result.displayName}
                                                             </p>
                                                         </div>
@@ -194,7 +194,7 @@ const LocationModal = ({ isOpen, onClose }) => {
                             </div>
 
                             <div className="text-center pt-8">
-                                <p className="text-[10px] font-black text-slate-300 dark:text-[#48484A] uppercase tracking-[0.2em] leading-relaxed">
+                                <p className="text-xxs font-black text-slate-300 dark:text-[#48484A] uppercase tracking-[0.2em] leading-relaxed">
                                     Privacy Shield Active • End-to-End Celestial Sync
                                 </p>
                             </div>

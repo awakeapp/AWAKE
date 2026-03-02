@@ -342,7 +342,7 @@ const Login = () => {
             </motion.div>
 
             <div className="absolute bottom-4 left-0 w-full text-center z-10">
-                <p className="text-[10px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-[0.2em] opacity-60">
+                <p className="text-xxs font-black text-slate-300 dark:text-slate-700 uppercase tracking-[0.2em] opacity-60">
                     Developed by CoolCraft
                 </p>
             </div>

@@ -33,7 +33,7 @@ const ManageVehiclesModal = ({ isOpen, onClose, setEditingVehicle, setIsAddOpen,
                             </div>
                             <div>
                                 <h3 className="font-bold text-slate-900 dark:text-white">Manage Vehicles</h3>
-                                <p className="text-[10px] text-slate-500">{vehicles.length} Vehicles in Fleet</p>
+                                <p className="text-xxs text-slate-500">{vehicles.length} Vehicles in Fleet</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-2">

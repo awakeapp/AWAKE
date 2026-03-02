@@ -175,7 +175,7 @@ const DashboardHero = ({ percentage = 0, completedCount = 0, totalCount = 0 }) =
                         </span>
                     </motion.div>
                     {percentage > 0 && (
-                        <p className="text-white/50 text-[10px] font-medium tracking-wide">
+                        <p className="text-white/50 text-xxs font-medium tracking-wide">
                             {completedCount} / {totalCount} completed
                         </p>
                     )}

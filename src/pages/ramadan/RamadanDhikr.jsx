@@ -31,9 +31,9 @@ const DhikrListItem = ({ title, count, target, onClick, accentClass, bgTint = "b
                     <Hash className={clsx("w-5 h-5", accentClass.replace('bg-', 'text-'))} />
                 </div>
                 <div>
-                    <h3 className="text-[16px] font-black text-slate-900 dark:text-white leading-none mb-1.5">{title}</h3>
+                    <h3 className="text-base font-black text-slate-900 dark:text-white leading-none mb-1.5">{title}</h3>
                     <div className="flex items-center gap-2">
-                        <span className="text-[13px] font-bold text-slate-500 dark:text-[#8E8E93] tabular-nums tracking-tight">
+                        <span className="text-sm-minus font-bold text-slate-500 dark:text-[#8E8E93] tabular-nums tracking-tight">
                             {count} {target > 0 && `/ ${target}`}
                         </span>
                     </div>
@@ -114,7 +114,7 @@ const FullScreenCounter = ({ dhikr, onSave, onClose }) => {
                     variant="back" 
                     onClick={() => { onSave(currentCount); onClose(); }} 
                 />
-                <h2 className="text-[16px] font-black tracking-widest uppercase text-slate-900 dark:text-white absolute left-1/2 -translate-x-1/2">{title}</h2>
+                <h2 className="text-base font-black tracking-widest uppercase text-slate-900 dark:text-white absolute left-1/2 -translate-x-1/2">{title}</h2>
                 <div className="w-12 h-12" />
             </div>
 
@@ -150,14 +150,14 @@ const FullScreenCounter = ({ dhikr, onSave, onClose }) => {
                 </Pressable>
                 
                 <div className="flex flex-col items-center text-center">
-                    <span className="text-[80px] font-black tracking-tighter leading-none tabular-nums text-slate-900 dark:text-white">
+                    <span className="text-display-lg font-black tracking-tighter leading-none tabular-nums text-slate-900 dark:text-white">
                         {currentCount}
                     </span>
                     {target > 0 && (
                         <motion.div 
                             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                             className={clsx(
-                                "mt-4 px-6 py-2.5 rounded-full border text-[11px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors",
+                                "mt-4 px-6 py-2.5 rounded-full border text-xs-plus font-black uppercase tracking-widest flex items-center gap-2 transition-colors",
                                 isComplete ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30" : "bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10"
                             )}
                         >
@@ -178,7 +178,7 @@ const FullScreenCounter = ({ dhikr, onSave, onClose }) => {
                             exit={{ opacity: 0 }}
                             onClick={handleReset}
                             scaleDown={0.96}
-                            className="px-6 py-3 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-[#8E8E93] text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-white/10 transition-colors"
+                            className="px-6 py-3 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-[#8E8E93] text-xxs font-black uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-white/10 transition-colors"
                         >
                             Reset Counter
                         </Pressable>
@@ -190,7 +190,7 @@ const FullScreenCounter = ({ dhikr, onSave, onClose }) => {
                             exit={{ opacity: 0, scale: 0.9 }}
                             onClick={handleReset}
                             scaleDown={0.96}
-                            className="px-6 py-3 rounded-2xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-500 border border-rose-200 dark:border-rose-500/30 text-[10px] font-black uppercase tracking-widest shadow-sm"
+                            className="px-6 py-3 rounded-2xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-500 border border-rose-200 dark:border-rose-500/30 text-xxs font-black uppercase tracking-widest shadow-sm"
                         >
                             Tap to Confirm
                         </Pressable>

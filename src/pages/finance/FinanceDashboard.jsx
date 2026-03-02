@@ -189,7 +189,7 @@ const FinanceDashboard = () => {
                             size="sm" 
                             className="bg-transparent hover:bg-white dark:hover:bg-slate-800"
                         />
-                        <span className="text-[10px] font-black uppercase tracking-widest min-w-[70px] text-center text-slate-700 dark:text-slate-200">
+                        <span className="text-xxs font-black uppercase tracking-widest min-w-[70px] text-center text-slate-700 dark:text-slate-200">
                             {format(selectedDate, 'MMM yy')}
                         </span>
                         <ActionButton 
@@ -216,8 +216,8 @@ const FinanceDashboard = () => {
                         <div className="relative z-10">
                             <div className="mb-4 w-full flex flex-col items-center">
                                 <div className="space-y-1 flex flex-col items-center">
-                                    <p className="text-indigo-100/70 text-[10px] font-black uppercase tracking-[0.2em]">{t('finance.total_balance', 'Total Balance')}</p>
-                                    <h2 className="text-[44px] sm:text-[48px] font-black tracking-tightest leading-tight flex items-center justify-center gap-1.5">
+                                    <p className="text-indigo-100/70 text-xxs font-black uppercase tracking-[0.2em]">{t('finance.total_balance', 'Total Balance')}</p>
+                                    <h2 className="text-display-sm sm:text-display-sm font-black tracking-tightest leading-tight flex items-center justify-center gap-1.5">
                                         <span className="text-2xl opacity-40 font-bold">₹</span>
                                         <span dir="ltr">{formatCurrency(totalBalance)}</span>
                                     </h2>
@@ -227,17 +227,17 @@ const FinanceDashboard = () => {
                             <div className="w-full h-px bg-white/10 mb-5" />
 
                             <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-2 w-full mb-5 max-w-[90%] mx-auto">
-                                <div className="flex items-center gap-1.5 font-bold text-[10px] min-[380px]:text-[11px] tracking-tight">
+                                <div className="flex items-center gap-1.5 font-bold text-xxs min-[380px]:text-xs-plus tracking-tight">
                                     <span className="text-emerald-300 uppercase tracking-wider">Income</span>
                                     <span className="text-white">{formatCurrency(monthStats.income, true)}</span>
                                 </div>
-                                <span className="text-white/20 select-none text-[10px] hidden min-[360px]:block">|</span>
-                                <div className="flex items-center gap-1.5 font-bold text-[10px] min-[380px]:text-[11px] tracking-tight">
+                                <span className="text-white/20 select-none text-xxs hidden min-[360px]:block">|</span>
+                                <div className="flex items-center gap-1.5 font-bold text-xxs min-[380px]:text-xs-plus tracking-tight">
                                     <span className="text-rose-300 uppercase tracking-wider">Expense</span>
                                     <span className="text-white">{formatCurrency(monthStats.expense, true)}</span>
                                 </div>
-                                <span className="text-white/20 select-none text-[10px] hidden min-[360px]:block">|</span>
-                                <div className="flex items-center gap-1.5 font-bold text-[10px] min-[380px]:text-[11px] tracking-tight">
+                                <span className="text-white/20 select-none text-xxs hidden min-[360px]:block">|</span>
+                                <div className="flex items-center gap-1.5 font-bold text-xxs min-[380px]:text-xs-plus tracking-tight">
                                     <span className="text-slate-300 uppercase tracking-wider">Recurring</span>
                                     <span className="text-white">{formatCurrency(recurringTotal, true)}</span>
                                 </div>
@@ -251,7 +251,7 @@ const FinanceDashboard = () => {
                                         setAddType('savings'); 
                                         setIsAddOpen(true); 
                                     }} 
-                                    className="px-5 py-2 rounded-full border border-white/20 bg-transparent hover:bg-white/10 active:scale-95 transition-all text-[10px] font-black tracking-widest uppercase text-white flex items-center gap-2 shadow-sm"
+                                    className="px-5 py-2 rounded-full border border-white/20 bg-transparent hover:bg-white/10 active:scale-95 transition-all text-xxs font-black tracking-widest uppercase text-white flex items-center gap-2 shadow-sm"
                                 >
                                     <span>Savings</span>
                                     <div className="w-1 h-1 rounded-full bg-white/30" />
@@ -273,8 +273,8 @@ const FinanceDashboard = () => {
                             <PieChart className="w-[18px] h-[18px] text-emerald-500" strokeWidth={2.5} />
                         </div>
                         <div className="text-left">
-                            <p className="text-[13px] font-bold text-slate-900 dark:text-white leading-tight">Analytics</p>
-                            <p className="text-[10px] text-slate-400 font-medium">Spending insights</p>
+                            <p className="text-sm-minus font-bold text-slate-900 dark:text-white leading-tight">Analytics</p>
+                            <p className="text-xxs text-slate-400 font-medium">Spending insights</p>
                         </div>
                     </Pressable>
                     <Pressable
@@ -286,8 +286,8 @@ const FinanceDashboard = () => {
                             <TrendingUp className="w-[18px] h-[18px] text-rose-500" strokeWidth={2.5} />
                         </div>
                         <div className="text-left">
-                            <p className="text-[13px] font-bold text-slate-900 dark:text-white leading-tight">Budget</p>
-                            <p className="text-[10px] text-slate-400 font-medium">Category limits</p>
+                            <p className="text-sm-minus font-bold text-slate-900 dark:text-white leading-tight">Budget</p>
+                            <p className="text-xxs text-slate-400 font-medium">Category limits</p>
                         </div>
                     </Pressable>
                 </div>
@@ -356,11 +356,11 @@ const FinanceDashboard = () => {
                                                 })()}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="font-bold text-slate-900 dark:text-white text-[15px] truncate">{tx.description || tx.note || cat?.name || 'Transaction'}</p>
+                                                <p className="font-bold text-slate-900 dark:text-white text-base-minus truncate">{tx.description || tx.note || cat?.name || 'Transaction'}</p>
                                                 <p className="text-xs text-slate-400 mt-0.5">{format(new Date(tx.date || tx.createdAt), timeFormat === '24h' ? 'dd MMM, HH:mm' : 'dd MMM, h:mm a')} • {accounts.find(a => a.id === tx.accountId)?.name || 'Account'}</p>
                                             </div>
                                             <div className="text-right shrink-0">
-                                                <p className={`text-[16px] font-bold ${isIncome ? 'text-emerald-500' : 'text-slate-900 dark:text-white'}`}>
+                                                <p className={`text-base font-bold ${isIncome ? 'text-emerald-500' : 'text-slate-900 dark:text-white'}`}>
                                                     {isIncome ? '+' : '-'}<span dir="ltr">{formatCurrency(tx.amount, true)}</span>
                                                 </p>
                                             </div>

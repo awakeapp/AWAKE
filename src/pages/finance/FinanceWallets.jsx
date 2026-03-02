@@ -94,7 +94,7 @@ const FinanceWallets = () => {
                             />
                             <div>
                                 <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Wallets</h1>
-                                <p className="text-[11px] text-slate-400 font-medium">{activeAccounts.length} active account{activeAccounts.length !== 1 ? 's' : ''}</p>
+                                <p className="text-xs-plus text-slate-400 font-medium">{activeAccounts.length} active account{activeAccounts.length !== 1 ? 's' : ''}</p>
                             </div>
                         </div>
                         <ActionButton
@@ -150,8 +150,8 @@ const FinanceWallets = () => {
                                         <Wallet className="w-6 h-6" />
                                     </div>
                                     <div className="text-left">
-                                        <p className="font-bold text-slate-900 dark:text-white text-[15px]">{acc.name}</p>
-                                        <p className="text-[11px] text-slate-400 font-medium mt-0.5">Active • Tap to view</p>
+                                        <p className="font-bold text-slate-900 dark:text-white text-base-minus">{acc.name}</p>
+                                        <p className="text-xs-plus text-slate-400 font-medium mt-0.5">Active • Tap to view</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
@@ -176,7 +176,7 @@ const FinanceWallets = () => {
                 {/* Archived */}
                 {archivedAccounts.length > 0 && (
                     <>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 mt-6">Archived</p>
+                        <p className="text-xxs font-black uppercase tracking-widest text-slate-400 ml-1 mt-6">Archived</p>
                         {archivedAccounts.map(acc => (
                             <button
                                 key={acc.id}
@@ -187,7 +187,7 @@ const FinanceWallets = () => {
                                     <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center">
                                         <ArchiveIcon className="w-5 h-5 text-slate-400" />
                                     </div>
-                                    <p className="font-bold text-slate-500 text-[15px]">{acc.name}</p>
+                                    <p className="font-bold text-slate-500 text-base-minus">{acc.name}</p>
                                 </div>
                                 <p className="text-slate-400 font-bold">{formatCurrency(acc.balance || 0, true)}</p>
                             </button>

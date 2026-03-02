@@ -111,26 +111,26 @@ const Settings = () => {
                                         </div>
                                         
                                         <div className="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-100 dark:border-white/5">
-                                            <p className="font-black text-[10px] uppercase tracking-widest text-slate-400 mb-3">How to Install</p>
+                                            <p className="font-black text-xxs uppercase tracking-widest text-slate-400 mb-3">How to Install</p>
                                             {isIOS ? (
                                                 <ol className="text-sm text-slate-600 dark:text-slate-300 space-y-3 font-medium">
                                                     <li className="flex gap-3">
-                                                        <span className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] shrink-0">1</span>
+                                                        <span className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xxs shrink-0">1</span>
                                                         <span>Tap the <strong className="text-indigo-500">Share</strong> button in Safari.</span>
                                                     </li>
                                                     <li className="flex gap-3">
-                                                        <span className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] shrink-0">2</span>
+                                                        <span className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xxs shrink-0">2</span>
                                                         <span>Select <strong className="text-indigo-500">Add to Home Screen</strong>.</span>
                                                     </li>
                                                 </ol>
                                             ) : (
                                                 <ol className="text-sm text-slate-600 dark:text-slate-300 space-y-3 font-medium">
                                                     <li className="flex gap-3">
-                                                        <span className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] shrink-0">1</span>
+                                                        <span className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xxs shrink-0">1</span>
                                                         <span>Tap the <strong className="text-indigo-500">Three Dots</strong> in Chrome.</span>
                                                     </li>
                                                     <li className="flex gap-3">
-                                                        <span className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] shrink-0">2</span>
+                                                        <span className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xxs shrink-0">2</span>
                                                         <span>Select <strong className="text-indigo-500">Install App</strong>.</span>
                                                     </li>
                                                 </ol>
@@ -167,14 +167,14 @@ const Settings = () => {
                                     )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <h2 className="text-[20px] font-bold text-slate-900 dark:text-white leading-tight truncate">
+                                    <h2 className="text-xl-minus font-bold text-slate-900 dark:text-white leading-tight truncate">
                                         {user?.displayName || 'User'}
                                     </h2>
                                     <div className="mt-1 flex flex-col">
-                                        <span className="text-[12px] font-bold text-primary-600 dark:text-primary-400 uppercase tracking-wider">
+                                        <span className="text-xs font-bold text-primary-600 dark:text-primary-400 uppercase tracking-wider">
                                             {memberId}
                                         </span>
-                                        <span className="text-[14px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                                        <span className="text-sm text-slate-500 dark:text-slate-400 truncate mt-0.5">
                                             {user?.email}
                                         </span>
                                     </div>
@@ -200,7 +200,7 @@ const Settings = () => {
                                 <select 
                                     value={themePreference}
                                     onChange={(e) => setThemePreference(e.target.value)}
-                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer max-w-[120px]"
+                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer max-w-[120px]"
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <option value="light">Light</option>
@@ -217,7 +217,7 @@ const Settings = () => {
                                 <select 
                                     value={appSettings.language}
                                     onChange={(e) => updateSetting('language', e.target.value)}
-                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer"
+                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer"
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <option value="en">English</option>
@@ -235,7 +235,7 @@ const Settings = () => {
                                 <select 
                                     value={appSettings.timeFormat}
                                     onChange={(e) => updateSetting('timeFormat', e.target.value)}
-                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-[14px] font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer"
+                                    className="appearance-none bg-slate-100 dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-white px-3 py-1.5 rounded-lg outline-none cursor-pointer"
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <option value="12h">12-hour</option>
@@ -315,7 +315,7 @@ const Settings = () => {
                             subtitle={isStandalone ? 'Running as standalone App' : 'Running in browser'}
                             rightElement={
                                 isStandalone ? (
-                                    <span className="text-[10px] font-black text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">Standlone</span>
+                                    <span className="text-xxs font-black text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">Standlone</span>
                                 ) : (
                                     <ActionButton
                                         variant="primary"
@@ -323,7 +323,7 @@ const Settings = () => {
                                         label="Install Now"
                                         iconOnly={false}
                                         size="sm"
-                                        className="text-[11px] font-bold px-3 py-1.5"
+                                        className="text-xs-plus font-bold px-3 py-1.5"
                                     />
                                 )
                             }
@@ -358,7 +358,7 @@ const Settings = () => {
                         />
                     </SettingsSection>
 
-                    <p className="text-center text-[12px] text-slate-400 dark:text-slate-600 mt-2 font-medium tracking-tight">
+                    <p className="text-center text-xs text-slate-400 dark:text-slate-600 mt-2 font-medium tracking-tight">
                         HUMI AWAKE • BUILD 88AF2
                     </p>
                 </SettingsList>

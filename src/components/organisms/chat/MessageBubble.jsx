@@ -24,7 +24,7 @@ const MessageBubble = ({ message, isOwn }) => {
             )}>
                 <p>{message.text}</p>
                 <div className={clsx(
-                    "text-[10px] mt-1 text-right opacity-60 font-medium",
+                    "text-xxs mt-1 text-right opacity-60 font-medium",
                     isOwn ? "text-emerald-900 dark:text-emerald-100" : "text-slate-500 dark:text-slate-400"
                 )}>
                     {time}

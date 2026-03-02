@@ -47,7 +47,7 @@ const ChatInterface = () => {
                     </div>
                     <div>
                         <h3 className="font-bold text-base leading-tight">{partner?.email?.split('@')[0] || "Partner"}</h3>
-                        <p className="text-[10px] opacity-80">{isMock ? 'online' : 'click for info'}</p>
+                        <p className="text-xxs opacity-80">{isMock ? 'online' : 'click for info'}</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-3 pr-2">

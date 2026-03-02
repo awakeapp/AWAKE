@@ -54,7 +54,7 @@ const ChatWindow = ({ assistant, isOpen, onClose }) => {
  </div>
  <div>
  <h3 className="font-bold text-slate-900 dark:text-white text-sm">Health Assistant</h3>
- <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1">
+ <p className="text-xxs text-slate-500 font-medium flex items-center gap-1">
  <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"></span>
  Mistral 7B (Local)
  </p>

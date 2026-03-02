@@ -167,7 +167,7 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
                                             type="time"
                                             value={task.time || ''}
                                             onChange={(e) => handleTaskChange(task.id, 'time', e.target.value)}
-                                            className="w-full bg-slate-50 dark:bg-slate-900/50 text-[14px] font-medium text-slate-700 dark:text-slate-300 rounded-lg px-2 py-1.5 outline-none border border-slate-200 dark:border-slate-800 focus:border-indigo-500"
+                                            className="w-full bg-slate-50 dark:bg-slate-900/50 text-sm font-medium text-slate-700 dark:text-slate-300 rounded-lg px-2 py-1.5 outline-none border border-slate-200 dark:border-slate-800 focus:border-indigo-500"
                                         />
                                     </div>
 
@@ -186,12 +186,12 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
                                             onChange={(e) => handleTaskChange(task.id, 'name', e.target.value)}
                                             placeholder="Task Name"
                                             maxLength={50}
-                                            className="w-full bg-transparent border-none p-0 text-[16px] font-normal text-slate-900 dark:text-slate-50 placeholder:text-slate-300 focus:ring-0 focus:outline-none"
+                                            className="w-full bg-transparent border-none p-0 text-base font-normal text-slate-900 dark:text-slate-50 placeholder:text-slate-300 focus:ring-0 focus:outline-none"
                                         />
                                         <select
                                             value={task.category || 'EVE/NIGHT'}
                                             onChange={(e) => handleTaskChange(task.id, 'category', e.target.value)}
-                                            className="bg-transparent text-[9px] font-bold uppercase tracking-wider text-slate-400 focus:outline-none p-0 w-max appearance-none cursor-pointer hover:text-indigo-500"
+                                            className="bg-transparent text-micro font-bold uppercase tracking-wider text-slate-400 focus:outline-none p-0 w-max appearance-none cursor-pointer hover:text-indigo-500"
                                             style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
                                         >
                                             <option value="EARLY MORNING">EARLY MORNING</option>
@@ -222,7 +222,7 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
                                         type="time"
                                         value={newTaskTime || ''}
                                         onChange={(e) => setNewTaskTime(e.target.value)}
-                                        className="w-full bg-white dark:bg-slate-900 text-[14px] font-medium text-slate-700 dark:text-slate-300 rounded-lg px-2 py-1.5 outline-none border border-indigo-200 dark:border-indigo-800 focus:border-indigo-500 shadow-sm"
+                                        className="w-full bg-white dark:bg-slate-900 text-sm font-medium text-slate-700 dark:text-slate-300 rounded-lg px-2 py-1.5 outline-none border border-indigo-200 dark:border-indigo-800 focus:border-indigo-500 shadow-sm"
                                     />
                                 </div>
                                 <div className="shrink-0 w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600">
@@ -243,12 +243,12 @@ const TaskManagerModal = ({ isOpen, onClose, tasks }) => {
                                             if (e.key === 'Escape') setShowAddRow(false);
                                         }}
                                         placeholder="Type task name..."
-                                        className="w-full bg-transparent border-none p-0 text-[16px] font-normal text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-0 focus:outline-none"
+                                        className="w-full bg-transparent border-none p-0 text-base font-normal text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-0 focus:outline-none"
                                     />
                                     <select
                                         value={newTaskCategory}
                                         onChange={(e) => setNewTaskCategory(e.target.value)}
-                                        className="bg-transparent text-[9px] font-bold uppercase tracking-wider text-slate-400 focus:outline-none p-0 w-max appearance-none cursor-pointer hover:text-indigo-500"
+                                        className="bg-transparent text-micro font-bold uppercase tracking-wider text-slate-400 focus:outline-none p-0 w-max appearance-none cursor-pointer hover:text-indigo-500"
                                         style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
                                     >
                                         <option value="EARLY MORNING">EARLY MORNING</option>

@@ -102,7 +102,7 @@ const VehicleEntryModal = ({ isOpen, onClose, activeVehicle }) => {
                                     className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all ${type === t.id ? t.bg + ' ' + t.color + ' ring-1 ring-current' : 'bg-slate-50 dark:bg-slate-800 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                                 >
                                     <t.icon className="w-5 h-5" />
-                                    <span className="text-[10px] font-bold uppercase">{t.label}</span>
+                                    <span className="text-xxs font-bold uppercase">{t.label}</span>
                                 </button>
                             ))}
                         </div>
@@ -155,7 +155,7 @@ const VehicleEntryModal = ({ isOpen, onClose, activeVehicle }) => {
 
                         {/* Account Selector */}
                         <div>
-                            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Paid From</label>
+                            <label className="block text-xxs font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Paid From</label>
                             <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
                                 {accounts.filter(a => !a.isArchived).map(acc => (
                                     <button

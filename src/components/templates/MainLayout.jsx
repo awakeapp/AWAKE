@@ -96,7 +96,7 @@ const MainLayout = ({ children }) => {
                     <Suspense fallback={Loader}>
                         {children || <Outlet />}
                     </Suspense>
-                    <div className="text-[10px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-[0.2em] text-center mt-8 mb-2 opacity-60">
+                    <div className="text-xxs font-black text-slate-300 dark:text-slate-700 uppercase tracking-[0.2em] text-center mt-8 mb-2 opacity-60">
                         Developed by CoolCraft
                     </div>
                 </main>

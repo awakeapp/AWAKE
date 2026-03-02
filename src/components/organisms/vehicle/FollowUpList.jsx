@@ -74,7 +74,7 @@ const FollowUpList = ({ vehicle }) => {
                     </span>
                     <div>
                         <h4 className="font-bold text-slate-900 dark:text-white text-sm">{item.name || item.type}</h4>
-                        <div className={`text-[10px] font-semibold flex flex-col ${urgency === 'overdue' ? 'text-red-500' : urgency === 'upcoming' ? 'text-orange-500' : 'text-slate-400'}`}>
+                        <div className={`text-xxs font-semibold flex flex-col ${urgency === 'overdue' ? 'text-red-500' : urgency === 'upcoming' ? 'text-orange-500' : 'text-slate-400'}`}>
                             {(item.interval_type === 'months' || item.interval_type === 'both' || item.frequencyType === 'date' || item.frequencyType === 'both') && (
                                 <span className="flex items-center gap-1">
                                     <Calendar className="w-2.5 h-2.5" />
@@ -90,7 +90,7 @@ const FollowUpList = ({ vehicle }) => {
                         </div>
                     </div>
                 </div>
-                {item.isRecurring && <span className="text-[10px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded border border-indigo-100 dark:bg-indigo-900/30 dark:border-indigo-800 dark:text-indigo-300">Recurring</span>}
+                {item.isRecurring && <span className="text-xxs bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded border border-indigo-100 dark:bg-indigo-900/30 dark:border-indigo-800 dark:text-indigo-300">Recurring</span>}
             </div>
 
             <div className="flex justify-between items-end mt-1">
@@ -98,7 +98,7 @@ const FollowUpList = ({ vehicle }) => {
                     {(() => {
                         const last = getLatestRecord(vehicle.id, item.name || item.type);
                         if (last) return (
-                            <p className="text-[9px] text-slate-400 font-medium">
+                            <p className="text-micro text-slate-400 font-medium">
                                 Last: {format(parseISO(last.date), 'MMM d, yyyy')} {last.odometer ? `(${Number(last.odometer).toLocaleString()} km)` : ''}
                             </p>
                         );
@@ -130,13 +130,13 @@ const FollowUpList = ({ vehicle }) => {
                 <div className="flex gap-2">
                     <button
                         onClick={() => setConfigModalOpen(true)}
-                        className="text-slate-600 text-[10px] font-bold bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full flex items-center gap-1 transition-colors dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+                        className="text-slate-600 text-xxs font-bold bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full flex items-center gap-1 transition-colors dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
                     >
                         <Settings className="w-3 h-3" /> Manage
                     </button>
                     <button
                         onClick={() => setAddModalOpen(true)}
-                        className="text-indigo-600 text-[10px] font-bold bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-full flex items-center gap-1 transition-colors dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50"
+                        className="text-indigo-600 text-xxs font-bold bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-full flex items-center gap-1 transition-colors dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50"
                     >
                         <Plus className="w-3 h-3" /> Add
                     </button>
@@ -165,7 +165,7 @@ const FollowUpList = ({ vehicle }) => {
                                             <p className={`font-bold text-sm ${isEnabled ? 'text-indigo-900 dark:text-indigo-100' : 'text-slate-600 dark:text-slate-400'}`}>
                                                 {template.name}
                                             </p>
-                                            <p className="text-[10px] text-slate-500">
+                                            <p className="text-xxs text-slate-500">
                                                 {template.interval_type === 'both' ? `Every ${template.interval_months} months / ${template.interval_km}km` :
                                                     template.interval_type === 'months' ? `Every ${template.interval_months} months` :
                                                         template.interval_type === 'km' ? `Every ${template.interval_km}km` : 'Ad-hoc'}

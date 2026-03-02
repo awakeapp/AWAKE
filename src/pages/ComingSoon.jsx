@@ -17,7 +17,7 @@ const ComingSoon = () => {
                         <Clock className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
                     </div>
                     <h1 className="text-2xl font-bold mb-3 tracking-tight">Coming Soon</h1>
-                    <p className="text-slate-500 dark:text-slate-400 text-[15px] leading-relaxed">
+                    <p className="text-slate-500 dark:text-slate-400 text-base-minus leading-relaxed">
                         We're working hard to bring this feature to you. Check back later for updates.
                     </p>
                     <button

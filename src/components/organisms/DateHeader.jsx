@@ -83,7 +83,7 @@ const DateHeader = ({ className, showControls = true, overviewText, onEditClick,
                 {!isToday && (
                     <button
                         onClick={jumpToToday}
-                        className="flex items-center justify-center bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl transition-colors flex-shrink-0"
+                        className="flex items-center justify-center bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-xxs sm:text-xs font-bold uppercase tracking-wider px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl transition-colors flex-shrink-0"
                     >
                         Today
                     </button>

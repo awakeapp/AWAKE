@@ -42,7 +42,7 @@ const Analytics = () => {
     >
       <div className="space-y-6 pb-20">
         <div className="space-y-4">
-            <p className="text-slate-500 dark:text-slate-400 text-[13px] font-bold uppercase tracking-widest text-center">
+            <p className="text-slate-500 dark:text-slate-400 text-sm-minus font-bold uppercase tracking-widest text-center">
                 {activeTab === 'finance' ? 'Your financial performance' : 'Your routine & habits'}
             </p>
 
@@ -50,13 +50,13 @@ const Analytics = () => {
             <div className="flex bg-slate-100/50 dark:bg-slate-900/50 p-1 rounded-2xl w-full border border-slate-200/50 dark:border-slate-800/50">
                 <button 
                     onClick={() => setActiveTab('finance')}
-                    className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'finance' ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-md' : 'text-slate-500 dark:text-slate-500 hover:text-slate-600'}`}
+                    className={`flex-1 py-3 rounded-xl text-xxs font-black uppercase tracking-widest transition-all ${activeTab === 'finance' ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-md' : 'text-slate-500 dark:text-slate-500 hover:text-slate-600'}`}
                 >
                     Finance
                 </button>
                 <button 
                     onClick={() => setActiveTab('routine')}
-                    className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'routine' ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-md' : 'text-slate-500 dark:text-slate-500 hover:text-slate-600'}`}
+                    className={`flex-1 py-3 rounded-xl text-xxs font-black uppercase tracking-widest transition-all ${activeTab === 'routine' ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-md' : 'text-slate-500 dark:text-slate-500 hover:text-slate-600'}`}
                 >
                     Routine
                 </button>

@@ -115,7 +115,7 @@ const CompleteFollowUpModal = ({ isOpen, onClose, onComplete, followUp, vehicle 
                                         <option key={acc.id} value={acc.id}>{acc.name} (₹{acc.balance})</option>
                                     ))}
                                 </select>
-                                <p className="text-[10px] text-indigo-500 mt-1 flex items-center gap-1">
+                                <p className="text-xxs text-indigo-500 mt-1 flex items-center gap-1">
                                     <CheckCircle className="w-3 h-3" /> Creates expense in Finance
                                 </p>
                             </div>

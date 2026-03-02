@@ -29,7 +29,7 @@ const DateStrip = ({ selectedDate, onSelectDate }) => {
                                 : 'bg-white text-slate-400 hover:bg-slate-50'
                         }`}
                     >
-                        <span className={`text-[20px] font-bold leading-none mb-1 ${isSelected ? 'text-white' : 'text-slate-800'}`}>
+                        <span className={`text-xl-minus font-bold leading-none mb-1 ${isSelected ? 'text-white' : 'text-slate-800'}`}>
                             {dayName}
                         </span>
                         <span className="text-xs font-medium">

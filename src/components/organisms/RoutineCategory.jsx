@@ -28,11 +28,11 @@ const RoutineCategory = ({ title, tasks, onUpdateStatus, isLocked }) => {
             <div className="w-full flex items-center justify-between px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 shadow-sm ring-1 ring-slate-900/5 transition-all duration-200">
                 <div className="flex items-center gap-2.5">
                     <div className={cn("w-1 h-4 rounded-full", getTheme())} />
-                    <h3 className="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest leading-none">
+                    <h3 className="text-xxs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest leading-none">
                         {title}
                     </h3>
                 </div>
-                <span className="text-[9px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-md">
+                <span className="text-micro font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-md">
                     {completed}/{total}
                 </span>
             </div>

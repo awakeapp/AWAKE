@@ -21,7 +21,7 @@ const SelectionCard = ({ icon: Icon, title, options, value, onChange, delay = 0 
                 <div className="p-2.5 bg-indigo-500/10 rounded-xl">
                     <Icon className="w-5 h-5 text-indigo-500" />
                 </div>
-                <h3 className="text-[17px] font-black uppercase tracking-tight text-slate-900 dark:text-white">{title}</h3>
+                <h3 className="text-base-plus font-black uppercase tracking-tight text-slate-900 dark:text-white">{title}</h3>
             </div>
 
             <div className="grid grid-cols-2 xs:grid-cols-3 gap-2">
@@ -32,7 +32,7 @@ const SelectionCard = ({ icon: Icon, title, options, value, onChange, delay = 0 
                             key={opt.id}
                             onClick={() => onChange(opt.id)}
                             className={clsx(
-                                "relative px-3 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 border",
+                                "relative px-3 py-4 rounded-2xl text-xs-plus font-black uppercase tracking-widest transition-all duration-300 border",
                                 isSelected 
                                     ? "bg-indigo-600 text-white border-indigo-500 shadow-xl shadow-indigo-500/20" 
                                     : "bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-[#48484A] border-transparent hover:bg-slate-100 dark:hover:bg-white/10"
@@ -134,7 +134,7 @@ const RamadanSettings = () => {
                             <div className="p-2.5 bg-emerald-500/10 rounded-xl">
                                 <Calendar className="w-5 h-5 text-emerald-500" />
                             </div>
-                            <h3 className="text-[17px] font-black uppercase tracking-tight text-slate-900 dark:text-white">Hijri Sync</h3>
+                            <h3 className="text-base-plus font-black uppercase tracking-tight text-slate-900 dark:text-white">Hijri Sync</h3>
                         </div>
                         <span className="px-4 py-2 bg-emerald-500 text-white text-xs font-black rounded-xl shadow-lg shadow-emerald-500/20">
                             {localOffset > 0 ? `+${localOffset}` : localOffset} DAYS
@@ -152,7 +152,7 @@ const RamadanSettings = () => {
                         }}
                         className="w-full h-3 bg-slate-100 dark:bg-white/5 rounded-full appearance-none cursor-pointer accent-emerald-500 mb-4"
                     />
-                    <div className="flex justify-between text-[11px] font-black text-slate-300 dark:text-[#48484A] px-1 uppercase tracking-widest">
+                    <div className="flex justify-between text-xs-plus font-black text-slate-300 dark:text-[#48484A] px-1 uppercase tracking-widest">
                         <span>-2 Days</span>
                         <span>Official</span>
                         <span>+2 Days</span>
@@ -175,7 +175,7 @@ const RamadanSettings = () => {
                             </div>
                             <div>
                                 <h3 className="text-xs font-black text-[#8E8E93] uppercase tracking-[0.2em] leading-none">Primary Beacon</h3>
-                                <p className="text-[18px] font-black text-white mt-1.5 tracking-tight group-hover:text-indigo-400 transition-colors">
+                                <p className="text-lg font-black text-white mt-1.5 tracking-tight group-hover:text-indigo-400 transition-colors">
                                     {displayName || 'Locating...'}
                                 </p>
                             </div>
@@ -196,20 +196,20 @@ const RamadanSettings = () => {
                         <div className="p-2.5 bg-indigo-500/10 rounded-xl">
                             <Bell className="w-5 h-5 text-indigo-500" />
                         </div>
-                        <h3 className="text-[17px] font-black uppercase tracking-tight text-slate-900 dark:text-white">Reminders</h3>
+                        <h3 className="text-base-plus font-black uppercase tracking-tight text-slate-900 dark:text-white">Reminders</h3>
                     </div>
 
                     <div className="pt-2 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <div className={clsx("w-2 h-2 rounded-full", permission === 'granted' ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" : "bg-slate-300 dark:bg-[#48484A]")} />
-                            <span className="text-[11px] font-black uppercase tracking-widest text-slate-400 dark:text-[#48484A]">
+                            <span className="text-xs-plus font-black uppercase tracking-widest text-slate-400 dark:text-[#48484A]">
                                 System Link: {permission === 'granted' ? 'Active' : 'Standby'}
                             </span>
                         </div>
                         {permission !== 'granted' && (
                             <button 
                                 onClick={requestPermission}
-                                className="text-[11px] font-black uppercase tracking-widest text-indigo-500 hover:text-indigo-400 transition-colors"
+                                className="text-xs-plus font-black uppercase tracking-widest text-indigo-500 hover:text-indigo-400 transition-colors"
                             >
                                 Sync Notifications
                             </button>
@@ -222,8 +222,8 @@ const RamadanSettings = () => {
                         <Settings2 className="w-6 h-6 text-slate-300 dark:text-[#48484A]" />
                     </div>
                     <div>
-                        <p className="text-[10px] font-black text-slate-400 dark:text-[#8E8E93] uppercase tracking-[0.3em]">Version 2.4.0-Cinematic</p>
-                        <p className="text-[11px] font-bold text-slate-500 dark:text-[#48484A] mt-1 max-w-[220px] leading-relaxed">
+                        <p className="text-xxs font-black text-slate-400 dark:text-[#8E8E93] uppercase tracking-[0.3em]">Version 2.4.0-Cinematic</p>
+                        <p className="text-xs-plus font-bold text-slate-500 dark:text-[#48484A] mt-1 max-w-[220px] leading-relaxed">
                             Changes are applied instantly across your spiritual network.
                         </p>
                     </div>

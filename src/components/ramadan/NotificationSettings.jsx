@@ -101,7 +101,7 @@ const NotificationSettings = () => {
 
     const ToggleRow = ({ label, isOn, onToggle }) => (
         <div className="flex items-center justify-between py-4 border-b border-slate-100 dark:border-white/5 last:border-0 group">
-            <span className="block text-[13px] font-black uppercase tracking-widest text-slate-500 dark:text-[#8E8E93] group-hover:text-indigo-500 transition-colors">{label}</span>
+            <span className="block text-sm-minus font-black uppercase tracking-widest text-slate-500 dark:text-[#8E8E93] group-hover:text-indigo-500 transition-colors">{label}</span>
             <button 
                 onClick={onToggle}
                 className={clsx(
@@ -130,7 +130,7 @@ const NotificationSettings = () => {
                     <Bell className="w-5 h-5 text-indigo-500" />
                 </div>
                 <div>
-                    <h2 className="text-[17px] font-black uppercase tracking-tight text-slate-900 dark:text-white">Reminders</h2>
+                    <h2 className="text-base-plus font-black uppercase tracking-tight text-slate-900 dark:text-white">Reminders</h2>
                 </div>
             </div>
             

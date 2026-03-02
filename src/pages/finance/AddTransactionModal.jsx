@@ -160,9 +160,9 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                                             {editTransactionId ? 'Edit Entry' : 'New Record'}
                                         </h2>
                                         <div className="flex items-center gap-2">
-                                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Finance Center</p>
+                                            <p className="text-xxs text-slate-400 font-bold uppercase tracking-widest">Finance Center</p>
                                             <div className="w-1 h-1 rounded-full bg-indigo-500/30"></div>
-                                            <p className="text-[10px] text-indigo-500 font-black uppercase tracking-widest">{type}</p>
+                                            <p className="text-xxs text-indigo-500 font-black uppercase tracking-widest">{type}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -180,7 +180,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                                         key={t}
                                         type="button"
                                         onClick={() => setType(t)}
-                                        className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${type === t ? 'bg-white dark:bg-slate-700 shadow-lg text-indigo-600 dark:text-indigo-400' : 'text-slate-400 hover:text-slate-600'}`}
+                                        className={`flex-1 py-3 text-xxs font-black uppercase tracking-widest rounded-xl transition-all ${type === t ? 'bg-white dark:bg-slate-700 shadow-lg text-indigo-600 dark:text-indigo-400' : 'text-slate-400 hover:text-slate-600'}`}
                                     >{t}</button>
                                 ))}
                             </div>
@@ -209,7 +209,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                             <div className="grid grid-cols-2 gap-4">
                                 {type !== 'transfer' && (
                                     <div className="space-y-1.5">
-                                        <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Category</label>
+                                        <label className="text-micro font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Category</label>
                                         <div className="relative group">
                                             <select
                                                 value={categoryId}
@@ -227,7 +227,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                                 )}
 
                                 <div className="space-y-1.5">
-                                    <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                                    <label className="text-micro font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
                                         {type === 'transfer' ? 'Source' : 'Account'}
                                     </label>
                                     <select
@@ -242,7 +242,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
 
                                 {type === 'transfer' && (
                                     <div className="space-y-1.5">
-                                        <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Destination</label>
+                                        <label className="text-micro font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Destination</label>
                                         <select
                                             value={toAccountId}
                                             onChange={e => setToAccountId(e.target.value)}
@@ -257,7 +257,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1.5">
-                                    <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Date</label>
+                                    <label className="text-micro font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Date</label>
                                     <button
                                         type="button"
                                         onClick={() => setDatePickerOpen(true)}
@@ -274,7 +274,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Reference</label>
+                                    <label className="text-micro font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Reference</label>
                                     <input
                                         type="text"
                                         value={note}
@@ -287,14 +287,14 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
 
                             {/* Quick Select Chips */}
                             <div className="pt-2">
-                                <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 mb-3 block">Quick Add</label>
+                                <label className="text-micro font-black text-slate-400 uppercase tracking-[0.2em] ml-1 mb-3 block">Quick Add</label>
                                 <div className="flex gap-2 shrink-0">
                                     {[100, 500, 1000, 2000].map(amt => (
                                         <button
                                             key={amt}
                                             type="button"
                                             onClick={() => handleQuickAmount(amt)}
-                                            className="px-5 py-2.5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl text-[10px] font-black text-slate-600 dark:text-slate-400 hover:border-indigo-500 transition-all"
+                                            className="px-5 py-2.5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl text-xxs font-black text-slate-600 dark:text-slate-400 hover:border-indigo-500 transition-all"
                                         >+ ₹{amt}</button>
                                     ))}
                                 </div>
