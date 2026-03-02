@@ -18,6 +18,7 @@ import { useToast } from '../../context/ToastContext';
 import PageLayout from '../../components/layout/PageLayout';
 import ActionButton from '../../components/atoms/ActionButton';
 import Pressable from '../../components/atoms/Pressable';
+import EmptyState from '../../components/ui/EmptyState';
 import { parseFloatSafe, formatCurrency } from '../../utils/numberUtils';
 
 const FinanceDashboard = () => {
@@ -306,26 +307,17 @@ const FinanceDashboard = () => {
 
                     <div className="space-y-3">
                         {sortedMonthlyTx.length === 0 ? (
-                            <div className="text-center py-12 px-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800">
-                                <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <TrendingUp className="w-8 h-8 text-slate-300" />
-                                </div>
-                                <p className="text-slate-900 dark:text-white font-bold mb-1">{t('finance.no_expenses', 'No expenses yet')}</p>
-                                <p className="text-slate-500 text-sm mb-6 max-w-[200px] mx-auto">
-                                    {t('finance.start_tracking', 'Start tracking where your money goes.')}
-                                </p>
-                                <Pressable
-                                    onClick={() => {
-                                        setEditTransactionId(null);
-                                        setAddType('expense');
-                                        setIsAddOpen(true);
-                                    }}
-                                    scaleDown={0.96}
-                                    className="bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 px-6 py-2.5 rounded-xl font-bold transition-all text-sm inline-block"
-                                >
-                                    {t('finance.add_first_record', '+ Add Record')}
-                                </Pressable>
-                            </div>
+                            <EmptyState 
+                                icon={TrendingUp}
+                                title={t('finance.no_expenses', 'No expenses yet')}
+                                subtitle={t('finance.start_tracking', 'Start tracking where your money goes.')}
+                                actionLabel={t('finance.add_first_record', '+ Add Record')}
+                                onAction={() => {
+                                    setEditTransactionId(null);
+                                    setAddType('expense');
+                                    setIsAddOpen(true);
+                                }}
+                            />
                         ) : (
                             sortedMonthlyTx.map(tx => {
                                 const cat = categories.find(c => c.id === tx.categoryId);
