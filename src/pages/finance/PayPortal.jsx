@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { CreditCard, CheckCircle2, AlertTriangle, Smartphone } from 'lucide-react';
+import { formatCurrency } from '../../utils/numberUtils';
 
 const PayPortal = () => {
     const nativeParams = new URLSearchParams(window.location.search);
@@ -71,7 +72,7 @@ const PayPortal = () => {
         );
     }
 
-    const formattedAmt = Number(amount).toLocaleString('en-IN');
+    const formattedAmt = formatCurrency(amount, true);
 
     return (
         <div style={{ minHeight: '100svh' }} className="bg-gradient-to-br from-slate-50 to-indigo-50 flex flex-col items-center justify-center p-5">

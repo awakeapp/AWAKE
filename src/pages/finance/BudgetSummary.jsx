@@ -4,6 +4,7 @@ import { X, PieChart, Edit3, Settings2, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import { useToast } from '../../context/ToastContext';
+import { formatCurrency } from '../../utils/numberUtils';
 
 const BudgetSummary = ({ isOpen, onClose }) => {
     const { categories, getBudgetStats, updateCategoryBudget, addCategory } = useFinance();
@@ -114,7 +115,7 @@ const BudgetSummary = ({ isOpen, onClose }) => {
                                                     </div>
                                                     <div>
                                                         <p className="font-black text-slate-900 dark:text-white text-[15px]">{cat.name}</p>
-                                                        <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-0.5">Limit: ₹{stats.budget.toLocaleString()}</p>
+                                                        <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-0.5">Limit: {formatCurrency(stats.budget, true)}</p>
                                                     </div>
                                                 </div>
                                                 <div className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tighter ${isDanger ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600' : isWarning ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-600' : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600'}`}>
@@ -130,9 +131,9 @@ const BudgetSummary = ({ isOpen, onClose }) => {
                                             </div>
 
                                             <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-                                                <span className="text-slate-400">Spent ₹{stats.spent.toLocaleString()}</span>
+                                                <span className="text-slate-400">Spent {formatCurrency(stats.spent, true)}</span>
                                                 <span className={isDanger ? 'text-rose-500' : 'text-emerald-500'}>
-                                                    {stats.remaining >= 0 ? `Left ₹${stats.remaining.toLocaleString()}` : `Over ₹${Math.abs(stats.remaining).toLocaleString()}`}
+                                                    {stats.remaining >= 0 ? `Left ${formatCurrency(stats.remaining, true)}` : `Over ${formatCurrency(Math.abs(stats.remaining), true)}`}
                                                 </span>
                                             </div>
                                         </div>

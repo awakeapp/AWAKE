@@ -907,10 +907,10 @@ const PartyDetail = () => {
                                                     <div className="text-right shrink-0 ml-3 flex items-center gap-3">
                                                         <div>
                                                             <p className={`text-base font-black ${isPositive ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
-                                                                {isPositive ? '+' : '−'}₹{Number(tx.amount).toLocaleString()}
+                                                                {isPositive ? '+' : '−'}{formatCurrency(tx.amount, true)}
                                                             </p>
                                                             <p className={`text-[10px] font-bold mt-0.5 ${runBal >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                                                                Bal: {runBal >= 0 ? '+' : '−'}₹{Math.abs(runBal).toLocaleString()}
+                                                                Bal: {runBal >= 0 ? '+' : '−'}{formatCurrency(Math.abs(runBal), true)}
                                                             </p>
                                                         </div>
                                                         {!isSelectionMode && !locked && (
@@ -934,8 +934,8 @@ const PartyDetail = () => {
                                                 {isOutstandingEntry && (
                                                     <div className="mt-2.5">
                                                         <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-                                                            <span>Settled ₹{settled.toLocaleString()}</span>
-                                                            <span>{entryRemaining <= 0 ? 'Fully Paid' : `₹${entryRemaining.toLocaleString()} left`}</span>
+                                                            <span>Settled {formatCurrency(settled, true)}</span>
+                                                            <span>{entryRemaining <= 0 ? 'Fully Paid' : `${formatCurrency(entryRemaining, true)} left`}</span>
                                                         </div>
                                                         <div className="h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                                             <div
@@ -1076,7 +1076,7 @@ const PartyDetail = () => {
                                         />
                                     </div>
                                     {isSettlementType && pendingEntries.length > 0 && Number(amount) > maxSettleAmount && (
-                                        <p className="text-xs text-amber-600 dark:text-amber-400 mt-2 font-bold">Max: ₹{maxSettleAmount.toLocaleString()}</p>
+                                        <p className="text-xs text-amber-600 dark:text-amber-400 mt-2 font-bold">Max: {formatCurrency(maxSettleAmount, true)}</p>
                                     )}
                                 </div>
                             </div>
@@ -1234,7 +1234,7 @@ const PartyDetail = () => {
                             initial={{ y: "100%", opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: "100%", opacity: 0 }} transition={{ type: "spring", damping: 25, stiffness: 300 }}
                             className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2rem] p-6 shadow-2xl border border-slate-100 dark:border-slate-800 relative z-10 max-h-[85vh] overflow-y-auto"
                         >
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">Allocate ₹{Number(settleAmount).toLocaleString()}</h3>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">Allocate {formatCurrency(settleAmount, true)}</h3>
                             {/* Toggle */}
                             <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl mb-5">
                                 <div>
@@ -1263,10 +1263,10 @@ const PartyDetail = () => {
                                                             </div>
                                                             <div className="text-left">
                                                                 <p className="font-bold text-slate-900 dark:text-white text-sm">{entry.type === 'you_gave' ? 'You Gave' : 'You Borrowed'}</p>
-                                                                <p className="text-[10px] text-slate-400">{format(new Date(entry.date), 'MMM d, yyyy')} • Rem ₹{entry.remaining.toLocaleString()}</p>
+                                                                <p className="text-[10px] text-slate-400">{format(new Date(entry.date), 'MMM d, yyyy')} • Rem {formatCurrency(entry.remaining, true)}</p>
                                                             </div>
                                                         </button>
-                                                        <p className="font-black text-slate-900 dark:text-white text-sm">₹{Number(entry.amount).toLocaleString()}</p>
+                                                        <p className="font-black text-slate-900 dark:text-white text-sm">{formatCurrency(entry.amount, true)}</p>
                                                     </div>
                                                     {isSelected && (
                                                         <div className="mt-3 flex items-center gap-2">
@@ -1286,7 +1286,7 @@ const PartyDetail = () => {
                                     {totalSelectedAllocation > 0 && (
                                         <div className="flex justify-between items-center text-xs font-bold text-slate-500 pt-2 border-t border-slate-100 dark:border-slate-800">
                                             <span>Total allocated</span>
-                                            <span className={totalSelectedAllocation > Number(settleAmount) ? 'text-red-500' : 'text-emerald-500'}>₹{totalSelectedAllocation.toLocaleString()} / ₹{Number(settleAmount).toLocaleString()}</span>
+                                            <span className={totalSelectedAllocation > Number(settleAmount) ? 'text-red-500' : 'text-emerald-500'}>{formatCurrency(totalSelectedAllocation, true)} / {formatCurrency(settleAmount, true)}</span>
                                         </div>
                                     )}
                                 </div>
@@ -1308,8 +1308,8 @@ const PartyDetail = () => {
                                                         <p className="text-[10px] text-slate-400">{format(new Date(entry.date), 'MMM d, yyyy')}</p>
                                                     </div>
                                                     <div className="text-right">
-                                                        <p className="font-black text-indigo-600 dark:text-indigo-400">₹{allocate.toLocaleString()}</p>
-                                                        <p className="text-[10px] text-slate-400">of ₹{entry.remaining.toLocaleString()}</p>
+                                                        <p className="font-black text-indigo-600 dark:text-indigo-400">{formatCurrency(allocate, true)}</p>
+                                                        <p className="text-[10px] text-slate-400">of {formatCurrency(entry.remaining, true)}</p>
                                                     </div>
                                                 </div>
                                             );
@@ -1447,7 +1447,7 @@ const PartyDetail = () => {
                                                     <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{e.notes || 'Entry'}</p>
                                                     <p className="text-[10px] font-medium text-slate-400">{format(new Date(e.date), 'dd MMM yyyy')}</p>
                                                 </div>
-                                                <p className="text-xs font-black text-slate-900 dark:text-white shrink-0">₹{e.remaining.toLocaleString()}</p>
+                                                <p className="text-xs font-black text-slate-900 dark:text-white shrink-0">{formatCurrency(e.remaining, true)}</p>
                                             </div>
                                         ))}
                                     </div>
@@ -1509,7 +1509,7 @@ const PartyDetail = () => {
                         
                         <p className="text-sm font-black text-slate-500 uppercase tracking-widest mb-3">Total Outstanding Balance</p>
                         <p className={`text-[80px] leading-none font-black mb-10 tracking-tighter ${(balance > 0) ? 'text-emerald-400' : 'text-rose-400'}`}>
-                            ₹{totalSelectedPending.toLocaleString()}
+                            {formatCurrency(totalSelectedPending, true)}
                         </p>
                         
                         <div className="bg-slate-900/50 rounded-3xl p-6 border border-slate-700/50 text-left">
@@ -1523,7 +1523,7 @@ const PartyDetail = () => {
                                                 {format(new Date(e.date), 'dd MMM yyyy')}
                                             </p>
                                        </div>
-                                       <span className="font-black">₹{e.remaining.toLocaleString()}</span>
+                                       <span className="font-black">{formatCurrency(e.remaining, true)}</span>
                                    </div>
                                ))}
                            </div>

@@ -13,6 +13,7 @@ import { clsx } from 'clsx';
 import { Check } from 'lucide-react';
 import PageLayout from '../../components/layout/PageLayout';
 import FinanceBottomNav from '../../components/finance/FinanceBottomNav';
+import { parseFloatSafe, formatCurrency } from '../../utils/numberUtils';
 
 const ICONS = [
     { icon: Zap, label: 'Utility' },
@@ -235,7 +236,7 @@ const UpcomingPayments = () => {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h4 className="font-black text-slate-900 dark:text-white text-[11px] leading-tight truncate">{sub.name}</h4>
-                                        <p className="text-slate-400 text-[11px] font-extrabold mt-0.5">₹{Number(sub.amount).toLocaleString()}</p>
+                                        <p className="text-slate-400 text-[11px] font-extrabold mt-0.5">{formatCurrency(sub.amount, true)}</p>
                                     </div>
                                 </div>
                                 <div className={`w-full text-center py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${sub.status !== 'active' ? 'bg-slate-100 dark:bg-slate-800 text-slate-400' : daysLeft.includes('Overdue') ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-500' : 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600'}`}>

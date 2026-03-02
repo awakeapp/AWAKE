@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, PieChart, TrendingUp, TrendingDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { useScrollLock } from '../../hooks/useScrollLock';
+import { formatCurrency } from '../../utils/numberUtils';
 
 const AnalyticsModal = ({ isOpen, onClose, monthStats, categories, selectedDate }) => {
     const navigate = useNavigate();
@@ -60,8 +61,8 @@ const AnalyticsModal = ({ isOpen, onClose, monthStats, categories, selectedDate 
                             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Cash Flow</h3>
                             
                             <div className="flex justify-between text-sm mb-2 font-bold">
-                                <span className="text-emerald-500">₹{income.toLocaleString()} In</span>
-                                <span className="text-rose-500">₹{expense.toLocaleString()} Out</span>
+                                <span className="text-emerald-500">{formatCurrency(income, true)} In</span>
+                                <span className="text-rose-500">{formatCurrency(expense, true)} Out</span>
                             </div>
 
                             {/* Progress Bar representation */}
@@ -109,7 +110,7 @@ const AnalyticsModal = ({ isOpen, onClose, monthStats, categories, selectedDate 
                                                         <span className="text-sm font-bold text-slate-900 dark:text-white">{c?.name || 'Uncategorized'}</span>
                                                     </div>
                                                     <div className="text-right">
-                                                        <p className="text-sm font-bold text-slate-900 dark:text-white"><span dir="ltr">₹{cat.amount.toLocaleString()}</span></p>
+                                                        <p className="text-sm font-bold text-slate-900 dark:text-white"><span dir="ltr">{formatCurrency(cat.amount, true)}</span></p>
                                                         <p className="text-xs font-medium text-slate-500">{percent}%</p>
                                                     </div>
                                                 </div>
