@@ -6,6 +6,7 @@ import * as LucideIcons from 'lucide-react';
 import { format, startOfMonth, endOfMonth, isWithinInterval, subMonths, addMonths } from 'date-fns';
 import PageLayout from '../../components/layout/PageLayout';
 import ActionButton from '../../components/atoms/ActionButton';
+import { parseFloatSafe, formatCurrency } from '../../utils/numberUtils';
 
 const MonthlyOverview = () => {
   const navigate = useNavigate();
@@ -20,8 +21,8 @@ const MonthlyOverview = () => {
       !t.isDeleted && isWithinInterval(new Date(t.date), { start, end })
     );
 
-    const income = monthTx.filter(t => t.type === 'income').reduce((sum, t) => sum + Number(t.amount), 0);
-    const expense = monthTx.filter(t => t.type === 'expense').reduce((sum, t) => sum + Number(t.amount), 0);
+    const income = monthTx.filter(t => t.type === 'income').reduce((sum, t) => sum + parseFloatSafe(t.amount), 0);
+    const expense = monthTx.filter(t => t.type === 'expense').reduce((sum, t) => sum + parseFloatSafe(t.amount), 0);
     const savings = income - expense;
 
     // Category Breakdown
@@ -30,10 +31,10 @@ const MonthlyOverview = () => {
       const catId = t.categoryId;
       if (t.splits) {
         t.splits.forEach(s => {
-          categoryMap[s.categoryId] = (categoryMap[s.categoryId] || 0) + Number(s.amount);
+          categoryMap[s.categoryId] = (categoryMap[s.categoryId] || 0) + parseFloatSafe(s.amount);
         });
       } else if (catId) {
-        categoryMap[catId] = (categoryMap[catId] || 0) + Number(t.amount);
+        categoryMap[catId] = (categoryMap[catId] || 0) + parseFloatSafe(t.amount);
       }
     });
 
@@ -50,7 +51,7 @@ const MonthlyOverview = () => {
 
     const largestExpense = monthTx
       .filter(t => t.type === 'expense')
-      .sort((a, b) => Number(b.amount) - Number(a.amount))[0];
+      .sort((a, b) => parseFloatSafe(b.amount) - parseFloatSafe(a.amount))[0];
 
     return { income, expense, savings, topCategories, largestExpense, count: monthTx.length };
   };
@@ -94,7 +95,7 @@ const MonthlyOverview = () => {
           <div className="text-center py-6 bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
             <p className="text-slate-400 dark:text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Net Savings</p>
             <h2 className={`text-4xl font-black tracking-tightest leading-tight ${currentStats.savings >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-              {currentStats.savings >= 0 ? '+' : ''}₹{currentStats.savings.toLocaleString()}
+              {currentStats.savings >= 0 ? '+' : ''}{formatCurrency(currentStats.savings, true)}
             </h2>
           </div>
           {/* Summary Cards */}
@@ -104,7 +105,7 @@ const MonthlyOverview = () => {
               <div>
                 <div className="flex justify-between text-sm font-bold mb-1">
                   <span className="text-slate-500">Income</span>
-                  <span className="text-emerald-500">₹{currentStats.income.toLocaleString()}</span>
+                  <span className="text-emerald-500">{formatCurrency(currentStats.income, true)}</span>
                 </div>
                 <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                   <div className="h-full bg-emerald-500 rounded-full" style={{ width: '100%' }}></div>
@@ -115,7 +116,7 @@ const MonthlyOverview = () => {
               <div>
                 <div className="flex justify-between text-sm font-bold mb-1">
                   <span className="text-slate-500">Expense</span>
-                  <span className="text-red-500">₹{currentStats.expense.toLocaleString()}</span>
+                  <span className="text-red-500">{formatCurrency(currentStats.expense, true)}</span>
                 </div>
                 <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                   <div
@@ -145,7 +146,7 @@ const MonthlyOverview = () => {
                 <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-sm">
                   <p className="text-xs text-indigo-200 uppercase font-bold mb-1">Largest Expense</p>
                   <p className="font-bold text-sm truncate">{currentStats.largestExpense.note || 'Unknow Expense'}</p>
-                  <p className="text-xs text-indigo-100">₹{Number(currentStats.largestExpense.amount).toLocaleString()}</p>
+                  <p className="text-xs text-indigo-100">{formatCurrency(currentStats.largestExpense.amount, true)}</p>
                 </div>
               )}
             </div>
@@ -178,7 +179,7 @@ const MonthlyOverview = () => {
                         <p className="text-xs text-slate-400">{Math.round((cat.amount / currentStats.expense) * 100)}% of total</p>
                       </div>
                     </div>
-                    <p className="font-bold text-slate-900 dark:text-white">₹{cat.amount.toLocaleString()}</p>
+                    <p className="font-bold text-slate-900 dark:text-white">{formatCurrency(cat.amount, true)}</p>
                   </div>
                 );
               })}

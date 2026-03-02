@@ -18,6 +18,7 @@ import { useToast } from '../../context/ToastContext';
 import PageLayout from '../../components/layout/PageLayout';
 import ActionButton from '../../components/atoms/ActionButton';
 import Pressable from '../../components/atoms/Pressable';
+import { parseFloatSafe, formatCurrency } from '../../utils/numberUtils';
 
 const FinanceDashboard = () => {
     const navigate = useNavigate();
@@ -55,15 +56,15 @@ const FinanceDashboard = () => {
 
         const income = monthlyTx
             .filter(t => t.type === 'income')
-            .reduce((sum, t) => sum + Number(t.amount), 0);
+            .reduce((sum, t) => sum + parseFloatSafe(t.amount), 0);
 
         const expense = monthlyTx
             .filter(t => t.type === 'expense')
-            .reduce((sum, t) => sum + Number(t.amount), 0);
+            .reduce((sum, t) => sum + parseFloatSafe(t.amount), 0);
 
         const savings = monthlyTx
             .filter(t => t.type === 'savings')
-            .reduce((sum, t) => sum + Number(t.amount), 0);
+            .reduce((sum, t) => sum + parseFloatSafe(t.amount), 0);
 
         const netBalance = income - expense;
         const availableBalance = netBalance - savings;
@@ -106,7 +107,7 @@ const FinanceDashboard = () => {
     const totalBalance = getTotalBalance();
     const activeAccounts = accounts.filter(a => !a.isArchived);
     const recurringTotal = useMemo(() => 
-        subscriptions.filter(s => s.status === 'active').reduce((sum, s) => sum + Number(s.amount), 0),
+        subscriptions.filter(s => s.status === 'active').reduce((sum, s) => sum + parseFloatSafe(s.amount), 0),
     [subscriptions]);
     const sortedMonthlyTx = [...monthStats.transactions].sort((a, b) =>
         new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)
@@ -218,7 +219,7 @@ const FinanceDashboard = () => {
                                     <p className="text-indigo-100/70 text-[10px] font-black uppercase tracking-[0.2em]">{t('finance.total_balance', 'Total Balance')}</p>
                                     <h2 className="text-[44px] sm:text-[48px] font-black tracking-tightest leading-tight flex items-center justify-center gap-1.5">
                                         <span className="text-2xl opacity-40 font-bold">₹</span>
-                                        <span dir="ltr">{totalBalance.toLocaleString()}</span>
+                                        <span dir="ltr">{formatCurrency(totalBalance)}</span>
                                     </h2>
                                 </div>
                             </div>
@@ -228,17 +229,17 @@ const FinanceDashboard = () => {
                             <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-2 w-full mb-5 max-w-[90%] mx-auto">
                                 <div className="flex items-center gap-1.5 font-bold text-[10px] min-[380px]:text-[11px] tracking-tight">
                                     <span className="text-emerald-300 uppercase tracking-wider">Income</span>
-                                    <span className="text-white">₹{monthStats.income.toLocaleString()}</span>
+                                    <span className="text-white">{formatCurrency(monthStats.income, true)}</span>
                                 </div>
                                 <span className="text-white/20 select-none text-[10px] hidden min-[360px]:block">|</span>
                                 <div className="flex items-center gap-1.5 font-bold text-[10px] min-[380px]:text-[11px] tracking-tight">
                                     <span className="text-rose-300 uppercase tracking-wider">Expense</span>
-                                    <span className="text-white">₹{monthStats.expense.toLocaleString()}</span>
+                                    <span className="text-white">{formatCurrency(monthStats.expense, true)}</span>
                                 </div>
                                 <span className="text-white/20 select-none text-[10px] hidden min-[360px]:block">|</span>
                                 <div className="flex items-center gap-1.5 font-bold text-[10px] min-[380px]:text-[11px] tracking-tight">
                                     <span className="text-slate-300 uppercase tracking-wider">Recurring</span>
-                                    <span className="text-white">₹{recurringTotal.toLocaleString()}</span>
+                                    <span className="text-white">{formatCurrency(recurringTotal, true)}</span>
                                 </div>
                             </div>
 
@@ -254,7 +255,7 @@ const FinanceDashboard = () => {
                                 >
                                     <span>Savings</span>
                                     <div className="w-1 h-1 rounded-full bg-white/30" />
-                                    <span className="text-teal-300 tracking-tight">₹{monthStats.savings.toLocaleString()}</span>
+                                    <span className="text-teal-300 tracking-tight">{formatCurrency(monthStats.savings, true)}</span>
                                 </button>
                             </div>
                         </div>
@@ -360,7 +361,7 @@ const FinanceDashboard = () => {
                                             </div>
                                             <div className="text-right shrink-0">
                                                 <p className={`text-[16px] font-bold ${isIncome ? 'text-emerald-500' : 'text-slate-900 dark:text-white'}`}>
-                                                    {isIncome ? '+' : '-'}<span dir="ltr">₹{Number(tx.amount).toLocaleString()}</span>
+                                                    {isIncome ? '+' : '-'}<span dir="ltr">{formatCurrency(tx.amount, true)}</span>
                                                 </p>
                                             </div>
                                         </div>

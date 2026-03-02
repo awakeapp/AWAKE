@@ -12,6 +12,7 @@ import { SelectionBar } from '../../components/ui/SelectionBar';
 import { ItemMenu } from '../../components/ui/ItemMenu';
 import { DeleteConfirmationModal } from '../../components/ui/DeleteConfirmationModal';
 import { useToast } from '../../context/ToastContext';
+import { parseFloatSafe, formatCurrency } from '../../utils/numberUtils';
 import { clsx } from 'clsx';
 
 const DebtManager = () => {
@@ -191,7 +192,7 @@ const DebtManager = () => {
             phone_number: phone,
             country_code: countryCode,
             tag,
-            credit_limit: creditLimit ? Number(creditLimit) : null,
+            credit_limit: creditLimit ? parseFloatSafe(creditLimit) : null,
             preferred_reminder_method: 'whatsapp',
             last_reminder_sent_at: null
         });
@@ -369,11 +370,11 @@ const DebtManager = () => {
                 <div className="grid grid-cols-2 gap-3">
                     <div className="bg-emerald-50 text-emerald-900 dark:bg-emerald-500/10 dark:text-emerald-100 p-4 rounded-[1.5rem] shadow-sm border border-emerald-100 dark:border-emerald-500/20">
                         <p className="text-[9px] font-black uppercase tracking-[0.15em] opacity-60 mb-1">To Get</p>
-                        <h2 className="text-xl font-black">₹{totalReceivable.toLocaleString()}</h2>
+                        <h2 className="text-xl font-black">{formatCurrency(totalReceivable, true)}</h2>
                     </div>
                     <div className="bg-red-50 text-red-900 dark:bg-red-500/10 dark:text-red-100 p-4 rounded-[1.5rem] shadow-sm border border-red-100 dark:border-red-500/20">
                         <p className="text-[9px] font-black uppercase tracking-[0.15em] opacity-60 mb-1">To Pay</p>
-                        <h2 className="text-xl font-black">₹{totalPayable.toLocaleString()}</h2>
+                        <h2 className="text-xl font-black">{formatCurrency(totalPayable, true)}</h2>
                     </div>
                 </div>
 
@@ -479,7 +480,7 @@ const DebtManager = () => {
                                                 ) : (
                                                     <div className="flex flex-col items-end">
                                                         <p className={`text-xl font-black tracking-tightest leading-none ${isReceivable ? 'text-emerald-600 dark:text-emerald-500' : 'text-red-600 dark:text-red-500'}`}>
-                                                            ₹{Math.abs(bal).toLocaleString()}
+                                                            {formatCurrency(Math.abs(bal), true)}
                                                         </p>
                                                         <p className={`text-[9px] font-black uppercase tracking-[0.15em] mt-1.5 ${isReceivable ? 'text-emerald-500/60' : 'text-red-500/60'}`}>
                                                             {isReceivable ? 'To Get' : 'To Pay'}

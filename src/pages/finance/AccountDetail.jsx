@@ -9,6 +9,7 @@ import { useSelection } from '../../hooks/useSelection';
 import { SelectionBar } from '../../components/ui/SelectionBar';
 import { ItemMenu } from '../../components/ui/ItemMenu';
 import { DeleteConfirmationModal } from '../../components/ui/DeleteConfirmationModal';
+import { parseFloatSafe, formatCurrency } from '../../utils/numberUtils';
 import clsx from 'clsx';
 
 const AccountDetail = () => {
@@ -52,7 +53,7 @@ const AccountDetail = () => {
     };
 
     const handleSave = () => {
-        updateAccount(id, { name: editName, openingBalance: Number(editBalance) });
+        updateAccount(id, { name: editName, openingBalance: parseFloatSafe(editBalance) });
         setIsEditing(false);
         setShowSaveConfirm(false);
     };
@@ -164,7 +165,7 @@ const AccountDetail = () => {
                             ) : (
                                 <div className="space-y-1">
                                     <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.2em] mb-1">{account.name}</p>
-                                    <h2 className="text-4xl font-black tracking-tightest leading-tight">₹{account.balance.toLocaleString()}</h2>
+                                    <h2 className="text-4xl font-black tracking-tightest leading-tight">{formatCurrency(account.balance, true)}</h2>
                                     <button onClick={handleEdit} className="text-[10px] font-bold text-indigo-300 hover:text-white uppercase tracking-wider mt-2">Edit Account</button>
                                 </div>
                             )}
@@ -211,7 +212,7 @@ const AccountDetail = () => {
                                     const isTransfer = tx.type === 'transfer';
                                     let isIncome = false;
                                     let isExpense = false;
-                                    let displayAmount = Number(tx.amount);
+                                    let displayAmount = parseFloatSafe(tx.amount);
                                     let label = tx.note;
                                     let icon = null;
 
@@ -262,7 +263,7 @@ const AccountDetail = () => {
                                              </div>
                                              <div className="flex items-center gap-3">
                                                 <span className={`font-black tracking-tight ${isIncome ? 'text-emerald-500' : 'text-slate-900 dark:text-white'}`}>
-                                                    {isIncome ? '+' : '-'}₹{displayAmount.toLocaleString()}
+                                                    {isIncome ? '+' : '-'}{formatCurrency(displayAmount, true)}
                                                 </span>
                                                 {!isSelectionMode && (
                                                     <ItemMenu 

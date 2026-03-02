@@ -9,6 +9,7 @@ import { useSelection } from '../../hooks/useSelection';
 import { SelectionBar } from '../../components/ui/SelectionBar';
 import { ArrowLeft, Wallet, Plus, Trash2, Archive as ArchiveIcon } from 'lucide-react';
 import ActionButton from '../../components/atoms/ActionButton';
+import { parseFloatSafe, formatCurrency } from '../../utils/numberUtils';
 import clsx from 'clsx';
 
 const FinanceWallets = () => {
@@ -36,7 +37,7 @@ const FinanceWallets = () => {
 
     const handleAdd = async () => {
         if (!newName.trim()) return;
-        await addAccount({ name: newName.trim(), openingBalance: Number(newBalance) || 0 });
+        await addAccount({ name: newName.trim(), openingBalance: parseFloatSafe(newBalance) });
         setNewName('');
         setNewBalance('');
         setIsAdding(false);
@@ -155,7 +156,7 @@ const FinanceWallets = () => {
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <p className={`text-lg font-black ${(bal || 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
-                                        ₹{(bal || 0).toLocaleString()}
+                                        {formatCurrency(bal || 0, true)}
                                     </p>
                                     {!isSelectionMode && (
                                         <ItemMenu 
@@ -188,7 +189,7 @@ const FinanceWallets = () => {
                                     </div>
                                     <p className="font-bold text-slate-500 text-[15px]">{acc.name}</p>
                                 </div>
-                                <p className="text-slate-400 font-bold">₹{(acc.balance || 0).toLocaleString()}</p>
+                                <p className="text-slate-400 font-bold">{formatCurrency(acc.balance || 0, true)}</p>
                             </button>
                         ))}
                     </>
