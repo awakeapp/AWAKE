@@ -14,6 +14,18 @@ module.exports = {
                 'safe-l': 'env(safe-area-inset-left)',
                 'safe-r': 'env(safe-area-inset-right)',
             },
+            // ── Unified Typography Scale ──────────────────
+            fontSize: {
+                'micro': ['9px', '12px'],
+                'xxs': ['10px', '14px'],
+                'xs-plus': ['11px', '16px'],
+                'sm-minus': ['13px', '18px'],
+                'base-minus': ['15px', '22px'],
+                'base-plus': ['17px', '24px'],
+                'xl-minus': ['20px', '28px'],
+                'display-sm': ['44px', '48px'],
+                'display-lg': ['80px', '80px'],
+            },
             // ── Unified border radius tokens ──────────────
             borderRadius: {
                 'app-sm': '8px',

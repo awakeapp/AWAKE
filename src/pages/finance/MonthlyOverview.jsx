@@ -7,6 +7,7 @@ import { format, startOfMonth, endOfMonth, isWithinInterval, subMonths, addMonth
 import PageLayout from '../../components/layout/PageLayout';
 import ActionButton from '../../components/atoms/ActionButton';
 import { parseFloatSafe, formatCurrency } from '../../utils/numberUtils';
+import { AppCard } from '../../components/ui/AppCard';
 
 const MonthlyOverview = () => {
   const navigate = useNavigate();
@@ -78,7 +79,7 @@ const MonthlyOverview = () => {
             size="sm" 
             className="bg-transparent hover:bg-slate-200 dark:hover:bg-slate-800"
           />
-          <span className="text-[10px] font-black uppercase tracking-widest min-w-[64px] text-center text-slate-700 dark:text-slate-200">
+          <span className="text-xxs font-black uppercase tracking-widest min-w-[64px] text-center text-slate-700 dark:text-slate-200">
             {format(selectedDate, 'MMM yy')}
           </span>
           <ActionButton 
@@ -92,14 +93,14 @@ const MonthlyOverview = () => {
     >
       <div className="space-y-6">
           {/* Net Savings Summary */}
-          <div className="text-center py-6 bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
-            <p className="text-slate-400 dark:text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Net Savings</p>
+          <AppCard className="text-center py-6 border-0 shadow-sm" padding="none">
+            <p className="text-slate-400 dark:text-slate-500 text-xxs font-black uppercase tracking-[0.2em] mb-1">Net Savings</p>
             <h2 className={`text-4xl font-black tracking-tightest leading-tight ${currentStats.savings >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
               {currentStats.savings >= 0 ? '+' : ''}{formatCurrency(currentStats.savings, true)}
             </h2>
-          </div>
+          </AppCard>
           {/* Summary Cards */}
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
+          <AppCard padding="large" className="shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
             <div className="space-y-4">
               {/* Income Bar */}
               <div>
@@ -126,7 +127,7 @@ const MonthlyOverview = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </AppCard>
 
           {/* Insights */}
           <div className="bg-indigo-500 text-white p-6 rounded-3xl shadow-xl shadow-indigo-500/30 relative overflow-hidden">
@@ -169,7 +170,7 @@ const MonthlyOverview = () => {
                 }
                 const IconComponent = LucideIcons[iconName];
                 return (
-                  <div key={cat.id} className="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <AppCard key={cat.id} padding="default" className="flex flex-row items-center justify-between border border-slate-100 dark:border-slate-800 shadow-sm">
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${cat.color ? cat.color + '/20' : 'bg-slate-100'} ${cat.color?.replace('bg-', 'text-') || 'text-slate-500'}`}>
                         {IconComponent ? <IconComponent className="w-5 h-5 opacity-90" /> : cat.name[0]}
@@ -180,7 +181,7 @@ const MonthlyOverview = () => {
                       </div>
                     </div>
                     <p className="font-bold text-slate-900 dark:text-white">{formatCurrency(cat.amount, true)}</p>
-                  </div>
+                  </AppCard>
                 );
               })}
               {currentStats.topCategories.length === 0 && (

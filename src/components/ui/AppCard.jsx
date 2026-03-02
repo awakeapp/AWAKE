@@ -26,8 +26,8 @@ export function AppCard({
       onClick={onClick}
       className={cn(
         // Base iOS card style: max 2 levels of shadow (using 'md' here for elevated surface)
-        "bg-surface dark:bg-surface-dark border border-slate-100 dark:border-slate-800",
-        "rounded shadow-md overflow-hidden flex flex-col",
+        "bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800",
+        "rounded-2xl shadow-md overflow-hidden flex flex-col",
         paddingMap[padding],
         // Strict interaction rules: Optional soft shadow or tint on hover/active, NO scale jumps, NO arbitrary timings
         interactive && "cursor-pointer transition-all outline-none hover:border-primary-200 dark:hover:border-slate-700 active:bg-slate-50 dark:active:bg-slate-800/50",

@@ -14,6 +14,7 @@ import { Check } from 'lucide-react';
 import PageLayout from '../../components/layout/PageLayout';
 import FinanceBottomNav from '../../components/finance/FinanceBottomNav';
 import { parseFloatSafe, formatCurrency } from '../../utils/numberUtils';
+import EmptyState from '../../components/ui/EmptyState';
 
 const ICONS = [
     { icon: Zap, label: 'Utility' },
@@ -175,10 +176,13 @@ const UpcomingPayments = () => {
             < div className="overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide flex gap-3" >
                 {
                     sortedSubs.length === 0 && !isAdding && (
-                        <div className="w-full text-center py-6 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
-                            <p className="text-slate-400 text-sm mb-2">{t('finance.no_upcoming_bills', 'No upcoming bills.')}</p>
-                            <button onClick={() => setIsAdding(true)} className="text-indigo-500 font-bold text-sm">{t('finance.add_bill', '+ Add Bill')}</button>
-                        </div>
+                        <EmptyState 
+                            icon={Calendar}
+                            title={t('finance.no_upcoming_bills', 'No upcoming bills.')}
+                            actionLabel={t('finance.add_bill', '+ Add Bill')}
+                            onAction={() => setIsAdding(true)}
+                            className="w-full text-center py-10"
+                        />
                     )
                 }
 
@@ -235,11 +239,11 @@ const UpcomingPayments = () => {
                                         <Icon className="w-4 h-4 text-indigo-500" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h4 className="font-black text-slate-900 dark:text-white text-[11px] leading-tight truncate">{sub.name}</h4>
-                                        <p className="text-slate-400 text-[11px] font-extrabold mt-0.5">{formatCurrency(sub.amount, true)}</p>
+                                        <h4 className="font-black text-slate-900 dark:text-white text-xs-plus leading-tight truncate">{sub.name}</h4>
+                                        <p className="text-slate-400 text-xs-plus font-extrabold mt-0.5">{formatCurrency(sub.amount, true)}</p>
                                     </div>
                                 </div>
-                                <div className={`w-full text-center py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${sub.status !== 'active' ? 'bg-slate-100 dark:bg-slate-800 text-slate-400' : daysLeft.includes('Overdue') ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-500' : 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600'}`}>
+                                <div className={`w-full text-center py-1 rounded-lg text-micro font-black uppercase tracking-widest ${sub.status !== 'active' ? 'bg-slate-100 dark:bg-slate-800 text-slate-400' : daysLeft.includes('Overdue') ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-500' : 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600'}`}>
                                     {sub.status === 'active' ? daysLeft : 'Paused'}
                                 </div>
                             </div>
@@ -262,7 +266,7 @@ const UpcomingPayments = () => {
                                     </div>
                                     <div>
                                         <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Recurring Bill</h2>
-                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Subscription Manager</p>
+                                        <p className="text-xxs text-slate-400 font-bold uppercase tracking-widest">Subscription Manager</p>
                                     </div>
                                 </div>
                                 <button onClick={() => setIsAdding(false)} className="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 hover:rotate-90 transition-transform">
@@ -273,7 +277,7 @@ const UpcomingPayments = () => {
                             <form onSubmit={handleSubmit} className="space-y-6 overflow-y-auto pr-1 scrollbar-hide pb-2">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
-                                        <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Name</label>
+                                        <label className="text-micro font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Name</label>
                                         <input
                                             type="text"
                                             value={name}
@@ -284,7 +288,7 @@ const UpcomingPayments = () => {
                                         />
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Amount</label>
+                                        <label className="text-micro font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Amount</label>
                                         <input
                                             type="number"
                                             value={amount}
@@ -296,7 +300,7 @@ const UpcomingPayments = () => {
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Due Day (1-31)</label>
+                                    <label className="text-micro font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Due Day (1-31)</label>
                                     <input
                                         type="number"
                                         value={day}
@@ -309,7 +313,7 @@ const UpcomingPayments = () => {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Visual Symbol</label>
+                                    <label className="text-micro font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Visual Symbol</label>
                                     <div className="grid grid-cols-5 gap-3">
                                         {ICONS.map((item, idx) => (
                                             <button
@@ -325,7 +329,7 @@ const UpcomingPayments = () => {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <label className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Theme Palette</label>
+                                    <label className="text-micro font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Theme Palette</label>
                                     <div className="flex gap-4 pb-2">
                                         {COLORS.map((g, idx) => (
                                             <button

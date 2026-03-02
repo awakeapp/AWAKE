@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import { useToast } from '../../context/ToastContext';
 import { formatCurrency } from '../../utils/numberUtils';
+import EmptyState from '../../components/ui/EmptyState';
 
 const BudgetSummary = ({ isOpen, onClose }) => {
     const { categories, getBudgetStats, updateCategoryBudget, addCategory } = useFinance();
@@ -85,7 +86,7 @@ const BudgetSummary = ({ isOpen, onClose }) => {
                         </div>
                         <div>
                             <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Budgets</h2>
-                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{isAllocating ? 'Allocation Mode' : 'Monthly Summary'}</p>
+                            <p className="text-xxs text-slate-400 font-bold uppercase tracking-widest">{isAllocating ? 'Allocation Mode' : 'Monthly Summary'}</p>
                         </div>
                     </div>
                     <button onClick={onClose} className="p-2.5 bg-slate-50 dark:bg-slate-800 rounded-full text-slate-500 hover:rotate-90 transition-transform">
@@ -114,11 +115,11 @@ const BudgetSummary = ({ isOpen, onClose }) => {
                                                         {cat.name[0]}
                                                     </div>
                                                     <div>
-                                                        <p className="font-black text-slate-900 dark:text-white text-[15px]">{cat.name}</p>
-                                                        <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-0.5">Limit: {formatCurrency(stats.budget, true)}</p>
+                                                        <p className="font-black text-slate-900 dark:text-white text-base-minus">{cat.name}</p>
+                                                        <p className="text-xxs text-slate-400 font-black uppercase tracking-widest mt-0.5">Limit: {formatCurrency(stats.budget, true)}</p>
                                                     </div>
                                                 </div>
-                                                <div className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tighter ${isDanger ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600' : isWarning ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-600' : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600'}`}>
+                                                <div className={`px-3 py-1.5 rounded-xl text-xxs font-black uppercase tracking-tighter ${isDanger ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600' : isWarning ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-600' : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600'}`}>
                                                     {stats.percent}%
                                                 </div>
                                             </div>
@@ -130,7 +131,7 @@ const BudgetSummary = ({ isOpen, onClose }) => {
                                                 ></div>
                                             </div>
 
-                                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
+                                            <div className="flex justify-between items-center text-xxs font-black uppercase tracking-widest">
                                                 <span className="text-slate-400">Spent {formatCurrency(stats.spent, true)}</span>
                                                 <span className={isDanger ? 'text-rose-500' : 'text-emerald-500'}>
                                                     {stats.remaining >= 0 ? `Left ${formatCurrency(stats.remaining, true)}` : `Over ${formatCurrency(Math.abs(stats.remaining), true)}`}
@@ -141,11 +142,13 @@ const BudgetSummary = ({ isOpen, onClose }) => {
                                 })}
 
                                 {expenseCategories.filter(c => Number(c.budget) > 0).length === 0 && (
-                                    <div className="text-center py-20 bg-slate-50 dark:bg-slate-800/20 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800">
-                                        <PieChart className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                                        <p className="text-slate-400 text-sm font-bold">No active budgets found.</p>
-                                        <button onClick={handleStartAllocation} className="mt-4 text-indigo-500 font-black uppercase text-[10px] tracking-widest">+ Start Allocating</button>
-                                    </div>
+                                    <EmptyState 
+                                        icon={PieChart}
+                                        title="No active budgets found"
+                                        actionLabel="+ Start Allocating"
+                                        onAction={handleStartAllocation}
+                                        className="py-16"
+                                    />
                                 )}
                             </motion.div>
                         ) : (
@@ -157,13 +160,13 @@ const BudgetSummary = ({ isOpen, onClose }) => {
                                 {expenseCategories.map(cat => (
                                     <div key={cat.id} className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl flex items-center justify-between border border-white/5 group hover:border-indigo-500/30 transition-all">
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black ${cat.color} text-white`}>
+                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xxs font-black ${cat.color} text-white`}>
                                                 {cat.name[0]}
                                             </div>
                                             <span className="font-black text-slate-700 dark:text-slate-200 text-xs uppercase tracking-tight">{cat.name}</span>
                                         </div>
                                         <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-2 rounded-xl border border-white/5 shadow-sm shrink-0">
-                                            <span className="text-slate-300 font-black text-[10px]">₹</span>
+                                            <span className="text-slate-300 font-black text-xxs">₹</span>
                                             <input 
                                                 type="number"
                                                 value={editingBudgets[cat.id]}
@@ -189,14 +192,14 @@ const BudgetSummary = ({ isOpen, onClose }) => {
                                             autoFocus
                                         />
                                         <div className="flex gap-2">
-                                            <button onClick={() => setIsAddingCategory(false)} className="px-4 py-2 bg-white dark:bg-slate-800 text-slate-400 font-bold text-[10px] uppercase rounded-lg">Cancel</button>
-                                            <button onClick={handleAddCategory} className="flex-1 py-2 bg-indigo-600 text-white font-black text-[10px] uppercase rounded-lg">Confirm Label</button>
+                                            <button onClick={() => setIsAddingCategory(false)} className="px-4 py-2 bg-white dark:bg-slate-800 text-slate-400 font-bold text-xxs uppercase rounded-lg">Cancel</button>
+                                            <button onClick={handleAddCategory} className="flex-1 py-2 bg-indigo-600 text-white font-black text-xxs uppercase rounded-lg">Confirm Label</button>
                                         </div>
                                     </motion.div>
                                 ) : (
                                     <button 
                                         onClick={() => setIsAddingCategory(true)}
-                                        className="w-full py-4 border-2 border-dashed border-slate-100 dark:border-slate-800 text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:border-indigo-500/30 hover:text-indigo-500 transition-all"
+                                        className="w-full py-4 border-2 border-dashed border-slate-100 dark:border-slate-800 text-slate-400 font-black text-xxs uppercase tracking-widest rounded-2xl hover:border-indigo-500/30 hover:text-indigo-500 transition-all"
                                     >
                                         + New Spend Label
                                     </button>
@@ -211,7 +214,7 @@ const BudgetSummary = ({ isOpen, onClose }) => {
                     {!isAllocating ? (
                         <button 
                             onClick={handleStartAllocation}
-                            className="w-full py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black uppercase text-[10px] tracking-[0.2em] rounded-2xl shadow-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2 mb-3"
+                            className="w-full py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black uppercase text-xxs tracking-[0.2em] rounded-2xl shadow-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2 mb-3"
                         >
                             <Settings2 className="w-4 h-4" />
                             Edit Budget Limits
@@ -220,14 +223,14 @@ const BudgetSummary = ({ isOpen, onClose }) => {
                         <div className="grid grid-cols-2 gap-3 mb-3">
                             <button 
                                 onClick={() => setIsAllocating(false)}
-                                className="py-5 bg-slate-100 dark:bg-slate-800 text-slate-500 font-black uppercase text-[10px] tracking-[0.1em] rounded-2xl active:scale-[0.98] transition-all"
+                                className="py-5 bg-slate-100 dark:bg-slate-800 text-slate-500 font-black uppercase text-xxs tracking-[0.1em] rounded-2xl active:scale-[0.98] transition-all"
                             >Discard</button>
                             <button 
                                 onClick={async () => {
                                     await handleSaveBudgets();
                                     onClose();
                                 }}
-                                className="py-5 bg-indigo-600 text-white font-black uppercase text-[10px] tracking-[0.1em] rounded-2xl shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                                className="py-5 bg-indigo-600 text-white font-black uppercase text-xxs tracking-[0.1em] rounded-2xl shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                             >
                                 <CheckCircle2 className="w-4 h-4" />
                                 Commit

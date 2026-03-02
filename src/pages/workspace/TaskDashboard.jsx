@@ -15,6 +15,7 @@ import { SelectionBar } from '../../components/ui/SelectionBar';
 import { useSelection } from '../../hooks/useSelection';
 import PageLayout from '../../components/layout/PageLayout';
 import ActionButton from '../../components/atoms/ActionButton';
+import EmptyState from '../../components/ui/EmptyState';
 
 const TaskDashboard = () => {
     const { t: translate } = useTranslation(); 
@@ -238,7 +239,7 @@ const TaskDashboard = () => {
                                         className="flex flex-col items-center justify-center p-1 sm:p-2 text-indigo-600 dark:text-sky-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl group"
                                     >
                                         <Plus className="w-7 h-7 sm:w-8 sm:h-8 stroke-[2.5]" />
-                                        <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider mt-0.5 group-hover:text-indigo-700">Add Task</span>
+                                        <span className="text-xxs sm:text-xs-plus font-bold uppercase tracking-wider mt-0.5 group-hover:text-indigo-700">Add Task</span>
                                     </ActionButton>
                                 )}
                                 
@@ -262,7 +263,7 @@ const TaskDashboard = () => {
                                             : "opacity-0 scale-[0.96] -translate-y-1.5 pointer-events-none"
                                         )}
                                     >
-                                        <div className="font-mono text-[11px] text-slate-400 dark:text-white/20 tracking-[0.1em] uppercase px-3.5 pt-2 pb-1.5 flex items-center h-4">Actions</div>
+                                        <div className="font-mono text-xs-plus text-slate-400 dark:text-white/20 tracking-[0.1em] uppercase px-3.5 pt-2 pb-1.5 flex items-center h-4">Actions</div>
                                         <ActionButton
                                             variant="ghost"
                                             onClick={() => {
@@ -270,23 +271,23 @@ const TaskDashboard = () => {
                                                 const nextMode = modes[(modes.indexOf(sortMode) + 1) % modes.length];
                                                 handleSortChange(nextMode);
                                             }}
-                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white text-left w-full text-[15px] font-semibold"
+                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white text-left w-full text-base-minus font-semibold"
                                         >
                                             <div className="w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 bg-indigo-500/10 dark:bg-indigo-400/10">
                                                 <ArrowUpDown className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
                                             </div>
                                             <div className="flex-1 flex justify-between items-center pr-1">
                                                 <span>Sort</span>
-                                                <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">{sortMode}</span>
+                                                <span className="text-xxs font-bold text-indigo-500 uppercase tracking-wider">{sortMode}</span>
                                             </div>
                                         </ActionButton>
                                         <div className="h-px bg-slate-100 dark:bg-white/[0.06] mx-2 my-1" />
                                         
-                                        <div className="font-mono text-[11px] text-slate-400 dark:text-white/20 tracking-[0.1em] uppercase px-3.5 pt-2 pb-1.5 flex items-center h-4">View</div>
+                                        <div className="font-mono text-xs-plus text-slate-400 dark:text-white/20 tracking-[0.1em] uppercase px-3.5 pt-2 pb-1.5 flex items-center h-4">View</div>
                                         <ActionButton
                                             variant="ghost"
                                             onClick={() => { navigate('/workspace/filter/all'); setMenuOpen(false); }}
-                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white text-left w-full text-[15px] font-semibold"
+                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white text-left w-full text-base-minus font-semibold"
                                         >
                                             <div className="w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 bg-sky-500/10 dark:bg-sky-400/10">
                                                 <ListTodo className="w-4 h-4 text-sky-500 dark:text-sky-400" />
@@ -296,7 +297,7 @@ const TaskDashboard = () => {
                                         <ActionButton
                                             variant="ghost"
                                             onClick={() => { navigate('/workspace/calendar'); setMenuOpen(false); }}
-                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white text-left w-full text-[15px] font-semibold"
+                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white text-left w-full text-base-minus font-semibold"
                                         >
                                             <div className="w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 bg-blue-500/10 dark:bg-blue-400/10">
                                                 <CalendarIcon className="w-4 h-4 text-blue-500 dark:text-blue-400" />
@@ -306,7 +307,7 @@ const TaskDashboard = () => {
                                         <ActionButton
                                             variant="ghost"
                                             onClick={() => { navigate('/workspace/overview'); setMenuOpen(false); }}
-                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white text-left w-full text-[15px] font-semibold"
+                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white text-left w-full text-base-minus font-semibold"
                                         >
                                             <div className="w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 bg-purple-500/10 dark:bg-purple-400/10">
                                                 <Layout className="w-4 h-4 text-purple-500 dark:text-purple-400" />
@@ -316,7 +317,7 @@ const TaskDashboard = () => {
                                         <ActionButton
                                             variant="ghost"
                                             onClick={() => { navigate('/workspace/filter/recent'); setMenuOpen(false); }}
-                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white text-left w-full text-[15px] font-semibold"
+                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white text-left w-full text-base-minus font-semibold"
                                         >
                                             <div className="w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 bg-emerald-500/10 dark:bg-emerald-400/10">
                                                 <Clock className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
@@ -326,11 +327,11 @@ const TaskDashboard = () => {
                                         
                                         <div className="h-px bg-slate-100 dark:bg-white/[0.06] mx-2 my-1" />
                                         
-                                        <div className="font-mono text-[11px] text-slate-400 dark:text-white/20 tracking-[0.1em] uppercase px-3.5 pt-2 pb-1.5 flex items-center h-4">Options</div>
+                                        <div className="font-mono text-xs-plus text-slate-400 dark:text-white/20 tracking-[0.1em] uppercase px-3.5 pt-2 pb-1.5 flex items-center h-4">Options</div>
                                         <ActionButton
                                             variant="ghost"
                                             onClick={() => { setIsSettingsOpen(true); setMenuOpen(false); }}
-                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white text-left w-full text-[15px] font-semibold"
+                                            className="flex items-center gap-3 px-3.5 py-3 rounded-[12px] hover:bg-slate-50 dark:hover:bg-white/[0.06] text-slate-600 dark:text-white/60 hover:text-indigo-600 dark:hover:text-white text-left w-full text-base-minus font-semibold"
                                         >
                                             <div className="w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 bg-slate-500/10 dark:bg-slate-400/10">
                                                 <Settings className="w-4 h-4 text-slate-500 dark:text-slate-400" />
@@ -365,15 +366,12 @@ const TaskDashboard = () => {
                             onLongPress={handleLongPress}
                         />
                     ) : (
-                        <div className="text-center py-12 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
-                            <CalendarIcon className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                                No tasks scheduled for {isToday ? 'today' : 'this day'}.
-                            </p>
-                            <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
-                                Add tasks only if they support your routine.
-                            </p>
-                        </div>
+                        <EmptyState 
+                            icon={CalendarIcon}
+                            title={`No tasks scheduled for ${isToday ? 'today' : 'this day'}.`}
+                            subtitle="Add tasks only if they support your routine."
+                            className="py-12 bg-transparent dark:bg-transparent"
+                        />
                     )}
                 </section>
 
@@ -409,7 +407,7 @@ const TaskDashboard = () => {
                                             pendingTasks.forEach(task => handleReschedule(task.id, 'today'));
                                         }}
                                         label="Move all to Today"
-                                        className="w-full mt-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-[13px] font-medium text-slate-500 hover:text-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                                        className="w-full mt-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-sm-minus font-medium text-slate-500 hover:text-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-800/50"
                                     />
                         </div>
                     </section>

@@ -53,11 +53,11 @@ const PageLayout = ({
 
             {/* 2. Content Area: handles top spacing for fixed header */}
             <main 
-                className={clsx("flex-1 w-full relative [&>*:first-child]:mt-0", contentPadClass)}
+                className={clsx("flex-1 w-full relative", contentPadClass)}
                 style={{
                     paddingTop: hasHeader 
-                        ? 'calc(60px + env(safe-area-inset-top, 0px) + 16px)' // 60px header + 16px content gap
-                        : 'calc(0px + env(safe-area-inset-top, 0px) + 16px)'  // No header, but still gap
+                        ? 'calc(60px + env(safe-area-inset-top, 0px))' // 60px header
+                        : 'calc(env(safe-area-inset-top, 0px))'  // No header
                 }}
             >
                 {children}
