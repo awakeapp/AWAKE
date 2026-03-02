@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFinance } from '../../context/FinanceContext';
-import { User, Plus, MoreVertical, Search, CheckCircle, UserPlus, Phone, X, Trash2, Check, Archive } from 'lucide-react';
+import { User, Plus, MoreVertical, Search, CheckCircle, UserPlus, Phone, X, Trash2, Check, Archive, Edit2 } from 'lucide-react';
 import ActionButton from '../../components/atoms/ActionButton';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -61,6 +61,36 @@ const DebtManager = () => {
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
     const [isBulkDeleting, setIsBulkDeleting] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+
+    // Edit Party State
+    const [editParty, setEditParty] = useState(null);
+    const [editName, setEditName] = useState('');
+    const [editPhone, setEditPhone] = useState('');
+    const [editTag, setEditTag] = useState('');
+    useScrollLock(!!editParty);
+
+    const openEditParty = (party) => {
+        setEditParty(party);
+        setEditName(party.name || '');
+        setEditPhone(party.phone || '');
+        setEditTag(party.tag || '');
+    };
+
+    const handleEditSubmit = async (e) => {
+        e.preventDefault();
+        if (!editName.trim()) return;
+        try {
+            await context.updateDebtParty(editParty.id, {
+                name: editName.trim(),
+                phone: editPhone.trim(),
+                tag: editTag.trim(),
+            });
+            showToast('Party updated', 'success');
+            setEditParty(null);
+        } catch (err) {
+            showToast('Failed to update', 'error');
+        }
+    };
 
     const contactPickerSupported = typeof navigator !== 'undefined' && 'contacts' in navigator && 'ContactsManager' in window;
 
@@ -336,6 +366,40 @@ const DebtManager = () => {
                             </div>
                         )}
                     </AnimatePresence>
+
+                    {/* Edit Party Modal */}
+                    <AnimatePresence>
+                        {editParty && (
+                            <div className="fixed inset-0 z-50 flex items-end justify-center p-4 pb-24 sm:p-6 sm:items-center">
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setEditParty(null)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+                                <motion.form
+                                    initial={{ y: '100%', opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: '100%', opacity: 0 }} transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                                    onSubmit={handleEditSubmit}
+                                    className="bg-white dark:bg-[#0f172a] w-full max-w-lg rounded-[2.5rem] p-7 shadow-2xl border border-slate-100 dark:border-slate-800 relative z-10"
+                                >
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800/50 pb-5 mb-6 leading-tight">Edit Party</h3>
+                                    <div className="space-y-5">
+                                        <div>
+                                            <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2 block">Name</label>
+                                            <input type="text" value={editName} onChange={e => setEditName(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm" autoFocus />
+                                        </div>
+                                        <div>
+                                            <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2 block">Phone (Opt)</label>
+                                            <input type="tel" value={editPhone} onChange={e => setEditPhone(e.target.value)} placeholder="9876543210" className="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2 block">Tag (Opt)</label>
+                                            <input type="text" value={editTag} onChange={e => setEditTag(e.target.value)} placeholder="Vendor, Friend" className="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm" />
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-3 mt-8">
+                                        <ActionButton variant="back" onClick={() => setEditParty(null)} label="Cancel" iconOnly={false} className="flex-1 py-4 font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl" />
+                                        <ActionButton variant="primary" type="submit" label="Save" iconOnly={false} className="flex-[2] py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl shadow-lg shadow-indigo-500/30" />
+                                    </div>
+                                </motion.form>
+                            </div>
+                        )}
+                    </AnimatePresence>
                 </>
             }
             title={isSelectionMode ? undefined : "Debts & Lending"}
@@ -427,10 +491,10 @@ const DebtManager = () => {
                                         key={party.id} 
                                         initial={{ opacity: 0, y: 10 }} 
                                         animate={{ opacity: 1, y: 0 }} 
-                                        onClick={() => isSelectionMode && toggleSelection(party.id)}
+                                        onClick={() => isSelectionMode ? toggleSelection(party.id) : navigate(`/finance/debts/${party.id}`)}
                                         onContextMenu={(e) => { e.preventDefault(); enterSelectionMode(party.id); }}
                                         className={clsx(
-                                            "bg-white dark:bg-slate-900 p-5 rounded-3xl shadow-sm border transition-all flex flex-col gap-4 relative overflow-hidden group cursor-pointer",
+                                            "bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border transition-all flex flex-col gap-2 relative overflow-hidden group cursor-pointer active:scale-[0.98]",
                                             selectedIds.includes(party.id) ? "border-indigo-500 ring-2 ring-indigo-500/20" : "border-slate-100 dark:border-slate-800"
                                         )}
                                     >
@@ -471,7 +535,7 @@ const DebtManager = () => {
                                             <div className="text-right shrink-0 flex flex-col items-end gap-2">
                                                 {!isSelectionMode && (
                                                     <ItemMenu 
-                                                        onEdit={() => navigate(`/finance/debts/${party.id}`)}
+                                                        onEdit={() => { openEditParty(party); }}
                                                         onDelete={() => setDeleteConfirmId(party.id)}
                                                     />
                                                 )}
@@ -490,20 +554,13 @@ const DebtManager = () => {
                                             </div>
                                         </div>
 
-                                        <div className="flex gap-2.5 mt-1 pt-4 border-t border-slate-50 dark:border-slate-800/50">
-                                            <ActionButton 
-                                                variant="ghost"
-                                                onClick={(e) => { e.stopPropagation(); navigate(`/finance/debts/${party.id}`); }}
-                                                label="View"
-                                                iconOnly={false}
-                                                className="flex-1 py-2.5 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold uppercase tracking-wider rounded-xl"
-                                            />
+                                        <div className="flex gap-2 mt-1 pt-3 border-t border-slate-100/80 dark:border-slate-800/50">
                                             <ActionButton 
                                                 variant="primary"
                                                 onClick={(e) => { e.stopPropagation(); navigate(`/finance/debts/${party.id}`, { state: { openAdd: true }}); }}
-                                                label="Add Entry"
+                                                label="+ Add Entry"
                                                 iconOnly={false}
-                                                className="flex-1 py-2.5 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider rounded-xl"
+                                                className="flex-1 py-2 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold rounded-xl"
                                             />
                                         </div>
                                     </motion.div>
