@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePrayer } from '../../context/PrayerContext';
+import { useClock } from '../../context/ClockContext';
 import { Bell, BellOff, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
@@ -35,13 +36,14 @@ const NotificationSettings = () => {
         setPrefs(prev => ({ ...prev, [key]: !prev[key] }));
     };
 
+    const { now } = useClock();
+
     useEffect(() => {
         if (import.meta.env.VITE_RAMADAN_MODE !== 'true') return;
         if (!hijriDate?.isRamadan) return;
         if (permission !== 'granted') return;
 
         const checkReminders = () => {
-            const now = new Date();
             if (!dailyTimings) return;
 
             const parseTime = (timeStr) => {
@@ -60,21 +62,22 @@ const NotificationSettings = () => {
             const formatTimeMatch = (dateObj) => dateObj.getHours() + ':' + dateObj.getMinutes();
             const currentMatch = formatTimeMatch(now);
 
-            if (prefs.suhoor && currentMatch === formatTimeMatch(suhoorReminderTime)) {
-                sendNotification("Suhoor Reminder", "It's time for Suhoor. Fajr is in 30 minutes!");
-            }
-            if (prefs.iftar && currentMatch === formatTimeMatch(maghribTime)) {
-                sendNotification("Iftar Time", "It's time to break your fast! May Allah accept it.");
-            }
-            if (prefs.tahajjud && currentMatch === formatTimeMatch(tahajjudReminderTime)) {
-                sendNotification("Tahajjud Reminder", "Rise for Tahajjud. The best prayer after the obligatory ones.");
+            // only check at the 00 second mark to avoid blasting 60 notifications
+            if (now.getSeconds() === 0) {
+                if (prefs.suhoor && currentMatch === formatTimeMatch(suhoorReminderTime)) {
+                    sendNotification("Suhoor Reminder", "It's time for Suhoor. Fajr is in 30 minutes!");
+                }
+                if (prefs.iftar && currentMatch === formatTimeMatch(maghribTime)) {
+                    sendNotification("Iftar Time", "It's time to break your fast! May Allah accept it.");
+                }
+                if (prefs.tahajjud && currentMatch === formatTimeMatch(tahajjudReminderTime)) {
+                    sendNotification("Tahajjud Reminder", "Rise for Tahajjud. The best prayer after the obligatory ones.");
+                }
             }
         };
 
-        const intervalId = setInterval(checkReminders, 60000);
         checkReminders();
-        return () => clearInterval(intervalId);
-    }, [prefs, dailyTimings, hijriDate, permission]);
+    }, [prefs, dailyTimings, hijriDate, permission, now]);
 
     const sendNotification = (title, body) => {
         const lastNotif = sessionStorage.getItem(`notified_${title}`);
