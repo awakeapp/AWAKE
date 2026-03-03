@@ -248,16 +248,51 @@ const PartyDetail = () => {
                 baseUrl += import.meta.env.BASE_URL.replace(/\/$/, '');
             }
             const payUrl = new URL(baseUrl + '/');
-            payUrl.searchParams.set('pay', 'true');
-            payUrl.searchParams.set('upi', financeConfig.upiId);
-            payUrl.searchParams.set('am', totalSelectedPending.toString());
-            payUrl.searchParams.set('pn', user?.name || 'Payment');
-            message += `\n\n💳 Pay instantly via UPI:\n${payUrl.toString()}`;
+            payUrl.searchParams.set('v', 'u');
+            payUrl.searchParams.set('pa', financeConfig.upiId);
+            payUrl.searchParams.set('pn', financeConfig.businessName || user?.displayName || 'Merchant');
+            payUrl.searchParams.set('am', String(totalSelectedPending));
+            payUrl.searchParams.set('cu', 'INR');
+            payUrl.searchParams.set('tn', `Payment for ${party.name}`);
+            
+            const fullUrl = payUrl.toString();
+            message += `\n\nPay here: ${fullUrl}`;
         }
-        
         return message;
-    }, [party.name, totalSelectedPending, selectedPendingEntries, reminderMethod, balance, financeConfig, user]);
+    }, [totalSelectedPending, reminderMethod, balance, party.name, financeConfig, user?.displayName, selectedPendingEntries]);
 
+    // --- Edit Party states ---
+    const [isEditPartyOpen, setIsEditPartyOpen] = useState(false);
+    const [editPartyName, setEditPartyName] = useState('');
+    const [editPartyPhone, setEditPartyPhone] = useState('');
+    const [editPartyTag, setEditPartyTag] = useState('');
+    const [isSavingParty, setIsSavingParty] = useState(false);
+
+    const openEditParty = () => {
+        setEditPartyName(party.name);
+        setEditPartyPhone(party.phone_number || '');
+        setEditPartyTag(party.tag || '');
+        setIsEditPartyOpen(true);
+    };
+
+    const handleUpdateParty = async (e) => {
+        if (e) e.preventDefault();
+        if (!editPartyName.trim()) return;
+        setIsSavingParty(true);
+        try {
+            await updateDebtParty(partyId, {
+                name: editPartyName.trim(),
+                phone_number: editPartyPhone.trim(),
+                tag: editPartyTag.trim()
+            });
+            showToast('Party updated', 'success');
+            setIsEditPartyOpen(false);
+        } catch (err) {
+            showToast('Failed to update party', 'error');
+        } finally {
+            setIsSavingParty(false);
+        }
+    };
     const openReminderModal = () => {
         setIsReminderOpen(true);
     };
@@ -727,8 +762,15 @@ const PartyDetail = () => {
                         <div className="flex flex-col items-center flex-1 px-4 min-w-0">
                             <h1 className="text-xl font-black text-slate-900 dark:text-white truncate w-full text-center tracking-tight leading-tight capitalize">{party.name}</h1>
                         </div>
-                        <div className={`px-3 py-1.5 rounded-xl font-black uppercase tracking-widest text-micro shadow-sm shrink-0 ${statusBadge.cls}`}>
-                            {statusBadge.label}
+                        <div className="flex items-center gap-2 pr-1">
+                            <div className={`px-2.5 py-1 rounded-lg font-black uppercase tracking-widest text-micro shadow-sm shrink-0 h-fit ${statusBadge.cls}`}>
+                                {statusBadge.label}
+                            </div>
+                            <ItemMenu 
+                                onEdit={openEditParty}
+                                onDelete={() => setDeleteConfirmId('party')}
+                                iconClassName="p-1.5"
+                            />
                         </div>
                     </div>
                 </div>
@@ -744,16 +786,58 @@ const PartyDetail = () => {
                                     await softDeleteDebtTransaction(id);
                                 }
                                 exitSelectionMode();
+                            } else if (deleteConfirmId === 'party') {
+                                try {
+                                    await updateDebtParty(partyId, { is_deleted: true });
+                                    showToast('Party deleted', 'success');
+                                    navigate('/finance/debts');
+                                } catch (err) {
+                                    showToast('Failed to delete', 'error');
+                                }
                             } else {
                                 await softDeleteDebtTransaction(deleteConfirmId);
                             }
                             setDeleteConfirmId(null);
-                            showToast('Entries removed', 'success');
                         }}
-                        isFinancial={true}
-                        title={deleteConfirmId === 'bulk' ? `Delete ${selectedCount} Entries?` : "Delete Entry?"}
-                        message="Are you sure you want to remove this ledger entry? This will impact the party balance."
+                        title={deleteConfirmId === 'bulk' ? `Delete ${selectedCount} Entries?` : deleteConfirmId === 'party' ? "Delete Party?" : "Delete Transaction?"}
+                        message={deleteConfirmId === 'bulk' ? "Are you sure you want to delete these entries? This action cannot be undone." : deleteConfirmId === 'party' ? "Are you sure you want to delete this party? All transaction history for this party will be hidden." : "Are you sure you want to delete this transaction?"}
                     />
+
+                    {/* Edit Party Modal */}
+                    <AnimatePresence>
+                        {isEditPartyOpen && (
+                            <div className="fixed inset-0 z-[100] flex items-end justify-center p-4 pb-24 sm:p-6 sm:items-center">
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsEditPartyOpen(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+                                <motion.form
+                                    initial={{ y: '100%', opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: '100%', opacity: 0 }} transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                                    onSubmit={handleUpdateParty}
+                                    className="bg-white dark:bg-[#0f172a] w-full max-w-lg rounded-[2.5rem] p-7 shadow-2xl border border-slate-100 dark:border-slate-800 relative z-10"
+                                >
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800/50 pb-5 mb-6 leading-tight">Edit Party Profile</h3>
+                                    <div className="space-y-5">
+                                        <div>
+                                            <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2 block">Party Name</label>
+                                            <input type="text" value={editPartyName} onChange={e => setEditPartyName(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm" autoFocus required />
+                                        </div>
+                                        <div>
+                                            <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2 block">Phone Number (Optional)</label>
+                                            <input type="tel" value={editPartyPhone} onChange={e => setEditPartyPhone(e.target.value)} placeholder="9876543210" className="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xxs font-black text-slate-400 uppercase tracking-widest mb-2 block">Tag / Category (Optional)</label>
+                                            <input type="text" value={editPartyTag} onChange={e => setEditPartyTag(e.target.value)} placeholder="e.g. Supplier, Customer" className="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3.5 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm" />
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-3 mt-8">
+                                        <button type="button" onClick={() => setIsEditPartyOpen(false)} className="flex-1 py-4 font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors">Cancel</button>
+                                        <button type="submit" disabled={isSavingParty || !editPartyName.trim()} className="flex-[2] py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl shadow-lg shadow-indigo-500/30 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
+                                            {isSavingParty ? 'Saving...' : 'Save Changes'}
+                                        </button>
+                                    </div>
+                                </motion.form>
+                            </div>
+                        )}
+                    </AnimatePresence>
                     <DeleteConfirmationModal 
                         isOpen={showSubmitConfirm}
                         onClose={() => setShowSubmitConfirm(false)}
@@ -1088,25 +1172,25 @@ const PartyDetail = () => {
 
                             {/* Configurable Section */}
                             <div className="flex-1 overflow-y-auto px-7 pb-4 space-y-4 scrollbar-hide">
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div className="space-y-1.5">
-                                        <label className="text-micro font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Date</label>
-                                        <button type="button" onClick={() => setDatePickerOpen(true)} className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-left flex items-center gap-2.5 text-sm-minus transition-all hover:border-indigo-400/50">
-                                            <Calendar className="w-4 h-4 text-indigo-400 shrink-0" />{format(new Date(date + 'T00:00:00'), 'MMM d, yyyy')}
-                                        </button>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="space-y-1.5">
+                                            <label className="text-micro font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Date</label>
+                                            <button type="button" onClick={() => setDatePickerOpen(true)} className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-black text-left flex items-center gap-2.5 text-sm transition-all hover:border-indigo-400/50">
+                                                <Calendar className="w-4 h-4 text-indigo-400 shrink-0" />{format(new Date(date + 'T00:00:00'), 'MMM d, yyyy')}
+                                            </button>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-micro font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Due Date</label>
+                                            <button type="button" onClick={() => setDueDatePickerOpen(true)} className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-black text-left flex items-center gap-2.5 text-sm transition-all hover:border-indigo-400/50">
+                                                <Clock className="w-4 h-4 text-indigo-400 shrink-0" />{dueDate ? format(new Date(dueDate + 'T00:00:00'), 'MMM d, yyyy') : 'No Date'}
+                                            </button>
+                                        </div>
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-micro font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Due Date</label>
-                                        <button type="button" onClick={() => setDueDatePickerOpen(true)} className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-left flex items-center gap-2.5 text-sm-minus transition-all hover:border-indigo-400/50">
-                                            <Clock className="w-4 h-4 text-indigo-400 shrink-0" />{dueDate ? format(new Date(dueDate + 'T00:00:00'), 'MMM d, yyyy') : 'No Date'}
-                                        </button>
+                                        <label className="text-micro font-black text-slate-400 uppercase tracking-[0.15em] ml-1">What is this for?</label>
+                                        <input type="text" value={note} onChange={e => setNote(e.target.value)} placeholder="Enter description..." required
+                                            className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-black text-base outline-none focus:border-indigo-400/50 transition-all placeholder:text-slate-400" />
                                     </div>
-                                </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-micro font-black text-slate-400 uppercase tracking-[0.15em] ml-1">What is this for?</label>
-                                    <input type="text" value={note} onChange={e => setNote(e.target.value)} placeholder="Enter description..." required
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-900 dark:text-white font-bold text-sm-minus outline-none focus:border-indigo-400/50 transition-all placeholder:text-slate-400" />
-                                </div>
 
                                 {/* Receipt Attachment */}
                                 <div className="space-y-2">

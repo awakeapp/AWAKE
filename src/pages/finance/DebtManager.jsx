@@ -497,7 +497,7 @@ const DebtManager = () => {
                                         onClick={() => isSelectionMode ? toggleSelection(party.id) : navigate(`/finance/debts/${party.id}`)}
                                         onContextMenu={(e) => { e.preventDefault(); enterSelectionMode(party.id); }}
                                         className={clsx(
-                                            "bg-white dark:bg-slate-900 px-4 py-3 rounded-2xl border transition-all flex items-center gap-3 cursor-pointer active:scale-[0.99] active:bg-slate-50 dark:active:bg-slate-800/80",
+                                            "bg-white dark:bg-slate-900 px-4 py-2.5 rounded-2xl border transition-all flex items-center gap-3 cursor-pointer active:scale-[0.99] active:bg-slate-50 dark:active:bg-slate-800/80",
                                             selectedIds.includes(party.id) ? "border-indigo-500 ring-2 ring-indigo-500/20" : "border-slate-100 dark:border-slate-800"
                                         )}
                                     >

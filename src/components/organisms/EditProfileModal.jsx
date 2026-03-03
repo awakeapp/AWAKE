@@ -175,7 +175,10 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                         </button>
                     </div>
 
-                    <div className="p-8 space-y-8 overflow-y-auto no-scrollbar">
+                    <form 
+                        onSubmit={(e) => { e.preventDefault(); handleSaveWithCrop(); }}
+                        className="p-8 space-y-8 overflow-y-auto no-scrollbar"
+                    >
                         
                         {/* Avatar Section */}
                         {uploadSrc ? (
@@ -272,7 +275,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
 
                         <div className="pt-4 shrink-0">
                             <button
-                                onClick={handleSaveWithCrop}
+                                type="submit"
                                 disabled={isSaving || (uploadSrc && !completedCrop)}
                                 className="w-full h-14 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-indigo-600/20 disabled:opacity-50 flex items-center justify-center gap-2"
                             >
@@ -280,7 +283,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                                 {isSaving ? 'Saving...' : 'Save Profile'}
                             </button>
                         </div>
-                    </div>
+                    </form>
                 </motion.div>
             </div>
         </AnimatePresence>,

@@ -222,6 +222,7 @@ const AddTaskModal = ({ isOpen, onClose, onAdd, initialDate }) => {
  </Pressable>
  <Pressable
  type="submit"
+ as="button"
  disabled={!title.trim() || isSubmitting}
  scaleDown={0.96}
  className="px-6 py-2.5 rounded-[12px] text-base-minus font-semibold text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:opacity-50 disabled:bg-slate-200 dark:disabled:bg-slate-800 dark:disabled:text-slate-500 transition-colors flex items-center"

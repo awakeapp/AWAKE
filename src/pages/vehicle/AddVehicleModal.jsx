@@ -176,6 +176,7 @@ const AddVehicleModal = ({ isOpen, onClose, onSave, editVehicle = null }) => {
 
                     <ActionButton
                         variant="save"
+                        type="submit"
                         fullWidth
                         onClick={handleSubmit}
                         label={editVehicle ? 'Update Vehicle' : 'Add Vehicle'}

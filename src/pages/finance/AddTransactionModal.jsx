@@ -141,10 +141,11 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                         className="absolute inset-0 bg-slate-950/40 backdrop-blur-md pointer-events-auto"
                     />
 
-                    <motion.div
+                    <motion.form
                         initial={{ y: '100%' }} 
                         animate={{ y: 0 }} 
                         exit={{ y: '100%' }}
+                        onSubmit={handleSubmit}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                         className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl pointer-events-auto relative max-h-[92vh] flex flex-col overflow-hidden border border-white/20 dark:border-slate-800"
                     >
@@ -168,6 +169,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                                 </div>
                                 <ActionButton 
                                     variant="exit" 
+                                    type="button"
                                     onClick={onClose} 
                                     size="sm"
                                 />
@@ -214,7 +216,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                                             <select
                                                 value={categoryId}
                                                 onChange={e => setCategoryId(e.target.value)}
-                                                className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-indigo-500/30 rounded-2xl p-4 text-xs font-bold text-slate-900 dark:text-white appearance-none transition-all cursor-pointer"
+                                                className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-indigo-500/30 rounded-2xl p-4 text-sm font-bold text-slate-900 dark:text-white appearance-none transition-all cursor-pointer"
                                             >
                                                 <option value="" disabled>Select Goal</option>
                                                 {currentCategories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -233,7 +235,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                                     <select
                                         value={accountId}
                                         onChange={e => setAccountId(e.target.value)}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-indigo-500/30 rounded-2xl p-4 text-xs font-bold text-slate-900 dark:text-white appearance-none transition-all cursor-pointer"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-indigo-500/30 rounded-2xl p-4 text-sm font-bold text-slate-900 dark:text-white appearance-none transition-all cursor-pointer"
                                     >
                                         <option value="" disabled>Select Wallet</option>
                                         {activeAccounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
@@ -246,7 +248,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                                         <select
                                             value={toAccountId}
                                             onChange={e => setToAccountId(e.target.value)}
-                                            className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-indigo-500/30 rounded-2xl p-4 text-xs font-bold text-slate-900 dark:text-white appearance-none transition-all cursor-pointer"
+                                            className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-indigo-500/30 rounded-2xl p-4 text-sm font-bold text-slate-900 dark:text-white appearance-none transition-all cursor-pointer"
                                         >
                                             <option value="" disabled>Select Target</option>
                                             {activeAccounts.filter(a => a.id !== accountId).map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
@@ -261,7 +263,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                                     <button
                                         type="button"
                                         onClick={() => setDatePickerOpen(true)}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-indigo-500/30 rounded-2xl p-4 text-xs font-bold text-slate-900 dark:text-white flex items-center justify-between text-left transition-all"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-indigo-500/30 rounded-2xl p-4 text-sm font-bold text-slate-900 dark:text-white flex items-center justify-between text-left transition-all"
                                     >
                                         <span>{format(new Date(date + 'T00:00:00'), 'MMM dd, yyyy')}</span>
                                         <Calendar className="w-4 h-4 text-slate-400" />
@@ -280,7 +282,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                                         value={note}
                                         onChange={e => setNote(e.target.value)}
                                         placeholder="Note..."
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-indigo-500/30 rounded-2xl p-4 text-xs font-bold text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-0 transition-all"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-indigo-500/30 rounded-2xl p-4 text-sm font-bold text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-0 transition-all"
                                     />
                                 </div>
                             </div>
@@ -307,6 +309,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                                 {editTransactionId && (
                                     <ActionButton
                                         variant="delete"
+                                        type="button"
                                         onClick={() => setDeleteConfirmOpen(true)}
                                         className="w-16 h-16"
                                         size="lg"
@@ -315,9 +318,9 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                                 <ActionButton
                                     variant="primary"
                                     fullWidth
-                                    onClick={handleSubmit}
+                                    type="submit"
                                     label={editTransactionId ? 'Commit Changes' : 'Record Transaction'}
-                                    iconOnly={true} // It will use its variant icon or we can give it children
+                                    iconOnly={true}
                                     className="py-5"
                                     size="lg"
                                 >
@@ -327,7 +330,7 @@ const AddTransactionModal = ({ isOpen, onClose, editTransactionId = null, onDele
                                 </ActionButton>
                             </div>
                         </div>
-                    </motion.div>
+                    </motion.form>
                 </div>
             )}
 

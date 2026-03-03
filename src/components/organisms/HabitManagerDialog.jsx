@@ -73,7 +73,11 @@ const HabitManagerDialog = ({ isOpen, onClose, onAdd }) => {
                             </div>
 
                             {/* Scrollable Body */}
-                            <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar">
+                            <form 
+                                onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}
+                                className="p-0 flex flex-col overflow-hidden"
+                            >
+                                <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar min-h-0 flex-1">
                                 {/* 1. Name Input with Icon Preview */}
                                 <div className="space-y-4">
                                     <div className="flex gap-4">
@@ -173,21 +177,23 @@ const HabitManagerDialog = ({ isOpen, onClose, onAdd }) => {
                                             </div>
                                         </motion.div>
                                     )}
-                                </AnimatePresence>
-                            </div>
+                                    </AnimatePresence>
+                                </div>
 
                             {/* Footer - Pinned to bottom */}
-                            <div className="p-6 pt-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 pb-10 sm:pb-6">
-                                <Pressable
-                                    onClick={handleSubmit}
-                                    disabled={!name.trim()}
-                                    scaleDown={0.96}
-                                    block
-                                    className="w-full py-3.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[14px] font-bold text-base shadow-lg transition-all disabled:opacity-50 flex justify-center items-center"
-                                >
-                                    Create Habit
-                                </Pressable>
-                            </div>
+                                <div className="p-6 pt-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 pb-10 sm:pb-6">
+                                    <Pressable
+                                        type="submit"
+                                        as="button"
+                                        disabled={!name.trim()}
+                                        scaleDown={0.96}
+                                        block
+                                        className="w-full py-3.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[14px] font-bold text-base shadow-lg transition-all disabled:opacity-50 flex justify-center items-center"
+                                    >
+                                        Create Habit
+                                    </Pressable>
+                                </div>
+                            </form>
                         </motion.div>
                     </motion.div>
                 </>
